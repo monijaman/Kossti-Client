@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <main>
-      <h2>HEllow  dd</h2>
+      <h2>HEllow   </h2>
     </main>
   );
 }
