@@ -12,25 +12,101 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Server Setup
+## 1. Install nvm using curl:
+First, download and install nvm:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## 2. Load nvm into your shell:
+After installing nvm, you'll need to load it into your current shell session. You can do this by running the following command or by adding it to your .bashrc, .zshrc, or .profile file:
 
-To learn more about Next.js, take a look at the following resources:
+bash
+ 
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+##3.  install node:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+nvm install 20
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+remove rm -rf .next node_modules
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+
+
+# PM2
+1. Install PM2 Globally
+To install PM2 globally using npm:
+
+bash
+Copy code
+npm install -g pm2
+
+2. Verify PM2 Installation
+After installing PM2, verify that it’s installed correctly:
+
+bash
+Copy code
+pm2 --version
+You should see the version number of PM2.
+
+3. Use PM2 to Manage Processes
+Once PM2 is installed, you can use it to start and manage your Node.js applications. For example, to start a Next.js application:
+
+bash
+Copy code
+pm2 start npm --name "next-app" -- start
+This command will run the npm start command under PM2, giving it the name next-app.
+
+4. View Logs with PM2
+To view logs of your PM2-managed applications:
+
+bash
+Copy code
+pm2 logs
+
+5. Manage PM2 Processes
+Here are some useful PM2 commands:
+
+List all processes:
+
+bash
+Copy code
+pm2 list
+Stop a process:
+
+bash
+Copy code
+pm2 stop next-app
+Restart a process:
+
+bash
+Copy code
+pm2 restart next-app
+Delete a process:
+
+bash
+Copy code
+pm2 delete next-app
+6. Save and Auto-start PM2 Configuration
+To ensure your PM2 processes start on system reboot, save the current PM2 process list and configure auto-start:
+
+bash
+Copy code
+pm2 save
+pm2 startup
+This will generate a command to enable the PM2 startup script. Run the command provided to complete the setup.
+
+7. Reinstall Node Modules
+If you continue to encounter issues, make sure your node_modules are up-to-date:
+
+bash
+Copy code
+rm -rf node_modules
+npm install
