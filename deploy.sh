@@ -4,7 +4,7 @@
 set -e
 
 # Path to your project directory
-PROJECT_PATH=/home/username/public_html
+PROJECT_PATH=/home/u439480735/domains/review.monirspace.com/public_html
 
 # Navigate to the project directory
 cd $PROJECT_PATH
