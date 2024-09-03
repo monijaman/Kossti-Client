@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import Input from '@/components/ui/input';
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
-
+import getErrors from '@/components/Form/validation';
 import { useState } from 'react'
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,12 +18,14 @@ interface ErrorResponse {
 }
 
 interface FormData {
+  [key: string]: string; // Index signature allowing access to any string property
   name: string;
   email: string;
   password: string;
   password_confirmation: string;
   avatar: string;
 }
+
 
 export const RegisterForm = () => {
 
@@ -45,52 +47,30 @@ export const RegisterForm = () => {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
-  const getErrors = (): string[] => [
-    'name',
-    'email',
-    'password',
-    'password_confirmation' 
-  ].filter((k) => {
-    if (!formData[k as keyof FormData]) {
-      return true;
-    } else if (k === 'email') {
-      return !/\S+@\S+\.\S+/.test(formData.email);
-    } else if (k === 'phoneNumber') {
-      return !/^\+?\d{8,11}$/.test(formData[k as keyof FormData]?.replace(/\s/g, ''));
-    } else if (k === 'password_confirmation') {
+  const validationConfig = {
+    name: { required: true },
+    email: { required: true, email: true },
+    password: { required: true, minLength: 8 },
+    password_confirmation: { required: true, passwordConfirmation: true },
+    phoneNumber: { phoneNumber: true },
+  };
 
-      return formData.password !== formData.password_confirmation
-    }
-    return false;
-  });
+  const errors = getErrors(formData, validationConfig);
 
-  const errors = submitted ? getErrors() : [];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
 
-    if (!getErrors().length) {
-     console.log('hellow')
-      
+    if (!errors.length) {
+
+      console.log('hellow')
+
     }
-   
+
   };
 
-  const requiredMessage = (name: string, text: string) => {
-    return (
-      errors.includes(name) && (
-        <div className="error flex items-center bg-nsw-red-04">
 
-          <div className="nsw-in-page-alert__content">
-            <p>
-              <strong>{text} is required</strong>
-            </p>
-          </div>
-        </div>
-      )
-    )
-  }
 
   return (
     <>
@@ -108,7 +88,7 @@ export const RegisterForm = () => {
             name="name"
           />
 
-          <span className="text-sm text-red-600">{requiredMessage('name', 'username')}</span>
+          <span className="text-sm text-red-600">{errors.name}</span>
 
 
         </div>
@@ -126,7 +106,7 @@ export const RegisterForm = () => {
             name="email"
           />
 
-          <span className="text-sm text-red-600">{requiredMessage('email', 'Email')}</span>
+          <span className="text-sm text-red-600">{errors.email}</span>
 
         </div>
 
@@ -143,7 +123,7 @@ export const RegisterForm = () => {
             type="password"
           />
 
-          <span className="text-sm text-red-600">{requiredMessage('password', 'password')}</span>
+          <span className="text-sm text-red-600">{errors.password}</span>
 
         </div>
 
@@ -159,8 +139,7 @@ export const RegisterForm = () => {
             name="password_confirmation"
             type="password"
           />
-          <span className="text-sm text-red-600">{requiredMessage('password_confirmation', 'Password Confirmation')}</span>
-
+          <span className="text-sm text-red-600">{errors.password_confirmation}</span>
         </div>
 
         <div className="pt-4">
