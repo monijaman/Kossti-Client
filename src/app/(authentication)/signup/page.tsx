@@ -16,8 +16,8 @@ export default function RegisterPage() {
           </h2>
           <RegisterForm />
 
-          <Link href="/signup" className="block text-center text-blue-600 hover:underline font-medium">
-            Create New Account
+          <Link href="/signin" className="block text-center text-blue-600 hover:underline font-medium">
+          Login with existing account
           </Link>
         </div>
       </main>

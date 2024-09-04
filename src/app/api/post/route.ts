@@ -6,7 +6,6 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
     // Parse the request body as JSON
     const body = await req.json();
  
- 
     // Send a POST request to the API endpoint
     const accessToken = req.cookies.get("accessToken")?.value;
     const response = await fetch(`${apiUrl}/api/${body.apiUrl}`, {

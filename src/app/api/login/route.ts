@@ -18,8 +18,9 @@ export async function POST(req: NextRequest) {
 
     // Send a POST request to the API endpoint for login
    
+    console.log('resJsonresJson')
  
-    const response = await fetch(`${apiUrl}/api/login`, {
+    const response = await fetch(`${apiUrl}/api/v1/login`, {
       method: 'POST',
        body: formData,
     });
@@ -27,31 +28,29 @@ export async function POST(req: NextRequest) {
  
     // Parse the JSON response from the API
    const resJson =  await response.json();
+   // Check if login was successful
+   if (resJson.success === true) {
+     
+     // Set the access token and refresh token cookies
  
- 
-    // Check if login was successful
-    if (resJson.data.success === true) {
-    
-      // Set the access token and refresh token cookies
-
-      cookies().set('accessToken', resJson.data.access_token, {
+      cookies().set('accessToken', resJson.access_token, {
         httpOnly: true,
-        // maxAge: 24 * 60 * 60, // Example: Set maxAge for 1 day
+        maxAge: 24 * 60 * 60, // Example: Set maxAge for 1 day
       });
-      cookies().set('refreshToken', resJson.data. refresh_token, {
+      cookies().set('refreshToken', resJson.refresh_token, {
         httpOnly: true,
-        // maxAge: 7 * 24 * 60 * 60, // Example: Set maxAge for 7 days
+        maxAge: 7 * 24 * 60 * 60, // Example: Set maxAge for 7 days
       });
 
       // Remove sensitive data from the response before sending it back
-      delete resJson.data.accessToken;
-      delete resJson.data.refreshToken;
+      delete resJson.accessToken;
+      delete resJson.refreshToken;
 
       // Return a JSON response with the modified data
       
       return NextResponse.json({
         success: true,
-        dataset: resJson.data,
+        dataset: resJson,
       });
     } 
 

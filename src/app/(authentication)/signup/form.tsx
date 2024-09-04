@@ -25,7 +25,9 @@ interface FormData {
   password_confirmation: string;
   avatar: string;
 }
-
+interface FormErrors {
+  [key: string]: string[]; // Allow arrays of strings for each error field
+}
 
 export const RegisterForm = () => {
 
@@ -39,6 +41,7 @@ export const RegisterForm = () => {
     password_confirmation: "",
     avatar: "",
   });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   const [submitted, setSubmitted] = useState<boolean>(false);
 
@@ -52,23 +55,75 @@ export const RegisterForm = () => {
     email: { required: true, email: true },
     password: { required: true, minLength: 8 },
     password_confirmation: { required: true, passwordConfirmation: true },
-    phoneNumber: { phoneNumber: true },
   };
 
-  const errors = getErrors(formData, validationConfig);
 
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-
-    if (!errors.length) {
-
-      console.log('hellow')
-
+    const errors = getErrors(formData, validationConfig);
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) {
+    
+    
+      setSubmitted(true);
+      register();
     }
 
   };
+
+
+  const register = async () => {
+    // Check if window object is defined (client-side check)
+    if (typeof window !== "undefined") {
+      
+   
+      const formDataToSend = new FormData();
+
+      // Type assertion to inform TypeScript that the keys are strings
+      for (const key in formData) {
+        if (Object.prototype.hasOwnProperty.call(formData, key)) {
+          formDataToSend.append(key, formData[key as keyof typeof formData]);
+          // Using "as keyof typeof formData" to ensure only valid keys are used
+        }
+      }
+
+      try {
+       
+        const res = await fetch(`${apiUrl}/api/v1/registration`, {
+          method: "POST",
+          body: formDataToSend,
+          // Do not set Content-Type header for FormData
+        });
+      
+
+        if (res.ok) {
+          const userData = await res.json();
+          router.push("/signin");
+        } else {
+          const responseData = await res.json();
+          // Check if the error field exists in the response data
+          if (
+            responseData.error &&
+            Array.isArray(responseData.error) &&
+            responseData.error.length > 0
+          ) {
+            // Extract and set the first error message
+            const errorMessage = responseData.error[0];
+            // console.log(responseData.error[0])
+            setError(errorMessage);
+            // console.log(errorMessage.email[0])
+          } else {
+            // Handle other types of errors or messages
+            setError({ message: "An error occurred during registration." });
+          }
+        }
+      } catch (error: any) {
+        setError(error?.message);
+      }
+
+    }
+  }
 
 
 
@@ -88,7 +143,10 @@ export const RegisterForm = () => {
             name="name"
           />
 
-          <span className="text-sm text-red-600">{errors.name}</span>
+          {formErrors.name && formErrors.name.map((err, index) => (
+            <span key={index} className="text-sm text-red-600">{err}</span>
+          ))}
+
 
 
         </div>
@@ -105,8 +163,11 @@ export const RegisterForm = () => {
             id="email"
             name="email"
           />
+          {formErrors.email && formErrors.email.map((err, index) => (
+            <span key={index} className="text-sm text-red-600">{err}</span>
+          ))}
 
-          <span className="text-sm text-red-600">{errors.email}</span>
+
 
         </div>
 
@@ -122,8 +183,9 @@ export const RegisterForm = () => {
             name="password"
             type="password"
           />
-
-          <span className="text-sm text-red-600">{errors.password}</span>
+          {formErrors.password && formErrors.password.map((err, index) => (
+            <span key={index} className="text-sm text-red-600">{err}</span>
+          ))}
 
         </div>
 
@@ -139,7 +201,10 @@ export const RegisterForm = () => {
             name="password_confirmation"
             type="password"
           />
-          <span className="text-sm text-red-600">{errors.password_confirmation}</span>
+          {formErrors.password_confirmation && formErrors.password_confirmation.map((err, index) => (
+            <span key={index} className="text-sm text-red-600">{err}</span>
+          ))}
+
         </div>
 
         <div className="pt-4">
