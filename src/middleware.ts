@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
   }
 
   //  if token is valid and get a new acces token 
-  if (isValidToken && accessToken) {
+  if (isValidToken && accessToken) {   
  
     const response = NextResponse.redirect(new URL('/dashboard/projects', request.url));
     response.cookies.set('accessToken', accessToken);

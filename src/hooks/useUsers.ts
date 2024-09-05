@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { CampaignInt } from "@/app/types";
+
 interface loginInt {
     email: string,
     password: string
@@ -31,22 +31,7 @@ export const useUsers = () => {
         }
     };
 
-
-    // const fetchSearchedCampaigns = async (searchQuery = '') => {
-
-    //     let apiEndpoint = `?action=campaigns&search=${searchQuery}&orderBy&orderDirection=&paginate=false&page=1&perPage=10`;
-    //     try {
-    //         const response = await fetch(`/api/get${apiEndpoint}`);
-    //         if (!response.ok) {
-    //             throw new Error("Failed to load tags");
-    //         }
-    //         const dataset = await response.json();
-
-    //         return dataset.data.campaigns;
-    //     } catch (error) {
-    //         console.error("Error fetching tags:", error);
-    //     }
-    // };
+ 
 
     const addClient = async (name: number | null, email: string) => {
         try {
