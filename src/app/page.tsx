@@ -6,6 +6,8 @@ import Sidebar from '@/components/ui/Sidebar';
 import ProductReview from '@/components/Products/ProductReview';
 import PopularProducts from '@/components/Products/PopularProducts';
 import Pagination from '@/components/Pagination/index';
+import { useProducts } from '@/hooks/useProducts';
+const cacheBuster = new Date().getTime(); // Cache-busting parameter
 
 export interface Product {
   id: number;
@@ -14,8 +16,20 @@ export interface Product {
   category: string;
   branch: string;
   price: number;
+  
 }
 
+interface ApiResponse {
+  products: Product[];
+  totalProducts: number;
+}
+interface SearchParams {
+  page?: string;
+  category?: string;
+  branch?: string;
+  price?: string;
+}
+/*
 const fetchProducts = async (
   page: number,
   productsPerPage: number,
@@ -56,18 +70,24 @@ const fetchProducts = async (
     products: filteredProducts.slice(startIndex, endIndex),
     totalProducts: filteredProducts.length
   };
-};
+}; */
 
 
-const Page: FC<{ searchParams: { page?: string; category?: string; branch?: string; price?: string } }> = async ({ searchParams }) => {
+const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+  const { getProducts } = useProducts()
+
   const page = parseInt(searchParams.page as string, 10) || 1;
   const productsPerPage = 2;
   const activeCategory = searchParams.category || '';
   const activeBranch = searchParams.branch || '';
   const activePriceRange = searchParams.price || '';
 
-  const { products, totalProducts } = await fetchProducts(page, productsPerPage, activePriceRange);
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  // Fetch the products data using the async function
+  const response = await getProducts(page, productsPerPage, activeCategory, activeBranch, activePriceRange);
+  // Handle the fetched data
+  const dataset = response.success ? response.data : [];
+ 
+  console.log('productsproducts', dataset.products)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,15 +100,17 @@ const Page: FC<{ searchParams: { page?: string; category?: string; branch?: stri
       <Navigation />
 
       <div className="flex flex-grow">
-        <Sidebar 
-          activeCategory={activeCategory} 
-          activeBranch={activeBranch} 
-          activePriceRange={activePriceRange} 
+        <Sidebar
+          activeCategory={activeCategory}
+          activeBranch={activeBranch}
+          activePriceRange={activePriceRange}
         />
         <main className="flex-1 bg-white p-4">
-          <ProductReview products={products} />
-          <PopularProducts />
-          <Pagination currentPage={page} totalPages={totalPages} />
+          {dataset.products && 
+          <ProductReview products={dataset.products} />
+          }
+          <PopularProducts products={dataset.products} />
+          {/* <Pagination currentPage={page} totalPages={totalPages} /> */}
         </main>
       </div>
 
