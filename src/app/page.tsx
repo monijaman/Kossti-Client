@@ -2,7 +2,7 @@ import { FC } from 'react';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Navigation from '@/components/ui/Navigation';
-import Sidebar from '@/components/ui/Sidebar';
+import Sidebar from '@/components/ui/Sidebar/';
 import ProductReview from '@/components/Products/ProductReview';
 import PopularProducts from '@/components/Products/PopularProducts';
 import Pagination from '@/components/Pagination/index';
@@ -16,7 +16,7 @@ export interface Product {
   category: string;
   branch: string;
   price: number;
-  
+
 }
 
 interface ApiResponse {
@@ -26,7 +26,7 @@ interface ApiResponse {
 interface SearchParams {
   page?: string;
   category?: string;
-  branch?: string;
+  brand?: string;
   price?: string;
 }
 /*
@@ -77,17 +77,17 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { getProducts } = useProducts()
 
   const page = parseInt(searchParams.page as string, 10) || 1;
-  const productsPerPage = 2;
+  const productsPerPage = 10;
   const activeCategory = searchParams.category || '';
-  const activeBranch = searchParams.branch || '';
+  const activeBrand = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
 
   // Fetch the products data using the async function
-  const response = await getProducts(page, productsPerPage, activeCategory, activeBranch, activePriceRange);
+  const response = await getProducts(page, productsPerPage, activeCategory, activeBrand, activePriceRange);
   // Handle the fetched data
   const dataset = response.success ? response.data : [];
+  const totalPages = Math.ceil(dataset.totalProducts/productsPerPage)
  
-  console.log('productsproducts', dataset.products)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -102,15 +102,15 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       <div className="flex flex-grow">
         <Sidebar
           activeCategory={activeCategory}
-          activeBranch={activeBranch}
+          activeBrand={activeBrand}
           activePriceRange={activePriceRange}
         />
         <main className="flex-1 bg-white p-4">
-          {dataset.products && 
-          <ProductReview products={dataset.products} />
+          {dataset.products &&
+            <ProductReview products={dataset.products} />
           }
           <PopularProducts products={dataset.products} />
-          {/* <Pagination currentPage={page} totalPages={totalPages} /> */}
+          <Pagination category={activeCategory} currentPage={page} totalPages={totalPages} />
         </main>
       </div>
 

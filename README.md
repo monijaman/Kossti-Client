@@ -110,3 +110,7 @@ bash
 Copy code
 rm -rf node_modules
 npm install
+
+meed to run
+
+php artisan db:seed --class=CategorySeeder
