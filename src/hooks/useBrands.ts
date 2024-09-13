@@ -1,10 +1,10 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 
-export const useCategory = () => {
+export const useBrands = () => {
   // get all categories
-  const getCategory = async () => {
-    const apiEndpoint = `categories`;
+  const getBrands= async () => {
+    const apiEndpoint = `brands`;
     // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
 
     if (!apiUrl) {
@@ -14,9 +14,7 @@ export const useCategory = () => {
     }
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
-    console.log("Fetching category URL:", fullUrl); // Ensure this URL is correct
-
+ 
     try {
       const response = await fetch(fullUrl); // Adjust API endpoint
       const dataset = await response.json();
@@ -31,5 +29,5 @@ export const useCategory = () => {
     }
   };
 
-  return { getCategory };
+  return { getBrands };
 };

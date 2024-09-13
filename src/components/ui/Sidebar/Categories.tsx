@@ -26,8 +26,7 @@ const Categories = async ({ category }: SearchParams) => {
     const dataset = response.success ? response.data : [];
 
     // Handle undefined searchParams with a default empty string
-    const activeCategory =category || '';
-
+    const activeCategory = category || '';
     const clearCategoryUrl = `/`;
 
     return (

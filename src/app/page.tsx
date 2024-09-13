@@ -2,7 +2,7 @@ import { FC } from 'react';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Navigation from '@/components/ui/Navigation';
-import Sidebar from '@/components/ui/Sidebar/';
+import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import ProductReview from '@/components/Products/ProductReview';
 import PopularProducts from '@/components/Products/PopularProducts';
 import Pagination from '@/components/Pagination/index';
@@ -109,7 +109,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
           {dataset.products &&
             <ProductReview products={dataset.products} />
           }
-          <PopularProducts products={dataset.products} />
+          {/* <PopularProducts products={dataset.products} /> */}
           <Pagination category={activeCategory} currentPage={page} totalPages={totalPages} />
         </main>
       </div>

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import Categories from './Categories';
-
+import Brands from './Brands';
 
 interface SidebarProps {
   activeCategory?: string;
@@ -15,12 +15,14 @@ const Sidebar = async ({ activeCategory, activeBrand, activePriceRange }: Sideba
   const clearBranchUrl = `/?category=${activeCategory || ''}${activePriceRange ? `&price=${activePriceRange}` : ''}`;
   const clearPriceRangeUrl = `/?category=${activeCategory || ''}${activeBrand || ''}`;
 
-  
+
   return (
     <aside className="w-[300px] bg-gray-100 p-4">
 
-      <Categories category={activeCategory}  />
-      <h2 className="text-lg font-semibold mb-4">Branch</h2>
+      <Categories category={activeCategory} />
+      <Brands brand={activeBrand} category={activeCategory} />
+
+
       
 
       <h2 className="text-lg font-semibold mb-4">Price Range</h2>
