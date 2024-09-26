@@ -6,7 +6,7 @@ import { Product, SearchBoxProps } from '@/lib/types';
 import { useProducts } from '@/hooks/useProducts';
 import Link from 'next/link';
 
-const SearchBox = ({ initialSearchTerm = ''}:SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
@@ -14,7 +14,7 @@ const SearchBox = ({ initialSearchTerm = ''}:SearchBoxProps) => {
     const { getProducts } = useProducts()
 
 
-    
+
 
     // Handle search input change and update suggestions
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,15 +31,15 @@ const SearchBox = ({ initialSearchTerm = ''}:SearchBoxProps) => {
                 const activePriceRange = '';
                 const paginate = '0';
                 const locale = 'en';
- 
+
                 // Make the getProducts call to fetch suggestions
                 const response = await getProducts(page, productsPerPage, activeCategory, activeBrands, activePriceRange, searchTerm, locale);
-            
+
                 // Assuming that response.data contains products array
                 if (response.success && response.data) {
                     setSuggestions(response.data.products); // Store suggestions
                     setShowSuggestions(true)
-                   
+
                 }
             } catch (error) {
                 console.error('Error fetching suggestions:', error);
@@ -73,9 +73,11 @@ const SearchBox = ({ initialSearchTerm = ''}:SearchBoxProps) => {
                             <li
                                 key={product.id}
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
-                                // onClick={() => handleSuggestionClick(product)}
+                            // onClick={() => handleSuggestionClick(product)}
                             >
-                              <Link href={product.slug}> {product.name}</Link> 
+                                <Link href={`reviews/${product.slug}`}>
+                                    {product.name}
+                                </Link>
                             </li>
                         ))}
                     </ul>

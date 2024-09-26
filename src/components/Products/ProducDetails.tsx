@@ -8,6 +8,7 @@ interface PopularProductsProps {
 
 const ProducDetails = ({ product }: PopularProductsProps) => {
 
+ 
   return (
 
     <div key={product.id} className="p-4 bg-gray-50 border rounded">

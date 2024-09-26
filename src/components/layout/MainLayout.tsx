@@ -16,7 +16,6 @@ interface MainLayoutProps {
 }
 
 const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
-  console.log('sidebarProps', sidebarProps); // This should now log the correct sidebarProps
 
   return (
     <div className="min-h-screen flex flex-col">
