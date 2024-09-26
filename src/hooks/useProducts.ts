@@ -4,38 +4,43 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 export const useProducts = () => {
   const getProducts = async (
     page: number,
-    productsPerPage: number,
+    limit: number,
     category?: string,
-    branch?: string,
-    priceRange?: string
+    brands?: string,
+    priceRange?: string,
+    searchTerm?: string,
+    locale?: string
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
-      productsPerPage: productsPerPage.toString(),
+      limit: limit.toString(),
+      _: cacheBuster.toString(), // Cache-busting parameter
     };
 
+    // Add optional parameters only if they are defined
     if (category) params.category = category;
-    if (branch) params.branch = branch;
-    if (priceRange) params.priceRange = priceRange;
+    if (brands) params.brand = brands;
+    if (priceRange) params.pricerange = priceRange;
+    if (searchTerm) params.searchterm = searchTerm;
+    if (locale) params.locale = locale;
 
+    // Build the query string
     const queryString = new URLSearchParams(params).toString();
-    // const apiEndpoint = `api/get?action=products&${queryString}`;
 
-    const apiEndpoint = `products?page=${page}&productsPerPage=${productsPerPage}&category=${category}&branch=${branch}&priceRange=${priceRange}&_=${cacheBuster}`;
-    // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
+    console.log("queryString", queryString);
 
+    // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
         new Error("API URL is not defined in environment variables")
       );
     }
 
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
+    const fullUrl = `${apiUrl}/products?${queryString}`;
     console.log("Fetching URL:", fullUrl); // Ensure this URL is correct
 
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
+      const response = await fetch(fullUrl);
       const dataset = await response.json();
 
       return {
@@ -49,5 +54,38 @@ export const useProducts = () => {
     }
   };
 
-  return { getProducts };
+  const getAProductBySlug = async (slug: string, locale?: string) => {
+    const params: Record<string, string> = {};
+
+    // Add optional parameters only if they are defined
+    if (locale) params.locale = locale;
+
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
+
+    // Ensure API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/${slug}?${queryString}`;
+  
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+ 
+      return {
+        success: true,
+        data: dataset.products,
+        totalProducts: dataset.totalProducts,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
+
+  return { getProducts, getAProductBySlug };
 };

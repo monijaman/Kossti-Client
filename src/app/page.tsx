@@ -1,123 +1,50 @@
 import { FC } from 'react';
-import AccountDropdown from '@/components/ui/AccountDropdown';
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import Navigation from '@/components/ui/Navigation';
-import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import ProductReview from '@/components/Products/ProductReview';
-import PopularProducts from '@/components/Products/PopularProducts';
 import Pagination from '@/components/Pagination/index';
 import { useProducts } from '@/hooks/useProducts';
-const cacheBuster = new Date().getTime(); // Cache-busting parameter
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  branch: string;
-  price: number;
-
-}
-
-interface ApiResponse {
-  products: Product[];
-  totalProducts: number;
-}
-interface SearchParams {
-  page?: string;
-  category?: string;
-  brand?: string;
-  price?: string;
-}
-/*
-const fetchProducts = async (
-  page: number,
-  productsPerPage: number,
-  category?: string,
-  branch?: string,
-  priceRange?: string
-): Promise<{ products: Product[]; totalProducts: number }> => {
-  const totalProducts = 10; // Example total number of products
-  const products = Array.from({ length: totalProducts }, (_, index) => ({
-    id: index + 1,
-    name: `Product ${index + 1}`,
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam viverra...',
-    category: `category${(index % 3) + 1}`, // Example category
-    branch: `branch${(index % 3) + 1}`, // Example branch
-    price: (index + 1) * 20 // Example price
-  }));
-
-  // Apply filters
-  let filteredProducts = products;
-
-  if (category) {
-    filteredProducts = filteredProducts.filter(p => p.category === category);
-  }
-
-  if (branch) {
-    filteredProducts = filteredProducts.filter(p => p.branch === branch);
-  }
-
-  if (priceRange) {
-    const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-    filteredProducts = filteredProducts.filter(p => p.price >= minPrice && (maxPrice ? p.price <= maxPrice : true));
-  }
-
-  const startIndex = (page - 1) * productsPerPage;
-  const endIndex = startIndex + productsPerPage;
-
-  return {
-    products: filteredProducts.slice(startIndex, endIndex),
-    totalProducts: filteredProducts.length
-  };
-}; */
-
+import SearchBox from '@/components/Search';
+import { SearchParams, ProductApiResponse } from '@/lib/types';
+import MainLayout from '@/components/layout/MainLayout';
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const { getProducts } = useProducts()
+  const { getProducts } = useProducts();
 
   const page = parseInt(searchParams.page as string, 10) || 1;
-  const productsPerPage = 10;
+  const limit = 10;
   const activeCategory = searchParams.category || '';
-  const activeBrand = searchParams.brand || '';
+  const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
+  const searchTerm = searchParams.searchterm || '';
+  const locale = searchParams.locale || 'bn';
 
-  // Fetch the products data using the async function
-  const response = await getProducts(page, productsPerPage, activeCategory, activeBrand, activePriceRange);
-  // Handle the fetched data
-  const dataset = response.success ? response.data : [];
-  const totalPages = Math.ceil(dataset.totalProducts/productsPerPage)
- 
+  const fetchProductData = async () => {
+    const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, locale);
+    return response.success ? response.data : { products: [], totalProducts: 0 };
+  };
+
+  const dataset = await fetchProductData();
+  const totalPages = Math.ceil(dataset.totalProducts / limit);
+
+  // Prepare sidebarProps from searchParams
+  const sidebarProps = {
+    activeCategory,
+    selectedBrands: activeBrands,
+    activePriceRange,
+    searchTerm,
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">Review Layout</h1>
-        <AccountDropdown />
-      </header>
+    <MainLayout sidebarProps={sidebarProps}>
+      <SearchBox initialSearchTerm={searchTerm} />
+      <ProductReview products={dataset.products} />
 
-      <Breadcrumbs />
-      <Navigation />
-
-      <div className="flex flex-grow">
-        <Sidebar
-          activeCategory={activeCategory}
-          activeBrand={activeBrand}
-          activePriceRange={activePriceRange}
-        />
-        <main className="flex-1 bg-white p-4">
-          {dataset.products &&
-            <ProductReview products={dataset.products} />
-          }
-          {/* <PopularProducts products={dataset.products} /> */}
-          <Pagination category={activeCategory} currentPage={page} totalPages={totalPages} />
-        </main>
-      </div>
-
-      <footer className="bg-gray-800 text-white p-4 mt-auto">
-        <p className="text-center">&copy; 2024 Review Layout. All rights reserved.</p>
-      </footer>
-    </div>
+      <Pagination
+        category={activeCategory}
+        selectedBrands={activeBrands}
+        currentPage={page}
+        totalPages={totalPages}
+      />
+    </MainLayout>
   );
 };
 

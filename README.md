@@ -114,3 +114,10 @@ npm install
 meed to run
 
 php artisan db:seed --class=CategorySeeder
+
+
+generate slug:
+
+php artisan make:command GenerateBrandSlugs
+php artisan generate:brand-slugs
+

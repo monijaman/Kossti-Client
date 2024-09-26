@@ -2,9 +2,10 @@ interface PaginationProps {
   category: string;
   currentPage: number;
   totalPages: number;
+  selectedBrands: string; // Add this parameter
 }
 
-const Pagination = ({ category, currentPage, totalPages }: PaginationProps) => {
+const Pagination = ({ category, currentPage, totalPages, selectedBrands }: PaginationProps) => {
 
   // Function to get category from the URL
   const getCategory = () => {
@@ -14,7 +15,7 @@ const Pagination = ({ category, currentPage, totalPages }: PaginationProps) => {
     }
     return '';
   };
- 
+
   const getPageNumbers = () => {
     const pages = [];
 
@@ -64,7 +65,7 @@ const Pagination = ({ category, currentPage, totalPages }: PaginationProps) => {
     <div className="mt-4 flex justify-center items-center space-x-2">
       {/* Previous Button */}
       <a
-        href={`/?page=${currentPage - 1}${category ? `&category=${category}` : ''}`}
+        href={`/?page=${currentPage - 1}${category ? `&category=${category}` : ''}${selectedBrands ? `&brand=${selectedBrands}` : ''}`}
         className={`px-3 py-1 rounded-full border ${currentPage === 1 ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 border-gray-300'}`}
         aria-disabled={currentPage === 1}
       >
@@ -78,7 +79,7 @@ const Pagination = ({ category, currentPage, totalPages }: PaginationProps) => {
             <span className="px-3 py-1">...</span>
           ) : (
             <a
-              href={`/?page=${page}${category ? `&category=${category}` : ''}`}
+              href={`/?page=${page}${category ? `&category=${category}` : ''}${selectedBrands ? `&brand=${selectedBrands}` : ''}`}
               className={`px-3 py-1 rounded-full border ${currentPage === page ? 'bg-blue-600 text-white border-blue-600 font-bold' : 'bg-white text-blue-600 border-gray-300'}`}
             >
               {page}
@@ -89,7 +90,7 @@ const Pagination = ({ category, currentPage, totalPages }: PaginationProps) => {
 
       {/* Next Button */}
       <a
-        href={`/?page=${currentPage + 1}${category ? `&category=${category}` : ''}`}
+        href={`/?page=${currentPage + 1}${category ? `&category=${category}` : ''}${selectedBrands ? `&brand=${selectedBrands}` : ''}`}
         className={`px-3 py-1 rounded-full border ${currentPage === totalPages ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 border-gray-300'}`}
         aria-disabled={currentPage === totalPages}
       >
