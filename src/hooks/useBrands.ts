@@ -24,7 +24,7 @@ export const useBrands = () => {
         data: dataset 
       };
     } catch (error) {
-      console.error("Error fetching category:", error);
+      console.error("Error fetching category:-", error);
       return { success: false, data: [] };
     }
   };
