@@ -2,18 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Define a function to handle common POST requests
 async function handlePostRequest(req: NextRequest, apiUrl: string) {
-  try {
-    // Ensure the request has a valid Content-Type
+
+  if (req.method === 'POST') {
+    
+    try {
+      // Ensure the request has a valid Content-Type
     const contentType = req.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
       return NextResponse.json(
         { success: false, error: 'Invalid content type' },
         { status: 400 }
-      );
-    }
-
-    // Parse the request body as JSON
-    const body = await req.json();
+        );
+      }
+      
+      // Parse the request body as JSON
+      const body = await req.json();
+    
 
     // Ensure apiUrl is present in the request body
     if (!body.apiUrl) {
@@ -31,9 +35,9 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
         { status: 401 }
       );
     }
-
+    console.log('accessToken',accessToken);
     // Send a POST request to the API endpoint
-    const response = await fetch(`${apiUrl}/api/${body.apiUrl}`, {
+    const response = await fetch(`${apiUrl}/api/v1/${body.apiUrl}`, {
       method: req.method,
       body: JSON.stringify(body),
       headers: {
@@ -44,6 +48,7 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
 
     // Parse the JSON response from the API
     const resJson = await response.json();
+  
 
     // Check if the request was successful
     if (response.ok) {
@@ -71,6 +76,8 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
       { status: 500 }
     );
   }
+
+}  
 }
 
 // Define the POST request handler for the API route

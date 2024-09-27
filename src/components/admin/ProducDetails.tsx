@@ -1,15 +1,13 @@
 'use client';
 import { FC } from 'react';
 import { Product } from '@/lib/types'; // Assuming you have a Product type
-
+import Link from 'next/link';
 interface ProductDetailsProps {
   products: Product[]; // Change to array of Product
-  onEdit: (id: number) => void; // Function to handle edit action
   onDelete: (id: number) => void; // Function to handle delete action
-  onReview: (id: number) => void; // Function to handle review action
 }
 
-const ProductDetails: FC<ProductDetailsProps> = ({ products, onEdit, onDelete, onReview }) => {
+const ProductDetails: FC<ProductDetailsProps> = ({ products, onDelete }) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">
@@ -32,18 +30,9 @@ const ProductDetails: FC<ProductDetailsProps> = ({ products, onEdit, onDelete, o
               <td className="py-2 px-4 border">{product.category}</td>
               <td className="py-2 px-4 border">{product.price}</td>
               <td className="py-2 px-4 border">
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
-                  onClick={() => onReview(product.id)}
-                >
-                  Review
-                </button>
-                <button
-                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                  onClick={() => onEdit(product.id)}
-                >
-                  Edit
-                </button>
+                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.slug}`}>Review</Link>
+                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Edit</Link>
+                 
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded"
                   onClick={() => onDelete(product.id)}

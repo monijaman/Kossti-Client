@@ -36,21 +36,13 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
 
     const dataset = await fetchProductData();
     const totalPages = Math.ceil(dataset.totalProducts / limit);
-    const handleEdit = (id: number) => {
-        console.log('Edit product with ID:', id);
-        // Add your edit logic here
-    };
-
+ 
     const handleDelete = (id: number) => {
         console.log('Delete product with ID:', id);
         // Add your delete logic here
     };
 
-    const handleReview = (id: number) => {
-        console.log('Review product with ID:', id);
-        // Add your review logic here
-    };
-
+   
 
     return (
         <>
@@ -60,9 +52,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
             {/* Add your review management functionalities here */}
             <ProductDetails
                 products={dataset.products}
-                onEdit={handleEdit}
                 onDelete={handleDelete}
-                onReview={handleReview}
             />
             <Pagination
                 category={activeCategory}

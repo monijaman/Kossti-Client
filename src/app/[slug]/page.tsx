@@ -20,8 +20,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const { slug } = params;
 
   const { getAProductBySlug } = useProducts()
-
-  
   const activeCategory = searchParams.category || '';
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';

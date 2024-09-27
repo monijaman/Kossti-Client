@@ -26,7 +26,7 @@ export const LoginForm = () => {
 
   const validationConfig = {
     email: { required: true, email: true },
-    password: { required: true, minLength: 8 },
+    password: { required: true, minLength: 6 },
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,9 +50,9 @@ export const LoginForm = () => {
           body: JSON.stringify(formData),
         });
 
+        console.log('resJsonresJson', response)
         
         const resJson = await response.json();
-      
 
         if (!resJson.success) {
           setError(resJson.error || "An unexpected error occurred.");
