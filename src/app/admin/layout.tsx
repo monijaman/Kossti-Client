@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Viper Front',
-  description: 'By Monir',
+  description: 'By Monir dev',
 };
 
 interface AdminLayoutProps {
