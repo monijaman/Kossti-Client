@@ -11,14 +11,16 @@ interface PageProps {
         id: string; // Type for the slug
     };
 }
-
+interface AdditionalDetail {
+    detail: string;
+}
 
 const ReviewForm = ({ params }: PageProps) => {
 
     const { id } = params;
     const [rating, setRating] = useState<number>(1);
     const [reviews, setReviews] = useState<string>(''); // This will hold rich text
-    const [additionalDetails, setAdditionalDetails] = useState<string>([]);
+    const [additionalDdetails, setAdditionalDdetails] = useState<AdditionalDetail[]>([]);
     const [priority, setPriority] = useState<number>(1);
     const { addReview } = useReviews()
 
@@ -30,7 +32,7 @@ const ReviewForm = ({ params }: PageProps) => {
             review_id: id,
             rating: rating,
             reviews: reviews,
-            additional_details: ['quality', 'price'],
+            additional_details: [],
             priority: priority
         };
 
@@ -75,13 +77,13 @@ const ReviewForm = ({ params }: PageProps) => {
             />
 
             {/* Additional Details Field */}
-            <label htmlFor="additional_details" className="block mb-2">Additional Details</label>
+            {/* <label htmlFor="additional_details" className="block mb-2">Additional Details</label>
             <textarea
                 id="additional_details"
                 value={additionalDetails}
                 onChange={(e) => setAdditionalDetails(e.target.value)}
                 className="w-full p-2 mb-4 border rounded"
-            />
+            /> */}
 
             {/* Priority Field */}
             <label htmlFor="priority" className="block mb-2">Priority</label>

@@ -106,31 +106,31 @@ export const useReviews = () => {
         review_id,
         rating,
         reviews,
-        additional_details, // This now accepts string[]
+        additional_details, // Extract detail strings if needed
         priority,
         apiUrl: "reviews",
-      };
+    };
 
-      // Make the POST request
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newFormData),
-      });
+    // Make the POST request
+    const response = await fetch("/api/post", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newFormData),
+    });
 
-      // Handle response
-      if (!response.ok) {
-        throw new Error("Failed to submit review");
-      }
-
-      const responseData = await response.json();
-      return responseData; // Return the response if needed
-    } catch (error) {
-      console.error("Error submitting review:", error);
+    // Handle response
+    if (!response.ok) {
+      throw new Error("Failed to submit review");
     }
-  };
 
-  return { addReview, getReview, getReviewByProductId };
+    const responseData = await response.json();
+    return responseData; // Return the response if needed
+  } catch (error) {
+    console.error("Error submitting review:", error);
+  }
+};
+
+return { addReview, getReview, getReviewByProductId };
 };
