@@ -19,7 +19,7 @@ const PopularProducts = ({ products, onEdit, onDelete, onReview }:ProductDetails
 
       {products.map((product) => {
         return (
-          <div className="overflow-x-auto">
+          <div key={product.id} className="overflow-x-auto">
             <table className="min-w-full bg-white">
               <thead>
                 <tr>

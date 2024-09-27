@@ -9,14 +9,12 @@ interface PopularProductsProps {
 
 const PopularProducts = ({ products }: PopularProductsProps) => {
 
-
-
   return (
     <div className="grid grid-cols-1 gap-4">
 
-      {products.map((product) => {
+      {products.map((product, i) => {
         return (
-          <ProducDetails product={product} />
+          <ProducDetails key={product.id} product={product} />
         );
       })}
 
