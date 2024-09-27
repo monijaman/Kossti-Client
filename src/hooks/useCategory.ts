@@ -15,7 +15,7 @@ export const useCategory = () => {
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
-    console.log("Fetching category URL:", fullUrl); // Ensure this URL is correct
+    console.log("Fetching category URL:-", fullUrl); // Ensure this URL is correct
 
     try {
       const response = await fetch(fullUrl); // Adjust API endpoint
