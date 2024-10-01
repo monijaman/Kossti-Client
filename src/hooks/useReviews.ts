@@ -93,7 +93,6 @@ export const useReviews = () => {
   // services/reviewService.ts
   const addReview = async (
     product_id: number | null = null,
-    review_id: number | null = null,
     rating: number | null = null,
     reviews: string = "",
     additional_details: string[] = [], // Change here
@@ -103,7 +102,6 @@ export const useReviews = () => {
       // Prepare the form data
       const newFormData = {
         product_id,
-        review_id,
         rating,
         reviews,
         additional_details, // Extract detail strings if needed

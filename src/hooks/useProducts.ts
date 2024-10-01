@@ -70,7 +70,7 @@ export const useProducts = () => {
       );
     }
 
-    const fullUrl = `${apiUrl}/${slug}?${queryString}`;
+    const fullUrl = `${apiUrl}/products/${slug}?${queryString}`;
   
     try {
       const response = await fetch(fullUrl);
@@ -87,5 +87,37 @@ export const useProducts = () => {
     }
   };
 
-  return { getProducts, getAProductBySlug };
+
+  
+  const getAProductById = async (id: number) => {
+    const params: Record<string, string> = {};
+
+  
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
+
+    // Ensure API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/product/${id}`;
+  
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+ 
+      return {
+        success: true,
+        data: dataset.products
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
+
+  return { getProducts, getAProductBySlug, getAProductById };
 };

@@ -53,3 +53,15 @@ export interface SearchParams {
   paginate?: string;
   locale?: string;
 }
+
+
+export interface SpecTranslation {
+  id: number | null;
+  locale: string;
+  name: string;
+  price: string;
+  review: string;
+  rating: string;
+  product_review_id: string;
+  additional_details: string;
+}

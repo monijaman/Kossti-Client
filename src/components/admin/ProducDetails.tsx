@@ -30,7 +30,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ products, onDelete }) => {
               <td className="py-2 px-4 border">{product.category}</td>
               <td className="py-2 px-4 border">{product.price}</td>
               <td className="py-2 px-4 border">
-                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.slug}`}>Review</Link>
+                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Review</Link>
                 <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Edit</Link>
                  
                 <button

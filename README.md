@@ -105,7 +105,7 @@ This will generate a command to enable the PM2 startup script. Run the command p
 
 7. Reinstall Node Modules
 If you continue to encounter issues, make sure your node_modules are up-to-date:
-
+ changed
 bash
 Copy code
 rm -rf node_modules
