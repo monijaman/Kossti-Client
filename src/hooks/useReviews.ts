@@ -137,6 +137,8 @@ export const useReviews = () => {
     locale: string = "",
     additional_details: string[] = [], // Keeping additional details as an array of strings
   ) => {
+
+   
     try {
       // Prepare the form data
       const newFormData = {
@@ -148,6 +150,7 @@ export const useReviews = () => {
         apiUrl: "review/translation", // Assuming this is used on the backend for some routing logic
       };
 
+     
       // Make the POST request
       const response = await fetch("/api/post", {
         method: "POST",
@@ -156,9 +159,8 @@ export const useReviews = () => {
         },
         body: JSON.stringify(newFormData),
       });
-
      
-
+ 
       // Handle response
       if (!response.ok) {
         throw new Error("Failed to submit review");
