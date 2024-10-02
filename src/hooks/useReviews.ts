@@ -4,7 +4,6 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 import { useState, useEffect } from "react";
 
 export const useReviews = () => {
-
   const getReview = async (
     page: number,
     limit: number,
@@ -107,28 +106,71 @@ export const useReviews = () => {
         additional_details, // Extract detail strings if needed
         priority,
         apiUrl: "reviews",
-    };
+      };
 
-    // Make the POST request
-    const response = await fetch("/api/post", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newFormData),
-    });
+      // Make the POST request
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newFormData),
+      });
 
-    // Handle response
-    if (!response.ok) {
-      throw new Error("Failed to submit review");
+      // Handle response
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+
+      const responseData = await response.json();
+      return responseData; // Return the response if needed
+    } catch (error) {
+      console.error("Error submitting review:", error);
     }
+  };
 
-    const responseData = await response.json();
-    return responseData; // Return the response if needed
-  } catch (error) {
-    console.error("Error submitting review:", error);
-  }
-};
+  // services/reviewService.ts
+  const addReviewTranslation = async (
+    product_id: number | null = null, // Changed to product_review_id
+    rating: number | null = null,
+    review: string = "",
+    locale: string = "",
+    additional_details: string[] = [], // Keeping additional details as an array of strings
+  ) => {
+    try {
+      // Prepare the form data
+      const newFormData = {
+        product_id, // Keep the id as per your backend requirement
+        rating,
+        review,
+        locale,
+        additional_details, // Send additional details as an array
+        apiUrl: "review/translation", // Assuming this is used on the backend for some routing logic
+      };
 
-return { addReview, getReview, getReviewByProductId };
+      // Make the POST request
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newFormData),
+      });
+
+     
+
+      // Handle response
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+
+      const responseData = await response.json();
+      return responseData; // Return the response if needed
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      throw error;
+    }
+  };
+
+  return { addReview, getReview, getReviewByProductId, addReviewTranslation };
 };

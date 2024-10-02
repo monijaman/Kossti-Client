@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SpecTranslation } from '@/lib/types'; // Adjust import based on your file structure
+import { useReviews } from '@/hooks/useReviews';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -17,6 +18,8 @@ interface PageProps {
 const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     const [selectedTranslation, setSelectedTranslation] = useState<SpecTranslation | null>(null);
     const [rating, setRating] = useState<number | null>(null);
+    const { addReviewTranslation } = useReviews();
+    const [formStatus, setFormStatus] = useState("");
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -35,23 +38,29 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setFormStatus("")
         if (!selectedTranslation) return;
 
         // Prepare the data to be submitted
-        const formData = {
-            id: selectedTranslation.id,
-            locale: selectedTranslation.locale,
-            name: selectedTranslation.name,
-            price: selectedTranslation.price,
-            review: selectedTranslation.review,
-            rating: rating ? rating.toString() : selectedTranslation.rating,
-            product_review_id: selectedTranslation.product_review_id,
-        };
+        const product_id = id;
+        const review = selectedTranslation.review || "";
+        // const rating = selectedTranslation.rating ? Number(selectedTranslation.rating) : null;
+        const locale = selectedTranslation.locale ? selectedTranslation.locale : 'bn';
 
-        console.log("Form data to submit:", formData);
+        // Make sure rating is either selected or from the selected translation
+        const response = await addReviewTranslation(
+            product_id,              // Pass the product review ID
+            rating,                         // Rating value (ensure it's a number)
+            review,                         // Review content
+            locale,
+            [],                             // Pass empty additional details for now or use additionalDetails if needed
+        );
 
-        // TODO: Add your API call here to submit the formData to the backend
+        setFormStatus("review submitted")
+
+        // Handle the API response here, e.g., display success message or redirect
     };
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -124,8 +133,24 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                         Submit Translation
                     </button>
                 </div>
+
+
             )}
+
+            {formStatus && (
+                <div
+                    className={`p-4 mb-4 text-sm rounded-lg ext-green-700 bg-green-100`}
+                    role="alert"
+                >
+                    {formStatus}
+                </div>
+            )}
+
+
         </form>
+
+
+
     );
 };
 

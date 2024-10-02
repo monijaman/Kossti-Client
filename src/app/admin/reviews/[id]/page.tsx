@@ -5,9 +5,7 @@ import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import ReviewTransForm from '@/components/reviews/SpecificationTranslations';
 import { SpecTranslation, ProductApiResponse, Product } from '@/lib/types';
-
-
-
+import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
@@ -17,16 +15,15 @@ interface PageProps {
         id: string; // Type for the slug
     };
 }
-
 interface AdditionalDetail {
-    detail: string;
+    youtubeUrl?: string;
+    sourceUrl?: string;
 }
 
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = params;
     const [rating, setRating] = useState<number | null>(null);
     const [reviews, setReviews] = useState<string>(''); // This will hold rich text
-    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetail[]>([]); // Hold additional details
     const [priority, setPriority] = useState<number>(1);
     const { addReview } = useReviews();
     const { getAProductById } = useProducts();
@@ -34,7 +31,8 @@ const ReviewForm = ({ params }: PageProps) => {
     const [productName, setProductName] = useState<string>(''); // To hold the fetched product name
     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
     const [translations, setTranslations] = useState<SpecTranslation[]>([]); // Hold product translations
-    const [selectedTranslation, setSelectedTranslation] = useState<SpecTranslation | null>(null);
+    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetail[]>([]);
+    const [formStatus, setFormStatus] = useState("");
 
     const fetchProductData = async () => {
         try {
@@ -42,6 +40,7 @@ const ReviewForm = ({ params }: PageProps) => {
             if (response?.success && response?.data) {
                 setProductId(response.data.id); // Set the actual product ID
                 setProductName(response.data.name); // Set the actual product name
+                setReviews(response.data.review); // Set the actual review content
                 setTranslations(response.data.translations); // Set translations
             }
         } catch (error) {
@@ -51,13 +50,14 @@ const ReviewForm = ({ params }: PageProps) => {
 
     useEffect(() => {
         fetchProductData();
-    }, []);
+    }, [id]);
 
     const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
 
     const handleReviewSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setReviewsError('');
+        setFormStatus('')
         // Validate the reviews field
         if (!reviews.trim()) {
             setReviewsError('Review content is required.');
@@ -77,18 +77,11 @@ const ReviewForm = ({ params }: PageProps) => {
                 formattedAdditionalDetails,
                 priority
             );
-            console.log('Review submitted:', response);
+            setFormStatus('Review submitted!');
         } catch (error) {
             console.error('Error submitting review:', error);
         }
     };
-
-    const handleAdditionalDetailsChange = (index: number, value: string) => {
-        const updatedDetails = [...additionalDetails];
-        updatedDetails[index] = { detail: value };
-        setAdditionalDetails(updatedDetails);
-    };
-
 
 
     return (
@@ -118,59 +111,63 @@ const ReviewForm = ({ params }: PageProps) => {
                         <input
                             type="number"
                             id="priority"
-                            value={priority || ''}
+                            value={priority || ''}  // Default to empty string if null
                             onChange={(e) => setPriority(Number(e.target.value))}
                             className="w-full p-2 mb-4 border rounded"
                             min="1"
                         />
 
                         {/* Rich Text Editor for Reviews */}
-                        <div className="row"  >
-                            <div className="row" style={{ minHeight: '320px' }}>
-                                <label htmlFor="reviews" className="block mb-2">Review</label>
-                                <ReactQuill
-                                    value={reviews}
-                                    onChange={setReviews}
-                                    className="mb-4"
-                                    id="reviews"
-                                    style={{ backgroundColor: '#f9f9f9', height: '200px' }}
-                                />
-                                {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
-                            </div>
+                        <div className="row" style={{ minHeight: '320px' }}>
+                            <label htmlFor="reviews" className="block mb-2">Review</label>
+                            <ReactQuill
+                                value={reviews}
+                                onChange={setReviews}
+                                className="mb-4"
+                                id="reviews"
+                                style={{ backgroundColor: '#f9f9f9', height: '200px' }}
+                            />
+                            {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                         </div>
 
-                        {/* Additional Details Field */}
-                        {additionalDetails.map((detail, index) => (
-                            <div key={index}>
-                                <label htmlFor={`additionalDetail_${index}`} className="block mb-2">
-                                    Additional Detail {index + 1}
-                                </label>
-                                <input
-                                    type="text"
-                                    id={`additionalDetail_${index}`}
-                                    value={detail.detail}
-                                    onChange={(e) => handleAdditionalDetailsChange(index, e.target.value)}
-                                    className="w-full p-2 mb-4 border rounded"
-                                />
-                            </div>
-                        ))}
+
+
+                        {/* Render the AdditionalDetailsForm component */}
+                        <AdditionalDetailsForm
+                            additionalDetails={additionalDetails}
+                            setAdditionalDetails={setAdditionalDetails}
+                        />
 
                         {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white py-2 px-4 rounded"
-                        >
-                            Submit Review
-                        </button>
+                        <div className='my-4'>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white py-2 px-4 rounded"
+                            >
+                                Submit Review
+                            </button>
+                        </div>
                     </form>
 
-                </div>
-                <div className="w-1/2">
+                    {formStatus && (
+                        <div
+                            className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
+                                    ? 'text-green-700 bg-green-100'
+                                    : 'text-black-700 bg-green-100'
+                                }`}
+                            role="alert"
+                        >
+                            {formStatus}
+                        </div>
+                    )}
 
+                </div>
+
+                {/* Translation Form */}
+                <div className="w-1/2">
                     <ReviewTransForm id={productId} productName={productName} translations={translations} />
                 </div>
             </div>
-
         </>
     );
 };
