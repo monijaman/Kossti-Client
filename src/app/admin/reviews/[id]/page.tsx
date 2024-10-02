@@ -155,8 +155,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                     ? 'text-green-700 bg-green-100'
                                     : 'text-black-700 bg-green-100'
                                 }`}
-                            role="alert"
-                        >
+                            role="alert">
                             {formStatus}
                         </div>
                     )}
