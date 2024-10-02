@@ -16,7 +16,7 @@ export const useReviews = () => {
     const params: Record<string, string> = {
       page: page.toString(),
       limit: limit.toString(),
-      _: cacheBuster.toString(), // Cache-busting parameter
+      // _: cacheBuster.toString(), // Cache-busting parameter
     };
 
     // Add optional parameters only if they are defined

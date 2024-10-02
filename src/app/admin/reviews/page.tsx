@@ -56,7 +56,6 @@ const ReviewForm = ({ params }: PageProps) => {
 
         const formData = {
             product_id: productId,  // Use the fetched product ID
-            review_id: id,          // Assuming `id` is used for review_id, you can change it if necessary
             rating: rating,
             reviews: reviews,
             additional_details: formattedAdditionalDetails, // Passing additional details
@@ -66,7 +65,6 @@ const ReviewForm = ({ params }: PageProps) => {
         try {
             const response = await addReview(
                 +formData.product_id,
-                +formData.review_id,
                 formData.rating,
                 formData.reviews,
                 formData.additional_details,
