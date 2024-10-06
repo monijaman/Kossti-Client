@@ -15,8 +15,8 @@ const AccountDropdown: React.FC = () => {
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 shadow-lg rounded-md">
-          <a href="#" className="block px-4 py-2 hover:bg-gray-100">Sign In</a>
-          <a href="#" className="block px-4 py-2 hover:bg-gray-100">Sign Up</a>
+          <a href="/signin" className="block px-4 py-2 hover:bg-gray-100">Sign In</a>
+          <a href="/signup" className="block px-4 py-2 hover:bg-gray-100">Sign Up</a>
         </div>
       )}
     </div>
