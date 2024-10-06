@@ -26,13 +26,13 @@ const AccountDropdown = () => {
               <a href="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</a>
               <a href="/logout" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
               
-              {isAdmin && (
+             
                 <>
                   <hr className="my-1" />
                   <a href="/admin/dashboard" className="block px-4 py-2 hover:bg-gray-100">Admin Dashboard</a>
                   <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100">Manage Users</a>
                 </>
-              )}
+              
             </>
           )}
         </div>
