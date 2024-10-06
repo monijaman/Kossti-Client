@@ -2,10 +2,11 @@
 import Link from 'next/link'
 import SearchBox from '@/components/Search';
 import ProductReview from '@/components/admin/ProducDetails';
-import { SearchParams, ProductApiResponse, Product } from '@/lib/types';
+import { SearchParams,  ProductApiResponse, Product } from '@/lib/types';
 import { useProducts } from '@/hooks/useProducts';
 import Pagination from '@/components/Pagination/index';
 import ProductDetails from '@/components/admin/ProducDetails';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PageProps {
     params: {
@@ -18,6 +19,8 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
 
     const { slug } = params;
     const { getProducts } = useProducts();
+    const isAuthenticated = useAuth();
+    
 
     const page = parseInt(searchParams.page as string, 10) || 1;
     const limit = 10;

@@ -65,3 +65,8 @@ export interface SpecTranslation {
   product_review_id: string;
   additional_details: string;
 }
+
+export interface AdditionalDetails {
+  youtubeUrl?: string;
+  sourceUrl?: string;
+}

@@ -23,13 +23,12 @@ export async function middleware(request: NextRequest) {
   console.log('Is Valid Token:', isValidToken);
   console.log('Access Token:', accessToken);
   console.log('Pathname:', request.nextUrl.pathname);
-  console.log('Ends with /dashboard:', request.nextUrl.pathname.endsWith('/dashboard'));
+  console.log('Ends with /dashboard:', request.nextUrl.pathname.endsWith('/admin'));
 
  
   // Redirect to signin if token is invalid and clear cookies
   if (token && !isValidToken) {
-   
-
+    
     const response = NextResponse.redirect(new URL('/signin', request.url));
     response.cookies.set('accessToken', '', { expires: new Date(0) });
     response.cookies.set('refreshToken', '', { expires: new Date(0) });
@@ -40,14 +39,14 @@ export async function middleware(request: NextRequest) {
   //  if token is valid and get a new acces token 
   if (isValidToken && accessToken) {   
  
-    const response = NextResponse.redirect(new URL('/dashboard/projects', request.url));
+    const response = NextResponse.redirect(new URL('/admin', request.url));
     response.cookies.set('accessToken', accessToken);
     return response;
   }
 
   // Redirect to dashboard if token is valid
   if (token && isValidToken && request.nextUrl.pathname.startsWith('/signin')) {
-    return NextResponse.redirect(new URL('/dashboard/projects', request.url));
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   // Redirect to signin if no token and accessing protected routes
@@ -57,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
   // Redirect to dashboard if accessing signup with a valid token
   if (token && request.nextUrl.pathname.startsWith('/signup')) {
-    return NextResponse.redirect(new URL('/dashboard/projects', request.url));
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   // Continue to the requested page if none of the above conditions are met
@@ -72,7 +71,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   // Define the routes to apply the middleware
   matcher: [
-    '/dashboard/:path*',
+    '/admin/:path*',
     '/signin/:path*',
     '/signup/:path*',
   ],

@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { SpecTranslation } from '@/lib/types'; // Adjust import based on your file structure
 import { useReviews } from '@/hooks/useReviews';
+import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
+import { SpecTranslation, AdditionalDetails, ProductApiResponse, Product } from '@/lib/types';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -20,6 +21,8 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     const [rating, setRating] = useState<number | null>(null);
     const { addReviewTranslation } = useReviews();
     const [formStatus, setFormStatus] = useState("");
+    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
+    const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -53,7 +56,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
             rating,                         // Rating value (ensure it's a number)
             review,                         // Review content
             locale,
-            [],                             // Pass empty additional details for now or use additionalDetails if needed
+            formattedAdditionalDetails,                             // Pass empty additional details for now or use additionalDetails if needed
         );
 
         setFormStatus("review submitted")
@@ -124,6 +127,12 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                             style={{ backgroundColor: "#f9f9f9", height: "150px" }}
                         />
                     </div>
+
+
+                    <AdditionalDetailsForm
+                            additionalDetails={additionalDetails}
+                            setAdditionalDetails={setAdditionalDetails}
+                        />
 
                     {/* Submit Button */}
                     <button

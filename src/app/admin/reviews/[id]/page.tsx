@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import ReviewTransForm from '@/components/reviews/SpecificationTranslations';
-import { SpecTranslation, ProductApiResponse, Product } from '@/lib/types';
+import { SpecTranslation, AdditionalDetails, ProductApiResponse, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -15,10 +15,7 @@ interface PageProps {
         id: string; // Type for the slug
     };
 }
-interface AdditionalDetail {
-    youtubeUrl?: string;
-    sourceUrl?: string;
-}
+ 
 
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = params;
@@ -31,7 +28,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [productName, setProductName] = useState<string>(''); // To hold the fetched product name
     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
     const [translations, setTranslations] = useState<SpecTranslation[]>([]); // Hold product translations
-    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetail[]>([]);
+    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [formStatus, setFormStatus] = useState("");
 
     const fetchProductData = async () => {

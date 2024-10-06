@@ -1,6 +1,9 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { useAuth } from '@/hooks/useAuth';
+ 
+
 // import './globals.css';
 import ClientProvider from '@/components/Provider/ClientProvider';
 import { ReactNode } from 'react';
@@ -19,6 +22,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
+  
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
