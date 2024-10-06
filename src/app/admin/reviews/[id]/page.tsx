@@ -15,7 +15,7 @@ interface PageProps {
         id: string; // Type for the slug
     };
 }
- 
+
 
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = params;
@@ -149,14 +149,13 @@ const ReviewForm = ({ params }: PageProps) => {
                     {formStatus && (
                         <div
                             className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
-                                    ? 'text-green-700 bg-green-100'
-                                    : 'text-black-700 bg-green-100'
+                                ? 'text-green-700 bg-green-100'
+                                : 'text-black-700 bg-green-100'
                                 }`}
                             role="alert">
                             {formStatus}
                         </div>
                     )}
-
                 </div>
 
                 {/* Translation Form */}

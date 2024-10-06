@@ -86,9 +86,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
             {/* Display Selected Translation */}
             {selectedTranslation && (
                 <div>
-                    <h3 className="font-semibold mb-2">
-                        Editing Translation for {selectedTranslation.locale.toUpperCase()}
-                    </h3>
+                 
 
                     {/* Rating Input */}
                     <label htmlFor="rating" className="block mb-2">Rating</label>
@@ -124,23 +122,25 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                             onChange={(value) => setSelectedTranslation({ ...selectedTranslation, review: value })}
                             className="mb-4"
                             id="review"
-                            style={{ backgroundColor: "#f9f9f9", height: "150px" }}
+                            style={{ backgroundColor: "#f9f9f9", height: "200px" }}
                         />
                     </div>
 
 
                     <AdditionalDetailsForm
-                            additionalDetails={additionalDetails}
-                            setAdditionalDetails={setAdditionalDetails}
-                        />
+                        additionalDetails={additionalDetails}
+                        setAdditionalDetails={setAdditionalDetails}
+                    />
 
                     {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white py-2 px-4 rounded"
-                    >
-                        Submit Translation
-                    </button>
+                    <div className='my-4'>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white py-2 px-4 rounded"
+                        >
+                            Submit Translation
+                        </button>
+                    </div>
                 </div>
 
 

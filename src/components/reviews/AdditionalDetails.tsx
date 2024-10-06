@@ -43,7 +43,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
     return (
         <div>
             {/* Render YouTube URLs first */}
-            <h3 className="font-semibold mb-2">YouTube URLs</h3>
+            {/* <h3 className="font-semibold mb-2">YouTube URLs</h3> */}
             {youtubeDetails.map((detail, index) => (
                 <div key={`youtube_${index}`} className="mb-4">
                     <label htmlFor={`youtubeUrl_${index}`} className="block mb-2">
@@ -68,7 +68,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
             ))}
 
             {/* Render Source Links second */}
-            <h3 className="font-semibold mb-2">Source Links</h3>
+            {/* <h3 className="font-semibold mb-2">Source Links</h3> */}
             {sourceDetails.map((detail, index) => (
                 <div key={`source_${index}`} className="mb-4">
                     <label htmlFor={`sourceUrl_${index}`} className="block mb-2">
