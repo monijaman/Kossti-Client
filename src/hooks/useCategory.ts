@@ -5,8 +5,7 @@ export const useCategory = () => {
   // get all categories
   const getCategory = async () => {
     const apiEndpoint = `categories`;
-    // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
-
+   
     if (!apiUrl) {
       return Promise.reject(
         new Error("API URL is not defined in environment variables")

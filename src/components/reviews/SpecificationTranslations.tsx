@@ -86,7 +86,6 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
             {/* Display Selected Translation */}
             {selectedTranslation && (
                 <div>
-                 
 
                     {/* Rating Input */}
                     <label htmlFor="rating" className="block mb-2">Rating</label>

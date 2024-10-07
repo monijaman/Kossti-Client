@@ -1,27 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-export const dynamic = 'force-dynamic'; // Mark this route as dynamic
+export const dynamic = "force-dynamic"; // Mark this route as dynamic
 
 // Function to handle common GET requests
 async function handleGetRequest(req: NextRequest, apiUrl: string) {
   try {
-    console.log("==========================================");
-
     // Extract search params and action route
     const searchParams = req.nextUrl.searchParams;
-    const actionRoute = searchParams.get("action");
+    const reqType = searchParams.get("type");
 
     // Construct the base fetch URL with the action route (if provided)
-    let fetchUrl = `${apiUrl}/api/v1/${actionRoute ? actionRoute : ""}${
-      req.nextUrl.search
-    }`;
+    let fetchUrl = `${apiUrl}/api/v1/${req.nextUrl.search}`;
 
-    // Retrieve the access token from cookies
-    const accessToken = req.cookies.get("accessToken")?.value;
+    // Initialize headers as an empty object
+    let headers: HeadersInit = {};
 
-    // Prepare request headers (add Authorization if accessToken exists)
-    const headers: HeadersInit = accessToken
-      ? { Authorization: `Bearer ${accessToken}` }
-      : {};
+ 
+    // Check if the request type is not public and retrieve the access token from cookies
+    if (!reqType || reqType !== "public") {
+      const accessToken = req.cookies.get("accessToken")?.value;
+
+      // Add Authorization header if accessToken exists
+      if (accessToken) {
+        headers = {
+          Authorization: `Bearer ${accessToken}`,
+        };
+      }
+    }
 
     // Make the API request
     const response = await fetch(fetchUrl, {
@@ -29,19 +33,17 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
       headers,
     });
 
-    
     // Check if the response is successful
     if (!response.ok) throw new Error("Failed to fetch products");
 
     // Parse the response as JSON
     const resJson = await response.json();
 
-  
     // Check if the response is successful
     if (response.ok) {
       return NextResponse.json({
-        success: 'eeee4',
-        data: resJson
+        success: "eeee4",
+        data: resJson,
       });
     } else {
       return NextResponse.json({

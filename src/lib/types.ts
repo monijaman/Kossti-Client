@@ -11,11 +11,15 @@ export interface brandInt {
 export interface Product {
   id: number;
   name: string;
+  category_id:number;
+  brand_id:number;
   slug: string;
   brand: string;
   category: string;
   model?: string | null;
-  price: string; // or number
+  price: number; // or number
+  status?: number; // or whatever type it is
+  priority?: number; // or whatever type it is
   specifications?: string[]; // or whatever type it is
 }
 
@@ -69,4 +73,15 @@ export interface SpecTranslation {
 export interface AdditionalDetails {
   youtubeUrl?: string;
   sourceUrl?: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  slug?: string;
+}
+export interface Brand {
+  id: number;
+  name: string;
+  slug?: string;
 }

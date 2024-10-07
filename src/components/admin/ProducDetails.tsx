@@ -4,10 +4,14 @@ import { Product } from '@/lib/types'; // Assuming you have a Product type
 import Link from 'next/link';
 interface ProductDetailsProps {
   products: Product[]; // Change to array of Product
-  onDelete: (id: number) => void; // Function to handle delete action
 }
 
-const ProductDetails: FC<ProductDetailsProps> = ({ products, onDelete }) => {
+const ProductDetails: FC<ProductDetailsProps> = ({ products }) => {
+
+
+  const deleteProduct = (id: number) => {
+
+  }
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">
@@ -30,12 +34,13 @@ const ProductDetails: FC<ProductDetailsProps> = ({ products, onDelete }) => {
               <td className="py-2 px-4 border">{product.category}</td>
               <td className="py-2 px-4 border">{product.price}</td>
               <td className="py-2 px-4 border">
-                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Review</Link>
-                <Link  className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Edit</Link>
-                 
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Review</Link>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${product.id}`}>View</Link>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${product.id}`}>Edit</Link>
+
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => onDelete(product.id)}
+                  onClick={() => deleteProduct(product.id)}
                 >
                   Delete
                 </button>
