@@ -30,10 +30,12 @@ const ReviewForm = ({ params }: PageProps) => {
 
     const fetchProductData = async () => {
         try {
-            const response = await getAProductById(+id);
-            if (response?.success && response?.data) {
-                setProductId(response.data.id); // Set the actual product ID
-                console.log('Product data:', response.data);
+            if(id){
+                const response = await getAProductById(+id);
+                if (response?.success && response?.data) {
+                    setProductId(response.data.id); // Set the actual product ID
+                    console.log('Product data:', response.data);
+                }
             }
         } catch (error) {
             console.error('Error fetching product:', error);

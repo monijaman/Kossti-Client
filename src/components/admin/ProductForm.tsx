@@ -5,10 +5,11 @@ import { Product, Category, Brand } from '@/lib/types';
 import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
+import { combineSlices } from '@reduxjs/toolkit';
 
 interface ProductFormProps {
     product?: Product; // Optional for create case
-    
+
 }
 
 const ProductForm = ({ product }: ProductFormProps) => {
@@ -57,38 +58,39 @@ const ProductForm = ({ product }: ProductFormProps) => {
         };
 
         try {
+            setSubmitStatus('')
             let response;
-
             if (product?.id) {
                 // Update existing product
                 response = await updateProduct(product.id, payload);
             } else {
                 // Create new product
                 response = await createProduct(payload);
+                const productId =response.data.product.id;
+
+                 // Optionally: Redirect after delay or handle the newly created product
+                 setTimeout(() => {
+                    router.push(`/admin/products/${productId}`); // Redirect to the product's page
+                }, 1000);
             }
-
+ 
             if (response.success) {
-                setSubmitStatus('Product successfully submitted!');
+            
+                setSubmitStatus(response.data.message);
 
-                // Reset form only if creating a new product
-                if (!product) {
-                    resetForm();
-                }
-                // Redirect after delay
-                setTimeout(() => {
-                   
-                  //  router.push('/products');
-                }, 1500);
+                // Access the product ID from response.data
+      
+               
             } else {
                 setSubmitStatus('Error submitting the form');
-                console.error('Form submission error', response);
             }
         } catch (error) {
             console.error('Error submitting form', error);
             setSubmitStatus('Error submitting the form');
         } finally {
-            setLoading(false); // Reset loading state
+            setLoading(false);
         }
+
     };
 
     const resetForm = () => {
@@ -237,11 +239,10 @@ const ProductForm = ({ product }: ProductFormProps) => {
             {/* Submission Status */}
             {submitStatus && (
                 <div
-                    className={`p-4 mt-4 text-sm rounded-lg ${
-                        submitStatus.includes('successfully')
+                    className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
                             ? 'text-green-700 bg-green-100'
                             : 'text-red-700 bg-red-100'
-                    }`}
+                        }`}
                     role="alert"
                 >
                     {submitStatus}

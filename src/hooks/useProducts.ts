@@ -86,36 +86,45 @@ export const useProducts = () => {
       return { success: false, data: [] };
     }
   };
-
   const getAProductById = async (id: number) => {
-    const params: Record<string, string> = {};
-
-    // Build the query string
+    const params: Record<string, string> = {
+      // Add any additional query parameters if necessary
+      // e.g. 'filter': 'someFilterValue'
+    };
+  
+    // Build the query string (if params are provided)
     const queryString = new URLSearchParams(params).toString();
-
+    const fullUrl = queryString
+      ? `${apiUrl}/product/${id}?${queryString}&type=public`
+      : `${apiUrl}/product/${id}?type=public`;
+  
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
         new Error("API URL is not defined in environment variables")
       );
     }
-
- 
-    const fullUrl = `${apiUrl}/product/${id}?type=public`;
- 
+  
     try {
-      const response = await fetch(fullUrl);
+      const response = await fetch(fullUrl, { cache: 'no-store' });
+  
+      // Check if the response is okay (status 200-299)
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+  
       const dataset = await response.json();
-
+  
       return {
         success: true,
-        data: dataset.products,
+        data: dataset,
       };
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching product:", error);
       return { success: false, data: [] };
     }
   };
+  
 
   const createProduct = async (productData: Record<string, any>) => {
     try {
@@ -147,7 +156,7 @@ export const useProducts = () => {
       // Return success along with the data
       return {
         success: true,
-        data: dataset,
+         ...dataset,
       };
     } catch (error) {
       const err = error as Error;
@@ -190,7 +199,7 @@ export const useProducts = () => {
       // Return success along with the data
       return {
         success: true,
-        data: dataset,
+        ...dataset,
       };
     } catch (error) {
       // Type the error as `Error` to access the `message` property
@@ -251,7 +260,50 @@ export const useProducts = () => {
     }
   };
 
+
+  
+  const Translation = async (productData: Record<string, any>, id: number) => {
+    try {
+      const apiUrl = `product-trans/${id}`; // Assuming this is the API route
+
+      // Append apiUrl to productData
+      const payload = { ...productData, apiUrl };
+
+      // Make the POST request to the backend API
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Ensure you're sending JSON data
+        },
+        body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
+      });
+
+      if (!response.ok) {
+        // If the response status is not OK, throw an error
+        const errorData = await response.json();
+        throw new Error(
+          `Error creating product: ${errorData.message || response.statusText}`
+        );
+      }
+
+      // Parse the response body as JSON if the request was successful
+      const dataset = await response.json();
+
+      // Return success along with the data
+      return {
+        success: true,
+        ...dataset,
+      };
+    } catch (error) {
+      const err = error as Error;
+      console.error("Error updating product:", err.message);
+
+      return { success: false, data: [], error: err.message };
+    }
+  };
+
   return {
+    Translation,
     getProducts,
     getAProductBySlug,
     getAProductById,

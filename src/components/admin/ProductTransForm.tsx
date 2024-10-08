@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product, Category, Brand } from '@/lib/types'; // Assuming you have a Product type
+import { Product, Category, Brand, Translation } from '@/lib/types'; // Assuming you have a Product type
 import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
@@ -12,7 +12,6 @@ interface ProductFormProps {
 }
 
 
-
 const ProductTransForm = ({ product }: ProductFormProps) => {
 
 
@@ -21,25 +20,37 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     const { Translation } = useProducts();
     const router = useRouter();
     const id = product && product.id;
-    const [submitstatus, setSubmitstatus] = useState('');
+    const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
-
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [brands, setBrands] = useState<Brand[]>([]);
-
-
-
-
+    const [translations, setTranslations] = useState(product?.translations);
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
-        console.log(locale)
-        const translation = LOCALES.find((lang) => lang === locale);
-        if (translation) {
-            setSelectedTranslation(locale);
 
+        const selectedLang = LOCALES.find((lang) => lang === locale);
+        if (selectedLang) {
+            setSelectedTranslation(locale);
+        }
+        console.log('translationstranslations', translations)
+        if (product && translations) {
+            const item = translations.find((item) => {
+                return item.locale == locale
+            })
+
+            if (item) {
+                setName(item.name)
+                setPrice(item.price)
+            }else{
+                setName('');
+                setPrice(0);
+            }
         }
     };
+
+    useEffect(() => {
+       console.log('translationstranslations', translations)
+    }, [translations]);
+
 
     // Select 'bn' translation by default on mount
     useEffect(() => {
@@ -52,15 +63,30 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         const payload = {
             name,
             price: parseFloat(price.toString()), // Convert price to a number
+            locale: selectedTranslation
         };
 
         try {
+
+            if (!id) {
+                console.error('Product ID is undefined');
+                return; // Handle this error case appropriately
+            }
+
+
             // If there's an ID, update the product
             const response = await Translation(payload, id);  // Update product using its ID
 
             if (response.success) {
-                setSubmitstatus('Form Submitted');
-                // router.push('/products'); // Redirect to product listing on success
+                setSubmitStatus('Form Submitted successfully');
+                
+                setTranslations((prevItem) => [
+                    ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
+                    response.data.translation  // append the new translation to the array
+                  ]);
+                  
+                
+
             } else {
                 console.error('Error submitting form', response);
             }
@@ -130,11 +156,15 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     </button>
                 </div>
 
-                {submitstatus && (
+                {submitStatus && (
                     <div
-                        className={`p-4 mb-4 text-sm rounded-lg text-green-700 bg-green-100 text-green-700 bg-green-100`}
-                        role="alert">
-                        {submitstatus}
+                        className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
+                            ? 'text-green-700 bg-green-100'
+                            : 'text-red-700 bg-red-100'
+                            }`}
+                        role="alert"
+                    >
+                        {submitStatus}
                     </div>
                 )}
             </form>

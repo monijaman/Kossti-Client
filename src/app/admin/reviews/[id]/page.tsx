@@ -46,8 +46,10 @@ const ReviewForm = ({ params }: PageProps) => {
     };
 
     useEffect(() => {
-        fetchProductData();
-    }, [id]);
+        if (id) {
+            fetchProductData();
+        }
+    }, []);
 
     const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
 

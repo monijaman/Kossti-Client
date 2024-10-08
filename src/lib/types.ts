@@ -20,7 +20,18 @@ export interface Product {
   price: number; // or number
   status?: number; // or whatever type it is
   priority?: number; // or whatever type it is
-  specifications?: string[]; // or whatever type it is
+  translations?: Translation[]; // or whatever type it is
+}
+
+
+export interface Translation{
+  id: number;
+  product_id: number;
+  locale: string;
+  name: string;
+  price: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SidebarParams {
