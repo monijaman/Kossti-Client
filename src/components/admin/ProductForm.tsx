@@ -1,90 +1,109 @@
 "use client";
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product, Category, Brand } from '@/lib/types'; // Assuming you have a Product type
+import { Product, Category, Brand } from '@/lib/types';
 import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
-// import { useBrands } from "@/hooks/useModel";
 
 interface ProductFormProps {
-    product?: Product; // Make it optional for the create case
+    product?: Product; // Optional for create case
+    
 }
 
-
-
 const ProductForm = ({ product }: ProductFormProps) => {
-
-
     const [name, setName] = useState(product?.name || '');
-
     const [category, setCategory] = useState(product?.category_id || '');
     const [brand, setBrand] = useState(product?.brand_id || '');
     const [model, setModel] = useState(product?.model || '');
     const [price, setPrice] = useState(product?.price || 0);
-    const [status, setStatus] = useState(product?.status || false); // Assuming status is boolean
+    const [status, setStatus] = useState(product?.status || false);
     const [priority, setPriority] = useState(product?.priority || 1);
+    const [submitStatus, setSubmitStatus] = useState('');
+    const [loading, setLoading] = useState(false);
+
     const { getCategory } = useCategory();
     const { getBrands } = useBrands();
     const { createProduct, updateProduct } = useProducts();
     const router = useRouter();
-    const id = product && product.id;
-    const [submitstatus, setSubmitstatus] = useState('');
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
-    const fetchCategories = async () => {
-        const categories = await getCategory();
-        setCategories(categories.data)
-    }
-    const fetchBrands = async () => {
-        const brands = await getBrands();
-        setBrands(brands.data)
-    }
-
     useEffect(() => {
-        fetchCategories();
-        fetchBrands();
-    }, [])
+        // Fetch categories and brands on component mount
+        const fetchCategoriesAndBrands = async () => {
+            const categories = await getCategory();
+            const brands = await getBrands();
+            setCategories(categories.data);
+            setBrands(brands.data);
+        };
+
+        fetchCategoriesAndBrands();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true); // Set loading state
 
         const payload = {
             name,
-            category_id: String(category),   // Ensure category is a string
-            brand_id: String(brand),         // Ensure brand is a string
+            category_id: String(category),
+            brand_id: String(brand),
             model,
-            price: parseFloat(price.toString()), // Convert price to a number
-            status: status ? 1 : 0,          // Use 1/0 for boolean values
-            priority: Number(priority),      // Ensure priority is a number
+            price: parseFloat(price.toString()),
+            status: status ? 1 : 0, // Convert status to integer
+            priority: Number(priority),
         };
 
         try {
             let response;
 
-            // If there's an ID, update the product
-            if (id) {
-                response = await updateProduct(id, payload);  // Update product using its ID
+            if (product?.id) {
+                // Update existing product
+                response = await updateProduct(product.id, payload);
             } else {
-                response = await createProduct(payload);      // Create a new product
+                // Create new product
+                response = await createProduct(payload);
             }
 
             if (response.success) {
-                setSubmitstatus('Form Submitted');
-                // router.push('/products'); // Redirect to product listing on success
+                setSubmitStatus('Product successfully submitted!');
+
+                // Reset form only if creating a new product
+                if (!product) {
+                    resetForm();
+                }
+                // Redirect after delay
+                setTimeout(() => {
+                   
+                  //  router.push('/products');
+                }, 1500);
             } else {
-                console.error('Error submitting form', response);
+                setSubmitStatus('Error submitting the form');
+                console.error('Form submission error', response);
             }
         } catch (error) {
             console.error('Error submitting form', error);
+            setSubmitStatus('Error submitting the form');
+        } finally {
+            setLoading(false); // Reset loading state
         }
     };
 
+    const resetForm = () => {
+        setName('');
+        setCategory('');
+        setBrand('');
+        setModel('');
+        setPrice(0);
+        setStatus(false);
+        setPriority(1);
+    };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-lg   bg-white   rounded px-8 pt-6 pb-8 mb-4">
+        <form onSubmit={handleSubmit} className="rounded px-8 pt-6 pb-8 mb-4">
+            {/* Product Name */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                     Product Name
@@ -96,47 +115,55 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     placeholder="Enter product name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    required
                 />
             </div>
 
+            {/* Category */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
                     Category
                 </label>
-
                 <select
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     name="categories"
                     id="categories"
-                    value={category}  // Bind the selected value to the state
-                    onChange={(e) => setCategory(e.target.value)}  // Update state on change
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
                 >
+                    <option value="" disabled>Select category</option>
                     {categories.map((item) => (
                         <option key={item.id} value={item.id}>
                             {item.name}
                         </option>
                     ))}
                 </select>
-
             </div>
 
+            {/* Brand */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="brand">
                     Brand
                 </label>
-
                 <select
-                    onChange={(e) => setBrand(e.target.value)}
-                    value={brand}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    name="brands" id="brands" >
-                    {brands.map((item) => {
-                        return <option value={item.id}>{item.name}</option>
-                    })}
+                    name="brands"
+                    id="brands"
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                    required
+                >
+                    <option value="" disabled>Select brand</option>
+                    {brands.map((item) => (
+                        <option key={item.id} value={item.id}>
+                            {item.name}
+                        </option>
+                    ))}
                 </select>
-
             </div>
 
+            {/* Model */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="model">
                     Model
@@ -151,6 +178,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                 />
             </div>
 
+            {/* Price */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
                     Price
@@ -166,21 +194,20 @@ const ProductForm = ({ product }: ProductFormProps) => {
                 />
             </div>
 
+            {/* Status */}
             <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Status
-                </label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Status</label>
                 <input
                     className="mr-2 leading-tight"
                     id="status"
                     type="checkbox"
                     checked={!!status}  // Convert to boolean
-                    onChange={() => setStatus(!status)} // Toggle the status between true/false
+                    onChange={() => setStatus(!status)}
                 />
-
                 <span className="text-sm">Active</span>
             </div>
 
+            {/* Priority */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="priority">
                     Priority
@@ -192,30 +219,35 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     placeholder="Enter priority"
                     value={priority}
                     onChange={(e) => setPriority(Number(e.target.value) || 1)}
+                    required
                 />
             </div>
 
-
-
-
+            {/* Submit Button */}
             <div className="flex items-center justify-between">
                 <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     type="submit"
+                    disabled={loading}
                 >
-                    {id ? 'Update Product' : 'Create Product'}
+                    {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
                 </button>
             </div>
 
-            {submitstatus && (
+            {/* Submission Status */}
+            {submitStatus && (
                 <div
-                    className={`p-4 mb-4 text-sm rounded-lg text-green-700 bg-green-100 text-green-700 bg-green-100`}
-                    role="alert">
-                    {submitstatus}
+                    className={`p-4 mt-4 text-sm rounded-lg ${
+                        submitStatus.includes('successfully')
+                            ? 'text-green-700 bg-green-100'
+                            : 'text-red-700 bg-red-100'
+                    }`}
+                    role="alert"
+                >
+                    {submitStatus}
                 </div>
             )}
         </form>
-
     );
 };
 

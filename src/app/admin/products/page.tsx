@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import SearchBox from '@/components/Search';
 import ProductReview from '@/components/admin/ProducDetails';
-import { SearchParams,  ProductApiResponse, Product } from '@/lib/types';
+import { SearchParams, ProductApiResponse, Product } from '@/lib/types';
 import { useProducts } from '@/hooks/useProducts';
 import Pagination from '@/components/Pagination/index';
 import ProductDetails from '@/components/admin/ProducDetails';
- 
+
 interface PageProps {
     params: {
         slug: string; // Type for the slug
@@ -17,7 +17,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
 
     const { slug } = params;
     const { getProducts } = useProducts();
-    
+
 
     const page = parseInt(searchParams.page as string, 10) || 1;
     const limit = 10;
@@ -36,7 +36,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
 
     const dataset = await fetchProductData();
     const totalPages = Math.ceil(dataset.totalProducts / limit);
- 
+
     const handleDelete = (id: number) => {
         console.log('Delete product with ID:', id);
         // Add your delete logic here
@@ -45,7 +45,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
     return (
         <>
             <h2 className="text-2xl font-bold mb-4"> Products</h2>
-        <Link href="admin/products">Add New Product</Link>
+            <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
             <SearchBox initialSearchTerm={searchTerm} />
 
             {/* Add your review management functionalities here */}
