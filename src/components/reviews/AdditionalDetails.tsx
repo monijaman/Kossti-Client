@@ -6,14 +6,15 @@ interface AdditionalDetail {
     sourceUrl?: string;  // Optional Source Link
 }
 
-interface AdditionalDetailsFormProps {
-    additionalDetails?: AdditionalDetail[];
-    setAdditionalDetails: React.Dispatch<React.SetStateAction<AdditionalDetail[]>>;
+interface FormProps {
+    additionalDetails: AdditionalDetail[]; // Array type for additional details
+    setAdditionalDetails: (details: AdditionalDetail[]) => void; // Callback function for updating details
 }
 
-const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additionalDetails = [], setAdditionalDetails }) => {
+const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }: FormProps) => {
+
     // Handle change for both YouTube and Source fields
-    const handleAdditionalDetailsChange = (index: number, field: 'youtubeUrl' | 'sourceUrl', value: string) => {
+    const handleDetailsChange = (index: number, field: 'youtubeUrl' | 'sourceUrl', value: string) => {
         const updatedDetails = [...additionalDetails];
         updatedDetails[index] = { ...updatedDetails[index], [field]: value }; // Update the specific field
         setAdditionalDetails(updatedDetails);
@@ -21,55 +22,49 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
 
     // Remove a YouTube URL or Source Link by index
     const handleRemoveDetail = (index: number) => {
-        const updatedDetails = additionalDetails.filter((_, i) => i !== index);
-        setAdditionalDetails(updatedDetails);
+        let currentDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
+        // Proceed to remove the detail if we have a valid array
+        const updatedDetails = currentDetails.filter((_, i) => i !== index);
+        setAdditionalDetails(updatedDetails); // Update the state
+    };
+
+    const handleURL = (): AdditionalDetail[] => {
+        return Array.isArray(additionalDetails) ? additionalDetails : [];
+    };
+
+    // Reusable function to add new details (YouTube URL or Source Link)
+    const addNewField = (field: 'youtubeUrl' | 'sourceUrl') => {
+        const currentDetails = handleURL();
+        const newDetail = field === 'youtubeUrl' ? { youtubeUrl: '' } : { sourceUrl: '' };
+        const updatedDetails = [...currentDetails, newDetail];
+        setAdditionalDetails(updatedDetails); // Update the state
     };
 
     // Add a new YouTube URL field
-    const handleAddYouTube = () => {
-
-        setAdditionalDetails([...additionalDetails, { youtubeUrl: '' }]);
-
-        console.log('ddddddddddddd', { youtubeUrl: '' })
-
-    };
+    const handleAddYouTube = () => addNewField('youtubeUrl');
 
     // Add a new Source Link field
-    const handleAddSource = () => {
-        setAdditionalDetails([...additionalDetails, { sourceUrl: '' }]);
-    };
+    const handleAddSource = () => addNewField('sourceUrl');
 
     // Filter and render Source Links after YouTube URLs
     const [youtubeDetails, setYoutubeDetails] = useState<AdditionalDetail[]>([]);
     const [sourceDetails, setSourceDetails] = useState<AdditionalDetail[]>([]);
 
     useEffect(() => {
-        // Ensure additionalDetails is a stringified JSON array and parse it if necessary
-        let parsedAdditionalDetails: AdditionalDetail[] = [];
-    
-        if (typeof additionalDetails === 'string') {
-            try {
-                // Parse the string into a JSON array
-                parsedAdditionalDetails = JSON.parse(additionalDetails);
-            } catch (error) {
-                console.error('Failed to parse additionalDetails JSON:', error);
-            }
-        } else if (Array.isArray(additionalDetails)) {
-            // If additionalDetails is already an array, use it directly
-            parsedAdditionalDetails = additionalDetails;
-        }
-    
-        if (parsedAdditionalDetails.length > 0) {
-            // Filter and extract YouTube URLs
-            const youtubeDetails = parsedAdditionalDetails.filter(detail => detail.youtubeUrl && detail.youtubeUrl.trim() !== '');
-            // Filter and extract Source Links
-            const sourceDetails = parsedAdditionalDetails.filter(detail => detail.sourceUrl && detail.sourceUrl.trim() !== '');
-    
-            setYoutubeDetails(youtubeDetails);
-            setSourceDetails(sourceDetails);
-        }
+        const parsedAdditionalDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
+
+        // We map through the details and retain even empty fields
+        const youtubeDetails = parsedAdditionalDetails.map(detail => ({
+            youtubeUrl: detail.youtubeUrl || '' // Keep the empty values
+        }));
+
+        const sourceDetails = parsedAdditionalDetails.map(detail => ({
+            sourceUrl: detail.sourceUrl || '' // Keep the empty values
+        }));
+
+        setYoutubeDetails(youtubeDetails);
+        setSourceDetails(sourceDetails);
     }, [additionalDetails]);
-    
 
     return (
         <div>
@@ -83,9 +78,10 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
                         type="url"
                         id={`youtubeUrl_${index}`}
                         value={detail.youtubeUrl}
-                        onChange={(e) => handleAdditionalDetailsChange(index, 'youtubeUrl', e.target.value)}
+                        onChange={(e) => handleDetailsChange(index, 'youtubeUrl', e.target.value)}
                         placeholder="Enter a YouTube URL"
                         className="w-full p-2 mb-2 border rounded"
+                        required
                     />
                     <button
                         type="button"
@@ -107,9 +103,10 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
                         type="url"
                         id={`sourceUrl_${index}`}
                         value={detail.sourceUrl}
-                        onChange={(e) => handleAdditionalDetailsChange(index, 'sourceUrl', e.target.value)}
+                        onChange={(e) => handleDetailsChange(index, 'sourceUrl', e.target.value)}
                         placeholder="Enter a Source URL"
                         className="w-full p-2 mb-2 border rounded"
+                        required
                     />
                     <button
                         type="button"

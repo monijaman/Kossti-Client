@@ -40,13 +40,15 @@ const ReviewForm = ({ params }: PageProps) => {
 
                 setProducts(response.data); // Set the actual review content
                 if (response?.data.reviews?.[0]) {
-                    setReviewData(response.data.reviews[0]);
+                    const dataset = response?.data.reviews?.[0];
+                    setReviewData(dataset);
 
-                    setReviews(response.data.reviews[0].reviews)
-                    setRating(response.data.reviews[0].rating)
+                    setReviews(dataset.reviews)
+                    setRating(dataset.rating)
+                    setAdditionalDetails(dataset.additional_details ?? [])
                 }
 
-                
+
                 // setTranslations(response.data.translations); // Set translations
             }
         } catch (error) {
@@ -61,8 +63,10 @@ const ReviewForm = ({ params }: PageProps) => {
         }
     }, []);
 
-   
-    const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
+
+    const formattedAdditionalDetails = Array.isArray(additionalDetails)
+        ? additionalDetails.map(detail => JSON.stringify(detail))
+        : [];
 
     const handleReviewSubmit = async (event: React.FormEvent) => {
 
@@ -81,12 +85,15 @@ const ReviewForm = ({ params }: PageProps) => {
             return;
         }
 
+
+        console.log(additionalDetails)
+
         try {
             const response = await addReview(
                 id,
                 rating,
                 reviews,
-                formattedAdditionalDetails,
+                additionalDetails,
             );
             setFormStatus('Review submitted!');
         } catch (error) {
@@ -117,7 +124,7 @@ const ReviewForm = ({ params }: PageProps) => {
                             step="0.1"  // Allow decimal values, with steps of 0.1
                         />
 
-                     
+
 
                         {/* Rich Text Editor for Reviews */}
                         <div className="row" style={{ minHeight: '320px' }}>
@@ -136,7 +143,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                         {/* Render the AdditionalDetailsForm component */}
                         <AdditionalDetailsForm
-                            additionalDetails={reviewData?.additional_details}
+                            additionalDetails={additionalDetails}
                             setAdditionalDetails={setAdditionalDetails}
                         />
 

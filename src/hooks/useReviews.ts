@@ -1,6 +1,7 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 import { useState, useEffect } from "react";
+import {  AdditionalDetails } from '@/lib/types';
 
 export const useReviews = () => {
   const getReview = async (
@@ -124,7 +125,7 @@ export const useReviews = () => {
     product_id: number | null = null,
     rating: number | null = null,
     reviews: string = "",
-    additional_details: string[] = [], // Change here
+    additional_details: AdditionalDetails[] = [], // Change here
   ) => {
     try {
       // Prepare the form data
