@@ -1,4 +1,3 @@
-// "use client";
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 import { useState, useEffect } from "react";
@@ -56,7 +55,7 @@ export const useReviews = () => {
     }
   };
 
-  const getReviewByProductId = async (slug: string, locale?: string) => {
+  const getReviewByProductSlug= async (slug: string, locale?: string) => {
     const params: Record<string, string> = {};
 
     // Add optional parameters only if they are defined
@@ -88,6 +87,37 @@ export const useReviews = () => {
       return { success: false, data: [] };
     }
   };
+  const getReviewByProductId = async (id: number, locale?: string) => {
+    const params: Record<string, string> = {};
+
+    // Add optional parameters only if they are defined
+    if (locale) params.locale = locale;
+
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
+
+    // Ensure API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/products/${id}/reviews?${queryString}`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+ 
+      return {
+        success: true,
+        data: dataset.product,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
 
   // services/reviewService.ts
   const addReview = async (
@@ -95,7 +125,6 @@ export const useReviews = () => {
     rating: number | null = null,
     reviews: string = "",
     additional_details: string[] = [], // Change here
-    priority: number | null = null
   ) => {
     try {
       // Prepare the form data
@@ -104,8 +133,7 @@ export const useReviews = () => {
         rating,
         reviews,
         additional_details, // Extract detail strings if needed
-        priority,
-        apiUrl: "reviews",
+        apiUrl: `reviews/${product_id}`
       };
 
       // Make the POST request

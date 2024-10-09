@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import ReviewTransForm from '@/components/reviews/SpecificationTranslations';
-import { SpecTranslation, AdditionalDetails, ProductApiResponse, Product } from '@/lib/types';
+import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -12,33 +12,42 @@ import 'react-quill/dist/quill.snow.css'; // Import styles
 
 interface PageProps {
     params: {
-        id: string; // Type for the slug
+        id: number; // Type for the slug
     };
 }
 
 
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = params;
-    const [rating, setRating] = useState<number | null>(null);
-    const [reviews, setReviews] = useState<string>(''); // This will hold rich text
-    const [priority, setPriority] = useState<number>(1);
-    const { addReview } = useReviews();
+    const [reviewData, setReviewData] = useState<Review>();
+    const [reviews, setReviews] = useState<string>('');
+    const [rating, setRating] = useState<number>(0);
+    const { addReview, getReviewByProductId } = useReviews();
     const { getAProductById } = useProducts();
-    const [productId, setProductId] = useState<number | null>(null); // To hold the fetched product ID
+    // const [productId, setProductId] = useState<number | null>(id); // To hold the fetched product ID
     const [productName, setProductName] = useState<string>(''); // To hold the fetched product name
     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
-    const [translations, setTranslations] = useState<SpecTranslation[]>([]); // Hold product translations
+    const [translations, setTranslations] = useState<ProductTranslation[]>([]); // Hold product translations
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [formStatus, setFormStatus] = useState("");
+    const [products, setProducts] = useState<Product>();
 
     const fetchProductData = async () => {
         try {
-            const response = await getAProductById(+id); // Fetch product by ID
+            const response = await getReviewByProductId(+id); // Fetch product by ID
             if (response?.success && response?.data) {
-                setProductId(response.data.id); // Set the actual product ID
-                setProductName(response.data.name); // Set the actual product name
-                setReviews(response.data.review); // Set the actual review content
-                setTranslations(response.data.translations); // Set translations
+                // setProductId(id); // Set the actual product ID
+
+                setProducts(response.data); // Set the actual review content
+                if (response?.data.reviews?.[0]) {
+                    setReviewData(response.data.reviews[0]);
+
+                    setReviews(response.data.reviews[0].reviews)
+                    setRating(response.data.reviews[0].rating)
+                }
+
+                
+                // setTranslations(response.data.translations); // Set translations
             }
         } catch (error) {
             console.error('Error fetching product:', error);
@@ -46,14 +55,18 @@ const ReviewForm = ({ params }: PageProps) => {
     };
 
     useEffect(() => {
+
         if (id) {
             fetchProductData();
         }
     }, []);
 
+   
     const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
 
     const handleReviewSubmit = async (event: React.FormEvent) => {
+
+
         event.preventDefault();
         setReviewsError('');
         setFormStatus('')
@@ -63,18 +76,17 @@ const ReviewForm = ({ params }: PageProps) => {
             return; // Stop form submission
         }
 
-        if (!productId) {
+        if (!id) {
             console.error('No product ID found');
             return;
         }
 
         try {
             const response = await addReview(
-                productId,
+                id,
                 rating,
                 reviews,
                 formattedAdditionalDetails,
-                priority
             );
             setFormStatus('Review submitted!');
         } catch (error) {
@@ -90,7 +102,7 @@ const ReviewForm = ({ params }: PageProps) => {
                 <div className="w-1/2">
                     {/* Review Form */}
                     <form onSubmit={handleReviewSubmit} className="p-4 bg-gray-100 border rounded">
-                        <h2 className="font-bold mb-4">Submit a Review for {productName && productName}</h2>
+                        <h2 className="font-bold mb-4">Submit a Review for {products && products.name}</h2>
 
                         {/* Rating Field */}
                         <label htmlFor="rating" className="block mb-2">Rating</label>
@@ -105,16 +117,7 @@ const ReviewForm = ({ params }: PageProps) => {
                             step="0.1"  // Allow decimal values, with steps of 0.1
                         />
 
-                        {/* Priority Field */}
-                        <label htmlFor="priority" className="block mb-2">Priority</label>
-                        <input
-                            type="number"
-                            id="priority"
-                            value={priority || ''}  // Default to empty string if null
-                            onChange={(e) => setPriority(Number(e.target.value))}
-                            className="w-full p-2 mb-4 border rounded"
-                            min="1"
-                        />
+                     
 
                         {/* Rich Text Editor for Reviews */}
                         <div className="row" style={{ minHeight: '320px' }}>
@@ -133,7 +136,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                         {/* Render the AdditionalDetailsForm component */}
                         <AdditionalDetailsForm
-                            additionalDetails={additionalDetails}
+                            additionalDetails={reviewData?.additional_details}
                             setAdditionalDetails={setAdditionalDetails}
                         />
 
@@ -162,7 +165,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                 {/* Translation Form */}
                 <div className="w-1/2">
-                    <ReviewTransForm id={productId} productName={productName} translations={translations} />
+                    {/* <ReviewTransForm id={id} productName={productName} translations={reviewData?.translations} /> */}
                 </div>
             </div>
         </>

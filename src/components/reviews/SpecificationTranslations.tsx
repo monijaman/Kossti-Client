@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
-import { SpecTranslation, AdditionalDetails, ProductApiResponse, Product } from '@/lib/types';
+import { SpecTranslation, ProductTranslation, AdditionalDetails, ProductApiResponse, Product } from '@/lib/types';
+import { LOCALES } from '@/lib/constants';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -13,7 +14,7 @@ import 'react-quill/dist/quill.snow.css'; // Import styles
 interface PageProps {
     id: number | null;
     productName: string;
-    translations: SpecTranslation[];
+    translations: ProductTranslation[];
 }
 
 const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
@@ -23,12 +24,13 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const formattedAdditionalDetails = additionalDetails.map(detail => JSON.stringify(detail));
+    const [selectedLocale, setSelectedLocale] = useState('');
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
         const translation = translations.find((trans) => trans.locale === locale);
         if (translation) {
-            setSelectedTranslation(translation);
+            setSelectedLocale(locale);
             setRating(parseFloat(translation.rating));
         }
     };
@@ -68,23 +70,22 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="font-bold mb-4">Submit a Review for {productName}</h2>
-
-            {/* Language Switch Buttons */}
+            
             <div className="mb-4">
-                {translations.map((translation) => (
+                {LOCALES.map((translation) => (
                     <button
-                        key={translation.locale}
-                        onClick={() => handleLanguageSwitch(translation.locale)}
-                        className={`px-4 py-2 mr-2 ${selectedTranslation?.locale === translation.locale ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                        key={translation}
+                        onClick={() => handleLanguageSwitch(translation)}
+                        className={`px-4 py-2 mr-2 ${selectedLocale === translation ? 'bg-blue-500 text-white' : 'bg-gray-200'
                             }`}
                     >
-                        {translation.locale.toUpperCase()}
+                        {translation.toUpperCase()}
                     </button>
                 ))}
             </div>
 
             {/* Display Selected Translation */}
-            {selectedTranslation && (
+            {selectedLocale && (
                 <div>
 
                     {/* Rating Input */}
@@ -101,7 +102,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                     />
 
                     {/* Translation Price */}
-                    <label htmlFor="price" className="block mb-2">Price ({selectedTranslation.locale})</label>
+                    <label htmlFor="price" className="block mb-2">Price ({selectedLocale})</label>
                     <input
                         type="number"
                         id="price"

@@ -20,6 +20,7 @@ export interface Product {
   price: number; // or number
   status?: number; // or whatever type it is
   priority?: number; // or whatever type it is
+  reviews?:Review[]
   translations?: Translation[]; // or whatever type it is
 }
 
@@ -32,6 +33,19 @@ export interface Translation{
   price: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProductTranslation{
+  id: number;
+  product_id: number;
+  user_id: number;
+  review: number;
+  product_review_id: string;
+  rating: string;
+  price: number;
+  additional_details: [];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SidebarParams {
@@ -78,7 +92,17 @@ export interface SpecTranslation {
   review: string;
   rating: string;
   product_review_id: string;
-  additional_details: string;
+  additional_details: [];
+}
+
+
+export interface Review {
+  id: number | null;
+  user_id: string;
+  reviews: string;
+  rating: string;
+  additional_details: [];
+  translations:Translation[]
 }
 
 export interface AdditionalDetails {

@@ -31,7 +31,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         if (selectedLang) {
             setSelectedTranslation(locale);
         }
-        console.log('translationstranslations', translations)
+        
         if (product && translations) {
             const item = translations.find((item) => {
                 return item.locale == locale

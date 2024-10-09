@@ -1,4 +1,5 @@
-import React from 'react';
+'use client'
+import React, { useEffect, useState } from 'react';
 
 interface AdditionalDetail {
     youtubeUrl?: string; // Optional YouTube URL
@@ -6,25 +7,15 @@ interface AdditionalDetail {
 }
 
 interface AdditionalDetailsFormProps {
-    additionalDetails: AdditionalDetail[];
+    additionalDetails?: AdditionalDetail[];
     setAdditionalDetails: React.Dispatch<React.SetStateAction<AdditionalDetail[]>>;
 }
 
-const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additionalDetails, setAdditionalDetails }) => {
-    // Add a new YouTube URL field
-    const handleAddYouTube = () => {
-        setAdditionalDetails([...additionalDetails, { youtubeUrl: '' }]);
-    };
-
-    // Add a new Source Link field
-    const handleAddSource = () => {
-        setAdditionalDetails([...additionalDetails, { sourceUrl: '' }]);
-    };
-
+const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additionalDetails = [], setAdditionalDetails }) => {
     // Handle change for both YouTube and Source fields
     const handleAdditionalDetailsChange = (index: number, field: 'youtubeUrl' | 'sourceUrl', value: string) => {
         const updatedDetails = [...additionalDetails];
-        updatedDetails[index][field] = value;
+        updatedDetails[index] = { ...updatedDetails[index], [field]: value }; // Update the specific field
         setAdditionalDetails(updatedDetails);
     };
 
@@ -34,16 +25,55 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
         setAdditionalDetails(updatedDetails);
     };
 
-    // Filter and render YouTube URLs first
-    const youtubeDetails = additionalDetails.filter(detail => detail.youtubeUrl !== undefined);
+    // Add a new YouTube URL field
+    const handleAddYouTube = () => {
+
+        setAdditionalDetails([...additionalDetails, { youtubeUrl: '' }]);
+
+        console.log('ddddddddddddd', { youtubeUrl: '' })
+
+    };
+
+    // Add a new Source Link field
+    const handleAddSource = () => {
+        setAdditionalDetails([...additionalDetails, { sourceUrl: '' }]);
+    };
 
     // Filter and render Source Links after YouTube URLs
-    const sourceDetails = additionalDetails.filter(detail => detail.sourceUrl !== undefined);
+    const [youtubeDetails, setYoutubeDetails] = useState<AdditionalDetail[]>([]);
+    const [sourceDetails, setSourceDetails] = useState<AdditionalDetail[]>([]);
+
+    useEffect(() => {
+        // Ensure additionalDetails is a stringified JSON array and parse it if necessary
+        let parsedAdditionalDetails: AdditionalDetail[] = [];
+    
+        if (typeof additionalDetails === 'string') {
+            try {
+                // Parse the string into a JSON array
+                parsedAdditionalDetails = JSON.parse(additionalDetails);
+            } catch (error) {
+                console.error('Failed to parse additionalDetails JSON:', error);
+            }
+        } else if (Array.isArray(additionalDetails)) {
+            // If additionalDetails is already an array, use it directly
+            parsedAdditionalDetails = additionalDetails;
+        }
+    
+        if (parsedAdditionalDetails.length > 0) {
+            // Filter and extract YouTube URLs
+            const youtubeDetails = parsedAdditionalDetails.filter(detail => detail.youtubeUrl && detail.youtubeUrl.trim() !== '');
+            // Filter and extract Source Links
+            const sourceDetails = parsedAdditionalDetails.filter(detail => detail.sourceUrl && detail.sourceUrl.trim() !== '');
+    
+            setYoutubeDetails(youtubeDetails);
+            setSourceDetails(sourceDetails);
+        }
+    }, [additionalDetails]);
+    
 
     return (
         <div>
-            {/* Render YouTube URLs first */}
-            {/* <h3 className="font-semibold mb-2">YouTube URLs</h3> */}
+            {/* Render YouTube URLs */}
             {youtubeDetails.map((detail, index) => (
                 <div key={`youtube_${index}`} className="mb-4">
                     <label htmlFor={`youtubeUrl_${index}`} className="block mb-2">
@@ -67,8 +97,7 @@ const AdditionalDetailsForm: React.FC<AdditionalDetailsFormProps> = ({ additiona
                 </div>
             ))}
 
-            {/* Render Source Links second */}
-            {/* <h3 className="font-semibold mb-2">Source Links</h3> */}
+            {/* Render Source Links */}
             {sourceDetails.map((detail, index) => (
                 <div key={`source_${index}`} className="mb-4">
                     <label htmlFor={`sourceUrl_${index}`} className="block mb-2">
