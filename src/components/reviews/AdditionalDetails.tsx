@@ -50,73 +50,76 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
     const [youtubeDetails, setYoutubeDetails] = useState<AdditionalDetail[]>([]);
     const [sourceDetails, setSourceDetails] = useState<AdditionalDetail[]>([]);
 
+
+
     useEffect(() => {
+        // Check if additionalDetails is an array; if not, use an empty array
         const parsedAdditionalDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
 
-        // We map through the details and retain even empty fields
-        const youtubeDetails = parsedAdditionalDetails.map(detail => ({
-            youtubeUrl: detail.youtubeUrl || '' // Keep the empty values
-        }));
+        // Update state with sorted details
+        setAdditionalDetails(parsedAdditionalDetails);
 
-        const sourceDetails = parsedAdditionalDetails.map(detail => ({
-            sourceUrl: detail.sourceUrl || '' // Keep the empty values
-        }));
-
-        setYoutubeDetails(youtubeDetails);
-        setSourceDetails(sourceDetails);
     }, [additionalDetails]);
+
+
+
+
 
     return (
         <div>
             {/* Render YouTube URLs */}
-            {youtubeDetails.map((detail, index) => (
-                <div key={`youtube_${index}`} className="mb-4">
-                    <label htmlFor={`youtubeUrl_${index}`} className="block mb-2">
-                        YouTube URL {index + 1}
-                    </label>
-                    <input
-                        type="url"
-                        id={`youtubeUrl_${index}`}
-                        value={detail.youtubeUrl}
-                        onChange={(e) => handleDetailsChange(index, 'youtubeUrl', e.target.value)}
-                        placeholder="Enter a YouTube URL"
-                        className="w-full p-2 mb-2 border rounded"
-                        required
-                    />
-                    <button
-                        type="button"
-                        onClick={() => handleRemoveDetail(index)}
-                        className="text-red-500"
-                    >
-                        Remove
-                    </button>
-                </div>
-            ))}
 
-            {/* Render Source Links */}
-            {sourceDetails.map((detail, index) => (
-                <div key={`source_${index}`} className="mb-4">
-                    <label htmlFor={`sourceUrl_${index}`} className="block mb-2">
-                        Source Link {index + 1}
-                    </label>
-                    <input
-                        type="url"
-                        id={`sourceUrl_${index}`}
-                        value={detail.sourceUrl}
-                        onChange={(e) => handleDetailsChange(index, 'sourceUrl', e.target.value)}
-                        placeholder="Enter a Source URL"
-                        className="w-full p-2 mb-2 border rounded"
-                        required
-                    />
-                    <button
-                        type="button"
-                        onClick={() => handleRemoveDetail(index)}
-                        className="text-red-500"
-                    >
-                        Remove
-                    </button>
-                </div>
-            ))}
+            {additionalDetails
+                .slice() // Create a shallow copy to avoid mutating the original array
+                .sort((a, b) => {
+                    const hasYoutubeA = 'youtubeUrl' in a;
+                    const hasYoutubeB = 'youtubeUrl' in b;
+                    const hasSourceA = 'sourceUrl' in a;
+                    const hasSourceB = 'sourceUrl' in b;
+
+                    // Sorting logic as per your requirements
+                    if (hasYoutubeA && !hasYoutubeB) return -1; // a comes first
+                    if (!hasYoutubeA && hasYoutubeB) return 1; // b comes first
+
+                    return 0; // If both are the same type, keep original order
+                })
+                .map((detail, index) => {
+                    // Determine which field to render based on the keys in detail
+                    const isYoutubeUrl = 'youtubeUrl' in detail;
+                    const isSourceUrl = 'sourceUrl' in detail;
+
+                    // Render YouTube URL if it exists
+                    if (isYoutubeUrl || isSourceUrl) {
+                        return (
+                            <div key={`${isYoutubeUrl ? 'youtube' : 'source'}_${index}`} className="mb-4">
+                                <label htmlFor={`details_${index}`} className="block mb-2">
+                                    {isYoutubeUrl ? `YouTube URL ${index + 1}` : `Source Link ${index + 1}`} {index}
+                                </label>
+                                <input
+                                    type="url"
+                                    id={`details_${index}`}
+                                    value={isYoutubeUrl ? detail.youtubeUrl || '' : detail.sourceUrl || ''} // Default to empty string if undefined
+                                    onChange={(e) => handleDetailsChange(index, isYoutubeUrl ? 'youtubeUrl' : 'sourceUrl', e.target.value)}
+                                    placeholder={isYoutubeUrl ? "Enter a YouTube URL" : "Enter a Source URL"}
+                                    className="w-full p-2 mb-2 border rounded"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveDetail(index)}
+                                    className="text-red-500"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        );
+                    }
+
+                    return null; // Render nothing if neither key exists
+                })}
+
+
+
 
             {/* Buttons to add YouTube URL or Source Link */}
             <div className="flex gap-4">
