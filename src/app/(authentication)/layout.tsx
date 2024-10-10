@@ -13,14 +13,14 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-white ">
         <div className="rounded-lg  ">
-          <Image
+          {/* <Image
             className="logotop mx-auto mb-6"
             src="/logo.png"
             alt="Creative Manager"
             width={201}
             height={37}
             priority
-          />
+          /> */}
           {children}
         </div>
 
