@@ -49,7 +49,6 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
     useEffect(() => {
         // Check if additionalDetails is an array; if not, use an empty array
         const parsedAdditionalDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
-
         // Update state with sorted details
         setAdditionalDetails(parsedAdditionalDetails);
 

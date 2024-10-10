@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product, Category, Brand, Translation } from '@/lib/types'; // Assuming you have a Product type
+import { Product } from '@/lib/types'; // Assuming you have a Product type
 import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
@@ -18,7 +18,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     const [name, setName] = useState(product?.name || '');
     const [price, setPrice] = useState(product?.price || 0);
     const { Translation } = useProducts();
-    const router = useRouter();
     const id = product && product.id;
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');

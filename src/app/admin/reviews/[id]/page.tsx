@@ -84,9 +84,7 @@ const ReviewForm = ({ params }: PageProps) => {
             return;
         }
 
-
-        console.log(additionalDetails)
-
+ 
         try {
             const response = await addReview(
                 id,
