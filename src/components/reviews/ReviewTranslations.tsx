@@ -9,6 +9,7 @@ import { LOCALES } from '@/lib/constants';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
+import { combineSlices } from '@reduxjs/toolkit';
 
 // Page props
 interface PageProps {
@@ -31,25 +32,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
         setSelectedLocale(locale);
-
-        if (translations) {
-            const translation = translations.find((trans) => trans.locale === locale);
-            if (translation) {
-                setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
-            }
-        } else {
-
-            const newTranslation: ReviewTranslation = {
-                locale: 'bn',
-                rating: 0,
-                review: '',
-                additional_details: []
-            };
-
-
-            setSelectedTranslation(newTranslation); // Set to null or leave unchanged
-
-        }
+ 
     };
 
     useEffect(() => {
@@ -57,11 +40,40 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
     }, []);
 
 
-
-    // Select 'bn' translation by default on mount
     useEffect(() => {
-        handleLanguageSwitch('bn');
-    }, []);
+
+        console.log('selectedLocale', selectedLocale)
+
+        const newTranslation: ReviewTranslation = {
+            locale: selectedLocale,
+            rating: 0,
+            review: '',
+            additional_details: []
+        };
+     
+        if (translations && translations?.length > 0) {
+            // handleLanguageSwitch('bn');
+            
+            const translation = translations.find((trans) => trans.locale === selectedLocale);
+            if (translation) {
+                setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
+                setAdditionalDetails(translation.additional_details); // Set selectedTranslation to the correct translation
+            }else{
+                setSelectedTranslation(newTranslation); // Set to null or leave unchanged
+                setAdditionalDetails([]); // Set to null or leave unchanged
+                
+            }
+            
+        }else{
+            
+            setAdditionalDetails([]); // Set to null or leave unchanged
+            setSelectedTranslation(newTranslation); // Set to null or leave unchanged
+        }
+
+    }, [selectedLocale,translations]);
+
+
+
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -73,15 +85,14 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
 
         // Prepare the data to be submitted
         const product_id = id;
-        const locale = selectedTranslation.locale ? selectedTranslation.locale : 'bn';
-
+        
         // Make sure rating is either selected or from the selected translation
         const response = await addReviewTranslation(
             product_id,              // Pass the product review ID
             selectedTranslation.rating,                         // Rating value (ensure it's a number)
             selectedTranslation.review,                         // Review content
-            locale,
-            formattedAdditionalDetails,                             // Pass empty additional details for now or use additionalDetails if needed
+            selectedLocale,
+            additionalDetails,                             // Pass empty additional details for now or use additionalDetails if needed
         );
 
         setFormStatus("review submitted")
@@ -97,6 +108,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
             <div className="mb-4">
                 {LOCALES.map((translation) => (
                     <button
+                        type='button'
                         key={translation}
                         onClick={() => handleLanguageSwitch(translation)}
                         className={`px-4 py-2 mr-2 ${selectedLocale === translation ? 'bg-blue-500 text-white' : 'bg-gray-200'
@@ -132,13 +144,11 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                         step="0.1"  // Allow decimal values, with steps of 0.1
                     />
 
-                  
-
                     {/* Translation Review */}
                     <div className="row" style={{ minHeight: '320px' }}>
                         <label htmlFor="review" className="block mb-2">Review ({selectedTranslation && selectedTranslation.locale})</label>
                         <ReactQuill
-                            value={selectedTranslation?.review }
+                            value={selectedTranslation?.review}
                             onChange={(value) => {
                                 if (selectedTranslation) {
                                     setSelectedTranslation({ ...selectedTranslation, review: value });
@@ -153,10 +163,7 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                             id="review"
                             style={{ backgroundColor: "#f9f9f9", height: "200px" }}
                         />
-
-
                     </div>
-
 
                     <AdditionalDetailsForm
                         additionalDetails={additionalDetails}

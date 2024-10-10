@@ -164,7 +164,7 @@ export const useReviews = () => {
     rating: number | null = null,
     review: string = "",
     locale: string = "",
-    additional_details: string[] = [], // Keeping additional details as an array of strings
+    additional_details: AdditionalDetails[] = [], // Change here
   ) => {
 
    

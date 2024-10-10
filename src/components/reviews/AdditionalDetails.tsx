@@ -42,14 +42,8 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
 
     // Add a new YouTube URL field
     const handleAddYouTube = () => addNewField('youtubeUrl');
-
     // Add a new Source Link field
     const handleAddSource = () => addNewField('sourceUrl');
-
-    // Filter and render Source Links after YouTube URLs
-    const [youtubeDetails, setYoutubeDetails] = useState<AdditionalDetail[]>([]);
-    const [sourceDetails, setSourceDetails] = useState<AdditionalDetail[]>([]);
-
 
 
     useEffect(() => {
