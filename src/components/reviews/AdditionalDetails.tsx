@@ -63,60 +63,58 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
 
 
 
+    const sortDetails = (details: AdditionalDetail[]) => {
+        details.sort((a, b) => {
+            const hasYoutubeA = 'youtubeUrl' in a;
+            const hasYoutubeB = 'youtubeUrl' in b;
+            const hasSourceA = 'sourceUrl' in a;
+            const hasSourceB = 'sourceUrl' in b;
 
+            // Sorting logic as per your requirements
+            if (hasYoutubeA && !hasYoutubeB) return -1; // a comes first
+            if (!hasYoutubeA && hasYoutubeB) return 1; // b comes first
+
+
+            // If both have sourceUrl, maintain original order (0)
+            if (hasSourceA && !hasSourceB) return 1; // b comes first
+            if (!hasSourceA && hasSourceB) return -1; // a comes first
+
+            return 0; // If both are the same type, keep original order
+        })
+        return additionalDetails;
+    }
 
     return (
         <div>
             {/* Render YouTube URLs */}
 
-            {additionalDetails
-                .slice() // Create a shallow copy to avoid mutating the original array
-                .sort((a, b) => {
-                    const hasYoutubeA = 'youtubeUrl' in a;
-                    const hasYoutubeB = 'youtubeUrl' in b;
-                    const hasSourceA = 'sourceUrl' in a;
-                    const hasSourceB = 'sourceUrl' in b;
-
-                    // Sorting logic as per your requirements
-                    if (hasYoutubeA && !hasYoutubeB) return -1; // a comes first
-                    if (!hasYoutubeA && hasYoutubeB) return 1; // b comes first
-
-                    return 0; // If both are the same type, keep original order
-                })
+            {sortDetails(additionalDetails)
                 .map((detail, index) => {
-                    // Determine which field to render based on the keys in detail
-                    const isYoutubeUrl = 'youtubeUrl' in detail;
-                    const isSourceUrl = 'sourceUrl' in detail;
-
-                    // Render YouTube URL if it exists
-                    if (isYoutubeUrl || isSourceUrl) {
-                        return (
-                            <div key={`${isYoutubeUrl ? 'youtube' : 'source'}_${index}`} className="mb-4">
-                                <label htmlFor={`details_${index}`} className="block mb-2">
-                                    {isYoutubeUrl ? `YouTube URL ${index + 1}` : `Source Link ${index + 1}`} {index}
-                                </label>
-                                <input
-                                    type="url"
-                                    id={`details_${index}`}
-                                    value={isYoutubeUrl ? detail.youtubeUrl || '' : detail.sourceUrl || ''} // Default to empty string if undefined
-                                    onChange={(e) => handleDetailsChange(index, isYoutubeUrl ? 'youtubeUrl' : 'sourceUrl', e.target.value)}
-                                    placeholder={isYoutubeUrl ? "Enter a YouTube URL" : "Enter a Source URL"}
-                                    className="w-full p-2 mb-2 border rounded"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveDetail(index)}
-                                    className="text-red-500"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        );
-                    }
-
-                    return null; // Render nothing if neither key exists
-                })}
+                    return (
+                        <div key={`${'youtubeUrl' in detail ? 'youtube' : 'source'}_${index}`} className="mb-4">
+                            <label htmlFor={`details_${index}`} className="block mb-2">
+                                {'youtubeUrl' in detail ? `YouTube URL ${index + 1}` : `Source Link ${index + 1}`}
+                            </label>
+                            <input
+                                type="url"
+                                id={`details_${index}`}
+                                value={'youtubeUrl' in detail ? detail.youtubeUrl : detail.sourceUrl}
+                                onChange={(e) => handleDetailsChange(index, 'youtubeUrl' in detail ? 'youtubeUrl' : 'sourceUrl', e.target.value)}
+                                placeholder={'youtubeUrl' in detail ? "Enter a YouTube URL" : "Enter a Source URL"}
+                                className="w-full p-2 mb-2 border rounded"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveDetail(index)}
+                                className="text-red-500"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    );
+                })
+            }
 
 
 

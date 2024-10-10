@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
-import ReviewTransForm from '@/components/reviews/SpecificationTranslations';
+import ReviewTransForm from '@/components/reviews/ReviewTranslations';
 import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 // Dynamically import React Quill to avoid SSR issues
@@ -42,7 +42,6 @@ const ReviewForm = ({ params }: PageProps) => {
                 if (response?.data.reviews?.[0]) {
                     const dataset = response?.data.reviews?.[0];
                     setReviewData(dataset);
-
                     setReviews(dataset.reviews)
                     setRating(dataset.rating)
                     setAdditionalDetails(dataset.additional_details ?? [])
@@ -172,7 +171,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                 {/* Translation Form */}
                 <div className="w-1/2">
-                    {/* <ReviewTransForm id={id} productName={productName} translations={reviewData?.translations} /> */}
+                    <ReviewTransForm id={id} productName={productName} translations={reviewData?.translations} />
                 </div>
             </div>
         </>

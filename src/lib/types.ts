@@ -21,32 +21,20 @@ export interface Product {
   status?: number; // or whatever type it is
   priority?: number; // or whatever type it is
   reviews?:Review[]
-  translations?: Translation[]; // or whatever type it is
+  translations?: ProductTranslation[]; // or whatever type it is
 }
 
 
-export interface Translation{
+export interface ProductTranslation{
   id: number;
   product_id: number;
   locale: string;
   name: string;
   price: number;
-  created_at: string;
-  updated_at: string;
+ 
 }
 
-export interface ProductTranslation{
-  id: number;
-  product_id: number;
-  user_id: number;
-  review: number;
-  product_review_id: string;
-  rating: string;
-  price: number;
-  additional_details: [];
-  created_at?: string;
-  updated_at?: string;
-}
+
 
 export interface SidebarParams {
   dataset?: brandInt[];
@@ -102,7 +90,20 @@ export interface Review {
   reviews: string;
   rating: string;
   additional_details: [];
-  translations:Translation[]
+  translations:ReviewTranslation[]
+}
+
+export interface ReviewTranslation{
+  id?: number;
+  user_id?: number;
+  product_review_id?: string;
+  locale: string;
+  rating: number;
+  review: string;
+  price?: number;
+  additional_details: AdditionalDetails[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AdditionalDetails {
