@@ -1,14 +1,16 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import ReviewTransForm from '@/components/reviews/ReviewTranslations';
 import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
+import Modal from '@/components/Modal/client';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
+import DragNdrop from "@/components/Uploader/Uploader";
 
 interface PageProps {
     params: {
@@ -31,7 +33,9 @@ const ReviewForm = ({ params }: PageProps) => {
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [formStatus, setFormStatus] = useState("");
     const [products, setProducts] = useState<Product>();
-
+    const [files, setFiles] = useState<File[]>([]);
+    const filesRef = useRef<File[]>([]); // Updated type
+    
     const fetchProductData = async () => {
         try {
             const response = await getReviewByProductId(+id); // Fetch product by ID
@@ -84,7 +88,7 @@ const ReviewForm = ({ params }: PageProps) => {
             return;
         }
 
- 
+
         try {
             const response = await addReview(
                 id,
@@ -98,12 +102,33 @@ const ReviewForm = ({ params }: PageProps) => {
         }
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
 
     return (
         <>
 
+
+            <Modal isOpen={isModalOpen} onClose={closeModal}>
+                <DragNdrop onFilesSelected={setFiles} productId={id} width="auto" height="auto" />
+            </Modal>
             <div className="flex flex-row gap-4">
                 <div className="w-1/2">
+                    {/* Navigates back to the base URL - closing the modal */}
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        onClick={openModal}
+                    >
+                        Add Photos
+                    </button>
                     {/* Review Form */}
                     <form onSubmit={handleReviewSubmit} className="p-4 bg-gray-100 border rounded">
                         <h2 className="font-bold mb-4">Submit a Review for {products && products.name}</h2>

@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import counterReducer from '@/redux/features/counter/counterSlice'
+import uploadReducer from '@/redux/features/upload/uploadSlice'
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer
+    counter: counterReducer,
+    upload: uploadReducer,
   }
 })
 

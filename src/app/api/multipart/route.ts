@@ -46,9 +46,11 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
 
     // Log formData for debugging
     formData.forEach((value, key) => console.log(`${key}: ${value}`));
-
+ 
     // Send a POST request to the API endpoint
-    const response = await fetch(`${apiUrl}${endApiUrl}`, {
+    const response = await fetch(`${apiUrl}/api/v1${endApiUrl}`, {
+
+    // const response = await fetch(`${apiUrl}${endApiUrl}`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -108,7 +110,7 @@ export async function POST(req: NextRequest) {
   try {
     // Get the API URL from environment variables
     const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
-
+ 
     // Check for missing API URL in environment variables
     if (!apiUrl) {
       throw new Error('API URL is not defined');

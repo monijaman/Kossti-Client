@@ -121,3 +121,14 @@ export interface Brand {
   name: string;
   slug?: string;
 }
+
+export interface ProductPhotos {
+  id: number;
+  name: string;
+  product_id: number;
+  default: number;
+  path: string;
+  status: string;
+  media_type?: string;
+  file_size?: number;
+}
