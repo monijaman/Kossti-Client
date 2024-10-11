@@ -105,7 +105,7 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   "upload/removemedia",
   async (payload, { getState }) => {
     const { creativeId } = payload;
-    const apiUrl = `creatives/${creativeId}`; // Construct the API URL
+    const apiUrl = `productimages/${creativeId}`; // Construct the API URL
 
     const newFormData = {
       apiUrl: `creatives/${creativeId}`,

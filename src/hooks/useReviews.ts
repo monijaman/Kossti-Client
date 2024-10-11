@@ -120,6 +120,37 @@ export const useReviews = () => {
     }
   };
 
+
+  const getImagesByProductId = async (id: number) => {
+    const params: Record<string, string> = {};
+
+   
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
+
+    // Ensure API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/productimages/${id}/`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+ 
+      return {
+        success: true,
+        data: dataset.product,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
+
   // services/reviewService.ts
   const addReview = async (
     product_id: number | null = null,
@@ -203,5 +234,5 @@ export const useReviews = () => {
     }
   };
 
-  return { addReview, getReview, getReviewByProductId, addReviewTranslation };
+  return { addReview, getReview, getReviewByProductId, getImagesByProductId, addReviewTranslation };
 };
