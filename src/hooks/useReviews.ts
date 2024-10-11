@@ -143,7 +143,7 @@ export const useReviews = () => {
  
       return {
         success: true,
-        data: dataset.product,
+        data: dataset.images,
       };
     } catch (error) {
       console.error("Error fetching products:", error);

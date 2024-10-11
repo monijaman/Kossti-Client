@@ -8,11 +8,13 @@ export interface brandInt {
   updated_at: string;
 }
 
+ 
+
 export interface Product {
   id: number;
   name: string;
-  category_id:number;
-  brand_id:number;
+  category_id: number;
+  brand_id: number;
   slug: string;
   brand: string;
   category: string;
@@ -20,21 +22,17 @@ export interface Product {
   price: number; // or number
   status?: number; // or whatever type it is
   priority?: number; // or whatever type it is
-  reviews?:Review[]
+  reviews?: Review[];
   translations?: ProductTranslation[]; // or whatever type it is
 }
 
-
-export interface ProductTranslation{
+export interface ProductTranslation {
   id: number;
   product_id: number;
   locale: string;
   name: string;
   price: number;
- 
 }
-
-
 
 export interface SidebarParams {
   dataset?: brandInt[];
@@ -71,7 +69,6 @@ export interface SearchParams {
   locale?: string;
 }
 
-
 export interface SpecTranslation {
   id: number | null;
   locale: string;
@@ -83,17 +80,16 @@ export interface SpecTranslation {
   additional_details: [];
 }
 
-
 export interface Review {
   id: number | null;
   user_id: string;
   reviews: string;
   rating: string;
   additional_details: [];
-  translations:ReviewTranslation[]
+  translations: ReviewTranslation[];
 }
 
-export interface ReviewTranslation{
+export interface ReviewTranslation {
   id?: number;
   user_id?: number;
   product_review_id?: string;
@@ -131,4 +127,5 @@ export interface ProductPhotos {
   status: string;
   media_type?: string;
   file_size?: number;
+  asset_url: string;
 }

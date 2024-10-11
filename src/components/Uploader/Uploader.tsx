@@ -52,7 +52,7 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     }
     dispatch(uploadmedia({ productId, files: files }));
     setFiles([])
-   
+
   };
 
   // when browse input for files;
@@ -61,12 +61,16 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     if (selectedFiles && selectedFiles.length > 0) {
       checkfileValidity(selectedFiles);
     }
+
+    event.target.value = '';
+
+
   };
 
-  const handleRemoveUPloadedFile = async (creativeId: number) => {
+  const handleRemoveUPloadedFile = async (productId: number) => {
     try {
 
-      dispatch(removeMedia({ creativeId }));
+      dispatch(removeMedia({ productId }));
 
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -196,14 +200,10 @@ const DragNdrop: React.FC<DragNdropProps> = ({
                         <tr key={index}>
                           <td>
                             <div className="preview-container">
-                              <RenderPreview
-                                file={null}
-                                fileurl={file.path}
-                              />
+                              <Image src={file.asset_url} alt="" width={50} height={50} />
                             </div>
                           </td>
                           <td>{file.name}</td>
-                          <td>{file.media_type}</td>
                           <td>{file.file_size && Math.ceil(file.file_size / 10000)}KB</td>
                           <td>
                             <div

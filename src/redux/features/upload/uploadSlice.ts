@@ -10,7 +10,7 @@ interface UploadMediaPayload {
 }
 
 interface removeMediaPayload {
-  creativeId: number;
+  productId: number;
 }
 
 export interface UploadState {
@@ -36,9 +36,9 @@ const initialState: UploadState = {
 // Define the API response type if needed
 interface ApiResponse {
   success: boolean;
-  dataset?: any;
+  images?: ProductPhotos;
   error?: string;
-  creativeId?: number;
+  productId?: number;
 }
 
 // The function below is called a thunk and allows us to perform async logic. It
@@ -55,8 +55,6 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
     // Initialize formData as a FormData object
     const formData = new FormData();
     const state = getState() as RootState;
-    const campaignId = state.upload.campaign_id;
-    const name = ""; // Adjust this value as needed
 
     formData.append("product_id", productId.toString()); // Convert to string
     formData.append("apiUrl", "/productimages");
@@ -76,20 +74,18 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
 
       // Assuming the response is JSON
       const responseArray = await response.json();
-      const { dataset } = responseArray;
+      const { data } = responseArray;
       // Check if the request was successful
 
-      if (dataset.error.code) {
+      if (data.images) {
         return {
-          success: false,
-          error:
-            `${dataset.error.file_name} - ${dataset.error.message}` ||
-            "Unknown error",
+          success: true,
+          images: data.images,
         };
       } else {
         return {
-          success: true,
-          dataset,
+          success: false,
+          error: `"Unknown error`,
         };
       }
     } catch (error) {
@@ -104,28 +100,45 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
 export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   "upload/removemedia",
   async (payload, { getState }) => {
-    const { creativeId } = payload;
-    const apiUrl = `productimages/${creativeId}`; // Construct the API URL
+    const { productId } = payload;
+    
 
+   
     const newFormData = {
-      apiUrl: `creatives/${creativeId}`,
+      apiUrl: `imageremove/${productId}`,
     };
 
-    const response = await fetch("/api/delete", {
-      method: "DELETE",
+    const response = await fetch("/api/post", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(newFormData), // Include apiUrl in the request body
     });
 
+
     if (!response.ok) {
       throw new Error("Failed to delete campaign");
     }
 
-    const responseObj = await response.json();
-    responseObj.creativeId = creativeId;
-    return responseObj; // Parse the response as JSON
+    const responseArray = await response.json();
+
+    console.log('responseArray', responseArray)
+    const { data } = responseArray;
+
+
+    if (data.images) {
+      return {
+        success: true,
+        images: data.images,
+      };
+    } else {
+      return {
+        success: false,
+        error: `"Unknown error`,
+      };
+    }
+
   }
 );
 
@@ -191,7 +204,11 @@ export const uploadSlice = createSlice({
           state.error = action.payload.error;
           state.confirmStatus = "failed";
         } else {
-          state.uploadedFiles.push(...action.payload.dataset.data);
+          //  console.log("action.payload", action.payload.data);
+
+          if (Array.isArray(action.payload.images)) {
+            state.uploadedFiles.push(...action.payload.images);
+          }
         }
       })
       .addCase(uploadmedia.rejected, (state) => {
@@ -199,14 +216,14 @@ export const uploadSlice = createSlice({
       })
       .addCase(removeMedia.pending, (state) => {
         state.status = "loading";
+        state.uploadedFiles = [];
       })
       .addCase(removeMedia.fulfilled, (state, action) => {
         state.status = "idle";
 
-        const existingItem = state.uploadedFiles.filter((creative) => {
-          return action.payload.creativeId !== creative.id;
-        });
-        state.uploadedFiles = existingItem;
+        if (Array.isArray(action.payload.images)) {
+          state.uploadedFiles = action.payload.images;
+        }
       })
       .addCase(removeMedia.rejected, (state) => {
         state.status = "failed";

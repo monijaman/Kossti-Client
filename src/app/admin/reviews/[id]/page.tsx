@@ -18,7 +18,6 @@ interface PageProps {
     };
 }
 
-
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = params;
     const [reviewData, setReviewData] = useState<Review>();
@@ -35,7 +34,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [products, setProducts] = useState<Product>();
     const [files, setFiles] = useState<File[]>([]);
     const filesRef = useRef<File[]>([]); // Updated type
-    
+
     const fetchProductData = async () => {
         try {
             const response = await getReviewByProductId(+id); // Fetch product by ID
