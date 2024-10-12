@@ -302,6 +302,28 @@ export const useProducts = () => {
     }
   };
 
+  
+  const getPhotosByProductId = async (productId: number) => {
+   
+      const fullUrl = `${apiUrl}/productimages/${productId}`;
+  
+      try {
+        const response = await fetch(fullUrl);
+        const dataset = await response.json();
+   console.log('holla', dataset.images)
+        return {
+          success: true,
+          data: dataset.images,
+        };
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        return { success: false, data: [] };
+      }
+  };
+ 
+  
+  
+
   return {
     Translation,
     getProducts,
@@ -309,5 +331,6 @@ export const useProducts = () => {
     getAProductById,
     createProduct,
     updateProduct,
+    getPhotosByProductId
   };
 };

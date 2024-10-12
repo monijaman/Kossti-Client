@@ -110,8 +110,6 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
             }
 
 
-
-
             {/* Buttons to add YouTube URL or Source Link */}
             <div className="flex gap-4">
                 <button

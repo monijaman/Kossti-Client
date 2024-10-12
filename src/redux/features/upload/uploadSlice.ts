@@ -80,7 +80,7 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
       if (data.images) {
         return {
           success: true,
-          images: data.images,
+          productId: productId,
         };
       } else {
         return {
@@ -130,7 +130,7 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
     if (data.images) {
       return {
         success: true,
-        images: data.images,
+        productId: productId
       };
     } else {
       return {
@@ -206,9 +206,9 @@ export const uploadSlice = createSlice({
         } else {
           //  console.log("action.payload", action.payload.data);
 
-          if (Array.isArray(action.payload.images)) {
-            state.uploadedFiles.push(...action.payload.images);
-          }
+          // if (Array.isArray(action.payload.images)) {
+          //   state.uploadedFiles.push(...action.payload.images);
+          // }
         }
       })
       .addCase(uploadmedia.rejected, (state) => {
@@ -220,10 +220,12 @@ export const uploadSlice = createSlice({
       })
       .addCase(removeMedia.fulfilled, (state, action) => {
         state.status = "idle";
-
-        if (Array.isArray(action.payload.images)) {
-          state.uploadedFiles = action.payload.images;
-        }
+        const productid = action.payload.productId
+         
+        // if (Array.isArray(action.payload.images)) {
+        //   state.uploadedFiles.push(...action.payload.images);
+        // }
+ 
       })
       .addCase(removeMedia.rejected, (state) => {
         state.status = "failed";

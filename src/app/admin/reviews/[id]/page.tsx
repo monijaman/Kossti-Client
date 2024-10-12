@@ -49,8 +49,6 @@ const ReviewForm = ({ params }: PageProps) => {
                     setRating(dataset.rating)
                     setAdditionalDetails(dataset.additional_details ?? [])
                 }
-
-
                 // setTranslations(response.data.translations); // Set translations
             }
         } catch (error) {
@@ -71,8 +69,6 @@ const ReviewForm = ({ params }: PageProps) => {
         : [];
 
     const handleReviewSubmit = async (event: React.FormEvent) => {
-
-
         event.preventDefault();
         setReviewsError('');
         setFormStatus('')
@@ -114,8 +110,6 @@ const ReviewForm = ({ params }: PageProps) => {
 
     return (
         <>
-
-
             <Modal isOpen={isModalOpen} onClose={closeModal}>
                 <DragNdrop onFilesSelected={setFiles} productId={id} width="auto" height="auto" />
             </Modal>

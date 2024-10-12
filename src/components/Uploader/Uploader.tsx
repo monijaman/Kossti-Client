@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
 import { useRef } from "react";
 import RenderPreview from "@/components/Uploader/RenderPreview";
+import { ProductPhotos } from '@/lib/types';
+
 import {
   selectstatus,
   uploadmedia,
   removeMedia,
   selectUploadedFiles,
 } from "@/redux/features/upload/uploadSlice";
+import { useProducts } from "@/hooks/useProducts";
 
 // Define the props for the DragNdrop component
 interface DragNdropProps {
@@ -21,12 +24,12 @@ interface DragNdropProps {
   height: string;
 }
 
-const DragNdrop: React.FC<DragNdropProps> = ({
+const DragNdrop  = ({
   onFilesSelected,
   productId,
   width,
   height,
-}) => {
+}: DragNdropProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif"];
   const dispatch = useAppDispatch();
@@ -44,16 +47,34 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     setFiles((prevFiles) => [...prevFiles, ...validFiles]);
     selectedFilesRef.current = validFiles; // Update useRef with valid files
   };
+  const [photos, setPhotos] = useState<ProductPhotos[]>([])
+  const {getPhotosByProductId} = useProducts();
 
   const uploadMedia = () => {
     // Dispatch the thunk action with the files
     if (files.length < 1) {
       return;
     }
-    dispatch(uploadmedia({ productId, files: files }));
+   
+    dispatch(uploadmedia({ productId, files: files }))
+    .then(() => {
+      getPhotos(); // Call getPhotos after dispatch is done
+    })
+    .catch((error) => {
+      console.error("Error removing media:", error);
+    });
+    
+    console.log('uploadedDatasetuploadedDataset', uploadedDataset)
+  //  setPhotos(uploadedDataset);
     setFiles([])
 
   };
+
+  const getPhotos = async() =>{
+    const response = await getPhotosByProductId(productId);
+ 
+    setPhotos(response.data);
+  }
 
   // when browse input for files;
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -61,17 +82,19 @@ const DragNdrop: React.FC<DragNdropProps> = ({
     if (selectedFiles && selectedFiles.length > 0) {
       checkfileValidity(selectedFiles);
     }
-
     event.target.value = '';
-
-
   };
 
   const handleRemoveUPloadedFile = async (productId: number) => {
     try {
-
-      dispatch(removeMedia({ productId }));
-
+      dispatch(removeMedia({ productId }))
+      .then(() => {
+        getPhotos(); // Call getPhotos after dispatch is done
+      })
+      .catch((error) => {
+        console.error("Error removing media:", error);
+      });
+    
     } catch (error) {
       console.error("Error fetching data:", error);
       // Handle the error if necessary
@@ -98,9 +121,12 @@ const DragNdrop: React.FC<DragNdropProps> = ({
   // if file is selected
   useEffect(() => {
     onFilesSelected(files);
-
   }, [files, onFilesSelected]);
 
+  useEffect(()=>{
+    
+    getPhotos();
+  },[files])
 
   return (
     <>
@@ -112,8 +138,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
           onDragOver={(event) => event.preventDefault()}
         >
           <div className="file-types">
-
-
             <div className="file-types__item">
               <Image
                 src={`/icons/image.svg`} // Ensure backticks are
@@ -129,7 +153,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
                 <h6> All .gif, .png, .jpg</h6>
               </div>
             </div>
-
           </div>
 
           <>
@@ -173,30 +196,42 @@ const DragNdrop: React.FC<DragNdropProps> = ({
               <div className="file-list__container">
                 <table>
                   <tbody>
-                    {files.length > 0 &&
-                      files.map((file, index) => (
-                        <tr key={index}>
-                          <td>
-                            <div className="preview-container">
-                              <RenderPreview file={file} fileurl={null} />
-                            </div>
-                          </td>
-                          <td>{file.name}</td>
-                          <td>{file.type}</td>
-                          <td>{Math.ceil(file.size / 10000)}KB</td>
-                          <td>
-                            <div
-                              className="remove-file"
-                              onClick={() => handleRemoveFile(index)}
-                            >
-                              Remove
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                  
+                {files.length > 0 &&
+                  files.map((file, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className="preview-container">
+                          <RenderPreview file={file} fileurl={null} />
+                        </div>
+                      </td>
+                      <td>{file.name}</td>
+                      <td>{file.type}</td>
+                      <td>{Math.ceil(file.size / 10000)}KB</td>
+                      <td>
+                        <div className="remove-file" onClick={() => handleRemoveFile(index)}>
+                          Remove
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                }
+              {files.length > 0 &&
+                            <tr>
+                              <td colSpan={5} className="text-center">
+                                <Button
+                                  className="bg-blue-500 my-4 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                                  onClick={uploadMedia}
+                                >
+                                  Upload
+                                </Button>
+                              </td>
+                            </tr>
+            }
 
-                    {uploadedDataset.length > 0 &&
-                      uploadedDataset.map((file, index) => (
+
+                    {photos  &&
+                      photos.map((file, index) => (
                         <tr key={index}>
                           <td>
                             <div className="preview-container">
@@ -243,7 +278,6 @@ const DragNdrop: React.FC<DragNdropProps> = ({
           </>
         </div>
 
-        <Button onClick={uploadMedia}>Upload </Button>
       </section>
     </>
   );
