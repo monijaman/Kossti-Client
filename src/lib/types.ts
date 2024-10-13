@@ -81,7 +81,7 @@ export interface SpecTranslation {
 }
 
 export interface Review {
-  id: number | null;
+  id: number ;
   user_id: string;
   reviews: string;
   rating: string;

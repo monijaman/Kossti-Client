@@ -8,9 +8,26 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
     const searchParams = req.nextUrl.searchParams;
     const reqType = searchParams.get("type");
 
-    // Construct the base fetch URL with the action route (if provided)
-    let fetchUrl = `${apiUrl}/api/v1/${req.nextUrl.search}`;
 
+
+    // Extract the action from query params and append it to the path
+// let searchParams = new URLSearchParams(req.nextUrl.search);
+
+// Extract the action parameter (like 'reviews') from the query string
+const action = searchParams.get("action");
+
+// Remove the action from the query params since it's now part of the path
+searchParams.delete("action");
+
+// Construct the URL without action in the query string
+let fetchUrl = `${apiUrl}/api/v1/${action}?${searchParams.toString()}`;
+
+console.log('fetchUrlfetchUrl', fetchUrl
+    
+)
+
+    // Construct the base fetch URL with the action route (if provided)
+    // let fetchUrl = `${apiUrl}/api/v1/${req.nextUrl.search}`;
     // Initialize headers as an empty object
     let headers: HeadersInit = {};
 
@@ -34,7 +51,7 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
     });
 
     // Check if the response is successful
-    if (!response.ok) throw new Error("Failed to fetch products");
+    if (!response.ok) throw new Error("Failed to fetch");
 
     // Parse the response as JSON
     const resJson = await response.json();
@@ -42,8 +59,9 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
     // Check if the response is successful
     if (response.ok) {
       return NextResponse.json({
-        success: "eeee4",
+        success: true,
         data: resJson,
+        headers
       });
     } else {
       return NextResponse.json({
@@ -66,6 +84,7 @@ export async function GET(req: NextRequest) {
     // Get the API URL from environment variables
     const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
     // Call the common GET request handler
+
     return handleGetRequest(req, apiUrl);
   } catch (error) {
     console.error("Error during GET request:", error);

@@ -234,5 +234,79 @@ export const useReviews = () => {
     }
   };
 
-  return { addReview, getReview, getReviewByProductId, getImagesByProductId, addReviewTranslation };
+
+  const getReviewsw = async (keyword: string) => {
+
+    if (!keyword) {
+        return
+    }
+
+    let apiEndpoint = `?action=search-users&keyword=${keyword}`
+    try {
+        const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+        const dataset = await response.json();
+        return dataset;
+
+    } catch (error) {
+        console.error('Error fetching campaigns:', error);
+    }
+};
+const getReviews = async (
+  page: number,
+  limit: number,
+  searchTerm?: string,
+) => {
+  const params: Record<string, string> = {
+    page: page.toString(),
+    limit: limit.toString(),
+  };
+
+  // Add optional parameters only if they are defined
+  if (searchTerm) params.searchterm = searchTerm;
+
+  // Build the query string
+  const queryString = new URLSearchParams(params).toString();
+
+  // Ensure API URL is defined
+  const routeUrl = process.env.NEXTAUTH_URL; // Define apiUrl properly
+
+  if (!routeUrl) {
+    return Promise.reject(
+      new Error("API URL is not defined in environment variables")
+    );
+  }
+
+  const apiEndpoint = `${routeUrl}/api/get?action=reviews&${queryString}`;
+
+  try {
+    const response = await fetch(apiEndpoint);
+
+    console.log('response', response)
+  // Log the response for debugging
+
+  if (!response.ok) {
+    // Attempt to parse the error message from the response
+    const errorMessage = await response.text();
+    throw new Error(`Failed to fetch reviews: ${errorMessage}`);
+  }
+
+  const dataset = await response.json();
+  return dataset;
+  
+  } catch (error) {
+    if (error instanceof Error) {
+      // Handle error if it's an instance of Error
+      console.error("Error fetching reviews:", error.message);
+      return { success: false, message: error.message, data: [] };
+    } else {
+      // Handle unexpected error types
+      console.error("Unknown error fetching reviews:", error);
+      return { success: false, message: "An unknown error occurred", data: [] };
+    }
+  }
+  
+};
+
+
+  return { addReview, getReview,getReviews, getReviewByProductId, getImagesByProductId, addReviewTranslation };
 };
