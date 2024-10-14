@@ -8,30 +8,25 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
     const searchParams = req.nextUrl.searchParams;
     const reqType = searchParams.get("type");
 
-
-
     // Extract the action from query params and append it to the path
-// let searchParams = new URLSearchParams(req.nextUrl.search);
+    // let searchParams = new URLSearchParams(req.nextUrl.search);
 
-// Extract the action parameter (like 'reviews') from the query string
-const action = searchParams.get("action");
+    // Extract the action parameter (like 'reviews') from the query string
+    const action = searchParams.get("action");
 
-// Remove the action from the query params since it's now part of the path
-searchParams.delete("action");
-
-// Construct the URL without action in the query string
-let fetchUrl = `${apiUrl}/api/v1/${action}?${searchParams.toString()}`;
-
-console.log('fetchUrlfetchUrl', fetchUrl
+    // Remove the action from the query params since it's now part of the path
+    searchParams.delete("action");
+    // Construct the URL without action in the query string
+    let fetchUrl = `${apiUrl}/api/v1/${action}?${searchParams.toString()}`;
     
-)
+    console.log('++++++++++++++++++++++++++++++',fetchUrl)
+    console.log("fetchUrlfetchUrl", fetchUrl);
 
     // Construct the base fetch URL with the action route (if provided)
     // let fetchUrl = `${apiUrl}/api/v1/${req.nextUrl.search}`;
     // Initialize headers as an empty object
     let headers: HeadersInit = {};
 
- 
     // Check if the request type is not public and retrieve the access token from cookies
     if (!reqType || reqType !== "public") {
       const accessToken = req.cookies.get("accessToken")?.value;
@@ -61,7 +56,7 @@ console.log('fetchUrlfetchUrl', fetchUrl
       return NextResponse.json({
         success: true,
         data: resJson,
-        headers
+        headers,
       });
     } else {
       return NextResponse.json({

@@ -1,7 +1,7 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 import { useState, useEffect } from "react";
-import {  AdditionalDetails } from '@/lib/types';
+import { AdditionalDetails } from "@/lib/types";
 
 export const useReviews = () => {
   const getReview = async (
@@ -56,7 +56,7 @@ export const useReviews = () => {
     }
   };
 
-  const getReviewByProductSlug= async (slug: string, locale?: string) => {
+  const getReviewByProductSlug = async (slug: string, locale?: string) => {
     const params: Record<string, string> = {};
 
     // Add optional parameters only if they are defined
@@ -109,7 +109,7 @@ export const useReviews = () => {
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
- 
+
       return {
         success: true,
         data: dataset.product,
@@ -120,11 +120,9 @@ export const useReviews = () => {
     }
   };
 
-
   const getImagesByProductId = async (id: number) => {
     const params: Record<string, string> = {};
 
-   
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
 
@@ -140,7 +138,7 @@ export const useReviews = () => {
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
- 
+
       return {
         success: true,
         data: dataset.images,
@@ -156,7 +154,7 @@ export const useReviews = () => {
     product_id: number | null = null,
     rating: number | null = null,
     reviews: string = "",
-    additional_details: AdditionalDetails[] = [], // Change here
+    additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
       // Prepare the form data
@@ -165,7 +163,7 @@ export const useReviews = () => {
         rating,
         reviews,
         additional_details, // Extract detail strings if needed
-        apiUrl: `reviews/${product_id}`
+        apiUrl: `reviews/${product_id}`,
       };
 
       // Make the POST request
@@ -195,10 +193,8 @@ export const useReviews = () => {
     rating: number | null = null,
     review: string = "",
     locale: string = "",
-    additional_details: AdditionalDetails[] = [], // Change here
+    additional_details: AdditionalDetails[] = [] // Change here
   ) => {
-
-   
     try {
       // Prepare the form data
       const newFormData = {
@@ -210,7 +206,6 @@ export const useReviews = () => {
         apiUrl: "review/translation", // Assuming this is used on the backend for some routing logic
       };
 
-     
       // Make the POST request
       const response = await fetch("/api/post", {
         method: "POST",
@@ -219,8 +214,7 @@ export const useReviews = () => {
         },
         body: JSON.stringify(newFormData),
       });
-     
- 
+
       // Handle response
       if (!response.ok) {
         throw new Error("Failed to submit review");
@@ -234,79 +228,78 @@ export const useReviews = () => {
     }
   };
 
-
   const getReviewsw = async (keyword: string) => {
-
     if (!keyword) {
-        return
+      return;
     }
 
-    let apiEndpoint = `?action=search-users&keyword=${keyword}`
+    let apiEndpoint = `?action=search-users&keyword=${keyword}`;
     try {
-        const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
-        const dataset = await response.json();
-        return dataset;
-
+      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+      const dataset = await response.json();
+      return dataset;
     } catch (error) {
-        console.error('Error fetching campaigns:', error);
+      console.error("Error fetching campaigns:", error);
     }
-};
-const getReviews = async (
-  page: number,
-  limit: number,
-  searchTerm?: string,
-) => {
-  const params: Record<string, string> = {
-    page: page.toString(),
-    limit: limit.toString(),
   };
 
-  // Add optional parameters only if they are defined
-  if (searchTerm) params.searchterm = searchTerm;
+  const getReviews = async (
+    page: number,
+    limit: number,
+    searchTerm?: string
+  ) => {
+    const params: Record<string, string> = {
+      page: page.toString(),
+      limit: limit.toString(),
+    };
 
-  // Build the query string
-  const queryString = new URLSearchParams(params).toString();
+    // Add optional parameters only if they are defined
+    if (searchTerm) params.searchterm = searchTerm;
 
-  // Ensure API URL is defined
-  const routeUrl = process.env.NEXTAUTH_URL; // Define apiUrl properly
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
 
-  if (!routeUrl) {
-    return Promise.reject(
-      new Error("API URL is not defined in environment variables")
-    );
-  }
-
-  const apiEndpoint = `${routeUrl}/api/get?action=reviews&${queryString}`;
-
-  try {
-    const response = await fetch(apiEndpoint);
-
-    console.log('response', response)
-  // Log the response for debugging
-
-  if (!response.ok) {
-    // Attempt to parse the error message from the response
-    const errorMessage = await response.text();
-    throw new Error(`Failed to fetch reviews: ${errorMessage}`);
-  }
-
-  const dataset = await response.json();
-  return dataset;
   
-  } catch (error) {
-    if (error instanceof Error) {
-      // Handle error if it's an instance of Error
-      console.error("Error fetching reviews:", error.message);
-      return { success: false, message: error.message, data: [] };
-    } else {
-      // Handle unexpected error types
-      console.error("Unknown error fetching reviews:", error);
-      return { success: false, message: "An unknown error occurred", data: [] };
+
+    const apiEndpoint = `/api/get?action=reviews&${queryString}`;
+ 
+    try {
+      const response = await fetch(apiEndpoint);
+
+      // console.log("response", response);
+      // Log the response for debugging
+
+      if (!response.ok) {
+        // Attempt to parse the error message from the response
+        const errorMessage = await response.text();
+        throw new Error(`Failed to fetch reviews: ${errorMessage}`);
+      }
+
+      const dataset = await response.json();
+      return dataset;
+    } catch (error) {
+      if (error instanceof Error) {
+        // Handle error if it's an instance of Error
+        console.error("Error fetching reviews:", error.message);
+        return { success: false, message: error.message, data: [] };
+      } else {
+        // Handle unexpected error types
+        console.error("Unknown error fetching reviews:", error);
+        return {
+          success: false,
+          message: "An unknown error occurred",
+          data: [],
+        };
+      }
     }
-  }
-  
-};
+  };
 
-
-  return { addReview, getReview,getReviews, getReviewByProductId, getImagesByProductId, addReviewTranslation };
+  return {
+    addReview,
+    getReview,
+    getReviews,
+    getReviewByProductId,
+    getImagesByProductId,
+    addReviewTranslation,
+  };
 };
