@@ -5,23 +5,19 @@ interface PaginationProps {
 
 const GeneralPagination = ({  currentPage, totalPages }: PaginationProps) => {
 
-  // Function to get category from the URL
-  const getCategory = () => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('category') || '';
-    }
-    return '';
-  };
+ 
 
   const getPageNumbers = () => {
     const pages = [];
-
+ 
     // Always display the first page
-    pages.push(1);
 
     // If totalPages is 7 or less, display all pages
-    if (totalPages <= 7) {
+    if (totalPages <= 1) {
+      pages.push(1);
+
+    }
+    else if (totalPages <= 7) {
       for (let i = 2; i < totalPages; i++) {
         pages.push(i);
       }

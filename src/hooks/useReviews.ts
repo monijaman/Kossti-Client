@@ -1,6 +1,5 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
-import { useState, useEffect } from "react";
 import { AdditionalDetails } from "@/lib/types";
 
 export const useReviews = () => {
@@ -264,7 +263,7 @@ export const useReviews = () => {
     const apiEndpoint = `/api/get?action=reviews&${queryString}`;
  
     try {
-      const response = await fetch(apiEndpoint);
+      const response = await fetch(apiEndpoint, { cache: 'no-store' });
 
       // console.log("response", response);
       // Log the response for debugging

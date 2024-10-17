@@ -12,7 +12,7 @@ interface ProductFormProps {
 }
 
 
-const ProductTransForm = ({ product }: ProductFormProps) => {
+const ReviewTransForm = ({ product }: ProductFormProps) => {
 
 
     const [name, setName] = useState(product?.name || '');
@@ -30,7 +30,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         if (selectedLang) {
             setSelectedTranslation(locale);
         }
-
+        
         if (product && translations) {
             const item = translations.find((item) => {
                 return item.locale == locale
@@ -39,7 +39,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
             if (item) {
                 setName(item.name)
                 setPrice(item.price)
-            } else {
+            }else{
                 setName('');
                 setPrice(0);
             }
@@ -47,7 +47,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     };
 
     useEffect(() => {
-        console.log('translationstranslations', translations)
+       console.log('translationstranslations', translations)
     }, [translations]);
 
 
@@ -78,13 +78,13 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
 
             if (response.success) {
                 setSubmitStatus('Form Submitted successfully');
-
+                
                 setTranslations((prevItem) => [
                     ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
                     response.data.translation  // append the new translation to the array
-                ]);
-
-
+                  ]);
+                  
+                
 
             } else {
                 console.error('Error submitting form', response);
@@ -171,4 +171,4 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     );
 };
 
-export default ProductTransForm;
+export default ReviewTransForm;

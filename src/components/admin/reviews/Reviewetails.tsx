@@ -6,40 +6,45 @@ interface PageProps {
   reviews: Review[]; // Change to array of Product
 }
 
-const Reviewetails  = ({ reviews }: PageProps) => {
-
-  const makeInactive = (reviewId: number) =>{
-    console.log('makeInactive', reviewId)
-  }
+const Reviewetails = ({ reviews }: PageProps) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">
         <thead>
           <tr>
-            <th className="py-2 px-4 border">ID</th>
-            <th className="py-2 px-4 border">Name</th>
-             
+            <th className="py-2 px-4 border">Product</th>
+            <th className="py-2 px-4 border">Product</th>
+            <th className="py-2 px-4 border">Review</th>
             <th className="py-2 px-4 border">Rating</th>
             <th className="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {reviews.map((review) => (
-            <tr key={review.id}>
-              <td className="py-2 px-4 border">{review.id}</td>
-              <td className="py-2 px-4 border">{review.rating}</td>
-              <td className="py-2 px-4 border">{review.rating}</td>
+          {reviews.map((dataset) => (
+            <tr key={dataset.review.id}>
+              <td className="py-2 px-4 border"> {dataset.review.id}  </td>
+              <td className="py-2 px-4 border"><Link href={`products/${dataset.review.id}`}>{dataset.product.name}</Link></td>
               <td className="py-2 px-4 border">
-                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${review.id}`}>Review</Link>
-                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${review.id}`}>View</Link>
-                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${review.id}`}>Edit</Link>
+                {dataset.review.reviews.length > 300 ? (
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: dataset.review.reviews.slice(0, 300) + '...',
+                    }}
+                  />
+                ) : (
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: dataset.review.reviews,
+                    }}
+                  />
+                )}
+              </td>
+              <td className="py-2 px-4 border">{dataset.review.rating}</td>
+              <td className="py-2 px-4 border">
 
-                <button
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => makeInactive(review.id)}
-                >
-                  Delete
-                </button>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${dataset.review.id}`}>View</Link>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${dataset.review.id}`}>Edit</Link>
+
               </td>
             </tr>
           ))}

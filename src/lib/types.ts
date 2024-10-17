@@ -129,3 +129,15 @@ export interface ProductPhotos {
   file_size?: number;
   asset_url: string;
 }
+
+
+export interface SpecificationInt {
+  id?: number;
+  specification_key_id: string;
+  value: string;
+}
+
+export interface SpecificationKey {
+  id: number;
+  specification_key: string;
+}

@@ -57,7 +57,6 @@ const ReviewForm = ({ params }: PageProps) => {
     };
 
     useEffect(() => {
-
         if (id) {
             fetchProductData();
         }
@@ -82,7 +81,6 @@ const ReviewForm = ({ params }: PageProps) => {
             console.error('No product ID found');
             return;
         }
-
 
         try {
             const response = await addReview(

@@ -37,6 +37,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ products }) => {
                 <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`reviews/${product.id}`}>Review</Link>
                 <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${product.id}`}>View</Link>
                 <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${product.id}`}>Edit</Link>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`specifications/${product.id}`}>Specifications</Link>
 
                 <button
                   className="bg-red-500 text-white px-2 py-1 rounded"

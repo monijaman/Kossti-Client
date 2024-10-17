@@ -5,6 +5,9 @@ import { useReviews } from '@/hooks/useReviews';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 import { SpecTranslation, ProductTranslation, AdditionalDetails, ProductApiResponse, Product, ReviewTranslation } from '@/lib/types';
 import { LOCALES } from '@/lib/constants';
+import { SpecificationInt, SpecificationKey } from '@/lib/types';
+import { useSpecifications } from "@/hooks/useSpecifications";
+import Select, { SingleValue } from 'react-select';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -16,98 +19,48 @@ interface PageProps {
     id: number | null;
     productName: string;
     translations?: ReviewTranslation[];
+    specKeys?: SpecificationKey[];
+    specifications?: SpecificationInt[];
 }
 
-const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
+const ReviewTransForm = ({ id, productName, specKeys, specifications }: PageProps) => {
     const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
     const { addReviewTranslation } = useReviews();
     const [formStatus, setFormStatus] = useState("");
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
+    const { getSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
+ 
 
-    useEffect(() => {
-        if (translations && translations?.length > 0) {
-            setTransData(translations);
-        }
-    }, [translations])
-
-
-    useEffect(() => {
-
-
-        const newTranslation: ReviewTranslation = {
-            locale: selectedLocale,
-            rating: 0,
-            review: '',
-            additional_details: []
-        };
-
-        setAdditionalDetails([]); // Set to null or leave unchanged
-        setSelectedTranslation(newTranslation); // Set to null or leave unchanged
-
-        if (transData && transData?.length > 0) {
-            // handleLanguageSwitch('bn');
-
-            const translation = transData.find((trans) => trans.locale === selectedLocale);
-            if (translation) {
-                setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
-                setAdditionalDetails(translation.additional_details); // Set selectedTranslation to the correct translation
-            }
-        }
-
-    }, [selectedLocale, translations]);
-
-
-
-
-    // Handle form submission
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setFormStatus("")
-
-        // console.log(selectedTranslation)
-        if (!selectedTranslation) return;
-
-        // Prepare the data to be submitted
-        const product_id = id;
-
-        // Make sure rating is either selected or from the selected translation
-        const response = await addReviewTranslation(
-            product_id,              // Pass the product review ID
-            selectedTranslation.rating,                         // Rating value (ensure it's a number)
-            selectedTranslation.review,                         // Review content
-            selectedLocale,
-            additionalDetails,                             // Pass empty additional details for now or use additionalDetails if needed
-        );
-
-        if (response.success) {
-            const details = response.data.review;
-
-            // Updated transData array by mapping over it
-            const updatedTransData = transData.map((dataset) => {
-                // Check if the locale matches
-                if (dataset.locale === selectedLocale) {
-                    // Return a new object, preserving structure and adding `details` where appropriate
-                    return {
-                        ...dataset,
-                        ...details,  // Spread details into the existing dataset
-                    };
-                } else {
-                    // Return unchanged dataset if locale doesn't match
-                    return dataset;
-                }
-            });
-
-            // Set the updated data in state
-            setTransData(updatedTransData);  // Make sure `setTransData` is used to update the state
-
-            // Set form status message
-            setFormStatus(response.data.message || ''); // Provide a fallback in case `message` is undefined
-        }
-
-        // Handle the API response here, e.g., display success message or redirect
+    // Function to handle form submission
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        await submitSpecifications(id, specifications);
     };
+
+    // Function to handle input change
+    const handleInputChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+        const values = [...specifications];
+        const { name, value } = event.target;
+
+        // Type guard to ensure name is a key of SpecificationInt
+        if (name === 'specification_key_id' || name === 'value') {
+            values[index][name] = value; // Ensure key is valid
+        }
+
+        setSpecifications(values);
+    };
+
+    // Function to handle specification key selection from react-select
+    const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
+        const values = [...specifications];
+        if (selectedOption) {
+            values[index].specification_key_id = selectedOption.value.toString(); // Set the selected key ID as string
+            setSpecifications(values);
+        }
+    };
+
 
 
     return (
@@ -128,70 +81,61 @@ const ReviewTransForm = ({ id, productName, translations }: PageProps) => {
                 ))}
             </div>
 
-            {/* Display Selected Translation */}
-            {selectedLocale && (
-                <div>
 
-                    {/* Rating Input */}
-                    <label htmlFor="rating" className="block mb-2">Rating</label>
-                    <input
-                        type="number"
-                        id="rating"
-                        value={selectedTranslation?.rating}  // Ensure initial value is set
-                        onChange={(e) => {
-                            if (selectedTranslation) {
-                                setSelectedTranslation({
-                                    ...selectedTranslation,
-                                    rating: parseFloat(e.target.value) || 0 // Convert to number
-                                });
-                            }
-                        }}
-
-                        className="w-full p-2 mb-4 border rounded"
-                        min="1"
-                        max="5"
-                        step="0.1"  // Allow decimal values, with steps of 0.1
-                    />
-
-                    {/* Translation Review */}
-                    <div className="row" style={{ minHeight: '320px' }}>
-                        <label htmlFor="review" className="block mb-2">Review ({selectedTranslation && selectedTranslation.locale})</label>
-                        <ReactQuill
-                            value={selectedTranslation?.review}
-                            onChange={(value) => {
-                                if (selectedTranslation) {
-                                    setSelectedTranslation({ ...selectedTranslation, review: value });
-                                }
-                            }}
-                            modules={{
-                                clipboard: {
-                                    matchVisual: false, // Strip out formatting on paste
-                                },
-                            }}
-                            className="mb-4"
-                            id="review"
-                            style={{ backgroundColor: "#f9f9f9", height: "200px" }}
-                        />
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {specifications.map((spec, index) => (
+                    <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Specification Key</label>
+                            <Select
+                                name="specification_key_id" // Match with SpecificationInt key
+                                value={specKeys
+                                    .map((key) => ({
+                                        value: key.id,
+                                        label: key.specification_key,
+                                    }))
+                                    .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
+                                onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
+                                options={specKeys.map((key) => ({
+                                    value: key.id,
+                                    label: key.specification_key,
+                                }))}
+                                onInputChange={(inputValue) => {
+                                    if (inputValue) {
+                                        fetchSpecificationKeys(inputValue); // Call API to fetch dynamic data
+                                    }
+                                }}
+                                className="mt-1 block w-full"
+                                placeholder="Search and select a specification key"
+                                isSearchable
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Value</label>
+                            <input
+                                type="text"
+                                name="value" // Ensure this matches the SpecificationInt key
+                                value={spec.value}
+                                onChange={(event) => handleInputChange(index, event)}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required
+                            />
+                        </div>
                     </div>
+                ))}
 
-                    <AdditionalDetailsForm
-                        additionalDetails={additionalDetails}
-                        setAdditionalDetails={setAdditionalDetails}
-                    />
+                <div className="flex justify-between">
 
-                    {/* Submit Button */}
-                    <div className='my-4'>
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white py-2 px-4 rounded"
-                        >
-                            Submit Translation
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                        Submit
+                    </button>
                 </div>
+            </form>
 
-
-            )}
 
             {formStatus && (
                 <div

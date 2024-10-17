@@ -18,9 +18,7 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
     searchParams.delete("action");
     // Construct the URL without action in the query string
     let fetchUrl = `${apiUrl}/api/v1/${action}?${searchParams.toString()}`;
-    
-    console.log('++++++++++++++++++++++++++++++',fetchUrl)
-    console.log("fetchUrlfetchUrl", fetchUrl);
+ 
 
     // Construct the base fetch URL with the action route (if provided)
     // let fetchUrl = `${apiUrl}/api/v1/${req.nextUrl.search}`;
@@ -56,7 +54,6 @@ async function handleGetRequest(req: NextRequest, apiUrl: string) {
       return NextResponse.json({
         success: true,
         data: resJson,
-        headers,
       });
     } else {
       return NextResponse.json({
