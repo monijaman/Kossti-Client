@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
-import { SpecTranslation, ProductTranslation, AdditionalDetails, ProductApiResponse, Product, ReviewTranslation } from '@/lib/types';
+import { SpecKeyTranslation, ReviewTranslation } from '@/lib/types';
 import { LOCALES } from '@/lib/constants';
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { useSpecifications } from "@/hooks/useSpecifications";
@@ -16,56 +16,85 @@ import { combineSlices } from '@reduxjs/toolkit';
 
 // Page props
 interface PageProps {
-    id: number | null;
-    productName: string;
+    productId: number | null;
     translations?: ReviewTranslation[];
     specKeys?: SpecificationKey[];
     specifications?: SpecificationInt[];
 }
 
-const ReviewTransForm = ({ id, productName, specKeys, specifications }: PageProps) => {
-    const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
-    const { addReviewTranslation } = useReviews();
+const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
-    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [selectedLocale, setSelectedLocale] = useState('bn');
-    const [transData, setTransData] = useState<ReviewTranslation[]>([]);
-    const { getSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
- 
+    const { submitSpecifications } = useSpecifications();
+    const [trspecifications, setTrspecifications] = useState<SpecificationKey[]>([]);
+
+    const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
+
+    useEffect(() => {
+        if (specifications) {
+            const transSpec = specifications.map((item) => {
+                return {
+                    // ...item,
+
+                    id: item.id ?? null,  // Ensure id is either a number or null, avoiding undefined
+                    locale: selectedLocale,
+                    specification_id: item.id ?? null,  // Ensure id is either a number or null
+                    translated_key: +item.specification_key_id,
+                    translated_value: item.value,
+                };
+            });
+
+            setTranSpecifications(transSpec);
+        }
+    }, [specifications]);
+
+
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        await submitSpecifications(id, specifications);
+        // await submitSpecifications(id, specifications);
     };
 
     // Function to handle input change
     const handleInputChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
-        const values = [...specifications];
-        const { name, value } = event.target;
+        if (tranSpecifications) {
 
-        // Type guard to ensure name is a key of SpecificationInt
-        if (name === 'specification_key_id' || name === 'value') {
-            values[index][name] = value; // Ensure key is valid
+            const values = [...tranSpecifications];
+            const { name, value } = event.target;
+
+            // console.log('valuesvalues',  values[index]['translated_value'])
+            // Type guard to ensure name is a key of SpecificationInt
+            if (name === 'translated_key' || name === 'value') {
+                values[index]['translated_value'] = value; // Ensure key is valid
+            }
+
+            setTranSpecifications(values);
         }
-
-        setSpecifications(values);
     };
 
     // Function to handle specification key selection from react-select
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-        const values = [...specifications];
+
+        const values = [...tranSpecifications];
+        console.log('valuesvalues', values[index])
         if (selectedOption) {
-            values[index].specification_key_id = selectedOption.value.toString(); // Set the selected key ID as string
-            setSpecifications(values);
+            values[index].specification_id = selectedOption.value; // Set the selected key ID as string
+            setTranSpecifications(values);
         }
     };
 
+    useEffect(() => {
 
+
+        console.log('-------44-----------specKeys', specKeys);
+        console.log('---------44---------specifications', specifications);
+
+    }, [])
 
     return (
         <form onSubmit={handleSubmit}>
-            <h2 className="font-bold mb-4">Submit a Review for {productName}</h2>
+            <h2 className="font-bold mb-4">Tranaslattion</h2>
 
             <div className="mb-4">
                 {LOCALES.map((translation) => (
@@ -83,40 +112,36 @@ const ReviewTransForm = ({ id, productName, specKeys, specifications }: PageProp
 
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {specifications.map((spec, index) => (
+                {tranSpecifications && tranSpecifications.map((spec, index) => (
                     <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Specification Key</label>
                             <Select
-                                name="specification_key_id" // Match with SpecificationInt key
-                                value={specKeys
+                                name="specification_id"
+                                value={specKeys && specKeys
                                     .map((key) => ({
-                                        value: key.id,
+                                        value: key.id, // Keeping this as a number
                                         label: key.specification_key,
                                     }))
-                                    .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
-                                onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
-                                options={specKeys.map((key) => ({
-                                    value: key.id,
+                                    .find((option) => option.value === spec.specification_id) || null}  // Comparing numbers
+                                onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
+                                options={specKeys && specKeys.map((key) => ({
+                                    value: key.id,  // Keeping id as a number
                                     label: key.specification_key,
                                 }))}
-                                onInputChange={(inputValue) => {
-                                    if (inputValue) {
-                                        fetchSpecificationKeys(inputValue); // Call API to fetch dynamic data
-                                    }
-                                }}
                                 className="mt-1 block w-full"
                                 placeholder="Search and select a specification key"
                                 isSearchable
                                 required
                             />
+
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Value</label>
                             <input
                                 type="text"
                                 name="value" // Ensure this matches the SpecificationInt key
-                                value={spec.value}
+                                value={spec.translated_value}
                                 onChange={(event) => handleInputChange(index, event)}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 required

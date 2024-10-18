@@ -8,8 +8,6 @@ export interface brandInt {
   updated_at: string;
 }
 
- 
-
 export interface Product {
   id: number;
   name: string;
@@ -24,6 +22,8 @@ export interface Product {
   priority?: number; // or whatever type it is
   reviews?: Review[];
   translations?: ProductTranslation[]; // or whatever type it is
+
+  specifications?: SpecificationInt[]; // Ensure specifications is included here
 }
 
 export interface ProductTranslation {
@@ -81,7 +81,7 @@ export interface SpecTranslation {
 }
 
 export interface Review {
-  id: number ;
+  id: number;
   user_id: string;
   reviews: string;
   rating: string;
@@ -130,11 +130,18 @@ export interface ProductPhotos {
   asset_url: string;
 }
 
-
 export interface SpecificationInt {
   id?: number;
   specification_key_id: string;
   value: string;
+}
+
+export interface SpecKeyTranslation {
+  id: null | number;
+  locale: string;
+  specification_id:  number | null;
+  translated_key: null | number;
+  translated_value: string;
 }
 
 export interface SpecificationKey {
