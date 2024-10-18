@@ -94,7 +94,6 @@ const Specification = ({ params }: PageProps) => {
                         {specifications.map((spec, index) => (
                             <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Specification Key</label>
                                     <Select
                                         name="specification_key_id" // Match with SpecificationInt key
                                         value={specKeys
@@ -120,7 +119,6 @@ const Specification = ({ params }: PageProps) => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Value</label>
                                     <input
                                         type="text"
                                         name="value" // Ensure this matches the SpecificationInt key

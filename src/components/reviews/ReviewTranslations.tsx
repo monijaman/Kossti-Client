@@ -28,13 +28,14 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
+    console.log('specifications', specifications)
     useEffect(() => {
         if (specifications) {
             const transSpec = specifications.map((item) => {
                 return {
                     id: item.id ?? null,  // Ensure id is either a number or null, avoiding undefined
                     locale: selectedLocale,
-                    specification_id: item.id ?? null,  // Ensure id is either a number or null
+                    specification_id: +item.specification_key_id,  // Ensure id is either a number or null
                     translated_key: +item.specification_key_id,
                     translated_value: item.value,
                 };
@@ -100,7 +101,6 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
                  {tranSpecifications && tranSpecifications.map((spec, index) => (
                     <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Specification Key</label>
                             <Select
                                 name="specification_id"
                                 value={specKeys && specKeys
@@ -122,7 +122,6 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Value</label>
                             <input
                                 type="text"
                                 name="value" // Ensure this matches the SpecificationInt key
