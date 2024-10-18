@@ -1,8 +1,6 @@
 "use client";
 import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
 import dynamic from 'next/dynamic';
-import { useReviews } from '@/hooks/useReviews';
-import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 import { SpecKeyTranslation, ReviewTranslation } from '@/lib/types';
 import { LOCALES } from '@/lib/constants';
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
@@ -25,8 +23,8 @@ interface PageProps {
 const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');
-    const { submitSpecifications } = useSpecifications();
-    const [trspecifications, setTrspecifications] = useState<SpecificationKey[]>([]);
+    const { submitSpecKeyTranslation } = useSpecifications();
+    // const [trspecifications, setTrspecifications] = useState<SpecificationKey[]>([]);
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
@@ -34,8 +32,6 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
         if (specifications) {
             const transSpec = specifications.map((item) => {
                 return {
-                    // ...item,
-
                     id: item.id ?? null,  // Ensure id is either a number or null, avoiding undefined
                     locale: selectedLocale,
                     specification_id: item.id ?? null,  // Ensure id is either a number or null
@@ -46,36 +42,34 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
             setTranSpecifications(transSpec);
         }
-    }, [specifications]);
-
-
+    }, [specifications, selectedLocale]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // await submitSpecifications(id, specifications);
+
+        console.log('===============', 4444444444)
+        if (productId) {
+
+            await submitSpecKeyTranslation(productId, tranSpecifications);
+        }
     };
 
     // Function to handle input change
     const handleInputChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
         if (tranSpecifications) {
-
             const values = [...tranSpecifications];
             const { name, value } = event.target;
-
-            // console.log('valuesvalues',  values[index]['translated_value'])
             // Type guard to ensure name is a key of SpecificationInt
             if (name === 'translated_key' || name === 'value') {
                 values[index]['translated_value'] = value; // Ensure key is valid
             }
-
             setTranSpecifications(values);
         }
     };
 
     // Function to handle specification key selection from react-select
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-
         const values = [...tranSpecifications];
         console.log('valuesvalues', values[index])
         if (selectedOption) {
@@ -84,16 +78,8 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
         }
     };
 
-    useEffect(() => {
-
-
-        console.log('-------44-----------specKeys', specKeys);
-        console.log('---------44---------specifications', specifications);
-
-    }, [])
-
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}  className="space-y-6">
             <h2 className="font-bold mb-4">Tranaslattion</h2>
 
             <div className="mb-4">
@@ -111,8 +97,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
             </div>
 
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {tranSpecifications && tranSpecifications.map((spec, index) => (
+                 {tranSpecifications && tranSpecifications.map((spec, index) => (
                     <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Specification Key</label>
@@ -159,8 +144,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
                         Submit
                     </button>
                 </div>
-            </form>
-
+        
 
             {formStatus && (
                 <div
