@@ -32,9 +32,9 @@ const Specification = () => {
     // Function to handle specification key selection
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
         if (selectedOption) {
-            const values = [...specifications];
+            const values = [...existingSpecs];
             values[index].id = selectedOption.value; // Ensure it's a number
-            setSpecifications(values);
+            setExistingSpecs(values);
         }
     };
 
@@ -144,11 +144,7 @@ const Specification = () => {
                                                 value: key.id ?? 0, // Ensure it's a number
                                                 label: key.specification_key?.toString() || "", // Handle null labels
                                             }))}
-                                        onInputChange={(inputValue) => {
-                                            if (inputValue) {
-                                                fetchSpecificationKeys(inputValue);
-                                            }
-                                        }}
+                                      
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
