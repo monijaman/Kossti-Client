@@ -29,6 +29,9 @@ export const useSpecifications = () => {
       return { success: false, data: [] };
     }
   };
+
+
+
   const getSpecifications = async (id: number) => {
     const apiEndpoint = `get-specifications/${id}`;
 
@@ -54,6 +57,53 @@ export const useSpecifications = () => {
       return { success: false, data: [] };
     }
   };
+
+
+  const getSpecificationsByCategory = async (categoryId: number) => {
+    const apiEndpoint = `catgory-specs/${categoryId}`;
+
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/${apiEndpoint}`;
+
+    try {
+      const response = await fetch(fullUrl); // Adjust API endpoint
+      const dataset = await response.json();
+      // console.log("Fetching getSpecifications URL:-", dataset); // Ensure this URL is correct
+
+      return {
+        success: true,
+        ...dataset,
+      };
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      return { success: false, data: [] };
+    }
+  };
+
+  
+
+  const getFormSpecifications = async (id: number) => {
+
+    if (!id) {
+        return
+    }
+
+    let apiEndpoint = `?action=formgenerator/${id}`
+    try {
+        const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+        const dataset = await response.json();
+        return dataset.data;
+
+    } catch (error) {
+        console.error('Error fetching campaigns:', error);
+    }
+};
+ 
 
   // Submit form
   const submitSpecifications = async (
@@ -125,6 +175,8 @@ export const useSpecifications = () => {
     getSpecificationsKeys,
     submitSpecifications,
     getSpecifications,
-    submitSpecKeyTranslation
+    submitSpecKeyTranslation,
+    getFormSpecifications,
+    getSpecificationsByCategory
   };
 };
