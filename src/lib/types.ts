@@ -145,6 +145,6 @@ export interface SpecKeyTranslation {
 }
 
 export interface SpecificationKey {
-  id: number;
-  specification_key: string;
+  id: number | null;
+  specification_key: string  ;
 }

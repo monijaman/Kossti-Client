@@ -1,7 +1,7 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
-import { SpecificationInt } from "@/lib/types"; // Assuming you have a Product type
-import { SpecKeyTranslation, ReviewTranslation } from '@/lib/types';
+import { SpecificationInt, SpecificationKey } from "@/lib/types"; // Assuming you have a Product type
+import { SpecKeyTranslation, ReviewTranslation } from "@/lib/types";
 
 export const useSpecifications = () => {
   const getSpecificationsKeys = async (serachTem = "") => {
@@ -30,8 +30,6 @@ export const useSpecifications = () => {
     }
   };
 
-
-
   const getSpecifications = async (id: number) => {
     const apiEndpoint = `get-specifications/${id}`;
 
@@ -57,7 +55,6 @@ export const useSpecifications = () => {
       return { success: false, data: [] };
     }
   };
-
 
   const getSpecificationsByCategory = async (categoryId: number) => {
     const apiEndpoint = `catgory-specs/${categoryId}`;
@@ -85,37 +82,38 @@ export const useSpecifications = () => {
     }
   };
 
-  
-
   const getFormSpecifications = async (id: number) => {
-
     if (!id) {
-        return
+      return;
     }
 
-    let apiEndpoint = `?action=formgenerator/${id}`
+    let apiEndpoint = `?action=formgenerator/${id}`;
     try {
-        const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
-        const dataset = await response.json();
-        return dataset.data;
-
+      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+      const dataset = await response.json();
+      return dataset.data;
     } catch (error) {
-        console.error('Error fetching campaigns:', error);
+      console.error("Error fetching campaigns:", error);
     }
-};
- 
+  };
 
   // Submit form
   const submitSpecifications = async (
-    productId: number,
-    specifications: SpecificationInt[]
+    categoryId: number,
+    specifications: SpecificationKey[]
   ): Promise<any> => {
     try {
       // Prepare the payload with productId, specifications, and apiUrl
+
+      const specArrays = specifications
+      .map((spec) => spec.id) // Return the `id` directly
+      .filter((id): id is number => id !== null) // Ensure non-null values
+      .sort((a, b) => a - b); // Sort numerically
+    
       const payload = {
-        productId,
-        specifications,
-        apiUrl: "specifications",
+        category_id: categoryId,
+        specification_id: specArrays,
+        apiUrl: "formgenerator",
       };
 
       // Send the request to the backend
@@ -141,7 +139,7 @@ export const useSpecifications = () => {
   // Submit form
   const submitSpecKeyTranslation = async (
     productId: number,
-    specifications: SpecKeyTranslation []
+    specifications: SpecKeyTranslation[]
   ): Promise<any> => {
     try {
       // Prepare the payload with productId, specifications, and apiUrl
@@ -177,6 +175,6 @@ export const useSpecifications = () => {
     getSpecifications,
     submitSpecKeyTranslation,
     getFormSpecifications,
-    getSpecificationsByCategory
+    getSpecificationsByCategory,
   };
 };
