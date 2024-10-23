@@ -15,11 +15,12 @@ import { combineSlices } from '@reduxjs/toolkit';
 // Page props
 interface PageProps {
     productId: number | null;
+    productName?: string;
     translations?: ReviewTranslation[];
     specKeys?: SpecificationKey[];
     specifications?: SpecificationInt[];
 }
-
+ 
 const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');

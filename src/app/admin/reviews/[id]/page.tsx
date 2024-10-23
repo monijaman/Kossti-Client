@@ -185,7 +185,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                 {/* Translation Form */}
                 <div className="w-1/2">
-                    <ReviewTransForm id={id} productName={productName} translations={reviewData?.translations} />
+                    <ReviewTransForm productId={id} productName={productName} translations={reviewData?.translations} />
                 </div>
             </div>
         </>

@@ -1,11 +1,52 @@
 'use client';
 import { FC } from 'react';
-import { Review } from '@/lib/types'; // Assuming you have a Product type
+import { Review, Product } from '@/lib/types'; // Assuming you have a Product type
 import Link from 'next/link';
-interface PageProps {
-  reviews: Review[]; // Change to array of Product
+
+
+interface ReviewData {
+  id: number;
+  review: {
+    id: number;
+    user_id: number;
+    rating: number;
+    reviews: string; // Assuming this is the HTML string containing the review
+    additional_details: { youtubeUrl: string }[];
+    priority: number;
+    created_at: string;
+    updated_at: string;
+  };
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+    category_id: string;
+    brand_id: number;
+    model: string | null;
+    price: string;
+    status: boolean;
+    priority: number;
+    created_by: string | null;
+    created_at: string;
+    updated_at: string;
+    updated_by: string | null;
+    deleted_at: string | null;
+    pivot: {
+      productable_type: string;
+      productable_id: number;
+      product_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+  };
 }
 
+interface PageProps {
+  reviews: ReviewData; // Using the structured ReviewData type
+}
+
+
+ 
 const Reviewetails = ({ reviews }: PageProps) => {
   return (
     <div className="overflow-x-auto">

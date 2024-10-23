@@ -30,9 +30,13 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
   // Function to fetch review data
   const fetchReviewsData = async () => {
     const response = await getReviews(page, limit, searchTerm);
+ 
 
     if (response.success) {
       setReviews(response.data.reviews);
+
+
+      
     }
   };
 

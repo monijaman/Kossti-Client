@@ -121,11 +121,7 @@ const Specification = ({ params }: PageProps) => {
                                             value: key.id,
                                             label: key.specification_key,
                                         }))}
-                                        onInputChange={(inputValue) => {
-                                            if (inputValue) {
-                                                fetchSpecificationKeys(inputValue); // Call API to fetch dynamic data
-                                            }
-                                        }}
+                                      
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
