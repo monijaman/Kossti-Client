@@ -13,11 +13,9 @@ interface PageProps {
 
 const Specification = ({ params }: PageProps) => {
     const { id } = params;
-    const { getSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
+    const { getSpecifications, getSpecificationsKeys, submitSpecificationsKeys } = useSpecifications();
 
-    const [specifications, setSpecifications] = useState<SpecificationInt[]>([
-        { specification_key_id: '', value: '' }
-    ]);
+    const [specifications, setSpecifications] = useState<SpecificationInt[]>([]);
 
     const [specKeys, setSpecKeys] = useState<SpecificationKey[]>([]);
     const [productName, setProductName] = useState<string>('');
@@ -36,10 +34,10 @@ const Specification = ({ params }: PageProps) => {
     };
 
     // Function to handle specification key selection from react-select
-    const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
+    const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number | null; label: string }>) => {
         const values = [...specifications];
         if (selectedOption) {
-            values[index].specification_key_id = selectedOption.value.toString(); // Set the selected key ID as string
+            values[index].specification_key_id = selectedOption.value !== undefined && selectedOption.value !== null ? selectedOption.value.toString() : "";
             setSpecifications(values);
         }
     };
@@ -52,23 +50,39 @@ const Specification = ({ params }: PageProps) => {
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        await submitSpecifications(id, specifications);
+
+     
+        // Call the submit function with the mapped data
+        await submitSpecificationsKeys(id, specifications);
+
     };
 
     // Fetch the specification keys
-    const fetchSpecificationKeys = async (searchTerm = "") => {
+    const fetchSpecificationKeys = async () => {
         try {
-            const dataset = await getSpecificationsKeys(searchTerm);
+            const dataset = await getSpecificationsKeys();
             setSpecKeys(dataset.data);
+            
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
     };
 
+
+    // fetch all specificatiosn for dropdown option
     const fetchSpecifications = async () => {
         try {
             const response = await getSpecifications(id);
-            setSpecifications(response.dataset.specifications);
+
+            if(response.dataset.specifications.length> 0){
+               
+                setSpecifications(response.dataset.specifications);
+                
+            }else{
+                console.log('response+++++++++++++++', response.dataset)
+                setSpecifications(response.dataset.formspecs);
+
+            }
 
             setProductName(response.dataset.name)
 
@@ -148,16 +162,11 @@ const Specification = ({ params }: PageProps) => {
                         </div>
                     </form>
                 </div>
-
-
             </div>
             <div className="w-1/2">
                 <ReviewTransForm productId={id} specKeys={specKeys && specKeys} specifications={specifications} />
             </div>
         </div>
-
-
-
     );
 };
 
