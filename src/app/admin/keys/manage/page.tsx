@@ -1,50 +1,69 @@
 'use client'
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 
 export default function CreateSpecification() {
     const [productId, setProductId] = useState('');
     const [specificationKeyId, setSpecificationKeyId] = useState('');
-    const [value, setValue] = useState('');
+    const [specKey, setSpecKey] = useState('');
+    const [submitStatus, setSubmitStatus] = useState('');
     const router = useRouter();
+    const { submitSpecificationsKeys } = useSpecificationsKeys();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        const res = await fetch('/api/specifications', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                specification_key_id: specificationKeyId,
-                value: value,
-            }),
-        });
+        const response = await submitSpecificationsKeys(specKey);
 
-        if (res.ok) {
-            router.push('/specifications'); // Redirect to the list page
+        if (response.success) {
+            router.push(`/keys/manage/${response.data.id}`); // Redirect to the list page
+            
         }
+
+        if (response.error) {
+            setSubmitStatus(response.error)
+        }
+
+        console.log(response)
+
     };
 
     return (
-        <div>
-            <h1>Create a New Specification</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Product ID</label>
-                    <input type="text" value={productId} onChange={(e) => setProductId(e.target.value)} required />
+        <div className="bg-gray-100 border border-gray-300 rounded-lg shadow-md max-w-md mx-auto p-6 mt-8">
+            <h1 className="text-2xl font-bold text-gray-700 mb-4">Create a New Specification</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+
+                <div className="flex flex-col">
+                    <label className="text-gray-600 font-medium mb-2">Value</label>
+                    <input
+                        type="text"
+                        value={specKey}
+                        onChange={(e) => setSpecKey(e.target.value)}
+                        required
+                        className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                 </div>
-                <div>
-                    <label>Specification Key ID</label>
-                    <input type="text" value={specificationKeyId} onChange={(e) => setSpecificationKeyId(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Value</label>
-                    <input type="text" value={value} onChange={(e) => setValue(e.target.value)} required />
-                </div>
-                <button type="submit">Create</button>
+
+                <button
+                    type="submit"
+                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300 w-full">
+                    Create
+                </button>
             </form>
+
+            {submitStatus && (
+                <div
+                    className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
+                            ? 'text-green-700 bg-green-100'
+                            : 'text-red-700 bg-red-100'
+                        }`}
+                    role="alert"
+                >
+                    {submitStatus}
+                </div>
+            )}
+
         </div>
+
     );
 }

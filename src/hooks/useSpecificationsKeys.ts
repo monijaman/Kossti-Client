@@ -21,8 +21,8 @@ const useSpecificationsKeys = () => {
    
 
   const submitSpecificationsKeys = async (
-    productId: number,
     specification_key: string,
+    productId?: number,
   ): Promise<any> => {
     try {
       // Prepare the payload with productId, specifications, and apiUrl
@@ -39,11 +39,8 @@ const useSpecificationsKeys = () => {
         body: JSON.stringify(payload), // Send payload including apiUrl
       });
 
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error("Failed to submit specifications");
-      }
-
+    
+ 
       // Return the JSON response if the request was successful
       return await response.json();
     } catch (error) {
