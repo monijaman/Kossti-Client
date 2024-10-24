@@ -12,6 +12,20 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
 import { combineSlices } from '@reduxjs/toolkit';
 
+
+interface transDataSet {
+    specification_key_id: number;
+    translations: {
+        id: number;
+        specification_id: number;
+        locale: string;
+        translated_key: string;
+        translated_value: string | undefined;
+    }
+}
+
+
+
 // Page props
 interface PageProps {
     productId: number | null;
@@ -20,40 +34,69 @@ interface PageProps {
     specKeys?: SpecificationKey[];
     specifications?: SpecificationInt[];
 }
- 
+
 const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');
-    const { submitSpecKeyTranslation } = useSpecifications();
-    // const [trspecifications, setTrspecifications] = useState<SpecificationKey[]>([]);
+    const { submitSpecKeyTranslation, getSpecTranslations } = useSpecifications();
+    const [translatedSpecifications, setTranslatedSpecifications] = useState<transDataSet[]>([]);
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
-    console.log('specifications', specifications)
-    useEffect(() => {
+    const tranlatedSpecification = async () => {
+        if (productId) {
+            const dataset = await getSpecTranslations(productId, selectedLocale);
+
+            // Set translated specifications
+            setTranslatedSpecifications(dataset.dataset);
+
+            // Return the dataset so we can use it immediately
+            return dataset.dataset;
+        }
+        return null;
+    };
+
+    const fetchAndProcess = async () => {
+        const fetchedSpecifications = await tranlatedSpecification();
+
         if (specifications) {
             const transSpec = specifications.map((item) => {
+                const keyValue = fetchedSpecifications?.find((trans: transDataSet) => {
+                    // Ensure that trans has the correct structure
+
+                    return trans?.specification_key_id === +item.specification_key_id;
+                });
+
                 return {
-                    id: item.id ?? null,  // Ensure id is either a number or null, avoiding undefined
+                    id: item.id ?? null,  // Ensure id is either a number or null
                     locale: selectedLocale,
                     specification_id: +item.specification_key_id,  // Ensure id is either a number or null
                     translated_key: +item.specification_key_id,
-                    translated_value: item.value,
+                    translated_value: keyValue?.translations?.translated_value ?? '', // Provide a default value
                 };
-            });
+            })
 
             setTranSpecifications(transSpec);
         }
+    }
+
+    useEffect(() => {
+        fetchAndProcess();
     }, [specifications, selectedLocale]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        console.log('===============', 4444444444)
+
         if (productId) {
 
-            await submitSpecKeyTranslation(productId, tranSpecifications);
+           const response= await submitSpecKeyTranslation(productId, tranSpecifications);
+
+            if (response.success) {
+
+                setFormStatus(response.data.message)
+            }
         }
     };
 
@@ -71,17 +114,17 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
     };
 
     // Function to handle specification key selection from react-select
-    const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-        const values = [...tranSpecifications];
-        console.log('valuesvalues', values[index])
-        if (selectedOption) {
-            values[index].specification_id = selectedOption.value; // Set the selected key ID as string
-            setTranSpecifications(values);
-        }
-    };
+    // const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number | null; label: string }>) => {
+    //     const values = [...tranSpecifications];
+    //     console.log('valuesvalues', values[index])
+    //     if (selectedOption) {
+    //         values[index].specification_id = selectedOption.value; // Set the selected key ID as string
+    //         setTranSpecifications(values);
+    //     }
+    // };
 
     return (
-        <form onSubmit={handleSubmit}  className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <h2 className="font-bold mb-4">Tranaslattion</h2>
 
             <div className="mb-4">
@@ -99,52 +142,54 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
             </div>
 
 
-                 {tranSpecifications && tranSpecifications.map((spec, index) => (
-                    <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div>
-                            <Select
-                                name="specification_id"
-                                value={specKeys && specKeys
-                                    .map((key) => ({
-                                        value: key.id, // Keeping this as a number
-                                        label: key.specification_key,
-                                    }))
-                                    .find((option) => option.value === spec.specification_id) || null}  // Comparing numbers
-                                onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
-                                options={specKeys && specKeys.map((key) => ({
-                                    value: key.id,  // Keeping id as a number
+            {tranSpecifications && tranSpecifications.map((spec, index) => (
+                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <Select
+                            name="specification_id"
+                            value={specKeys && specKeys
+                                .map((key) => ({
+                                    value: key.id, // Keeping this as a number
                                     label: key.specification_key,
-                                }))}
-                                className="mt-1 block w-full"
-                                placeholder="Search and select a specification key"
-                                isSearchable
-                                required
-                            />
+                                }))
+                                .find((option) => option.value === spec.specification_id) || null}  // Comparing numbers
+                            // onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
+                            options={specKeys && specKeys.map((key) => ({
+                                value: key.id,  // Keeping id as a number
+                                label: key.specification_key,
+                            }))}
+                            className="mt-1 block w-full"
+                            placeholder="Search and select a specification key"
+                            isSearchable
+                            required
+                            isDisabled={false} // Make the Select unchangeable
 
-                        </div>
-                        <div>
-                            <input
-                                type="text"
-                                name="value" // Ensure this matches the SpecificationInt key
-                                value={spec.translated_value}
-                                onChange={(event) => handleInputChange(index, event)}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required
-                            />
-                        </div>
+                        />
+
                     </div>
-                ))}
-
-                <div className="flex justify-between">
-
-                    <button
-                        type="submit"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                        Submit
-                    </button>
+                    <div>
+                        <input
+                            type="text"
+                            name="value" // Ensure this matches the SpecificationInt key
+                            value={spec.translated_value}
+                            onChange={(event) => handleInputChange(index, event)}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            required
+                        />
+                    </div>
                 </div>
-        
+            ))}
+
+            <div className="flex justify-between">
+
+                <button
+                    type="submit"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                    Submit
+                </button>
+            </div>
+
 
             {formStatus && (
                 <div
@@ -161,6 +206,19 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
 
     );
+
+    {
+        formStatus && (
+            <div
+                className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
+                    ? 'text-green-700 bg-green-100'
+                    : 'text-black-700 bg-green-100'
+                    }`}
+                role="alert">
+                {formStatus}
+            </div>
+        )
+    }
 };
 
 export default ReviewTransForm;

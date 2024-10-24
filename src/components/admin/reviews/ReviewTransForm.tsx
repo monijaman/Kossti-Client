@@ -1,109 +1,126 @@
 "use client";
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/types'; // Assuming you have a Product type
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
-import { useProducts } from "@/hooks/useProducts";
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useReviews } from '@/hooks/useReviews';
+import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
+import { SpecTranslation, ProductTranslation, AdditionalDetails, ProductApiResponse, Product, ReviewTranslation } from '@/lib/types';
 import { LOCALES } from '@/lib/constants';
 
-interface ProductFormProps {
-    product?: Product; // Make it optional for the create case
+// Dynamically import React Quill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css'; // Import styles
+import { combineSlices } from '@reduxjs/toolkit';
+
+// Page props
+interface PageProps {
+    productId: number | null;
+    productName: string;
+    translations?: ReviewTranslation[] | undefined;
 }
-
-
-const ReviewTransForm = ({ product }: ProductFormProps) => {
-
-
-    const [name, setName] = useState(product?.name || '');
-    const [price, setPrice] = useState(product?.price || 0);
-    const { Translation } = useProducts();
-    const id = product && product.id;
-    const [submitStatus, setSubmitStatus] = useState('');
-    const [selectedTranslation, setSelectedTranslation] = useState('');
-    const [translations, setTranslations] = useState(product?.translations);
-
-    // Handle language switch
-    const handleLanguageSwitch = (locale: string) => {
-
-        const selectedLang = LOCALES.find((lang) => lang === locale);
-        if (selectedLang) {
-            setSelectedTranslation(locale);
-        }
-        
-        if (product && translations) {
-            const item = translations.find((item) => {
-                return item.locale == locale
-            })
-
-            if (item) {
-                setName(item.name)
-                setPrice(item.price)
-            }else{
-                setName('');
-                setPrice(0);
-            }
-        }
-    };
+ 
+const ReviewTransForm = ({ productId, productName, translations }: PageProps) => {
+    const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
+    const { addReviewTranslation } = useReviews();
+    const [formStatus, setFormStatus] = useState("");
+    const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
+    const [selectedLocale, setSelectedLocale] = useState('bn');
+    const [transData, setTransData] = useState<ReviewTranslation[]>([]);
 
     useEffect(() => {
-       console.log('translationstranslations', translations)
-    }, [translations]);
+        if (translations && translations?.length > 0) {
+            setTransData(translations);
+        }
+    }, [translations])
 
 
-    // Select 'bn' translation by default on mount
     useEffect(() => {
-        handleLanguageSwitch('bn');
-    }, []);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
 
-        const payload = {
-            name,
-            price: parseFloat(price.toString()), // Convert price to a number
-            locale: selectedTranslation
+        const newTranslation: ReviewTranslation = {
+            locale: selectedLocale,
+            rating: 0,
+            review: '',
+            additional_details: []
         };
 
-        try {
+        setAdditionalDetails([]); // Set to null or leave unchanged
+        setSelectedTranslation(newTranslation); // Set to null or leave unchanged
 
-            if (!id) {
-                console.error('Product ID is undefined');
-                return; // Handle this error case appropriately
+        if (transData && transData?.length > 0) {
+            // handleLanguageSwitch('bn');
+
+            const translation = transData.find((trans) => trans.locale === selectedLocale);
+            if (translation) {
+                setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
+                setAdditionalDetails(translation.additional_details); // Set selectedTranslation to the correct translation
             }
-
-
-            // If there's an ID, update the product
-            const response = await Translation(payload, id);  // Update product using its ID
-
-            if (response.success) {
-                setSubmitStatus('Form Submitted successfully');
-                
-                setTranslations((prevItem) => [
-                    ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
-                    response.data.translation  // append the new translation to the array
-                  ]);
-                  
-                
-
-            } else {
-                console.error('Error submitting form', response);
-            }
-        } catch (error) {
-            console.error('Error submitting form', error);
         }
+
+    }, [selectedLocale, translations]);
+
+
+
+
+    // Handle form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setFormStatus("")
+
+        // console.log(selectedTranslation)
+        if (!selectedTranslation) return;
+
+        // Prepare the data to be submitted
+        const product_id = productId;
+
+        // Make sure rating is either selected or from the selected translation
+        const response = await addReviewTranslation(
+            product_id,              // Pass the product review ID
+            selectedTranslation.rating,                         // Rating value (ensure it's a number)
+            selectedTranslation.review,                         // Review content
+            selectedLocale,
+            additionalDetails,                             // Pass empty additional details for now or use additionalDetails if needed
+        );
+
+        if (response.success) {
+            const details = response.data.review;
+
+            // Updated transData array by mapping over it
+            const updatedTransData = transData.map((dataset) => {
+                // Check if the locale matches
+                if (dataset.locale === selectedLocale) {
+                    // Return a new object, preserving structure and adding `details` where appropriate
+                    return {
+                        ...dataset,
+                        ...details,  // Spread details into the existing dataset
+                    };
+                } else {
+                    // Return unchanged dataset if locale doesn't match
+                    return dataset;
+                }
+            });
+
+            // Set the updated data in state
+            setTransData(updatedTransData);  // Make sure `setTransData` is used to update the state
+
+            // Set form status message
+            setFormStatus(response.data.message || ''); // Provide a fallback in case `message` is undefined
+        }
+
+        // Handle the API response here, e.g., display success message or redirect
     };
 
 
     return (
-        <>
+        <form onSubmit={handleSubmit}>
+            <h2 className="font-bold mb-4">Submit a Review for {productName}</h2>
 
             <div className="mb-4">
                 {LOCALES.map((translation) => (
                     <button
+                        type='button'
                         key={translation}
-                        onClick={() => handleLanguageSwitch(translation)}
-                        className={`px-4 py-2 mr-2 ${selectedTranslation === translation ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                        onClick={() => setSelectedLocale(translation)}
+                        className={`px-4 py-2 mr-2 ${selectedLocale === translation ? 'bg-blue-500 text-white' : 'bg-gray-200'
                             }`}
                     >
                         {translation.toUpperCase()}
@@ -111,63 +128,85 @@ const ReviewTransForm = ({ product }: ProductFormProps) => {
                 ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="    rounded px-8 pt-6 pb-8 mb-4 ">
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                        Product Name
-                    </label>
+            {/* Display Selected Translation */}
+            {selectedLocale && (
+                <div>
+
+                    {/* Rating Input */}
+                    <label htmlFor="rating" className="block mb-2">Rating</label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="name"
-                        type="text"
-                        placeholder="Enter product name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-
-
-
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                        Price
-                    </label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="price"
                         type="number"
-                        step="0.01"
-                        placeholder="Enter product price"
-                        value={price}
-                        onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                        id="rating"
+                        value={selectedTranslation?.rating}  // Ensure initial value is set
+                        onChange={(e) => {
+                            if (selectedTranslation) {
+                                setSelectedTranslation({
+                                    ...selectedTranslation,
+                                    rating: parseFloat(e.target.value) || 0 // Convert to number
+                                });
+                            }
+                        }}
+
+                        className="w-full p-2 mb-4 border rounded"
+                        min="1"
+                        max="5"
+                        step="0.1"  // Allow decimal values, with steps of 0.1
                     />
-                </div>
 
-
-
-
-                <div className="flex items-center justify-between">
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="submit"
-                    >
-                        {id ? 'Update Product' : 'Create Product'}
-                    </button>
-                </div>
-
-                {submitStatus && (
-                    <div
-                        className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
-                            ? 'text-green-700 bg-green-100'
-                            : 'text-red-700 bg-red-100'
-                            }`}
-                        role="alert"
-                    >
-                        {submitStatus}
+                    {/* Translation Review */}
+                    <div className="row" style={{ minHeight: '320px' }}>
+                        <label htmlFor="review" className="block mb-2">Review ({selectedTranslation && selectedTranslation.locale})</label>
+                        <ReactQuill
+                            value={selectedTranslation?.review}
+                            onChange={(value) => {
+                                if (selectedTranslation) {
+                                    setSelectedTranslation({ ...selectedTranslation, review: value });
+                                }
+                            }}
+                            modules={{
+                                clipboard: {
+                                    matchVisual: false, // Strip out formatting on paste
+                                },
+                            }}
+                            className="mb-4"
+                            id="review"
+                            style={{ backgroundColor: "#f9f9f9", height: "200px" }}
+                        />
                     </div>
-                )}
-            </form>
-        </>
+
+                    <AdditionalDetailsForm
+                        additionalDetails={additionalDetails}
+                        setAdditionalDetails={setAdditionalDetails}
+                    />
+
+                    {/* Submit Button */}
+                    <div className='my-4'>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white py-2 px-4 rounded"
+                        >
+                            Submit Translation
+                        </button>
+                    </div>
+                </div>
+
+
+            )}
+
+            {formStatus && (
+                <div
+                    className={`p-4 mb-4 text-sm rounded-lg ext-green-700 bg-green-100`}
+                    role="alert"
+                >
+                    {formStatus}
+                </div>
+            )}
+
+
+        </form>
+
+
+
     );
 };
 

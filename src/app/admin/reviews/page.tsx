@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import SearchBox from '@/components/Search';
 import Reviewetails from '@/components/admin/reviews/Reviewetails';
-import { SearchParams, Review } from '@/lib/types';
+import { SearchParams, Review, Product } from '@/lib/types';
 import { useReviews } from '@/hooks/useReviews';
 import GeneralPagination from '@/components/Pagination/general';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,14 @@ interface PageProps {
   searchParams: SearchParams; // Include searchParams
 }
 
+interface reviweData {
+  id: number;
+  review: Review;
+  product: Product;
+}
+
+ 
+
 const ManageReviews = ({ params, searchParams }: PageProps) => {
   const { slug } = params;
   const { getReviews } = useReviews();
@@ -24,19 +32,16 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
   const searchTerm = searchParams.searchterm || '';
 
   // State to hold reviews and total products
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<reviweData[]>([]);
   const [totalProducts, setTotalProducts] = useState<number>(0);
 
   // Function to fetch review data
   const fetchReviewsData = async () => {
     const response = await getReviews(page, limit, searchTerm);
  
-
+ 
     if (response.success) {
       setReviews(response.data.reviews);
-
-
-      
     }
   };
 

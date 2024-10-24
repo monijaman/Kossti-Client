@@ -96,6 +96,23 @@ export const useSpecifications = () => {
       console.error("Error fetching campaigns:", error);
     }
   };
+  const getSpecTranslations = async (id: number, locale:string) => {
+    if (!id) {
+      return;
+    }
+
+    let apiEndpoint = `?action=spec_translation/${id}&locale=${locale}`;
+
+
+    try {
+      const response = await fetch(`/api/get${apiEndpoint}`, { cache: 'no-store' }); // Adjust API endpoint
+      const dataset = await response.json();
+ 
+      return dataset.data;
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+    }
+  };
 
   // Submit form
   const submitSpecifications = async (
@@ -211,7 +228,7 @@ export const useSpecifications = () => {
       const payload = {
         productId,
         specifications,
-        apiUrl: "transspecifications",
+        apiUrl: "spec_translation",
       };
 
       // Send the request to the backend
@@ -236,6 +253,7 @@ export const useSpecifications = () => {
 
   return {
     getSpecificationsKeys,
+    getSpecTranslations,
     submitSpecifications,
     getSpecifications,
     submitSpecKeyTranslation,

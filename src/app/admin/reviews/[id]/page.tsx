@@ -3,7 +3,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
-import ReviewTransForm from '@/components/reviews/ReviewTranslations';
+
+import ReviewTransForm from '@/components/admin/reviews/ReviewTransForm';
 import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 import Modal from '@/components/Modal/client';

@@ -3,8 +3,8 @@ import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey, Product } from '@/lib/types';
-import ReviewTransForm from '@/components/reviews/ReviewTranslations';
-
+ 
+import SpecTranslations from '@/components/admin/specifications/SpecTranslations';
 interface PageProps {
     params: {
         id: number;
@@ -142,13 +142,13 @@ const Specification = ({ params }: PageProps) => {
                         ))}
 
                         <div className="flex justify-between">
-                            <button
+                            {/* <button
                                 type="button"
                                 onClick={addMoreSpecifications}
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 Add More
-                            </button>
+                            </button> */}
                             <button
                                 type="submit"
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -160,7 +160,7 @@ const Specification = ({ params }: PageProps) => {
                 </div>
             </div>
             <div className="w-1/2">
-                <ReviewTransForm productId={id} specKeys={specKeys && specKeys} specifications={specifications} />
+                <SpecTranslations productId={id} specKeys={specKeys && specKeys} specifications={specifications && specifications} />
             </div>
         </div>
     );
