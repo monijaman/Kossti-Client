@@ -29,7 +29,7 @@ const Sidebar: React.FC = () => {
                                 <Link href="/admin/specifications" className="hover:underline">Specifications</Link>
                             </li>
                             <li>
-                                <Link href="/admin/speckeys" className="hover:underline">Keys</Link>
+                                <Link href="/admin/keys" className="hover:underline">Keys</Link>
                             </li>
                         </ul>
                     )}

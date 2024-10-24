@@ -75,7 +75,7 @@ const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
                             // onClick={() => handleSuggestionClick(product)}
                             >
-                                <Link href={`reviews/${product.slug}`}>
+                                <Link href={`products/${product.id}`}>
                                     {product.name}
                                 </Link>
                             </li>
