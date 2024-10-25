@@ -43,7 +43,7 @@ const useSpecificationsKeys = () => {
     const apiEndpoint = `?action=speckey/${id}`;
 
     try {
-       const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
 
       const dataset = await response.json();
       return dataset;
@@ -74,10 +74,37 @@ const useSpecificationsKeys = () => {
         body: JSON.stringify(payload),
       });
 
-      // Check if the response is successful
-      // if (!response.ok) {
-      //   throw new Error(`Error: ${response.statusText}`);
-      // }
+      // Return the JSON response
+      return await response.json();
+    } catch (error) {
+      console.error("Error submitting specifications:", error);
+      throw error; // Properly propagate the error
+    }
+  };
+  const submitKeysTranslation = async ({
+    locale = "bn",
+    speckeyId = null,
+    speckey,
+  }: {
+    locale: string;
+    speckeyId?: number | null;
+    speckey: string;
+  }): Promise<any> => {
+    try {
+      // Prepare the payload with consistent naming
+      const payload = {
+        specification_key_id: speckeyId, // Use speckeyId as the identifier
+        translated_key: speckey, // Ensure this matches the key you expect on the server
+        locale,
+        apiUrl: "speckey-translation",
+      };
+
+      // Send the request to the backend
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       // Return the JSON response
       return await response.json();
@@ -89,6 +116,7 @@ const useSpecificationsKeys = () => {
 
   return {
     getSpecificationsKeys,
+    submitKeysTranslation,
     submitSpecificationsKeys,
     getSpecificationsKeysById,
   };

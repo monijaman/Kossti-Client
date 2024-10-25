@@ -1,27 +1,27 @@
 "use client";
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/types'; // Assuming you have a Product type
+import { Product, SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
-import { useProducts } from "@/hooks/useProducts";
+import useSpecificationsKeys from "@/hooks/useSpecificationsKeys";
 import { LOCALES } from '@/lib/constants';
 
-interface ProductFormProps {
-    product?: Product; // Make it optional for the create case
+
+interface PageProps {
+    speckeyData?: SpecificationKey; // Optional for create case
+
 }
 
+const KeyTransForm = ({ speckeyData }: PageProps) => {
 
-const KeyTransForm = ({ product }: ProductFormProps) => {
 
-
-    const [name, setName] = useState(product?.name || '');
-    const [price, setPrice] = useState(product?.price || 0);
-    const { Translation } = useProducts();
-    const id = product && product.id;
+    const [translated_key, setTranslated_key] = useState(speckeyData?.specification_key || '');
+    const { submitKeysTranslation } = useSpecificationsKeys();
+    const id = speckeyData && speckeyData.id;
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
-    const [translations, setTranslations] = useState(product?.translations);
+    // const [translations, setTranslations] = useState(speckeyData?.translations);
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -30,25 +30,8 @@ const KeyTransForm = ({ product }: ProductFormProps) => {
         if (selectedLang) {
             setSelectedTranslation(locale);
         }
-
-        if (product && translations) {
-            const item = translations.find((item) => {
-                return item.locale == locale
-            })
-
-            if (item) {
-                setName(item.name)
-                setPrice(item.price)
-            } else {
-                setName('');
-                setPrice(0);
-            }
-        }
+ 
     };
-
-    useEffect(() => {
-        console.log('translationstranslations', translations)
-    }, [translations]);
 
 
     // Select 'bn' translation by default on mount
@@ -59,33 +42,29 @@ const KeyTransForm = ({ product }: ProductFormProps) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Ensure translated_key is defined
+        if (!translated_key) {
+            console.error('Translated key is undefined');
+            return; // Handle this error case appropriately
+        }
+
         const payload = {
-            name,
-            price: parseFloat(price.toString()), // Convert price to a number
-            locale: selectedTranslation
+            locale: selectedTranslation,
+            speckeyId: id, // Use speckeyId instead of specification_key_id
+            speckey: translated_key // Use the correct key for translated_key
         };
 
         try {
-
             if (!id) {
                 console.error('Product ID is undefined');
                 return; // Handle this error case appropriately
             }
 
-
-            // If there's an ID, update the product
-            const response = await Translation(payload, id);  // Update product using its ID
+            // Submit the translation
+            const response = await submitKeysTranslation(payload);
 
             if (response.success) {
                 setSubmitStatus('Form Submitted successfully');
-
-                setTranslations((prevItem) => [
-                    ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
-                    response.data.translation  // append the new translation to the array
-                ]);
-
-
-
             } else {
                 console.error('Error submitting form', response);
             }
@@ -93,6 +72,7 @@ const KeyTransForm = ({ product }: ProductFormProps) => {
             console.error('Error submitting form', error);
         }
     };
+
 
 
     return (
@@ -121,13 +101,20 @@ const KeyTransForm = ({ product }: ProductFormProps) => {
                         id="name"
                         type="text"
                         placeholder="Enter product name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={translated_key}
+                        onChange={(e) => setTranslated_key(e.target.value)}
                     />
                 </div>
 
+                <div className="flex items-center justify-between">
+                    <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        type="submit"
+                    >
+                        {id ? 'Update Product' : 'Create Product'}
+                    </button>
+                </div>
 
- 
                 {submitStatus && (
                     <div
                         className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')

@@ -28,7 +28,6 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
 
     useEffect(() => {
         if (id) {
-
             fetchKeys();
         }
 
@@ -42,7 +41,7 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
                 </div>
 
                 <div className="w-1/2">
-                    {/* <KeyTransForm product={dataset.products} /> */}
+                    <KeyTransForm speckeyData={key}  />
                 </div>
             </div>
         </>
