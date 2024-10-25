@@ -19,7 +19,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
           <tr>
             <th className="py-2 px-4 border">ID</th>
             <th className="py-2 px-4 border">Name</th>
-            <th className="py-2 px-4 border">Brand</th>
+            <th className="py-2 px-4 border"> </th>
           </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
               <td className="py-2 px-4 border">{key.id}</td>
               <td className="py-2 px-4 border">{key.specification_key}</td>
               <td className="py-2 px-4 border">
-                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`/keys/manage/${key.id}`}>Edit</Link>
+                <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`/admin/keys/manage/${key.id}`}>Edit</Link>
 
                 {/* <button
                   className="bg-red-500 text-white px-2 py-1 rounded"

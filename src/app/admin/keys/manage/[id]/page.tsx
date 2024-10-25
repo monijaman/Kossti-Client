@@ -1,50 +1,52 @@
 'use client'
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, useEffect, useState } from 'react';
+import KeyForm from "@/components/admin/keys/KeyForm";
+import KeyTransForm from "@/components/admin/keys/KeyTransForm";
+import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
+import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 
-export default function CreateSpecification() {
-    const [productId, setProductId] = useState('');
-    const [specificationKeyId, setSpecificationKeyId] = useState('');
-    const [value, setValue] = useState('');
-    const router = useRouter();
+interface PageProps {
+    params: {
+        id: number; // Type for the slug
+    };
+}
 
-    const handleSubmit = async (e:FormEvent) => {
-        e.preventDefault();
-        const res = await fetch('/api/specifications', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                specification_key_id: specificationKeyId,
-                value: value,
-            }),
-        });
+const CreateSpecificationKeys = ({ params }: PageProps) => {
 
-        if (res.ok) {
-            router.push('/specifications'); // Redirect to the list page
+    const { getSpecificationsKeysById } = useSpecificationsKeys();
+    const { id } = params;
+    const [key, setKey] = useState<SpecificationKey>()
+
+    const fetchKeys = async () => {
+        const response = await getSpecificationsKeysById(id);
+        if (response.success) {
+            setKey(response.data)
+
         }
+
     };
 
+    useEffect(() => {
+        if (id) {
+
+            fetchKeys();
+        }
+
+    }, [])
+
     return (
-        <div>
-            <h1>Create a New Specification</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Product ID</label>
-                    <input type="text" value={productId} onChange={(e) => setProductId(e.target.value)} required />
+        <>
+            <div className="flex flex-row gap-4">
+                <div className="w-1/2  bg-gray-100 border rounded">
+                    <KeyForm speckeyData={key} />
                 </div>
-                <div>
-                    <label>Specification Key ID</label>
-                    <input type="text" value={specificationKeyId} onChange={(e) => setSpecificationKeyId(e.target.value)} required />
+
+                <div className="w-1/2">
+                    {/* <KeyTransForm product={dataset.products} /> */}
                 </div>
-                <div>
-                    <label>Value</label>
-                    <input type="text" value={value} onChange={(e) => setValue(e.target.value)} required />
-                </div>
-                <button type="submit">Create</button>
-            </form>
-        </div>
+            </div>
+        </>
     );
 }
+
+export default CreateSpecificationKeys;

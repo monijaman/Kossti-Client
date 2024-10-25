@@ -23,7 +23,7 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     const [perPage, setPerPage] = useState(10);
     const [loading, setLoading] = useState(true);
     const { getSpecificationsKeys } = useSpecificationsKeys();
-
+    const paginate = true;
 
 
     const page = parseInt(searchParams.page as string, 10) || 1;
@@ -35,24 +35,24 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     const locale = searchParams.locale || 'bn';
 
 
-    const fetchSpecifications = async (search = '', perPage = 10) => {
+    const fetchSpecifications = async () => {
         setLoading(true);
-        const response = await getSpecificationsKeys();
+        const response = await getSpecificationsKeys({ perPage, searchTerm, paginate, page });
         setSpecificationsKeys(response.data);
-
-        setTotalPages(Math.ceil(response.data.total / limit));
+ 
+        setTotalPages(Math.ceil(response.total / limit));
 
         // setSpecifications(response);
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchSpecifications(searchTerm, perPage);
+        fetchSpecifications();
     }, [searchTerm, perPage]);
 
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-4"> Products</h2>
+            <h2 className="text-2xl font-bold mb-4"> Specification Keys</h2>
             <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
             <KeySearch initialSearchTerm={searchTerm} />
 

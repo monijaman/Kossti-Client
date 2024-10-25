@@ -31,7 +31,7 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                 const locale = 'en';
 
                 // Make the getProducts call to fetch suggestions
-                const response = await getSpecificationsKeys(page, searchTerm, paginate);
+                const response = await getSpecificationsKeys({page, searchTerm, paginate});
 
                 // Assuming that response.data contains products array
        

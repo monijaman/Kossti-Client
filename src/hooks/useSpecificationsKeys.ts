@@ -4,31 +4,66 @@ import { SpecificationInt, SpecificationKey } from "@/lib/types"; // Assuming yo
 import { SpecKeyTranslation, ReviewTranslation } from "@/lib/types";
 
 const useSpecificationsKeys = () => {
-  
-  const getSpecificationsKeys = async (per_page = 10, serachTem = "", paginate=false) => {
-    const apiEndpoint = `?action=speckey&search=${serachTem}&per_page=${per_page}&paginate=${paginate}`;
+  const getSpecificationsKeys = async ({
+    perPage = 10,
+    searchTerm = "",
+    paginate = false,
+    page = 1,
+  } = {}) => {
+    // Construct query parameters
+    const params = new URLSearchParams({
+      action: "speckey",
+      search: searchTerm,
+      per_page: perPage.toString(),
+      paginate: paginate.toString(),
+      page: page.toString(),
+    });
+
+    // Define the API endpoint
+    const apiEndpoint = `/api/get?${params.toString()}`;
 
     try {
-      const response = await fetch(`/api/get${apiEndpoint}`, { cache: 'no-store' }); // Adjust API endpoint
+      // Fetch data with 'no-store' cache policy to avoid cached responses
+      const response = await fetch(apiEndpoint, { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Parse and return JSON response data
       const dataset = await response.json();
- 
       return dataset.data;
+    } catch (error) {
+      console.error("Error fetching specification keys:", error);
+      return null; // Return null in case of an error
+    }
+  };
+
+  const getSpecificationsKeysById = async (id: number) => {
+    const apiEndpoint = `?action=speckey/${id}`;
+
+    try {
+       const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+
+      const dataset = await response.json();
+      return dataset;
     } catch (error) {
       console.error("Error fetching campaigns:", error);
     }
   };
 
-   
-
-  const submitSpecificationsKeys = async (
-    specification_key: string,
-    productId?: number,
-  ): Promise<any> => {
+  const submitSpecificationsKeys = async ({
+    speckeyId = null,
+    speckey,
+  }: {
+    speckeyId?: number | null;
+    speckey: string;
+  }): Promise<any> => {
     try {
-      // Prepare the payload with productId, specifications, and apiUrl
+      // Prepare the payload with productId, specificationKey, and apiUrl
       const payload = {
-        id:productId,
-        specification_key,
+        id: speckeyId, // Consistent naming with snake_case
+        specification_key: speckey,
         apiUrl: "speckey",
       };
 
@@ -36,12 +71,15 @@ const useSpecificationsKeys = () => {
       const response = await fetch("/api/post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), // Send payload including apiUrl
+        body: JSON.stringify(payload),
       });
 
-    
- 
-      // Return the JSON response if the request was successful
+      // Check if the response is successful
+      // if (!response.ok) {
+      //   throw new Error(`Error: ${response.statusText}`);
+      // }
+
+      // Return the JSON response
       return await response.json();
     } catch (error) {
       console.error("Error submitting specifications:", error);
@@ -52,6 +90,7 @@ const useSpecificationsKeys = () => {
   return {
     getSpecificationsKeys,
     submitSpecificationsKeys,
+    getSpecificationsKeysById,
   };
 };
 
