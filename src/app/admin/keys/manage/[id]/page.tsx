@@ -41,7 +41,7 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
                 </div>
 
                 <div className="w-1/2">
-                    <KeyTransForm speckeyData={key}  />
+                {key && <KeyTransForm speckeyData={key} />}
                 </div>
             </div>
         </>

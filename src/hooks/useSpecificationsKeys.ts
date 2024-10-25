@@ -52,6 +52,32 @@ const useSpecificationsKeys = () => {
     }
   };
 
+  const getKeysTranslationById = async ({
+    key_id = 0,
+    locale = "",
+  } = {}) => {
+
+    const params = new URLSearchParams({
+      action: "speckey-translation",
+      locale,
+      key_id: key_id.toString(),  // Convert number to string
+    });
+    
+console.log('==================================', key_id)
+    // Define the API endpoint
+    const apiEndpoint = `/api/get?${params.toString()}`;
+
+   
+    try {
+      const response = await fetch(apiEndpoint); // Adjust API endpoint
+
+      const dataset = await response.json();
+      return dataset;
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+    }
+  };
+
   const submitSpecificationsKeys = async ({
     speckeyId = null,
     speckey,
@@ -83,7 +109,7 @@ const useSpecificationsKeys = () => {
   };
   const submitKeysTranslation = async ({
     locale = "bn",
-    speckeyId = null,
+    speckeyId = 0,
     speckey,
   }: {
     locale: string;
@@ -119,6 +145,7 @@ const useSpecificationsKeys = () => {
     submitKeysTranslation,
     submitSpecificationsKeys,
     getSpecificationsKeysById,
+    getKeysTranslationById,
   };
 };
 
