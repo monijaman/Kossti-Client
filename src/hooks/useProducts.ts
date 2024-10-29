@@ -350,33 +350,7 @@ export const useProducts = () => {
 };
 
 
-
-  const MakePhotoDefaults = async (photoId: number) => {
-    const fullUrl = `${apiUrl}/default-image/${photoId}`;
-
-        // Make the POST request to the backend API
-        const response = await fetch("/api/post", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", // Ensure you're sending JSON data
-          },
-          body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
-        });
-  
-
-    try {
-      const response = await fetch(fullUrl);
-      const dataset = await response.json();
-
-      return {
-        success: true,
-        data: dataset.images,
-      };
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return { success: false, data: [] };
-    }
-  };
+ 
 
   return {
     Translation,
