@@ -35,10 +35,12 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
 
     useEffect(() => {
-        if (translations && translations?.length > 0) {
+        console.log("Translations:", translations);
+        if (translations && translations.length > 0) {
+            console.log("Setting TransData with:", translations);
             setTransData(translations);
         }
-    }, [translations])
+    }, [translations]);
 
 
     useEffect(() => {
@@ -48,8 +50,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             review: '',
             additional_details: []
         };
-        console.log('---------------------------')
-
+ 
         setAdditionalDetails([]); // Set to null or leave unchanged
         setSelectedTranslation(newTranslation); // Set to null or leave unchanged
 
