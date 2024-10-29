@@ -34,24 +34,31 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
 
-    useEffect(() => {
-       
-        if (translations && translations.length > 0) {
-           
-            setTransData(translations);
-        }
-    }, [translations]);
-
-    const loadTranslation = async () => {
+    const resetFrom = () => {
         const newTranslation: ReviewTranslation = {
             locale: selectedLocale,
             rating: 0,
             review: '',
             additional_details: []
         };
+      
+        setSelectedTranslation(newTranslation); // Set to null or leave unchanged
+    }
+
+    useEffect(() => {
+
+        if (translations && translations.length > 0) {
+
+            setTransData(translations);
+        } else {
+            resetFrom();
+        }
+    }, [translations]);
+
+    const loadTranslation = async () => {
 
         setAdditionalDetails([]); // Set to null or leave unchanged
-console.log(transData)
+
         if (transData && transData.length > 0) {
             // handleLanguageSwitch('bn');
 
@@ -60,22 +67,21 @@ console.log(transData)
                 setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
                 setAdditionalDetails(translation.additional_details); // Set selectedTranslation to the correct translation
             }
-        }else{
-       setSelectedTranslation(newTranslation); // Set to null or leave unchanged
-
+        } else {
+            resetFrom();
         }
-
     }
 
 
     useEffect(() => {
+        resetFrom();
         loadTranslation();
     }, [selectedLocale]);
 
 
 
     useEffect(() => {
-      
+
         loadTranslation();
     }, [transData]);
 
@@ -130,6 +136,7 @@ console.log(transData)
         // Handle the API response here, e.g., display success message or redirect
     };
 
+   
 
     return (
         <form onSubmit={handleSubmit}>
@@ -158,7 +165,7 @@ console.log(transData)
                     <input
                         type="number"
                         id="rating"
-                        value={selectedTranslation?.rating}  // Ensure initial value is set
+                        value={selectedTranslation.rating}  // Ensure initial value is set
                         onChange={(e) => {
                             if (selectedTranslation) {
                                 setSelectedTranslation({
@@ -177,8 +184,9 @@ console.log(transData)
                     {/* Translation Review */}
                     <div className="row" style={{ minHeight: '320px' }}>
                         <label htmlFor="review" className="block mb-2">Review ({selectedTranslation && selectedTranslation.locale})</label>
+                      
                         <ReactQuill
-                            value={selectedTranslation?.review}
+                            value={selectedTranslation.review || ''} // Clears content if review is empty
                             onChange={(value) => {
                                 if (selectedTranslation) {
                                     setSelectedTranslation({ ...selectedTranslation, review: value });
@@ -193,6 +201,7 @@ console.log(transData)
                             id="review"
                             style={{ backgroundColor: "#f9f9f9", height: "200px" }}
                         />
+
                     </div>
 
                     <AdditionalDetailsForm
