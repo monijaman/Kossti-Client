@@ -123,7 +123,7 @@ export interface ProductPhotos {
   id: number;
   name: string;
   product_id: number;
-  default: number;
+  defaultphoto: number;
   path: string;
   status: string;
   media_type?: string;
