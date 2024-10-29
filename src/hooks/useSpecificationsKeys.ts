@@ -62,8 +62,7 @@ const useSpecificationsKeys = () => {
       locale,
       key_id: key_id.toString(),  // Convert number to string
     });
-    
-console.log('==================================', key_id)
+ 
     // Define the API endpoint
     const apiEndpoint = `/api/get?${params.toString()}`;
 

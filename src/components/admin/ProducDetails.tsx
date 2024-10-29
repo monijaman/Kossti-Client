@@ -39,12 +39,12 @@ const ProductDetails: FC<ProductDetailsProps> = ({ products }) => {
                 <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`products/${product.id}`}>Edit</Link>
                 <Link className="bg-blue-500 text-white px-2 py-1 rounded mr-2" href={`specifications/${product.id}`}>Specifications</Link>
 
-                <button
+                {/* <button
                   className="bg-red-500 text-white px-2 py-1 rounded"
                   onClick={() => deleteProduct(product.id)}
                 >
                   Delete
-                </button>
+                </button> */}
               </td>
             </tr>
           ))}

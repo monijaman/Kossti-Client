@@ -16,7 +16,7 @@ interface PageProps {
 
 const Reviewetails = ({ reviews }: PageProps) => {
 
-  console.log('reviewsreviews', reviews)
+ 
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">

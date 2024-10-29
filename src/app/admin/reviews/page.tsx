@@ -58,7 +58,7 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
     <>
       <h2 className="text-2xl font-bold mb-4"> Reviews</h2>
  
-      <SearchBox initialSearchTerm={searchTerm} />
+      <SearchBox initialSearchTerm={searchTerm} searchType='reviews' />
 
       {/* Review management functionalities */}
       <Reviewetails reviews={reviews}   />

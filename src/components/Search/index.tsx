@@ -6,7 +6,7 @@ import { Product, SearchBoxProps } from '@/lib/types';
 import { useProducts } from '@/hooks/useProducts';
 import Link from 'next/link';
 
-const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '', searchType='products' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
@@ -75,7 +75,7 @@ const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
                             // onClick={() => handleSuggestionClick(product)}
                             >
-                                <Link href={`products/${product.id}`}>
+                                <Link href={`${searchType}/${product.id}`}>{searchType}
                                     {product.name}
                                 </Link>
                             </li>

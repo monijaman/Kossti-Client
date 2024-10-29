@@ -56,6 +56,7 @@ export interface SidebarParams {
 
 export interface SearchBoxProps {
   initialSearchTerm?: string;
+  searchType?: string;
 }
 
 export interface SearchParams {

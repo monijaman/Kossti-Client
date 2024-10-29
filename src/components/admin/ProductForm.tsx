@@ -6,6 +6,8 @@ import { useCategory } from "@/hooks/useCategory";
 import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
 import { combineSlices } from '@reduxjs/toolkit';
+import Modal from '@/components/Modal/client';
+import DragNdrop from "@/components/Uploader/Uploader";
 
 interface ProductFormProps {
     product?: Product; // Optional for create case
@@ -66,21 +68,21 @@ const ProductForm = ({ product }: ProductFormProps) => {
             } else {
                 // Create new product
                 response = await createProduct(payload);
-                const productId =response.data.product.id;
+                const productId = response.data.product.id;
 
-                 // Optionally: Redirect after delay or handle the newly created product
-                 setTimeout(() => {
+                // Optionally: Redirect after delay or handle the newly created product
+                setTimeout(() => {
                     router.push(`/admin/products/${productId}`); // Redirect to the product's page
                 }, 1000);
             }
- 
+
             if (response.success) {
-            
+
                 setSubmitStatus(response.data.message);
 
                 // Access the product ID from response.data
-      
-               
+
+
             } else {
                 setSubmitStatus('Error submitting the form');
             }
@@ -103,152 +105,181 @@ const ProductForm = ({ product }: ProductFormProps) => {
         setPriority(1);
     };
 
+    const [files, setFiles] = useState<File[]>([]);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="rounded px-8 pt-6 pb-8 mb-4">
-            {/* Product Name */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                    Product Name
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="name"
-                    type="text"
-                    placeholder="Enter product name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-            </div>
 
-            {/* Category */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
-                    Category
-                </label>
-                <select
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    name="categories"
-                    id="categories"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                >
-                    <option value="" disabled>Select category</option>
-                    {categories.map((item) => (
-                        <option key={item.id} value={item.id}>
-                            {item.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {/* Brand */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="brand">
-                    Brand
-                </label>
-                <select
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    name="brands"
-                    id="brands"
-                    value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
-                    required
-                >
-                    <option value="" disabled>Select brand</option>
-                    {brands.map((item) => (
-                        <option key={item.id} value={item.id}>
-                            {item.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {/* Model */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="model">
-                    Model
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="model"
-                    type="text"
-                    placeholder="Enter product model"
-                    value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                />
-            </div>
-
-            {/* Price */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                    Price
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    placeholder="Enter product price"
-                    value={price}
-                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                />
-            </div>
-
-            {/* Status */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Status</label>
-                <input
-                    className="mr-2 leading-tight"
-                    id="status"
-                    type="checkbox"
-                    checked={!!status}  // Convert to boolean
-                    onChange={() => setStatus(!status)}
-                />
-                <span className="text-sm">Active</span>
-            </div>
-
-            {/* Priority */}
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="priority">
-                    Priority
-                </label>
-                <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="priority"
-                    type="number"
-                    placeholder="Enter priority"
-                    value={priority}
-                    onChange={(e) => setPriority(Number(e.target.value) || 1)}
-                    required
-                />
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex items-center justify-between">
+        <>
+            {product &&
+                <Modal isOpen={isModalOpen} onClose={closeModal}>
+                    <DragNdrop onFilesSelected={setFiles} productId={product.id} width="auto" height="auto" />
+                </Modal>
+            }
+            <div className="rounded px-8 pt-6 pb-8 mb-4">
                 <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    type="submit"
-                    disabled={loading}
+                    className="bg-blue-500 mb-8 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                    onClick={openModal}
                 >
-                    {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
+                    Add Photos
                 </button>
-            </div>
 
-            {/* Submission Status */}
-            {submitStatus && (
-                <div
-                    className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
-                            ? 'text-green-700 bg-green-100'
-                            : 'text-red-700 bg-red-100'
-                        }`}
-                    role="alert"
-                >
-                    {submitStatus}
-                </div>
-            )}
-        </form>
+                <form onSubmit={handleSubmit} >
+                    {/* Product Name */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                            Product Name
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="name"
+                            type="text"
+                            placeholder="Enter product name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {/* Category */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+                            Category
+                        </label>
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="categories"
+                            id="categories"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Select category</option>
+                            {categories.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                    {item.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Brand */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="brand">
+                            Brand
+                        </label>
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            name="brands"
+                            id="brands"
+                            value={brand}
+                            onChange={(e) => setBrand(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Select brand</option>
+                            {brands.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                    {item.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Model */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="model">
+                            Model
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="model"
+                            type="text"
+                            placeholder="Enter product model"
+                            value={model}
+                            onChange={(e) => setModel(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Price */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+                            Price
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="price"
+                            type="number"
+                            step="0.01"
+                            placeholder="Enter product price"
+                            value={price}
+                            onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                        />
+                    </div>
+
+                    {/* Status */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                        <input
+                            className="mr-2 leading-tight"
+                            id="status"
+                            type="checkbox"
+                            checked={!!status}  // Convert to boolean
+                            onChange={() => setStatus(!status)}
+                        />
+                        <span className="text-sm">Active</span>
+                    </div>
+
+                    {/* Priority */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="priority">
+                            Priority
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="priority"
+                            type="number"
+                            placeholder="Enter priority"
+                            value={priority}
+                            onChange={(e) => setPriority(Number(e.target.value) || 1)}
+                            required
+                        />
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex items-center justify-between">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
+                        </button>
+                    </div>
+
+                    {/* Submission Status */}
+                    {submitStatus && (
+                        <div
+                            className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
+                                ? 'text-green-700 bg-green-100'
+                                : 'text-red-700 bg-red-100'
+                                }`}
+                            role="alert"
+                        >
+                            {submitStatus}
+                        </div>
+                    )}
+                </form>
+            </div>
+        </>
     );
 };
 

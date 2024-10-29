@@ -19,7 +19,15 @@ interface PageProps {
 }
  
 const ReviewTransForm = ({ productId, productName, translations }: PageProps) => {
-    const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
+    // const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
+
+    const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation>({
+        locale: '',
+        rating: 0,
+        review: '',
+        additional_details: []
+    }); // Initialize with default values
+
     const { addReviewTranslation } = useReviews();
     const [formStatus, setFormStatus] = useState("");
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
@@ -34,14 +42,13 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
 
     useEffect(() => {
-
-
         const newTranslation: ReviewTranslation = {
             locale: selectedLocale,
             rating: 0,
             review: '',
             additional_details: []
         };
+        console.log('---------------------------')
 
         setAdditionalDetails([]); // Set to null or leave unchanged
         setSelectedTranslation(newTranslation); // Set to null or leave unchanged

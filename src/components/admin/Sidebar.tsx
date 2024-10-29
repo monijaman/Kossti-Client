@@ -35,12 +35,12 @@ const Sidebar: React.FC = () => {
                     )}
 
                 </li>
-                <li className="mb-2">
+                {/* <li className="mb-2">
                     <Link href="/admin/users" className="hover:underline">Manage Users</Link>
                 </li>
                 <li className="mb-2">
                     <Link href="/admin/settings" className="hover:underline">Settings</Link>
-                </li>
+                </li> */}
             </ul>
         </nav>
     );

@@ -52,7 +52,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
     <>
       <h2 className="text-2xl font-bold mb-4"> Reviews</h2>
       <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
-      <SearchBox initialSearchTerm={searchTerm} />
+      <SearchBox initialSearchTerm={searchTerm} searchType="reviews" />
 
       {/* Add your review management functionalities here */}
       {/* <Reviewetails

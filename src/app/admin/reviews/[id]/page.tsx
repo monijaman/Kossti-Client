@@ -106,7 +106,6 @@ const ReviewForm = ({ params }: PageProps) => {
         setIsModalOpen(false);
     };
 
-
     return (
         <>
             <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -138,8 +137,6 @@ const ReviewForm = ({ params }: PageProps) => {
                             step="0.1"  // Allow decimal values, with steps of 0.1
                         />
 
-
-
                         {/* Rich Text Editor for Reviews */}
                         <div className="row" style={{ minHeight: '320px' }}>
                             <label htmlFor="reviews" className="block mb-2">Review</label>
@@ -152,8 +149,6 @@ const ReviewForm = ({ params }: PageProps) => {
                             />
                             {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                         </div>
-
-
 
                         {/* Render the AdditionalDetailsForm component */}
                         <AdditionalDetailsForm
@@ -185,9 +180,11 @@ const ReviewForm = ({ params }: PageProps) => {
                 </div>
 
                 {/* Translation Form */}
+                {reviewData && 
                 <div className="w-1/2">
-                    <ReviewTransForm productId={id} productName={productName} translations={reviewData?.translations} />
+                    <ReviewTransForm productId={id} productName={productName} translations={reviewData.translations} />
                 </div>
+                }
             </div>
         </>
     );

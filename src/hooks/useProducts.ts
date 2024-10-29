@@ -91,30 +91,30 @@ export const useProducts = () => {
       // Add any additional query parameters if necessary
       // e.g. 'filter': 'someFilterValue'
     };
-  
+
     // Build the query string (if params are provided)
     const queryString = new URLSearchParams(params).toString();
     const fullUrl = queryString
       ? `${apiUrl}/product/${id}?${queryString}&type=public`
       : `${apiUrl}/product/${id}?type=public`;
-  
+
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
         new Error("API URL is not defined in environment variables")
       );
     }
-  
+
     try {
-      const response = await fetch(fullUrl, { cache: 'no-store' });
-  
+      const response = await fetch(fullUrl, { cache: "no-store" });
+
       // Check if the response is okay (status 200-299)
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
-  
+
       const dataset = await response.json();
-  
+
       return {
         success: true,
         data: dataset,
@@ -124,7 +124,6 @@ export const useProducts = () => {
       return { success: false, data: [] };
     }
   };
-  
 
   const createProduct = async (productData: Record<string, any>) => {
     try {
@@ -156,7 +155,7 @@ export const useProducts = () => {
       // Return success along with the data
       return {
         success: true,
-         ...dataset,
+        ...dataset,
       };
     } catch (error) {
       const err = error as Error;
@@ -224,7 +223,6 @@ export const useProducts = () => {
     const fullUrl = `/products/update/${id}`;
 
     try {
-
       const response = await fetch("/api/post", {
         method: "POST",
         headers: {
@@ -232,8 +230,6 @@ export const useProducts = () => {
         },
         body: JSON.stringify(productData),
       });
-
-   
 
       if (!response.ok) {
         // If response status is not 200-299, throw an error with status info
@@ -260,8 +256,6 @@ export const useProducts = () => {
     }
   };
 
-
-  
   const Translation = async (productData: Record<string, any>, id: number) => {
     try {
       const apiUrl = `product-trans/${id}`; // Assuming this is the API route
@@ -302,27 +296,87 @@ export const useProducts = () => {
     }
   };
 
-  
   const getPhotosByProductId = async (productId: number) => {
-   
-      const fullUrl = `${apiUrl}/productimages/${productId}`;
-  
-      try {
-        const response = await fetch(fullUrl);
-        const dataset = await response.json();
-   console.log('holla', dataset.images)
-        return {
-          success: true,
-          data: dataset.images,
-        };
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        return { success: false, data: [] };
-      }
+    const fullUrl = `${apiUrl}/productimages/${productId}`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+    
+      return {
+        success: true,
+        data: dataset.images,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
   };
- 
+
+
+  const MakePhotoDefault = async (photoId: number | string) => {
+    try {
+        
+        const payload = {
+          apiUrl : `default-image/${photoId}`
+        };
+
+        // Make the POST request to the backend API
+        const response = await fetch("/api/post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        // Parse the response body as JSON
+        const dataset = await response.json();
+
+        // Return success along with the data
+        return {
+            success: true,
+            data: dataset.data.images,
+        };
+    } catch (error) {
+        // Type the error to access the message property
+        const err = error as Error;
+        console.error("Error updating product:", err.message);
+
+        return { success: false, data: [], error: err.message };
+    }
+};
+
+
+
+  const MakePhotoDefaults = async (photoId: number) => {
+    const fullUrl = `${apiUrl}/default-image/${photoId}`;
+
+        // Make the POST request to the backend API
+        const response = await fetch("/api/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Ensure you're sending JSON data
+          },
+          body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
+        });
   
-  
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+
+      return {
+        success: true,
+        data: dataset.images,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
 
   return {
     Translation,
@@ -331,6 +385,7 @@ export const useProducts = () => {
     getAProductById,
     createProduct,
     updateProduct,
-    getPhotosByProductId
+    getPhotosByProductId,
+    MakePhotoDefault
   };
 };
