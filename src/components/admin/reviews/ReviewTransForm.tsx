@@ -17,7 +17,7 @@ interface PageProps {
     productName: string;
     translations?: ReviewTranslation[] | undefined;
 }
- 
+
 const ReviewTransForm = ({ productId, productName, translations }: PageProps) => {
     // const [selectedTranslation, setSelectedTranslation] = useState<ReviewTranslation | null>(null);
 
@@ -35,26 +35,24 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
 
     useEffect(() => {
-        console.log("Translations:", translations);
+       
         if (translations && translations.length > 0) {
-            console.log("Setting TransData with:", translations);
+           
             setTransData(translations);
         }
     }, [translations]);
 
-
-    useEffect(() => {
+    const loadTranslation = async () => {
         const newTranslation: ReviewTranslation = {
             locale: selectedLocale,
             rating: 0,
             review: '',
             additional_details: []
         };
- 
-        setAdditionalDetails([]); // Set to null or leave unchanged
-        setSelectedTranslation(newTranslation); // Set to null or leave unchanged
 
-        if (transData && transData?.length > 0) {
+        setAdditionalDetails([]); // Set to null or leave unchanged
+console.log(transData)
+        if (transData && transData.length > 0) {
             // handleLanguageSwitch('bn');
 
             const translation = transData.find((trans) => trans.locale === selectedLocale);
@@ -62,9 +60,24 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
                 setAdditionalDetails(translation.additional_details); // Set selectedTranslation to the correct translation
             }
+        }else{
+       setSelectedTranslation(newTranslation); // Set to null or leave unchanged
+
         }
 
-    }, [selectedLocale, translations]);
+    }
+
+
+    useEffect(() => {
+        loadTranslation();
+    }, [selectedLocale]);
+
+
+
+    useEffect(() => {
+      
+        loadTranslation();
+    }, [transData]);
 
 
 
