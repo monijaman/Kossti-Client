@@ -78,7 +78,7 @@ const DragNdrop = ({
 
     setPhotos(response.data);
 
-    const defaultFile = response.data.find((file: ProductPhotos) => file.default === 1);
+    const defaultFile = response.data.find((file: ProductPhotos) => file.defaultphoto === 1);
 
 
     if (defaultFile) {
