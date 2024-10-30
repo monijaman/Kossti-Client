@@ -8,12 +8,25 @@ export interface brandInt {
   updated_at: string;
 }
 
+export interface categoryInt {
+  id: number;
+  name: string;
+  category_slug: string;
+  slug: string;
+  priority: number;
+  deleted_at: null;
+  created_at: string;
+  updated_at: string;
+}
+ 
+
 export interface Product {
   id: number;
   name: string;
   category_id: number;
   brand_id: number;
   slug: string;
+  category_slug: string;
   brand: string;
   category: string;
   model?: string | null;

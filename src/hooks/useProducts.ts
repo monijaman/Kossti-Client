@@ -27,7 +27,7 @@ export const useProducts = () => {
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
 
-    console.log("queryString", queryString);
+    // console.log("queryString", queryString);
 
     // Ensure API URL is defined
     if (!apiUrl) {
@@ -37,11 +37,12 @@ export const useProducts = () => {
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
-    console.log("Fetching URL:", fullUrl); // Ensure this URL is correct
+    // console.log("Fetching URL:", fullUrl); // Ensure this URL is correct
 
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
+      // console.log("dataset dataset:", dataset); // Ensure this URL is correct
 
       return {
         success: true,

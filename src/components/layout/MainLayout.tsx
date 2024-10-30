@@ -25,7 +25,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
       </header>
 
 
-      <div className="w-full max-w-[1600px] mx-auto">
+      {/* <div className="w-full max-w-[1600px] mx-auto"> */}
 
         <Breadcrumbs />
         <Navigation />
@@ -37,7 +37,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
             {children}
           </main>
         </div>
-      </div>
+      {/* </div> */}
 
       <footer className="bg-gray-800 text-white p-4 mt-auto">
         <p className="text-center">&copy; 2024 Your Site. All rights reserved.</p>

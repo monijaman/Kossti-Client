@@ -6,9 +6,17 @@ import SearchBox from '@/components/Search';
 import { SearchParams, ProductApiResponse } from '@/lib/types';
 import MainLayout from '@/components/layout/MainLayout';
 
-const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const { getProducts } = useProducts();
+interface PageProps {
+  params: {
+    category: string; // category parameter
+    slug: string; // slug parameter
+  };
+  searchParams: SearchParams; // or use a more specific type if needed
+}
 
+const Page = async ({ params, searchParams }: PageProps) => {
+  const { getProducts } = useProducts();
+  const { slug, category } = params
   const page = parseInt(searchParams.page as string, 10) || 1;
   const limit = 10;
   const activeCategory = searchParams.category || '';
@@ -32,20 +40,16 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     activePriceRange,
     searchTerm,
   };
-  
+
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} />
-      <ProductReview products={dataset.products} />
+      <h2>{category} - {slug}</h2>
 
-      <Pagination
-        category={activeCategory}
-        selectedBrands={activeBrands}
-        currentPage={page}
-        totalPages={totalPages}
-      />
     </MainLayout>
   );
 };
 
 export default Page;
+
+ 

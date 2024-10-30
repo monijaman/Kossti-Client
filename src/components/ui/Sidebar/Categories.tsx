@@ -1,21 +1,8 @@
 import { FC } from "react";
 import { useCategory } from "@/hooks/useCategory";
+import { brandInt, SidebarParams, categoryInt, SearchParams } from '@/lib/types';
 
-interface categoryInt {
-  id: number;
-  name: string;
-  slug: string;
-  priority: number;
-  deleted_at: null;
-  created_at: string;
-  updated_at: string;
-}
-interface SearchParams {
-  page?: string;
-  category?: string;
-  brand?: string;
-  price?: string;
-}
+
 const Categories = async ({ category }: SearchParams) => {
   // const Categories: FC<{ searchParams?: SearchParams }> = async ({ searchParams = {} }) => {
   const { getCategory } = useCategory();
