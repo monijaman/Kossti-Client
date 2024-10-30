@@ -121,3 +121,4 @@ generate slug:
 php artisan make:command GenerateBrandSlugs
 php artisan generate:brand-slugs
 
+# Typescript Error

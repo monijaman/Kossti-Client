@@ -27,16 +27,16 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
 
       {/* <div className="w-full max-w-[1600px] mx-auto"> */}
 
-        <Breadcrumbs />
-        <Navigation />
+      <Breadcrumbs />
+      <Navigation />
 
-        <div className="flex flex-grow">
-          <Sidebar {...sidebarProps} />
+      <div className="flex flex-grow">
+        <Sidebar {...sidebarProps} />
 
-          <main className="flex-1 bg-white p-4">
-            {children}
-          </main>
-        </div>
+        <main className="flex-1 bg-white p-4">
+          {children}
+        </main>
+      </div>
       {/* </div> */}
 
       <footer className="bg-gray-800 text-white p-4 mt-auto">

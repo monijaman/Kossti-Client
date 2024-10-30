@@ -5,7 +5,7 @@ import { useProducts } from '@/hooks/useProducts';
 import SearchBox from '@/components/Search';
 import { SearchParams, ProductApiResponse } from '@/lib/types';
 import MainLayout from '@/components/layout/MainLayout';
-
+import ProducDetails from '@/components/Products/ProducDetails';
 interface PageProps {
   params: {
     category: string; // category parameter
@@ -15,36 +15,27 @@ interface PageProps {
 }
 
 const Page = async ({ params, searchParams }: PageProps) => {
-  const { getProducts } = useProducts();
+  const { getAProductBySlug } = useProducts();
   const { slug, category } = params
-  const page = parseInt(searchParams.page as string, 10) || 1;
-  const limit = 10;
-  const activeCategory = searchParams.category || '';
-  const activeBrands = searchParams.brand || '';
-  const activePriceRange = searchParams.price || '';
+ 
   const searchTerm = searchParams.searchterm || '';
   const locale = searchParams.locale || 'bn';
 
   const fetchProductData = async () => {
-    const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, locale);
+    const response = await getAProductBySlug(slug, locale);
     return response.success ? response.data : { products: [], totalProducts: 0 };
   };
 
   const dataset = await fetchProductData();
-  const totalPages = Math.ceil(dataset.totalProducts / limit);
 
-  // Prepare sidebarProps from searchParams
-  const sidebarProps = {
-    activeCategory,
-    selectedBrands: activeBrands,
-    activePriceRange,
-    searchTerm,
-  };
+ 
+
 
   return (
-    <MainLayout sidebarProps={sidebarProps}>
+    <MainLayout >
       <SearchBox initialSearchTerm={searchTerm} />
-      <h2>{category} - {slug}</h2>
+
+      <ProducDetails product={dataset} />
 
     </MainLayout>
   );
@@ -52,4 +43,3 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
 export default Page;
 
- 

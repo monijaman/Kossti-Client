@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { SearchParams, brandInt, Product, ProductApiResponse } from '@/lib/types';
-import ProducDetails from '@/components/Products/ProducDetails';
+import ProducShortDetails from '@/components/Products/ProducShortDetails';
 
 interface PopularProductsProps {
   products: Product[];
@@ -9,12 +9,11 @@ interface PopularProductsProps {
 
 const PopularProducts = ({ products }: PopularProductsProps) => {
 
-  // console.log('productsproducts', products)
   return (
     <div className="grid grid-cols-1 gap-4">
       {products.map((product, i) => {
         return (
-          <ProducDetails key={i} product={product} />
+          <ProducShortDetails key={i} product={product} />
         );
       })} 
 
