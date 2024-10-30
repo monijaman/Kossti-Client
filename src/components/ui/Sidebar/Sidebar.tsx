@@ -3,8 +3,6 @@ import Categories from './Categories';
 import Brands from './Brands';
 import { brandInt, SidebarParams } from '@/lib/types';
 
-
-
 const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searchTerm }: SidebarParams) => {
 
   const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
@@ -15,9 +13,6 @@ const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searc
 
       <Categories category={activeCategory} />
       <Brands selectedBrands={selectedBrands} activeCategory={activeCategory} searchTerm={searchTerm} />
-
-
-
 
       <h2 className="text-lg font-semibold mb-4">Price Range</h2>
       <div className="mb-4">

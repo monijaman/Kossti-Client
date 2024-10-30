@@ -18,21 +18,25 @@ interface MainLayoutProps {
 const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">Your Site Title</h1>
         <AccountDropdown />
       </header>
 
-      <Breadcrumbs />
-      <Navigation />
 
-      <div className="flex flex-grow">
-        <Sidebar {...sidebarProps} />
+      <div className="w-full max-w-[1600px] mx-auto">
 
-        <main className="flex-1 bg-white p-4">
-          {children}
-        </main>
+        <Breadcrumbs />
+        <Navigation />
+
+        <div className="flex flex-grow">
+          <Sidebar {...sidebarProps} />
+
+          <main className="flex-1 bg-white p-4">
+            {children}
+          </main>
+        </div>
       </div>
 
       <footer className="bg-gray-800 text-white p-4 mt-auto">
