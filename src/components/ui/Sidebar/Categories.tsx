@@ -27,7 +27,7 @@ const Categories = async ({ category }: SearchParams) => {
   // Handle undefined searchParams with a default empty string
   const activeCategory = category || "";
   const clearCategoryUrl = `/`;
-
+console.log('activeCategoryactiveCategory', activeCategory)
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">Categories</h2>
@@ -39,7 +39,7 @@ const Categories = async ({ category }: SearchParams) => {
               return (
                 <a
                   key={category.id || index} // Fallback to index if category.id is undefined
-                  href={`/?category=${activeCategory}`}
+                  href={`/?category=${category.slug}`}
                   className={`block px-4 py-2 rounded-md ${
                     activeCategory === category.name
                       ? "bg-blue-100"
