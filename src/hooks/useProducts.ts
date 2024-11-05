@@ -37,7 +37,7 @@ export const useProducts = () => {
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
-    // console.log("Fetching URL:", fullUrl); // Ensure this URL is correct
+    // console.log("Fetching URL productsproducts:", fullUrl); // Ensure this URL is correct
 
     try {
       const response = await fetch(fullUrl);
