@@ -54,7 +54,7 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             <div className="mb-4">
                 {dataset && dataset.map((brand: brandInt) => (
                     <div key={brand.id} className="flex items-center mb-2">
-                        {brand.slug} {brand.id}
+
                         <Checkbox
                             key={brand.id}
                             name={brand.slug}
