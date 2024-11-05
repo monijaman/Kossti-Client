@@ -1,7 +1,10 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
-import { SpecificationInt, SpecificationKey } from "@/lib/types"; // Assuming you have a Product type
-import { SpecKeyTranslation, ReviewTranslation } from "@/lib/types";
+import {
+  SpecificationInt,
+  SpecificationKey,
+  SpecKeyTranslation,
+} from "@/lib/types"; // Assuming you have a Product type
 
 export const useSpecifications = () => {
   const getSpecificationsKeys = async (serachTem = "") => {
@@ -96,18 +99,19 @@ export const useSpecifications = () => {
       console.error("Error fetching campaigns:", error);
     }
   };
-  const getSpecTranslations = async (id: number, locale:string) => {
+  const getSpecTranslations = async (id: number, locale: string) => {
     if (!id) {
       return;
     }
 
     let apiEndpoint = `?action=spec_translation/${id}&locale=${locale}`;
 
-
     try {
-      const response = await fetch(`/api/get${apiEndpoint}`, { cache: 'no-store' }); // Adjust API endpoint
+      const response = await fetch(`/api/get${apiEndpoint}`, {
+        cache: "no-store",
+      }); // Adjust API endpoint
       const dataset = await response.json();
- 
+
       return dataset.data;
     } catch (error) {
       console.error("Error fetching campaigns:", error);
@@ -123,10 +127,10 @@ export const useSpecifications = () => {
       // Prepare the payload with productId, specifications, and apiUrl
 
       const specArrays = specifications
-      .map((spec) => spec.id) // Return the `id` directly
-      .filter((id): id is number => id !== null) // Ensure non-null values
-      .sort((a, b) => a - b); // Sort numerically
-    
+        .map((spec) => spec.id) // Return the `id` directly
+        .filter((id): id is number => id !== null) // Ensure non-null values
+        .sort((a, b) => a - b); // Sort numerically
+
       const payload = {
         category_id: categoryId,
         specification_id: specArrays,
@@ -221,7 +225,7 @@ export const useSpecifications = () => {
   // Submit form
   const submitSpecKeyTranslation = async (
     productId: number,
-    specifications: SpecKeyTranslation []
+    specifications: SpecKeyTranslation[]
   ): Promise<any> => {
     try {
       // Prepare the payload with productId, specifications, and apiUrl
@@ -251,7 +255,33 @@ export const useSpecifications = () => {
     }
   };
 
+  const getPublicSpecs = async (productId: number, locale: "bn") => {
+    const apiEndpoint = `get-public-spec/${productId}?locale=${locale}`;
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    const fullUrl = `${apiUrl}/${apiEndpoint}`;
+
+    try {
+      const response = await fetch(fullUrl); // Adjust API endpoint
+      const dataset = await response.json();
+      // console.log("Fetching getSpecifications URL:-", dataset); // Ensure this URL is correct
+
+      return {
+        success: true,
+        ...dataset,
+      };
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      return { success: false, data: [] };
+    }
+  };
+
   return {
+    getPublicSpecs,
     getSpecificationsKeys,
     getSpecTranslations,
     submitSpecifications,
@@ -259,6 +289,6 @@ export const useSpecifications = () => {
     submitSpecKeyTranslation,
     getFormSpecifications,
     getSpecificationsByCategory,
-    submitSpecificationsKeys
+    submitSpecificationsKeys,
   };
 };

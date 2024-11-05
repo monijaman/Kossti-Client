@@ -1,23 +1,47 @@
-import { FC } from 'react';
-import { SearchParams, brandInt, Product, ProductApiResponse } from '@/lib/types';
+import { useSpecifications } from '@/hooks/useSpecifications';
 
 interface PopularProductsProps {
-  product: Product;
+  productId: number;
 }
 
-const SpecDetails = ({ product }: PopularProductsProps) => {
+const SpecDetails = async ({ productId }: PopularProductsProps) => {
+  const { getPublicSpecs } = useSpecifications();
+  const locale = 'bn';
+
+  const fetchSpecifications = async () => {
+    const response = await getPublicSpecs(productId, locale);
+
+    return response;
+  }
+
+  // Await the fetch to get the actual data
+  const specs = await fetchSpecifications();
+
 
   return (
     <div>
-      {/* <h2 className='py-5'>{product.name} </h2>
 
-      
-      <h3 className="font-semibold">brand: {product.brand}</h3>
-      <h3 className="font-semibold">category: ${product.category}</h3>
-      <h3 className="font-semibold">Price: ${product.price}</h3> */}
-
+      {specs.success ? (
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left">Specification</th>
+              <th className="py-3 px-6 text-left">Value</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {specs.dataset.map((spec: any) => (
+              <tr key={spec.specification_key_id} className="border-b border-gray-300 hover:bg-gray-100">
+                <td className="py-3 px-6">{spec.translated_key}</td>
+                <td className="py-3 px-6">{spec.translated_value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>Error fetching specifications.</p>
+      )}
     </div>
-
   );
 };
 

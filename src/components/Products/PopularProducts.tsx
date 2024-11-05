@@ -1,6 +1,6 @@
 const PopularProducts = () => {
 
- 
+
   return (
 
     <section className="mt-8">

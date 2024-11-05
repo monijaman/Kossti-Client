@@ -1,16 +1,16 @@
 'use client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-import { useAppSelector, useAppDispatch } from '@/hooks/hooks'
+import { useAppDispatch, useAppSelector } from '@/hooks/hooks'
+import styles from './Counter.module.scss'
 import {
   decrement,
   increment,
-  incrementByAmount,
   incrementAsync,
+  incrementByAmount,
   incrementIfOdd,
   selectCount
 } from './counterSlice'
-import styles from './Counter.module.scss'
 
 export function Counter() {
   const count = useAppSelector(selectCount)

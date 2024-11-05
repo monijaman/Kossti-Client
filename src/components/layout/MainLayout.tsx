@@ -1,9 +1,9 @@
 // MainLayout.tsx
-import { FC, ReactNode } from 'react';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Navigation from '@/components/ui/Navigation';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
+import { FC, ReactNode } from 'react';
 
 interface MainLayoutProps {
   children: ReactNode;

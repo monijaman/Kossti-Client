@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product, SearchBoxProps } from '@/lib/types';
 import { useProducts } from '@/hooks/useProducts';
+import { Product, SearchBoxProps } from '@/lib/types';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-const SearchBox = ({ initialSearchTerm = '', searchType='products' }: SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '', searchType = 'products' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown

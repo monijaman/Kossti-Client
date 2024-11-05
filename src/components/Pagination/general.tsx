@@ -3,13 +3,13 @@ interface PaginationProps {
   totalPages: number;
 }
 
-const GeneralPagination = ({  currentPage, totalPages }: PaginationProps) => {
+const GeneralPagination = ({ currentPage, totalPages }: PaginationProps) => {
 
- 
+
 
   const getPageNumbers = () => {
     const pages = [];
- 
+
     // Always display the first page
 
     // If totalPages is 7 or less, display all pages

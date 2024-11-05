@@ -303,7 +303,7 @@ export const useProducts = () => {
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
-    
+
       return {
         success: true,
         data: dataset.images,
@@ -314,44 +314,39 @@ export const useProducts = () => {
     }
   };
 
-
   const MakePhotoDefault = async (photoId: number | string) => {
     try {
-        
-        const payload = {
-          apiUrl : `default-image/${photoId}`
-        };
+      const payload = {
+        apiUrl: `default-image/${photoId}`,
+      };
 
-        // Make the POST request to the backend API
-        const response = await fetch("/api/post", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+      // Make the POST request to the backend API
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
 
-        // Parse the response body as JSON
-        const dataset = await response.json();
+      // Parse the response body as JSON
+      const dataset = await response.json();
 
-        // Return success along with the data
-        return {
-            success: true,
-            data: dataset.data.images,
-        };
+      // Return success along with the data
+      return {
+        success: true,
+        data: dataset.data.images,
+      };
     } catch (error) {
-        // Type the error to access the message property
-        const err = error as Error;
-        console.error("Error updating product:", err.message);
+      // Type the error to access the message property
+      const err = error as Error;
+      console.error("Error updating product:", err.message);
 
-        return { success: false, data: [], error: err.message };
+      return { success: false, data: [], error: err.message };
     }
-};
-
-
- 
+  };
 
   return {
     Translation,
@@ -361,6 +356,6 @@ export const useProducts = () => {
     createProduct,
     updateProduct,
     getPhotosByProductId,
-    MakePhotoDefault
+    MakePhotoDefault,
   };
 };

@@ -1,11 +1,9 @@
-import { FC } from 'react';
-import ProductReview from '@/components/Products/ProductReview';
-import Pagination from '@/components/Pagination/index';
-import { useProducts } from '@/hooks/useProducts';
-import SearchBox from '@/components/Search';
-import { SearchParams, ProductApiResponse } from '@/lib/types';
 import MainLayout from '@/components/layout/MainLayout';
 import ProducDetails from '@/components/Products/ProducDetails';
+import ReviewDetails from '@/components/reviews/ReviewDetails';
+import SearchBox from '@/components/Search';
+import { useProducts } from '@/hooks/useProducts';
+import { SearchParams } from '@/lib/types';
 interface PageProps {
   params: {
     category: string; // category parameter
@@ -16,8 +14,8 @@ interface PageProps {
 
 const Page = async ({ params, searchParams }: PageProps) => {
   const { getAProductBySlug } = useProducts();
-  const { slug, category } = params
- 
+  const { slug } = params
+
   const searchTerm = searchParams.searchterm || '';
   const locale = searchParams.locale || 'bn';
 
@@ -28,15 +26,13 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const dataset = await fetchProductData();
 
- 
-
-
   return (
     <MainLayout >
-      <SearchBox initialSearchTerm={searchTerm} />
+      <SearchBox initialSearchTerm={searchTerm} searchType='public-reviews' />
+      <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -   ${dataset.category}</h3>
 
+      <ReviewDetails productId={dataset.id} />
       <ProducDetails product={dataset} />
-
     </MainLayout>
   );
 };

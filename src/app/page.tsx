@@ -1,9 +1,8 @@
-import { FC } from 'react';
 import ProductReview from '@/components/Products/ProductReview';
 import Pagination from '@/components/Pagination/index';
 import { useProducts } from '@/hooks/useProducts';
 import SearchBox from '@/components/Search';
-import { SearchParams, ProductApiResponse } from '@/lib/types';
+import { SearchParams } from '@/lib/types';
 import MainLayout from '@/components/layout/MainLayout';
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {

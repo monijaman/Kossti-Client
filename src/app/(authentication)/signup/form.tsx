@@ -1,12 +1,7 @@
 'use client'
-import styles from './style.module.scss';
-import { Alert } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import Input from '@/components/ui/input';
-import { Label } from '@/components/ui/label'
-import { useRouter } from 'next/navigation'
 import getErrors from '@/components/Form/validation';
-import { useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 interface ErrorResponse {
@@ -64,8 +59,8 @@ export const RegisterForm = () => {
     const errors = getErrors(formData, validationConfig);
     setFormErrors(errors);
     if (Object.keys(errors).length === 0) {
-    
-    
+
+
       setSubmitted(true);
       register();
     }
@@ -76,8 +71,8 @@ export const RegisterForm = () => {
   const register = async () => {
     // Check if window object is defined (client-side check)
     if (typeof window !== "undefined") {
-      
-   
+
+
       const formDataToSend = new FormData();
 
       // Type assertion to inform TypeScript that the keys are strings
@@ -89,16 +84,18 @@ export const RegisterForm = () => {
       }
 
       try {
-       
+
         const res = await fetch(`${apiUrl}/api/v1/registration`, {
           method: "POST",
           body: formDataToSend,
           // Do not set Content-Type header for FormData
         });
-      
+
 
         if (res.ok) {
           const userData = await res.json();
+          setSubmitted(false);
+
           router.push("/signin");
         } else {
           const responseData = await res.json();
@@ -207,12 +204,14 @@ export const RegisterForm = () => {
 
         </div>
 
+
         <div className="pt-4">
           <button
             type="submit"
             className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Register
+            {submitted ? "Register" : "Submitting"}
+
           </button>
         </div>
       </form>

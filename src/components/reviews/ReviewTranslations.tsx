@@ -1,17 +1,12 @@
 "use client";
-import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
-import dynamic from 'next/dynamic';
-import { SpecKeyTranslation, ReviewTranslation } from '@/lib/types';
-import { LOCALES } from '@/lib/constants';
-import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { useSpecifications } from "@/hooks/useSpecifications";
-import Select, { SingleValue } from 'react-select';
+import { LOCALES } from '@/lib/constants';
+import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import 'react-quill/dist/quill.snow.css'; // Import styles
+import Select from 'react-select';
 
 // Dynamically import React Quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; // Import styles
-import { combineSlices } from '@reduxjs/toolkit';
-
 
 interface transDataSet {
     specification_key_id: number;
@@ -91,7 +86,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
         if (productId) {
 
-           const response= await submitSpecKeyTranslation(productId, tranSpecifications);
+            const response = await submitSpecKeyTranslation(productId, tranSpecifications);
 
             if (response.success) {
 

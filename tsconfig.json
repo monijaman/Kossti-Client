@@ -5,6 +5,14 @@
       "dom.iterable",
       "esnext"
     ],
+ 
+       
+        "strictPropertyInitialization": true, // Ensures class properties are initialized
+        "noImplicitThis": true, // Prevents `this` from being implicitly `any`
+        // "noUnusedLocals": true, // Flags unused variables
+        // "noUnusedParameters": true, // Flags unused function parameters
+   
+    
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

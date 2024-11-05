@@ -18,7 +18,6 @@ export interface categoryInt {
   created_at: string;
   updated_at: string;
 }
- 
 
 export interface Product {
   id: number;
@@ -158,8 +157,7 @@ export interface SpecKeyTranslation {
   translated_value: string; // Allow undefined
 }
 
- 
 export interface SpecificationKey {
   id: number | null;
-  specification_key: string  ;
+  specification_key: string;
 }

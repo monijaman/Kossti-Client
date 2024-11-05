@@ -8,13 +8,6 @@ interface PaginationProps {
 const Pagination = ({ category, currentPage, totalPages, selectedBrands }: PaginationProps) => {
 
   // Function to get category from the URL
-  const getCategory = () => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('category') || '';
-    }
-    return '';
-  };
 
   const getPageNumbers = () => {
     const pages = [];

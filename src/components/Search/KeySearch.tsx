@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { SpecificationKey, SearchBoxProps } from '@/lib/types';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
+import { SearchBoxProps, SpecificationKey } from '@/lib/types';
 import Link from 'next/link';
-import { combineSlices } from '@reduxjs/toolkit';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -31,10 +30,10 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                 const locale = 'en';
 
                 // Make the getProducts call to fetch suggestions
-                const response = await getSpecificationsKeys({page, searchTerm, paginate});
+                const response = await getSpecificationsKeys({ page, searchTerm, paginate });
 
                 // Assuming that response.data contains products array
-       
+
                 if (response) {
                     setSuggestions(response); // Store suggestions
                     setShowSuggestions(true)

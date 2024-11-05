@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import { RegisterForm } from './form'
-import styles from './custom-component.module.scss';
-
 export default function RegisterPage() {
 
 
@@ -17,7 +15,7 @@ export default function RegisterPage() {
           <RegisterForm />
 
           <Link href="/signin" className="block text-center text-blue-600 hover:underline font-medium">
-          Login with existing account
+            Login with existing account
           </Link>
         </div>
       </main>

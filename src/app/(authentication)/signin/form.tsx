@@ -1,13 +1,8 @@
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import Input from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useUsers } from "@/hooks/useUsers";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import getErrors from '@/components/Form/validation';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import getErrors from '@/components/Form/validation';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 
 
 interface FormData {
@@ -22,7 +17,6 @@ export const LoginForm = () => {
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
-  const { loginUser } = useUsers();
 
   const validationConfig = {
     email: { required: true, email: true },
@@ -51,7 +45,7 @@ export const LoginForm = () => {
         });
 
         console.log('resJsonresJson', response)
-        
+
         const resJson = await response.json();
 
         if (!resJson.success) {
@@ -63,7 +57,7 @@ export const LoginForm = () => {
           localStorage.setItem('avatar', resJson.dataset.avatar);
           localStorage.setItem('email', resJson.dataset.email);
           console.log('Navigating to dashboard...');
-      
+
           router.push("/");
         } else {
           setError(resJson.error || "Login failed.");

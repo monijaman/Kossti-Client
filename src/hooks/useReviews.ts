@@ -258,12 +258,10 @@ export const useReviews = () => {
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
 
-  
-
     const apiEndpoint = `/api/get?action=reviews&${queryString}`;
- 
+
     try {
-      const response = await fetch(apiEndpoint, { cache: 'no-store' });
+      const response = await fetch(apiEndpoint, { cache: "no-store" });
 
       // console.log("response", response);
       // Log the response for debugging
@@ -293,6 +291,39 @@ export const useReviews = () => {
     }
   };
 
+  const getPublicReviewsByProductId = async (id: number, locale?: string) => {
+    const params: Record<string, string> = {};
+
+    // Add optional parameters only if they are defined
+    if (locale) params.locale = locale;
+
+    // Build the query string
+    const queryString = new URLSearchParams(params).toString();
+
+    // Ensure API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    // const fullUrl = `${apiUrl}/products/${id}/reviews?${queryString}`;
+    const fullUrl = `${apiUrl}/public-reviews/${id}/?${queryString}`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+
+      return {
+        success: true,
+        data: dataset.reviews,
+      };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, data: [] };
+    }
+  };
+
   return {
     addReview,
     getReview,
@@ -300,5 +331,6 @@ export const useReviews = () => {
     getReviewByProductId,
     getImagesByProductId,
     addReviewTranslation,
+    getPublicReviewsByProductId,
   };
 };

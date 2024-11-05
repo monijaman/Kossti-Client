@@ -1,7 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState, AppThunk } from "@/redux/store";
-import { fetchCount } from "./uploadAPI";
 import { ProductPhotos } from "@/lib/types";
+import { RootState } from "@/redux/store";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define the payload type
 interface UploadMediaPayload {
@@ -101,9 +100,7 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   "upload/removemedia",
   async (payload, { getState }) => {
     const { productId } = payload;
-    
 
-   
     const newFormData = {
       apiUrl: `imageremove/${productId}`,
     };
@@ -116,21 +113,19 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
       body: JSON.stringify(newFormData), // Include apiUrl in the request body
     });
 
-
     if (!response.ok) {
       throw new Error("Failed to delete campaign");
     }
 
     const responseArray = await response.json();
 
-    console.log('responseArray', responseArray)
+    console.log("responseArray", responseArray);
     const { data } = responseArray;
-
 
     if (data.images) {
       return {
         success: true,
-        productId: productId
+        productId: productId,
       };
     } else {
       return {
@@ -138,7 +133,6 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
         error: `"Unknown error`,
       };
     }
-
   }
 );
 
@@ -205,7 +199,6 @@ export const uploadSlice = createSlice({
           state.confirmStatus = "failed";
         } else {
           //  console.log("action.payload", action.payload.data);
-
           // if (Array.isArray(action.payload.images)) {
           //   state.uploadedFiles.push(...action.payload.images);
           // }
@@ -218,14 +211,8 @@ export const uploadSlice = createSlice({
         state.status = "loading";
         state.uploadedFiles = [];
       })
-      .addCase(removeMedia.fulfilled, (state, action) => {
+      .addCase(removeMedia.fulfilled, (state) => {
         state.status = "idle";
-        const productid = action.payload.productId
-         
-        // if (Array.isArray(action.payload.images)) {
-        //   state.uploadedFiles.push(...action.payload.images);
-        // }
- 
       })
       .addCase(removeMedia.rejected, (state) => {
         state.status = "failed";
@@ -233,7 +220,7 @@ export const uploadSlice = createSlice({
       .addCase(confirmMedia.pending, (state) => {
         state.confirmStatus = "loading";
       })
-      .addCase(confirmMedia.fulfilled, (state, action) => {
+      .addCase(confirmMedia.fulfilled, (state) => {
         state.confirmStatus = "complete";
         state.uploadedFiles = [];
         //  state.campaign_id = null;

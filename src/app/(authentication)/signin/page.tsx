@@ -13,7 +13,7 @@ export default function LoginPage() {
             Create Your Account
           </h2>
           <LoginForm />
-          <Link  className="block text-center p-4 text-blue-600 hover:underline font-medium" href="/signup">
+          <Link className="block text-center p-4 text-blue-600 hover:underline font-medium" href="/signup">
             Create New Account
           </Link>
         </div>

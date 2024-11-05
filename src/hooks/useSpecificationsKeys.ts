@@ -1,7 +1,5 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
-import { SpecificationInt, SpecificationKey } from "@/lib/types"; // Assuming you have a Product type
-import { SpecKeyTranslation, ReviewTranslation } from "@/lib/types";
 
 const useSpecificationsKeys = () => {
   const getSpecificationsKeys = async ({
@@ -52,21 +50,16 @@ const useSpecificationsKeys = () => {
     }
   };
 
-  const getKeysTranslationById = async ({
-    key_id = 0,
-    locale = "",
-  } = {}) => {
-
+  const getKeysTranslationById = async ({ key_id = 0, locale = "" } = {}) => {
     const params = new URLSearchParams({
       action: "speckey-translation",
       locale,
-      key_id: key_id.toString(),  // Convert number to string
+      key_id: key_id.toString(), // Convert number to string
     });
- 
+
     // Define the API endpoint
     const apiEndpoint = `/api/get?${params.toString()}`;
 
-   
     try {
       const response = await fetch(apiEndpoint); // Adjust API endpoint
 

@@ -1,12 +1,12 @@
-"use client"
-import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+"use client";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = Cookies.get('accessToken');
+    const token = Cookies.get("accessToken");
     setIsAuthenticated(!!token);
   }, []);
 

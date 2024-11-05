@@ -1,6 +1,5 @@
-import { FC } from 'react';
-import { SearchParams, brandInt, Product, ProductApiResponse } from '@/lib/types';
 import ProducShortDetails from '@/components/Products/ProducShortDetails';
+import { Product } from '@/lib/types';
 
 interface PopularProductsProps {
   products: Product[];
@@ -15,7 +14,7 @@ const PopularProducts = ({ products }: PopularProductsProps) => {
         return (
           <ProducShortDetails key={i} product={product} />
         );
-      })} 
+      })}
 
     </div>
   );

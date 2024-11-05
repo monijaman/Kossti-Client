@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface AdditionalDetail {
     youtubeUrl?: string; // Optional YouTube URL
