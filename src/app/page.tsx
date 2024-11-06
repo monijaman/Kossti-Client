@@ -1,11 +1,27 @@
-import ProductReview from '@/components/Products/ProductReview';
-import Pagination from '@/components/Pagination/index';
-import { useProducts } from '@/hooks/useProducts';
-import SearchBox from '@/components/Search';
-import { SearchParams } from '@/lib/types';
+// src/app/products/page.tsx
 import MainLayout from '@/components/layout/MainLayout';
+import Pagination from '@/components/Pagination/index';
+import ProductReview from '@/components/Products/ProductReview';
+import SearchBox from '@/components/Search';
+import { useProducts } from '@/hooks/useProducts';
+import { SearchParams } from '@/lib/types';
+import { headers } from 'next/headers';
+
+interface PageProps {
+  searchParams: SearchParams;
+  country: string;
+}
+
+// Function to determine the country based on IP address
+const getCountryFromIP = () => {
+  const ip = headers().get('x-forwarded-for') || headers().get('remoteAddress') || '127.0.0.1';
+  return ip
+  // const geo = geoip.lookup(ip as string);
+  // return geo ? geo.country : 'Unknown';
+};
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+  const country = getCountryFromIP();
   const { getProducts } = useProducts();
 
   const page = parseInt(searchParams.page as string, 10) || 1;
@@ -14,6 +30,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
+  // const locale = searchParams.locale || (country === 'BD' ? 'bn' : 'en');
   const locale = searchParams.locale || 'bn';
 
   const fetchProductData = async () => {
@@ -31,12 +48,13 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     activePriceRange,
     searchTerm,
   };
-  
+
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} />
       <ProductReview products={dataset.products} />
 
+      {country}
       <Pagination
         category={activeCategory}
         selectedBrands={activeBrands}
