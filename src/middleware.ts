@@ -14,6 +14,21 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const tokenStatus = await checkToken(token, apiUrl, refreshToken);
+  const res = NextResponse.next();
+
+  /*  const ip = (
+    request.headers.get("x-forwarded-for") ||
+    request.headers.get("remoteAddress") ||
+    "127.0.0.1"
+  )
+    .split(",")[0]
+    .trim();
+
+  if (ip) {
+    res.cookies.set("user-ip", ip, {
+      httpOnly: false,
+    });
+  }*/
 
   const { isValidToken, accessToken } = tokenStatus;
 
@@ -31,6 +46,7 @@ export async function middleware(request: NextRequest) {
   // Redirect to signin if token is invalid and clear cookies
   if (token && !isValidToken) {
     const response = NextResponse.redirect(new URL("/signin", request.url));
+    response.cookies.set("accessToken", "", { expires: new Date(0) });
     response.cookies.set("accessToken", "", { expires: new Date(0) });
     response.cookies.set("refreshToken", "", { expires: new Date(0) });
     response.cookies.set("XSRF-TOKEN", "", { expires: new Date(0) });

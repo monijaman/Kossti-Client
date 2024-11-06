@@ -12,13 +12,38 @@ interface PageProps {
   country: string;
 }
 
+
 // Function to determine the country based on IP address
-const getCountryFromIP = () => {
+// Define the type for the response from ip-api
+interface CountryResponse {
+  countryCode: string;
+}
+
+const getCountryFromIP = async (): Promise<string | undefined> => {
+  // Retrieve IP address from headers
   const ip = headers().get('x-forwarded-for') || headers().get('remoteAddress') || '127.0.0.1';
-  return ip
-  // const geo = geoip.lookup(ip as string);
-  // return geo ? geo.country : 'Unknown';
+  console.log("==============================", ip)
+  if (ip) {
+    try {
+      // Perform the fetch request asynchronously
+      const response = await fetch(`http://ip-api.com/json/${ip}`);
+
+      if (response.ok) {
+        // Parse the JSON response
+        const data: CountryResponse = await response.json();
+        return data.countryCode;  // Return the country code from the response
+      } else {
+        return "en"
+      }
+    } catch (error) {
+      console.error('Error fetching country data:', error);
+      return undefined;
+    }
+  }
+
+  return undefined;  // Return undefined if no IP address is found
 };
+
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const country = getCountryFromIP();
