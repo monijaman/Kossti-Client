@@ -1,13 +1,13 @@
 'use client'; // This directive makes this component a client component
 
-import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
 
 const AccountDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isAuthenticated = useAuth();
   return (
-    <div className="relative">
+    <div className="relative flex items-center">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="text-white bg-blue-600 px-4 py-2 rounded-md focus:outline-none"
@@ -25,14 +25,14 @@ const AccountDropdown = () => {
             <>
               <a href="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</a>
               <a href="/logout" className="block px-4 py-2 hover:bg-gray-100">Logout</a>
-              
-             
-                <>
-                  <hr className="my-1" />
-                  <a href="/admin/dashboard" className="block px-4 py-2 hover:bg-gray-100">Admin Dashboard</a>
-                  <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100">Manage Users</a>
-                </>
-              
+
+
+              <>
+                <hr className="my-1" />
+                <a href="/admin/dashboard" className="block px-4 py-2 hover:bg-gray-100">Admin Dashboard</a>
+                <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100">Manage Users</a>
+              </>
+
             </>
           )}
         </div>

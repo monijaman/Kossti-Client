@@ -1,10 +1,10 @@
 // MainLayout.tsx
+import LanguageSwitcher from '@/components/Language/LanguageSwitcher';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Navigation from '@/components/ui/Navigation';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import { FC, ReactNode } from 'react';
-
 interface MainLayoutProps {
   children: ReactNode;
   sidebarProps?: {
@@ -21,9 +21,11 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">Your Site Title</h1>
-        <AccountDropdown />
+        <div className="ml-auto flex items-center space-x-4">
+          <AccountDropdown />
+          <LanguageSwitcher />
+        </div>
       </header>
-
 
       {/* <div className="w-full max-w-[1600px] mx-auto"> */}
 

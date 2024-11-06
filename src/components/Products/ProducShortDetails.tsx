@@ -5,7 +5,6 @@ interface PopularProductsProps {
 }
 
 const ProducShortDetails = ({ product }: PopularProductsProps) => {
-
   return (
     <div>
 

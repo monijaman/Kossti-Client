@@ -5,7 +5,8 @@
       "dom.iterable",
       "esnext"
     ],
- 
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+
        
         "strictPropertyInitialization": true, // Ensures class properties are initialized
         "noImplicitThis": true, // Prevents `this` from being implicitly `any`

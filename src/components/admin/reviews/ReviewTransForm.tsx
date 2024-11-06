@@ -1,15 +1,14 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
-import { useReviews } from '@/hooks/useReviews';
 import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
-import { SpecTranslation, ProductTranslation, AdditionalDetails, ProductApiResponse, Product, ReviewTranslation } from '@/lib/types';
+import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
+import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from 'react';
+import 'react-quill/dist/quill.snow.css'; // Import styles
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; // Import styles
-import { combineSlices } from '@reduxjs/toolkit';
 
 // Page props
 interface PageProps {
@@ -41,7 +40,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             review: '',
             additional_details: []
         };
-      
+
         setSelectedTranslation(newTranslation); // Set to null or leave unchanged
     }
 
@@ -136,7 +135,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         // Handle the API response here, e.g., display success message or redirect
     };
 
-   
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -184,7 +183,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                     {/* Translation Review */}
                     <div className="row" style={{ minHeight: '320px' }}>
                         <label htmlFor="review" className="block mb-2">Review ({selectedTranslation && selectedTranslation.locale})</label>
-                      
+
                         <ReactQuill
                             value={selectedTranslation.review || ''} // Clears content if review is empty
                             onChange={(value) => {
