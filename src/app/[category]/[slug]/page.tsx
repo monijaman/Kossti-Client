@@ -21,7 +21,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const searchTerm = searchParams.searchterm || '';
-  const locale = searchParams.locale || 'bn';
 
   const fetchProductData = async () => {
     const response = await getAProductBySlug(slug, countryCode);

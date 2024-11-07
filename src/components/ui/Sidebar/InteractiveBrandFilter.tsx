@@ -23,7 +23,7 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             if (selected.length) {
                 currentParams.set('brand', selected.join(','));
             } else {
-                currentParams.delete('brand');
+                // currentParams.delete('brand');
             }
             // Generate the new query string
             const newQueryString = `/?${currentParams.toString()}`;
@@ -48,6 +48,7 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             <div className="mb-4">
                 {dataset && dataset.map((brand: brandInt) => (
                     <div key={brand.id} className="flex items-center mb-2">
+
                         <Checkbox
                             key={brand.id}
                             name={brand.slug}

@@ -13,6 +13,8 @@ const SpecDetails = async ({ productId }: PopularProductsProps) => {
   const fetchSpecifications = async () => {
     const response = await getPublicSpecs(productId, countryCode);
 
+
+
     return response;
   }
 
