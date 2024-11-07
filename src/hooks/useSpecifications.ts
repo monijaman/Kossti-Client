@@ -255,7 +255,7 @@ export const useSpecifications = () => {
     }
   };
 
-  const getPublicSpecs = async (productId: number, locale: "bn") => {
+  const getPublicSpecs = async (productId: number, locale: string) => {
     const apiEndpoint = `get-public-spec/${productId}?locale=${locale}`;
     if (!apiUrl) {
       return Promise.reject(

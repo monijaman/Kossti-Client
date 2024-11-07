@@ -4,6 +4,9 @@ import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
 import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from '@/lib/types';
+import { cookies } from 'next/headers';
+
+
 interface PageProps {
   params: {
     category: string; // category parameter
@@ -15,12 +18,13 @@ interface PageProps {
 const Page = async ({ params, searchParams }: PageProps) => {
   const { getAProductBySlug } = useProducts();
   const { slug } = params
+  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const searchTerm = searchParams.searchterm || '';
   const locale = searchParams.locale || 'bn';
 
   const fetchProductData = async () => {
-    const response = await getAProductBySlug(slug, locale);
+    const response = await getAProductBySlug(slug, countryCode);
     return response.success ? response.data : { products: [], totalProducts: 0 };
   };
 

@@ -7,10 +7,6 @@ import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 
-interface PageProps {
-  searchParams: SearchParams;
-  locale: string;
-}
 
 // Server Component
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
@@ -23,10 +19,6 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
   const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
-
-
-
-
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);

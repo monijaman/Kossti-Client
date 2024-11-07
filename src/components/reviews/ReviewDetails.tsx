@@ -1,4 +1,5 @@
 import { useReviews } from '@/hooks/useReviews';
+import { cookies } from 'next/headers';
 
 interface PopularProductsProps {
   productId: number;
@@ -7,9 +8,10 @@ interface PopularProductsProps {
 const ReviewDetails = async ({ productId }: PopularProductsProps) => {
   const { getPublicReviewsByProductId } = useReviews();
   const locale = 'bn';
+  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const fetchSpecifications = async () => {
-    const response = await getPublicReviewsByProductId(productId, locale);
+    const response = await getPublicReviewsByProductId(productId, countryCode);
 
     return response;
   }
