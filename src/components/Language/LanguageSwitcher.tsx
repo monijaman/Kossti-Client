@@ -29,6 +29,14 @@ const LanguageSwitcher = () => {
                 localStorage.setItem('locale', activeLocale);
                 setLocale(activeLocale);
                 document.cookie = `country-code=${activeLocale}; path=/`; // Set cookie with path for the entire site
+
+
+                // Use a slight delay to allow the server to read the cookie
+                setTimeout(() => {
+                    router.refresh();
+                }, 100); // Delay by 100ms
+
+
             }
         } else {
             setLocale(storedLocale); // Use the stored locale if available

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const SearchBox = ({ initialSearchTerm = '', searchType = 'products' }: SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
@@ -75,7 +75,7 @@ const SearchBox = ({ initialSearchTerm = '', searchType = 'products' }: SearchBo
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
                             // onClick={() => handleSuggestionClick(product)}
                             >
-                                <Link href={`${searchType}/${product.id}`}>{searchType}
+                                <Link href={`/${product.category_slug}/${product.slug}`}>
                                     {product.name}
                                 </Link>
                             </li>

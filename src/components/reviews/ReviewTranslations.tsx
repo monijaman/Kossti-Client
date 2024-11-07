@@ -19,8 +19,6 @@ interface transDataSet {
     }
 }
 
-
-
 // Page props
 interface PageProps {
     productId: number | null;

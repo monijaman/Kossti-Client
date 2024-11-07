@@ -18,7 +18,7 @@ interface PageProps {
 const Page = async ({ params, searchParams }: PageProps) => {
   const { getAProductBySlug } = useProducts();
   const { slug } = params
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = cookies().get('country-code')?.value; // Default to 'en' if not found
 
   const searchTerm = searchParams.searchterm || '';
 
@@ -31,8 +31,8 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   return (
     <MainLayout >
-      <SearchBox initialSearchTerm={searchTerm} searchType='public-reviews' />
-      <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -   ${dataset.category}</h3>
+      <SearchBox initialSearchTerm={searchTerm} />
+      <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
 
       <ReviewDetails productId={dataset.id} />
       <ProducDetails product={dataset} />

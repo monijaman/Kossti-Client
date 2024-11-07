@@ -68,7 +68,7 @@ export interface SidebarParams {
 
 export interface SearchBoxProps {
   initialSearchTerm?: string;
-  searchType?: string;
+  searchUrl?: string;
 }
 
 export interface SearchParams {
@@ -98,6 +98,7 @@ export interface Review {
   user_id: string;
   reviews: string;
   rating: string;
+  price: number;
   additional_details: [];
   translations: ReviewTranslation[];
 }

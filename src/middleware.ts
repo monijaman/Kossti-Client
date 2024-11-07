@@ -1,3 +1,4 @@
+import { country } from "@/lib/types";
 import { checkToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -5,7 +6,6 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
 
 // Function to handle IP Address extraction and setting
 async function handleIpAddress(request: NextRequest, response: NextResponse) {
-  // Get the IP address from request headers or default to localhost
   const ip = (
     request.headers.get("x-forwarded-for") ||
     request.headers.get("remoteAddress") ||
@@ -14,34 +14,29 @@ async function handleIpAddress(request: NextRequest, response: NextResponse) {
     .split(",")[0]
     .trim();
 
-  // Handle localhost IP consistency
-  const clientIp = ip === "::1" ? "127.0.0.1" : ip;
+  // Replace "::1" with "127.0.0.1" for localhost consistency
+  const clientIp = ip === "::1" ? "103.42.52.79" : ip;
 
-  // Set the IP address in a cookie (client-readable)
-  response.cookies.set("user-ip", clientIp, { httpOnly: false, path: "/" });
+  response.cookies.set("user-ip", clientIp, { httpOnly: false });
 
   try {
-    // Fetch country code from external IP service
+    // Fetch country code based on IP
     const fetchResponse = await fetch(`http://ip-api.com/json/${clientIp}`);
-
     if (fetchResponse.ok) {
-      const data: { countryCode: string } = await fetchResponse.json();
-
-      // Set the country code as a cookie for use in the app
+      const data: country = await fetchResponse.json();
       response.cookies.set("country-code", data.countryCode, {
         httpOnly: false,
-        path: "/",
       });
+
       return data.countryCode;
     } else {
-      console.error("Failed to fetch country information from IP API.");
+      console.error("Failed to fetch country information.");
     }
   } catch (error) {
     console.error("Error fetching country information:", error);
   }
 
-  // Default to returning null if no country code could be fetched
-  return null;
+  return null; // Return null if country code was not retrieved
 }
 
 // Function to handle token checking and redirection
@@ -115,7 +110,7 @@ export async function middleware(request: NextRequest) {
     return await handleTokenAndRedirect(request, response);
   } else if (!request.cookies.get("user-ip")) {
     // Call IP Address handling function
-    handleIpAddress(request, response);
+    await handleIpAddress(request, response);
   }
 
   // Continue to next response if no further handling is needed
