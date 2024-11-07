@@ -1,6 +1,8 @@
 const cacheBuster = new Date().getTime(); // Cache-busting parameter
 const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 
+// Function to get cookie by name
+
 export const useProducts = () => {
   const getProducts = async (
     page: number,

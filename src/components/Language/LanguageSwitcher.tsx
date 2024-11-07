@@ -1,36 +1,56 @@
-"use client"
+"use client";
 import { LOCALES } from '@/lib/constants';
-// Uncomment the following line if you're using a context for managing language state
-// import { useLanguage } from '@/context/LanguageContext';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const LanguageSwitcher = () => {
-    // Uncomment if using LanguageContext
-    // const { locale, setLocale } = useLanguage();
-
-    // Local state for the language selection
     const [locale, setLocale] = useState<string>('en'); // Default locale
+    const router = useRouter();
 
-    // Load the locale from local storage when the component mounts
+    // Load the locale from local storage or cookies when the component mounts
     useEffect(() => {
         const storedLocale = localStorage.getItem('locale');
-        if (storedLocale) {
-            setLocale(storedLocale);
+
+        if (!storedLocale) {
+            // Retrieve country code from cookies if available
+            const countryCookie = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('country-code='))
+                ?.split('=')[1];
+            if (countryCookie) {
+                let activeLocale = countryCookie.toLowerCase();
+
+                // Check for "bd" and set it to "bn" if matched
+                if (activeLocale === "bd") {
+                    activeLocale = "bn";
+                }
+
+                // Set locale in localStorage, update state, and set cookie
+                localStorage.setItem('locale', activeLocale);
+                setLocale(activeLocale);
+                document.cookie = `country-code=${activeLocale}; path=/`; // Set cookie with path for the entire site
+            }
+        } else {
+            setLocale(storedLocale); // Use the stored locale if available
         }
     }, []);
 
     const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newLocale = event.target.value;
         setLocale(newLocale);
-        localStorage.setItem('locale', newLocale); // Save the locale in local storage
-        // Uncomment if using LanguageContext
-        // setLocale(newLocale);
+        localStorage.setItem('locale', newLocale);
+
+        // Update the cookie when language is changed
+        document.cookie = `country-code=${newLocale}; path=/`; // Sets cookie for the entire site
+
+        // Trigger a router refresh to re-render components without full page reload
+        router.refresh();
     };
 
     return (
         <div className="flex items-center">
             <label htmlFor="language-select" className="block mb-2 text-gray-700 mr-2">
-                Select Language:
+                Language:
             </label>
             <select
                 id="language-select"
