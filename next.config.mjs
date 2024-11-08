@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      domains: ['127.0.0.1', 'localhost'], // Add your local domains here
-    },
-  };
-  
-  export default nextConfig;
-  
+  images: {
+    domains: ['127.0.0.1', 'localhost', 'viper.monirspace.com'], // Add your local domains here
+  },
+};
+
+export default nextConfig;
