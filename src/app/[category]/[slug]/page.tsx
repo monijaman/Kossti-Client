@@ -1,11 +1,11 @@
 import MainLayout from '@/components/layout/MainLayout';
 import ProducDetails from '@/components/Products/ProducDetails';
+import ProductPhotosPage from '@/components/reviews/ProductPhotos';
 import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
 import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
-
 
 interface PageProps {
   params: {
@@ -34,6 +34,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       <SearchBox initialSearchTerm={searchTerm} />
       <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
 
+      <ProductPhotosPage productId={dataset.id} />
       <ReviewDetails productId={dataset.id} />
       <ProducDetails product={dataset} />
     </MainLayout>

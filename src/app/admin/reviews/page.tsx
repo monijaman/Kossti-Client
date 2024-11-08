@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import GeneralPagination from '@/components/Pagination/general';
 import SearchBox from '@/components/Search';
 import Reviewetails from '@/components/admin/reviews/Reviewetails';
-import { SearchParams, Review, Product } from '@/lib/types';
 import { useReviews } from '@/hooks/useReviews';
-import GeneralPagination from '@/components/Pagination/general';
+import { Product, Review, SearchParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
 interface PageProps {
@@ -21,7 +20,7 @@ interface reviweData {
   product: Product;
 }
 
- 
+
 
 const ManageReviews = ({ params, searchParams }: PageProps) => {
   const { slug } = params;
@@ -38,8 +37,8 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
   // Function to fetch review data
   const fetchReviewsData = async () => {
     const response = await getReviews(page, limit, searchTerm);
- 
- 
+
+
     if (response.success) {
       setReviews(response.data.reviews);
     }
@@ -57,11 +56,11 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
   return (
     <>
       <h2 className="text-2xl font-bold mb-4"> Reviews</h2>
- 
-      <SearchBox initialSearchTerm={searchTerm} searchType='reviews' />
+
+      <SearchBox initialSearchTerm={searchTerm} searchUrl='reviews' />
 
       {/* Review management functionalities */}
-      <Reviewetails reviews={reviews}   />
+      <Reviewetails reviews={reviews} />
 
       <GeneralPagination
         currentPage={page}

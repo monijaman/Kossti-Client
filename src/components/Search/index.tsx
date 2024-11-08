@@ -6,14 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
     const router = useRouter();
     const { getProducts } = useProducts()
-
-
 
 
     // Handle search input change and update suggestions
@@ -75,7 +73,7 @@ const SearchBox = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
                             // onClick={() => handleSuggestionClick(product)}
                             >
-                                <Link href={`/${product.category_slug}/${product.slug}`}>
+                                <Link href={searchUrl ? `${searchUrl}/${product.id}` : `/${product.category_slug}/${product.slug}`}>
                                     {product.name}
                                 </Link>
                             </li>

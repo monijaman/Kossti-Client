@@ -24,7 +24,6 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
   // Await the fetch to get the actual data
   const review = await fetchSpecifications();
 
-  console.log('reviewreviewreview', review.data.additional_details)
 
   return (
     <div>

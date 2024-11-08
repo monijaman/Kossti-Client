@@ -1,10 +1,9 @@
-import Link from 'next/link'
-import SearchBox from '@/components/Search';
-import ProductReview from '@/components/admin/ProducDetails';
-import { SearchParams, ProductApiResponse, Product } from '@/lib/types';
-import { useProducts } from '@/hooks/useProducts';
 import Pagination from '@/components/Pagination/index';
+import SearchBox from '@/components/Search';
 import ProductDetails from '@/components/admin/ProducDetails';
+import { useProducts } from '@/hooks/useProducts';
+import { SearchParams } from '@/lib/types';
+import Link from 'next/link';
 
 interface PageProps {
     params: {
@@ -46,7 +45,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
         <>
             <h2 className="text-2xl font-bold mb-4"> Products</h2>
             <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
-            <SearchBox initialSearchTerm={searchTerm} />
+            <SearchBox initialSearchTerm={searchTerm} searchUrl='products/' />
 
             {/* Add your review management functionalities here */}
             <ProductDetails

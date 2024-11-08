@@ -1,13 +1,9 @@
- 
-import Link from 'next/link'
+
+import Link from 'next/link';
 
 import SearchBox from '@/components/Search';
-import Reviewetails from '@/components/admin/reviews/Reviewetails';
-import { SearchParams, ProductApiResponse, Product } from '@/lib/types';
 import { useReviews } from '@/hooks/useReviews';
-import ProductDetails from '@/components/admin/ProducDetails';
-import GeneralPagination from '@/components/Pagination/general';
-import { useEffect } from 'react';
+import { SearchParams } from '@/lib/types';
 interface PageProps {
   params: {
     slug: string; // Type for the slug
@@ -32,7 +28,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
 
   // Mock function to fetch product data
   const fetchReviewsData = async () => {
-   
+
     const response = await getReviews(page, limit, searchTerm);
     console.log('responseresponse', response)
     return response.success ? response.data : { reviews: [], totalProducts: 0 };
@@ -52,7 +48,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
     <>
       <h2 className="text-2xl font-bold mb-4"> Reviews</h2>
       <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
-      <SearchBox initialSearchTerm={searchTerm} searchType="reviews" />
+      <SearchBox initialSearchTerm={searchTerm} searchUrl="reviews" />
 
       {/* Add your review management functionalities here */}
       {/* <Reviewetails
