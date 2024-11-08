@@ -1,6 +1,5 @@
-import { FC } from "react";
 import { useCategory } from "@/hooks/useCategory";
-import { brandInt, SidebarParams, categoryInt, SearchParams } from '@/lib/types';
+import { categoryInt, SearchParams } from '@/lib/types';
 
 
 const Categories = async ({ category }: SearchParams) => {
@@ -14,24 +13,21 @@ const Categories = async ({ category }: SearchParams) => {
   // Handle undefined searchParams with a default empty string
   const activeCategory = category || "";
   const clearCategoryUrl = `/`;
-console.log('activeCategoryactiveCategory', activeCategory)
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">Categories</h2>
       <div className="mb-4">
         <div className="mb-4">
           {dataset &&
-            dataset.map((category: categoryInt, index:number) => {
-              console.log("Category ID: ", category.id); // Debug: Log the ID
+            dataset.map((category: categoryInt, index: number) => {
               return (
                 <a
                   key={category.id || index} // Fallback to index if category.id is undefined
                   href={`/?category=${category.slug}`}
-                  className={`block px-4 py-2 rounded-md ${
-                    activeCategory === category.name
+                  className={`block px-4 py-2 rounded-md ${activeCategory === category.name
                       ? "bg-blue-100"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {category.name}
                 </a>

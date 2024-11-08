@@ -44,19 +44,16 @@ export const LoginForm = () => {
           body: JSON.stringify(formData),
         });
 
-        console.log('resJsonresJson', response)
 
         const resJson = await response.json();
 
         if (!resJson.success) {
           setError(resJson.error || "An unexpected error occurred.");
         } else if (resJson.success) {
-          console.log('resJson.success', resJson.success)
           setError(null);
           localStorage.setItem('userName', resJson.dataset.username);
           localStorage.setItem('avatar', resJson.dataset.avatar);
           localStorage.setItem('email', resJson.dataset.email);
-          console.log('Navigating to dashboard...');
 
           router.push("/");
         } else {

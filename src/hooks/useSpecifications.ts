@@ -21,7 +21,6 @@ export const useSpecifications = () => {
     try {
       const response = await fetch(fullUrl); // Adjust API endpoint
       const dataset = await response.json();
-      // console.log("Fetching category URL:-", dataset); // Ensure this URL is correct
 
       return {
         success: true,
@@ -47,7 +46,6 @@ export const useSpecifications = () => {
     try {
       const response = await fetch(fullUrl); // Adjust API endpoint
       const dataset = await response.json();
-      // console.log("Fetching getSpecifications URL:-", dataset); // Ensure this URL is correct
 
       return {
         success: true,
@@ -73,7 +71,6 @@ export const useSpecifications = () => {
     try {
       const response = await fetch(fullUrl); // Adjust API endpoint
       const dataset = await response.json();
-      // console.log("Fetching getSpecifications URL:-", dataset); // Ensure this URL is correct
 
       return {
         success: true,

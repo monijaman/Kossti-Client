@@ -1,12 +1,7 @@
-import React, { useEffect, useState, ChangeEvent, DragEvent } from "react";
 import Image from "next/image";
 import "./uploader.scss";
-import { table } from "console";
-import { Button } from "@/components/ui/button";
-import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
-import { useRef } from "react";
 
- 
+
 interface propTypes {
   file: File | null;
   fileurl: string | null;
@@ -33,7 +28,6 @@ const RenderPreview = ({ file, fileurl }: propTypes) => {
     imgThumb = "/icons/video.svg";
   }
 
-  console.log(extension)
 
   return (
     <div key={filename} className="preview-item">

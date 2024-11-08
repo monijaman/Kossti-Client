@@ -92,7 +92,6 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         e.preventDefault();
         setFormStatus("")
 
-        // console.log(selectedTranslation)
         if (!selectedTranslation) return;
 
         // Prepare the data to be submitted

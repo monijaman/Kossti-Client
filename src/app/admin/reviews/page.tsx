@@ -48,10 +48,7 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
     fetchReviewsData(); // Fetch data when the component mounts
   }, [page, searchTerm]); // Re-fetch when page or search term changes
 
-  const handleDelete = (id: number) => {
-    console.log('Delete review with ID:', id);
-    // Add your delete logic here
-  };
+
 
   return (
     <>

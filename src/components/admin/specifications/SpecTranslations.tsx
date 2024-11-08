@@ -1,16 +1,14 @@
 "use client";
-import React, { useEffect, useState, FormEvent, ChangeEvent } from 'react';
-import dynamic from 'next/dynamic';
-import { SpecKeyTranslation, ReviewTranslation } from '@/lib/types';
-import { LOCALES } from '@/lib/constants';
-import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { useSpecifications } from "@/hooks/useSpecifications";
-import Select, { SingleValue } from 'react-select';
+import { LOCALES } from '@/lib/constants';
+import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import 'react-quill/dist/quill.snow.css'; // Import styles
+import Select from 'react-select';
 
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; // Import styles
-import { combineSlices } from '@reduxjs/toolkit';
 
 
 interface transDataSet {
@@ -91,7 +89,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
         if (productId) {
 
-           const response= await submitSpecKeyTranslation(productId, tranSpecifications);
+            const response = await submitSpecKeyTranslation(productId, tranSpecifications);
 
             if (response.success) {
 
@@ -116,7 +114,6 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     // Function to handle specification key selection from react-select
     // const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number | null; label: string }>) => {
     //     const values = [...tranSpecifications];
-    //     console.log('valuesvalues', values[index])
     //     if (selectedOption) {
     //         values[index].specification_id = selectedOption.value; // Set the selected key ID as string
     //         setTranSpecifications(values);

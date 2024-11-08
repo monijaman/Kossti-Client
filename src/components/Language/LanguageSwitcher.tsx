@@ -20,10 +20,6 @@ const LanguageSwitcher = () => {
             if (countryCookie) {
                 let activeLocale = countryCookie.toLowerCase();
 
-                // Check for "bd" and set it to "bn" if matched
-                if (activeLocale === "bd") {
-                    activeLocale = "bn";
-                }
 
                 // Set locale in localStorage, update state, and set cookie
                 localStorage.setItem('locale', activeLocale);

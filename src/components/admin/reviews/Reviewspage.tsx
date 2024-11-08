@@ -30,13 +30,11 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
   const fetchReviewsData = async () => {
 
     const response = await getReviews(page, limit, searchTerm);
-    console.log('responseresponse', response)
     return response.success ? response.data : { reviews: [], totalProducts: 0 };
   };
 
   // const dataset = await fetchReviewsData();
   // const totalPages = Math.ceil(dataset.totalProducts / limit);
-  //console.log('michael', dataset)
 
 
   fetchReviewsData();

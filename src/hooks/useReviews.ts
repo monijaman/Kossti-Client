@@ -36,7 +36,6 @@ export const useReviews = () => {
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
-    console.log("Fetching URL:", fullUrl); // Ensure this URL is correct
 
     try {
       const response = await fetch(fullUrl);
@@ -261,7 +260,6 @@ export const useReviews = () => {
     try {
       const response = await fetch(apiEndpoint, { cache: "no-store" });
 
-      // console.log("response", response);
       // Log the response for debugging
 
       if (!response.ok) {

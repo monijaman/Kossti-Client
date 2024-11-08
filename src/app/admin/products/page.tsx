@@ -36,29 +36,27 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
     const dataset = await fetchProductData();
     const totalPages = Math.ceil(dataset.totalProducts / limit);
 
-    const handleDelete = (id: number) => {
-        console.log('Delete product with ID:', id);
-        // Add your delete logic here
-    };
+  / Add your delete logic here
+};
 
-    return (
-        <>
-            <h2 className="text-2xl font-bold mb-4"> Products</h2>
-            <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
-            <SearchBox initialSearchTerm={searchTerm} searchUrl='products/' />
+return (
+    <>
+        <h2 className="text-2xl font-bold mb-4"> Products</h2>
+        <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/createproduct">Add New Product</Link>
+        <SearchBox initialSearchTerm={searchTerm} searchUrl='products/' />
 
-            {/* Add your review management functionalities here */}
-            <ProductDetails
-                products={dataset.products}
-            />
-            <Pagination
-                category={activeCategory}
-                selectedBrands={activeBrands}
-                currentPage={page}
-                totalPages={totalPages}
-            />
-        </>
-    );
+        {/* Add your review management functionalities here */}
+        <ProductDetails
+            products={dataset.products}
+        />
+        <Pagination
+            category={activeCategory}
+            selectedBrands={activeBrands}
+            currentPage={page}
+            totalPages={totalPages}
+        />
+    </>
+);
 };
 
 export default ManageReviews;

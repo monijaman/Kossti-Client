@@ -107,9 +107,7 @@ export const RegisterForm = () => {
           ) {
             // Extract and set the first error message
             const errorMessage = responseData.error[0];
-            // console.log(responseData.error[0])
             setError(errorMessage);
-            // console.log(errorMessage.email[0])
           } else {
             // Handle other types of errors or messages
             setError({ message: "An error occurred during registration." });

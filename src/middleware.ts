@@ -24,7 +24,12 @@ async function handleIpAddress(request: NextRequest, response: NextResponse) {
     const fetchResponse = await fetch(`http://ip-api.com/json/${clientIp}`);
     if (fetchResponse.ok) {
       const data: country = await fetchResponse.json();
-      response.cookies.set("country-code", data.countryCode, {
+      let ccode = data.countryCode;
+      if (data.countryCode == "BD") {
+        ccode = "bn";
+      }
+
+      response.cookies.set("country-code", ccode, {
         httpOnly: false,
       });
 

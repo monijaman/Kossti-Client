@@ -1,11 +1,8 @@
 "use client";
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product } from '@/lib/types'; // Assuming you have a Product type
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
 import { useProducts } from "@/hooks/useProducts";
 import { LOCALES } from '@/lib/constants';
+import { Product } from '@/lib/types'; // Assuming you have a Product type
+import { useEffect, useState } from 'react';
 
 interface ProductFormProps {
     product?: Product; // Make it optional for the create case
@@ -45,10 +42,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
             }
         }
     };
-
-    useEffect(() => {
-        console.log('translationstranslations', translations)
-    }, [translations]);
 
 
     // Select 'bn' translation by default on mount
@@ -155,7 +148,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     </button>
                 </div>
 
-                
+
 
                 {submitStatus && (
                     <div

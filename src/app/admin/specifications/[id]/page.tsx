@@ -1,9 +1,9 @@
 "use client";
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import Select, { SingleValue } from 'react-select';
 import { useSpecifications } from "@/hooks/useSpecifications";
-import { SpecificationInt, SpecificationKey, Product } from '@/lib/types';
- 
+import { SpecificationInt, SpecificationKey } from '@/lib/types';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import Select, { SingleValue } from 'react-select';
+
 import SpecTranslations from '@/components/admin/specifications/SpecTranslations';
 interface PageProps {
     params: {
@@ -51,7 +51,7 @@ const Specification = ({ params }: PageProps) => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-     
+
         // Call the submit function with the mapped data
         await submitSpecificationsKeys(id, specifications);
 
@@ -62,7 +62,7 @@ const Specification = ({ params }: PageProps) => {
         try {
             const dataset = await getSpecificationsKeys();
             setSpecKeys(dataset.data);
-            
+
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
@@ -74,12 +74,11 @@ const Specification = ({ params }: PageProps) => {
         try {
             const response = await getSpecifications(id);
 
-            if(response.dataset.specifications.length> 0){
-               
+            if (response.dataset.specifications.length > 0) {
+
                 setSpecifications(response.dataset.specifications);
-                
-            }else{
-                console.log('response+++++++++++++++', response.dataset)
+
+            } else {
                 setSpecifications(response.dataset.formspecs);
 
             }
@@ -121,7 +120,7 @@ const Specification = ({ params }: PageProps) => {
                                             value: key.id,
                                             label: key.specification_key,
                                         }))}
-                                      
+
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
