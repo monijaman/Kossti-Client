@@ -53,9 +53,7 @@ const LanguageSwitcher = () => {
 
     return (
         <div className="flex items-center">
-            <label htmlFor="language-select" className="block mb-2 text-gray-700 mr-2">
-                Language:
-            </label>
+
             <select
                 id="language-select"
                 value={locale}

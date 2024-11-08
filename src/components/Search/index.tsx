@@ -2,36 +2,51 @@
 
 import { useProducts } from '@/hooks/useProducts';
 import { Product, SearchBoxProps } from '@/lib/types';
+import useDebounce from '@/lib/useDebounce';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
-    const router = useRouter();
     const { getProducts } = useProducts()
+    const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            fetchData();
+        } else {
+            setShowSuggestions(false)
+            setSuggestions([]); // Clear suggestions when input is empty
+        }
+    }, [debouncedSearchTerm]);
 
 
     // Handle search input change and update suggestions
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value;
-        setSearchTerm(searchTerm);
+        const searchTag = e.target.value;
+        setSearchTerm(searchTag)
+
+    };
+
+
+    // Handle search input change and update suggestions
+    const fetchData = async () => {
 
         // Fetch product suggestions
-        if (searchTerm.length > 0) {
+        if (debouncedSearchTerm) {
             try {
                 const page = 1; // Default page
                 const productsPerPage = 5; // Limit number of suggestions
                 const activeCategory = '';
                 const activeBrands = '';
                 const activePriceRange = '';
-                const paginate = '0';
                 const locale = 'en';
 
                 // Make the getProducts call to fetch suggestions
-                const response = await getProducts(page, productsPerPage, activeCategory, activeBrands, activePriceRange, searchTerm, locale);
+                const response = await getProducts(page, productsPerPage, activeCategory, activeBrands, activePriceRange, debouncedSearchTerm, locale);
 
                 // Assuming that response.data contains products array
                 if (response.success && response.data) {
@@ -43,16 +58,12 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                 console.error('Error fetching suggestions:', error);
             }
         } else {
+
+            setShowSuggestions(false)
             setSuggestions([]); // Clear suggestions when input is empty
         }
     };
 
-    // Handle suggestion click
-    const handleSuggestionClick = (product: Product) => {
-        setSearchTerm(product.name);
-        setShowSuggestions(false);
-        router.push(`/?searchterm=${product.name}`); // Navigate based on the selected suggestion
-    };
 
     return (
         <div className="relative w-full pb-4">

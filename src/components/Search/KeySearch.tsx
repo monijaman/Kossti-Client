@@ -2,9 +2,10 @@
 
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SearchBoxProps, SpecificationKey } from '@/lib/types';
+import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -12,6 +13,16 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
     const router = useRouter();
     const { getSpecificationsKeys } = useSpecificationsKeys()
+    const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            fetchdata();
+        } else {
+            setShowSuggestions(false)
+            setSuggestions([]); // Clear suggestions when input is empty
+        }
+    }, [debouncedSearchTerm]);
 
 
 
@@ -20,6 +31,12 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = e.target.value;
         setSearchTerm(searchTerm);
+
+    };
+
+    // Handle search input change and update suggestions
+    const fetchdata = async () => {
+
 
         // Fetch product suggestions
         if (searchTerm.length > 0) {
@@ -46,12 +63,6 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
         }
     };
 
-    // Handle suggestion click
-    const handleSuggestionClick = (SpecificationKey: SpecificationKey) => {
-        setSearchTerm(SpecificationKey.specification_key);
-        setShowSuggestions(false);
-        router.push(`/?searchterm=${SpecificationKey.id}`); // Navigate based on the selected suggestion
-    };
 
     return (
         <div className="relative w-full">
@@ -69,9 +80,7 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                         {suggestions.map((key) => (
                             <li
                                 key={key.id}
-                                className="p-2 hover:bg-gray-100 cursor-pointer"
-                            // onClick={() => handleSuggestionClick(product)}
-                            >
+                                className="p-2 hover:bg-gray-100 cursor-pointer">
                                 <Link href={`keys/manage/${key.id}`}>
                                     {key.specification_key}
                                 </Link>
