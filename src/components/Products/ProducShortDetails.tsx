@@ -17,6 +17,8 @@ const ProducShortDetails = ({ product }: PopularProductsProps) => {
         className="flex items-center space-x-6 p-4 bg-white border border-gray-200 rounded-sm shadow-md hover:bg-gray-50 transition"
       >
         {/* Product Image */}
+
+        <img src={decodedUrl} width={50} height={50} />
         <Image
           src={decodedUrl}
           alt={product.name}
