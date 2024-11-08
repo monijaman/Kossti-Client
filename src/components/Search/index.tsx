@@ -2,10 +2,10 @@
 
 import { useProducts } from '@/hooks/useProducts';
 import { Product, SearchBoxProps } from '@/lib/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
@@ -55,7 +55,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full pb-4">
             <input
                 type="text"
                 value={searchTerm}
@@ -70,15 +70,34 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                         {suggestions.map((product) => (
                             <li
                                 key={product.id}
-                                className="p-2 hover:bg-gray-100 cursor-pointer"
-                            // onClick={() => handleSuggestionClick(product)}
+                                className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                             >
-                                <Link href={searchUrl ? `${searchUrl}/${product.id}` : `/${product.category_slug}/${product.slug}`}>
-                                    {product.name}
+                                <Link
+                                    href={
+                                        searchUrl
+                                            ? `${searchUrl}/${product.id}`
+                                            : `/${product.category_slug}/${product.slug}`
+                                    }
+                                    className="flex items-center space-x-4"
+                                >
+                                    {/* Image */}
+                                    <Image
+                                        src={product.photo}
+                                        alt={product.name}
+                                        width={50}
+                                        height={50}
+                                        className="rounded"
+                                    />
+
+                                    {/* Text */}
+                                    <span className="text-gray-800 font-medium">{product.name}</span>
+                                    <span className="text-gray-800 font-medium">{product.brand}</span>
+                                    <span className="text-gray-800 font-medium">{product.category}</span>
                                 </Link>
                             </li>
                         ))}
                     </ul>
+
                 </div>
             )}
         </div>

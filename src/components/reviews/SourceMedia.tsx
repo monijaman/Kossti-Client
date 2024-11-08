@@ -30,8 +30,7 @@ const VideoGrid: React.FC<VideoGridProps> = ({ dataset }) => {
     return (
         <>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-items-center">
-                {dataset
-                    .filter((item) => item.youtubeUrl) // Only items with youtubeUrl
+                {dataset?.filter((item) => item.youtubeUrl) // Only items with youtubeUrl
                     .map((item, index) => (
                         <div
                             key={index}
@@ -63,8 +62,7 @@ const VideoGrid: React.FC<VideoGridProps> = ({ dataset }) => {
             {/* Display Source URLs in a separate section */}
             <div className="mt-8">
                 <h2 className="text-2xl font-semibold mb-4">Useful Links</h2>
-                {dataset
-                    .filter(item => item.sourceUrl) // Filter only items with sourceUrl
+                {dataset?.filter(item => item.sourceUrl) // Filter only items with sourceUrl
                     .map((item, index) => (
                         <div
                             key={index}

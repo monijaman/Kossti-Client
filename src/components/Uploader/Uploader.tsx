@@ -1,21 +1,18 @@
-import React, { useEffect, useState, ChangeEvent, DragEvent } from "react";
-import Image from "next/image";
-import "./uploader.scss";
-import { table } from "console";
 import { Button } from "@/components/ui/button";
-import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
-import { useRef } from "react";
-import RenderPreview from "@/components/Uploader/RenderPreview";
-import { ProductPhotos } from '@/lib/types';
 import RadioButton from "@/components/ui/Radio";
-import {
-  selectstatus,
-  uploadmedia,
-  removeMedia,
-  selectUploadedFiles,
-} from "@/redux/features/upload/uploadSlice";
+import RenderPreview from "@/components/Uploader/RenderPreview";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useProducts } from "@/hooks/useProducts";
-import { Await } from "react-router-dom";
+import { ProductPhotos } from '@/lib/types';
+import {
+  removeMedia,
+  selectstatus,
+  selectUploadedFiles,
+  uploadmedia,
+} from "@/redux/features/upload/uploadSlice";
+import Image from "next/image";
+import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
+import "./uploader.scss";
 
 // Define the props for the DragNdrop component
 interface DragNdropProps {
@@ -67,7 +64,6 @@ const DragNdrop = ({
         console.error("Error removing media:", error);
       });
 
-    console.log('uploadedDatasetuploadedDataset', uploadedDataset)
     //  setPhotos(uploadedDataset);
     setFiles([])
 

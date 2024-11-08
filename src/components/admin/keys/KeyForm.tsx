@@ -1,12 +1,8 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product, Category, SpecificationKey } from '@/lib/types';
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
-import { useProducts } from "@/hooks/useProducts";
-import { combineSlices } from '@reduxjs/toolkit';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
+import { SpecificationKey } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface PageProps {
     speckeyData?: SpecificationKey; // Optional for create case
@@ -40,7 +36,6 @@ const KeyForm = ({ speckeyData }: PageProps) => {
 
             // Update existing product
             const response = await submitSpecificationsKeys({ speckeyId, speckey });
-            console.log('response.error-----------', response)
 
             if (response.success) {
                 setSubmitStatus(response.data.message);

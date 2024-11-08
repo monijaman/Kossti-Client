@@ -28,8 +28,6 @@ export const useReviews = () => {
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
 
-    console.log("queryString", queryString);
-
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(

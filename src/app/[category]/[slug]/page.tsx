@@ -32,6 +32,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
   return (
     <MainLayout >
       <SearchBox initialSearchTerm={searchTerm} />
+
       <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
 
       <ProductPhotosPage productId={dataset.id} />

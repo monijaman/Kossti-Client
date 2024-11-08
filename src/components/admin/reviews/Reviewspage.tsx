@@ -37,10 +37,7 @@ const ManageReviews = async ({ params, searchParams }: PageProps) => {
   // const dataset = await fetchReviewsData();
   // const totalPages = Math.ceil(dataset.totalProducts / limit);
   //console.log('michael', dataset)
-  const handleDelete = (id: number) => {
-    console.log('Delete product with ID:', id);
-    // Add your delete logic here
-  };
+
 
   fetchReviewsData();
 

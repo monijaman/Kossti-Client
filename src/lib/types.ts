@@ -29,6 +29,7 @@ export interface Product {
   brand: string;
   category: string;
   model?: string | null;
+  photo: string;
   price: number; // or number
   status?: number; // or whatever type it is
   priority?: number; // or whatever type it is

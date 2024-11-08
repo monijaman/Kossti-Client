@@ -13,7 +13,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { getProducts } = useProducts();
 
   const page = parseInt(searchParams.page as string, 10) || 1;
-  const limit = 10;
+  const limit = 20;
   const activeCategory = searchParams.category || '';
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
@@ -39,6 +39,8 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} />
+
+
       <ProductReview products={dataset.products} />
       <Pagination
         category={activeCategory}

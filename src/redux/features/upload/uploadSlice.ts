@@ -119,7 +119,6 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
 
     const responseArray = await response.json();
 
-    console.log("responseArray", responseArray);
     const { data } = responseArray;
 
     if (data.images) {
@@ -197,11 +196,6 @@ export const uploadSlice = createSlice({
         if (action.payload.error) {
           state.error = action.payload.error;
           state.confirmStatus = "failed";
-        } else {
-          //  console.log("action.payload", action.payload.data);
-          // if (Array.isArray(action.payload.images)) {
-          //   state.uploadedFiles.push(...action.payload.images);
-          // }
         }
       })
       .addCase(uploadmedia.rejected, (state) => {
