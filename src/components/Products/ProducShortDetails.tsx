@@ -6,6 +6,8 @@ interface PopularProductsProps {
 }
 
 const ProducShortDetails = ({ product }: PopularProductsProps) => {
+  const decodedUrl = decodeURIComponent(product.photo);
+
   return (
     <div className="p-1">
 
@@ -16,7 +18,7 @@ const ProducShortDetails = ({ product }: PopularProductsProps) => {
       >
         {/* Product Image */}
         <Image
-          src={product.photo}
+          src={decodedUrl}
           alt={product.name}
           width={60}
           height={60}
