@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react';
 import Link from 'next/link'; // Assuming you're using Next.js for navigation
+import { useState } from 'react';
 
 const Sidebar: React.FC = () => {
 
@@ -9,10 +9,33 @@ const Sidebar: React.FC = () => {
     const toggleSpecifications = () => {
         setShowSpecifications(!showSpecifications);
     };
+    const [showCategories, setShowCategories] = useState(false);
+
+    const toggleCategories = () => {
+        setShowCategories(!showCategories);
+    };
 
     return (
         <nav className="bg-gray-900 text-white w-64 p-4">
             <ul>
+                <li className="mb-2">
+                    <span onClick={toggleCategories} className="cursor-pointer hover:underline">
+                        Categories
+                    </span>
+                    {showCategories && (
+                        <ul className="ml-4 mt-2">
+                            <li>
+                                <Link href="/admin/categories" className="hover:underline">Categories</Link>
+                            </li>
+                            <li>
+                                <Link href="/admin/categories/brands" className="hover:underline">Related Brands</Link>
+                            </li>
+                        </ul>
+                    )}
+                </li>
+                <li className="mb-2">
+                    <Link href="/admin/brands" className="hover:underline">Brands</Link>
+                </li>
                 <li className="mb-2">
                     <Link href="/admin/reviews" className="hover:underline">Manage Reviews</Link>
                 </li>

@@ -13,6 +13,7 @@ export interface categoryInt {
   name: string;
   category_slug: string;
   slug: string;
+  status?: boolean;
   priority: number;
   deleted_at: null;
   created_at: string;
@@ -128,8 +129,8 @@ export interface Category {
   slug?: string;
 }
 export interface Brand {
-  id: number;
-  name: string;
+  id: number | null;
+  name: string | null;
   slug?: string;
 }
 
