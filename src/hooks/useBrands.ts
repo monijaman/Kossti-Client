@@ -151,10 +151,75 @@ export const useBrands = () => {
     }
   };
 
+  // get all categories
+  const getCategoryRelBrands = async (options: {
+    category_id?: number;
+    category_slug?: string;
+    locale?: string;
+  }) => {
+    const { category_id, category_slug, locale } = options;
+
+    // Ensure the API URL is defined
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    // Build query string based on optional parameters
+    const queryParams = new URLSearchParams();
+    if (category_id !== undefined) {
+      queryParams.append("category_id", category_id.toString());
+    }
+    if (category_slug) {
+      queryParams.append("category_slug", category_slug.toString());
+    }
+    if (locale) {
+      queryParams.append("locale", locale);
+    }
+
+    // Construct the full URL with query parameters
+    const apiEndpoint = `category-brands`;
+    const fullUrl = `${apiUrl}/${apiEndpoint}?${queryParams.toString()}`;
+
+    try {
+      // Fetch data from the API
+      const response = await fetch(fullUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data: ${response.statusText}`);
+      }
+
+      // Parse the JSON data
+      const dataset = await response.json();
+
+      // Return success with data
+      return {
+        success: true,
+        data: dataset,
+      };
+    } catch (error: any) {
+      // Log any errors and return failure
+      console.error("Error fetching category:", error);
+      return {
+        success: false,
+        data: [],
+        error: error.message || "An unknown error occurred",
+      };
+    }
+  };
+
   return {
     getBrands,
     getPublicBrands,
     getAllBrands,
     submitBrands,
+    getCategoryRelBrands,
   };
 };

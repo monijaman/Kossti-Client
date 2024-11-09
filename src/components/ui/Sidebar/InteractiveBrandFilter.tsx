@@ -1,7 +1,7 @@
 'use client';
 
 import Checkbox from '@/components/ui/checkbox';
-import { brandInt, SidebarParams } from '@/lib/types';
+import { Brand, SidebarParams } from '@/lib/types';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
 const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm }: SidebarParams) => {
@@ -46,16 +46,18 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
     return (
         <>
             <div className="mb-4">
-                {dataset && dataset.map((brand: brandInt) => (
+                {dataset && dataset.map((brand: Brand) => (
                     <div key={brand.id} className="flex items-center mb-2">
+
 
                         <Checkbox
                             key={brand.id}
-                            name={brand.slug}
-                            value={selected.includes(brand.slug)} // Check if the brand is selected
+                            name={brand.slug ?? ''} // Use empty string if brand.slug is undefined or null
+                            value={selected.includes(brand.slug ?? '')} // Ensure brand.slug is always a string
                             updateValue={handleBrandChange}
-                            label={brand.name}
+                            label={brand.name ?? 'Unknown'} // Provide a fallback for brand.name
                         />
+
 
                     </div>
                 ))}

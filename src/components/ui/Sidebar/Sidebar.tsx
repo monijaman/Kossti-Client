@@ -1,19 +1,22 @@
-import { FC } from 'react';
+import BrandsListClient from '@/components/ui/Sidebar/BrandsClient';
+import { SidebarParams } from '@/lib/types';
+import { cookies } from 'next/headers';
 import Categories from './Categories';
-import Brands from './Brands';
-import { brandInt, SidebarParams } from '@/lib/types';
 
 const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searchTerm }: SidebarParams) => {
 
   const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
+  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
 
 
   return (
     <aside className="w-[300px] bg-gray-100 p-4">
 
       <Categories category={activeCategory} />
-      <Brands selectedBrands={selectedBrands} activeCategory={activeCategory} searchTerm={searchTerm} />
- 
+      {activeCategory &&
+        <BrandsListClient selectedBrands={selectedBrands} activeCategory={activeCategory} searchTerm={searchTerm} countryCode={countryCode} />
+      }
+
     </aside>
   );
 };

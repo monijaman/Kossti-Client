@@ -49,11 +49,12 @@ export interface ProductTranslation {
 }
 
 export interface SidebarParams {
-  dataset?: brandInt[];
+  dataset?: Brand[];
   selectedBrands?: string; // Change from string[] to string
   activeCategory?: string; // Change from string[] to string
   activePriceRange?: string; // Change from string[] to string
   searchTerm?: string;
+  countryCode?: string;
 }
 
 export interface ProductApiResponse {
@@ -61,12 +62,12 @@ export interface ProductApiResponse {
   totalProducts: number;
 }
 
-export interface SidebarParams {
-  dataset?: brandInt[];
-  selectedBrands?: string; // Change from string[] to string
-  activeCategory?: string; // Change from string[] to string
-  activePriceRange?: string; // Change from string[] to string
-}
+// export interface SidebarParams {
+//   dataset?: brandInt[];
+//   selectedBrands?: string; // Change from string[] to string
+//   activeCategory?: string; // Change from string[] to string
+//   activePriceRange?: string; // Change from string[] to string
+// }
 
 export interface SearchBoxProps {
   initialSearchTerm?: string;

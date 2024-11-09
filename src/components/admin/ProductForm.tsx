@@ -1,13 +1,12 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Product, Category, Brand } from '@/lib/types';
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
-import { useProducts } from "@/hooks/useProducts";
-import { combineSlices } from '@reduxjs/toolkit';
 import Modal from '@/components/Modal/client';
 import DragNdrop from "@/components/Uploader/Uploader";
+import { useBrands } from "@/hooks/useBrands";
+import { useCategory } from "@/hooks/useCategory";
+import { useProducts } from "@/hooks/useProducts";
+import { Brand, Category, Product } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface ProductFormProps {
     product?: Product; // Optional for create case
@@ -187,10 +186,12 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         >
                             <option value="" disabled>Select brand</option>
                             {brands.map((item) => (
-                                <option key={item.id} value={item.id}>
+                                <option key={item.id as number} value={item.id as number}>
                                     {item.name}
                                 </option>
                             ))}
+
+
                         </select>
                     </div>
 
