@@ -191,7 +191,6 @@ const ProductForm = ({ product }: ProductFormProps) => {
                                 </option>
                             ))}
 
-
                         </select>
                     </div>
 
