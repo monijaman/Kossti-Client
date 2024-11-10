@@ -18,18 +18,8 @@ const Sidebar: React.FC = () => {
     return (
         <nav className="bg-gray-900 text-white w-64 p-4">
             <ul>
-                <li className="mb-2">
-                    <span onClick={toggleCategories} className="cursor-pointer hover:underline">
-                        Categories
-                    </span>
-                    {showCategories && (
-                        <ul className="ml-4 mt-2">
-                            <li>
-                                <Link href="/admin/categories" className="hover:underline">Categories</Link>
-                            </li>
-
-                        </ul>
-                    )}
+                <li>
+                    <Link href="/admin/categories" className="hover:underline">Categories</Link>
                 </li>
                 <li className="mb-2">
                     <Link href="/admin/brands" className="hover:underline">Brands</Link>

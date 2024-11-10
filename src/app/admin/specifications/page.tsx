@@ -1,9 +1,9 @@
 "use client";
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import Select, { SingleValue } from 'react-select';
-import { useSpecifications } from "@/hooks/useSpecifications";
 import { useCategory } from "@/hooks/useCategory";
-import { SpecificationInt, SpecificationKey, Category } from '@/lib/types';
+import { useSpecifications } from "@/hooks/useSpecifications";
+import { Category, SpecificationKey } from '@/lib/types';
+import { FormEvent, useEffect, useState } from 'react';
+import Select, { SingleValue } from 'react-select';
 
 interface Specification {
     id: number | null;
@@ -29,6 +29,14 @@ const Specification = () => {
         }
     };
 
+    const saveSpecs = async () => {
+        const response = await submitSpecifications(selectedCategory ?? 0, activeSpecifications);
+        if (response.success) {
+
+            setFormStatus(response.data.message)
+        }
+    }
+
     // Function to handle specification key selection
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
         if (selectedOption) {
@@ -36,6 +44,8 @@ const Specification = () => {
             values[index].id = selectedOption.value; // Ensure it's a number
             values[index].specification_key = selectedOption.label; // Ensure it's a number
             setActiveSpecigications(values);
+            saveSpecs();
+
         }
     };
 
@@ -48,11 +58,7 @@ const Specification = () => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // Submit the form data including the selected category and specifications
-        const response = await submitSpecifications(selectedCategory ?? 0, activeSpecifications);
-        if (response.success) {
-
-            setFormStatus(response.data.message)
-        }
+        saveSpecs();
     };
 
     // Fetch the specification keys
@@ -95,11 +101,10 @@ const Specification = () => {
     useEffect(() => {
         if (selectedCategory) {
             fetchSpecifications();
-
         }
 
-
     }, [selectedCategory]);
+
 
     return (
         <div className="flex flex-row gap-4">
@@ -200,7 +205,7 @@ const Specification = () => {
                             </div>
                         )}
 
-                     
+
                     </form>
                 </div>
             </div>

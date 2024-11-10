@@ -127,7 +127,6 @@ export const useSpecifications = () => {
         .map((spec) => spec.id) // Return the `id` directly
         .filter((id): id is number => id !== null) // Ensure non-null values
         .sort((a, b) => a - b); // Sort numerically
-
       const payload = {
         category_id: categoryId,
         specification_id: specArrays,
