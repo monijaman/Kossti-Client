@@ -111,7 +111,7 @@ const Specification = ({ params }: PageProps) => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8  bg-gray-100  ">
             <h1 className="text-2xl font-bold mb-6">Manage Related Brands for Category</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Category Select Dropdown */}

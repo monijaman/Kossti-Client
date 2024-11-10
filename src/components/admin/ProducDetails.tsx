@@ -9,7 +9,6 @@ interface ProductDetailsProps {
 
 const ProductDetails: FC<ProductDetailsProps> = ({ products }) => {
   const deleteProduct = (id: number) => {
-    console.log(`Product with ID ${id} deleted.`);
   };
 
   return (

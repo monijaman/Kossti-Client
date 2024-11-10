@@ -72,7 +72,7 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     }, []);
 
     return (
-        <div className="container mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="container mx-auto p-6 bg-white shadow-md rounded-lg p-6 bg-gray-100 min-h-screen">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Categories</h2>
 
             <Link
@@ -82,7 +82,7 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
                 Add New Key
             </Link>
 
-            <div className="my-6 flex justify-between items-center">
+            <div className="my-6 flex justify-between items-center bg-white">
                 <input
                     type="text"
                     value={searchTerm}

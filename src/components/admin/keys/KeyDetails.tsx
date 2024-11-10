@@ -23,7 +23,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
                 ID
               </th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Specification Name
+                Key Name
               </th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions

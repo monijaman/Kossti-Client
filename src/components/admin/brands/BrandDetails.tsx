@@ -37,7 +37,7 @@ const BrandDetails = ({ brands }: PageProps) => {
 
 
   return (
-    <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6">
+    <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6 bg-white shadow rounded-lg p-6">
       <table className="min-w-full bg-white border-collapse">
         <thead>
           <tr className="text-left border-b">

@@ -107,7 +107,7 @@ const Specification = () => {
 
 
     return (
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 bg-gray-300  ">
             <div className="w-full">
                 <div className="bg-white shadow-md rounded-lg p-8">
                     <h1 className="text-2xl font-semibold mb-6">Add Specifications for {productName}</h1>
