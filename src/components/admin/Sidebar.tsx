@@ -27,9 +27,7 @@ const Sidebar: React.FC = () => {
                             <li>
                                 <Link href="/admin/categories" className="hover:underline">Categories</Link>
                             </li>
-                            <li>
-                                <Link href="/admin/categories/brands" className="hover:underline">Related Brands</Link>
-                            </li>
+
                         </ul>
                     )}
                 </li>

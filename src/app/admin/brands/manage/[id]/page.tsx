@@ -1,34 +1,48 @@
 'use client'
-import { FormEvent, useEffect, useState } from 'react';
-import KeyForm from "@/components/admin/keys/KeyForm";
-import KeyTransForm from "@/components/admin/keys/KeyTransForm";
-import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
-import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
-
+import BrandForm from "@/components/admin/brands/BrandForm";
+import BrandTransForm from "@/components/admin/brands/BrandTransForm";
+import { useBrands } from "@/hooks/useBrands";
+import { useCategory } from '@/hooks/useCategory';
+import { Category } from '@/lib/types'; // Assuming you have a Product type
+import { useEffect, useState } from 'react';
 interface PageProps {
     params: {
         id: number; // Type for the slug
     };
 }
 
-const CreateSpecificationKeys = ({ params }: PageProps) => {
+const ManageBrands = ({ params }: PageProps) => {
 
-    const { getSpecificationsKeysById } = useSpecificationsKeys();
-    const { id } = params;
-    const [key, setKey] = useState<SpecificationKey>()
+    const { getCategoryById } = useCategory();
+    const { getWideBrands } = useBrands();
 
-    const fetchKeys = async () => {
-        const response = await getSpecificationsKeysById(id);
-        if (response.success) {
-            setKey(response.data)
+    const { id: brandId } = params;
+    const [brand, setBrand] = useState<Category>()
 
+    const fetchBrand = async () => {
+        try {
+            const brandResponse = await getWideBrands({
+                perPage: 10,        // Number of items per page (optional)
+                search: '',   // Search term (optional)
+                paginate: 'false',   // 'true' or 'false' to enable/disable pagination
+                locale: 'en',        // Locale, e.g., 'en', 'bn', etc.
+                brandId: brandId,      // Category ID (optional, can be empty)
+
+            });
+
+            if (brandResponse.success) {
+                setBrand(brandResponse.data.data)
+            } else {
+                console.error('Failed to fetch categories');
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
         }
-
     };
 
     useEffect(() => {
-        if (id) {
-            fetchKeys();
+        if (brandId) {
+            fetchBrand();
         }
 
     }, [])
@@ -37,15 +51,15 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
         <>
             <div className="flex flex-row gap-4">
                 <div className="w-1/2  bg-gray-100 border rounded">
-                    <KeyForm speckeyData={key} />
+                    <BrandForm brandData={brand} />
                 </div>
 
                 <div className="w-1/2">
-                {key && <KeyTransForm speckeyData={key} />}
+                    {brand && <BrandTransForm brandData={brand} />}
                 </div>
             </div>
         </>
     );
 }
 
-export default CreateSpecificationKeys;
+export default ManageBrands;

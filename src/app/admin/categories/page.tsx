@@ -1,5 +1,4 @@
 'use client'
-// pages/specifications/index.js
 import CategoryDetails from '@/components/admin/categories/CategoryDetails';
 import Pagination from '@/components/Pagination/index';
 import { useCategory } from '@/hooks/useCategory';
@@ -17,7 +16,6 @@ interface PageProps {
 }
 
 const ListSpecifications = ({ params, searchParams }: PageProps) => {
-
     const [totalPages, setTotalPages] = useState(0);
     const [categories, setCategories] = useState<categoryInt[]>([]);
     const [perPage, setPerPage] = useState(10);
@@ -28,14 +26,12 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
-
     const page = parseInt(searchParams.page as string, 10) || 1;
     const limit = 10;
     const activeCategory = searchParams.category || '';
     const activeBrands = searchParams.brand || '';
     const activePriceRange = searchParams.price || '';
     const locale = searchParams.locale || 'en';
-
 
     const fetchCategories = async () => {
         try {
@@ -50,13 +46,8 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
             });
 
             if (categoriesResponse.success) {
-
-
                 setCategories(categoriesResponse.data.data);
-
                 setTotalPages(Math.ceil(categoriesResponse.data.total / limit));
-
-                // setSpecifications(response);
                 setLoading(false);
             } else {
                 console.error('Failed to fetch categories');
@@ -66,16 +57,12 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
         }
     };
 
-
     useEffect(() => {
         if (debouncedSearchTerm) {
             fetchCategories();
         }
     }, [debouncedSearchTerm]);
 
-
-
-    // Handle search input change and update suggestions
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
@@ -85,23 +72,37 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     }, [searchTerm, perPage]);
 
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-4"> Categories</h2>
-            <Link className='bg-blue-500 text-white px-2 py-2 px-4 rounded mr-2 my-2' href="/admin/categories/manage">Add New Key</Link>
-            <div className='py-4'>
+        <div className="container mx-auto p-6 bg-white shadow-md rounded-lg">
+            <h2 className="text-3xl font-semibold text-gray-800 mb-6">Categories</h2>
 
+            <Link
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                href="/admin/categories/manage"
+            >
+                Add New Key
+            </Link>
+
+            <div className="my-6 flex justify-between items-center">
                 <input
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    placeholder="Search products..."
-                    className="border border-gray-300 p-2 w-full rounded"
+                    placeholder="Search categories..."
+                    className="border border-gray-300 p-3 w-1/2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
-            {/* Add your review management functionalities here */}
-            <CategoryDetails
-                categories={categories}
-            />
+
+            {/* Loading Indicator */}
+            {loading && <div className="text-center text-lg text-gray-500">Loading categories...</div>}
+
+            {/* Categories List */}
+            {!loading && (
+                <CategoryDetails
+                    categories={categories}
+                />
+            )}
+
+            {/* Pagination */}
             <Pagination
                 category={activeCategory}
                 selectedBrands={activeBrands}
@@ -110,7 +111,6 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
             />
         </div>
     );
-}
-
+};
 
 export default ListSpecifications;

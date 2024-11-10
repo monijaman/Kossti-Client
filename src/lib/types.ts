@@ -128,11 +128,13 @@ export interface Category {
   id: number;
   name: string;
   slug?: string;
+  status?: boolean;
 }
 export interface Brand {
   id: number | null;
   name: string | null;
   slug?: string;
+  status?: boolean;
 }
 
 export interface ProductPhotos {

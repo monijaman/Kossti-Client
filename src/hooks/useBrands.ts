@@ -112,6 +112,36 @@ export const useBrands = () => {
     }
   };
 
+  const addNewBrand = async ({
+    brand,
+    brandId = null,
+  }: {
+    brand: string;
+    brandId?: number | null;
+  }): Promise<any> => {
+    try {
+      // Prepare the payload with productId, specificationKey, and apiUrl
+      const payload = {
+        id: brandId, // Consistent naming with snake_case
+        name: brand,
+        apiUrl: "brands",
+      };
+
+      // Send the request to the backend
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // Return the JSON response
+      return await response.json();
+    } catch (error) {
+      console.error("Error submitting specifications:", error);
+      throw error; // Properly propagate the error
+    }
+  };
+
   // Submit form
   const submitBrands = async (
     categoryId: number,
@@ -215,11 +245,135 @@ export const useBrands = () => {
     }
   };
 
+  // get all categories
+  const getWideBrands = async ({
+    perPage = "",
+    search = "",
+    paginate = "false",
+    locale = "en",
+    brandId = "",
+    status = null,
+    page = null,
+  }: {
+    perPage?: number | string;
+    search?: string;
+    paginate?: "true" | "false";
+    locale?: string;
+    brandId?: number | string;
+    status?: number | null;
+    page?: number | null;
+  }) => {
+    // Construct query parameters dynamically
+    const queryParams = new URLSearchParams({
+      per_page: perPage.toString(),
+      search,
+      paginate,
+      locale,
+      brand_id: brandId.toString(),
+    });
+
+    queryParams.append("status", status !== null ? status.toString() : "");
+    queryParams.append("page", page !== null ? page.toString() : "");
+
+    if (!apiUrl) {
+      return Promise.reject(
+        new Error("API URL is not defined in environment variables")
+      );
+    }
+
+    // Construct the full URL with the query string
+    const fullUrl = `${apiUrl}/wide-brands?${queryParams.toString()}`;
+
+    try {
+      const response = await fetch(fullUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const dataset = await response.json();
+
+      return {
+        success: true,
+        data: dataset,
+      };
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      return { success: false, data: [] };
+    }
+  };
+
+  const brandStatUpdate = async ({
+    brand_id,
+    status,
+  }: {
+    brand_id: number;
+    status: number;
+  }): Promise<any> => {
+    try {
+      // Prepare the payload with consistent naming
+      const payload = {
+        status: status, // Use speckeyId as the identifier
+        apiUrl: `brand-status/${brand_id}`,
+      };
+
+      // Send the request to the backend
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // Return the JSON response
+      return await response.json();
+    } catch (error) {
+      console.error("Error submitting specifications:", error);
+      throw error; // Properly propagate the error
+    }
+  };
+
+  const submitBrandTranslation = async ({
+    locale = "bn",
+    brandId = 0,
+    brand,
+  }: {
+    locale: string;
+    brandId?: number | null;
+    brand: string;
+  }): Promise<any> => {
+    try {
+      // Prepare the payload with consistent naming
+      const payload = {
+        brand_id: brandId, // Use speckeyId as the identifier
+        name: brand, // Ensure this matches the key you expect on the server
+        locale,
+        apiUrl: "brand-translation",
+      };
+
+      // Send the request to the backend
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // Return the JSON response
+      return await response.json();
+    } catch (error) {
+      console.error("Error submitting specifications:", error);
+      throw error; // Properly propagate the error
+    }
+  };
+
   return {
+    brandStatUpdate,
+    getWideBrands,
     getBrands,
     getPublicBrands,
     getAllBrands,
     submitBrands,
     getCategoryRelBrands,
+    addNewBrand,
+    submitBrandTranslation,
   };
 };

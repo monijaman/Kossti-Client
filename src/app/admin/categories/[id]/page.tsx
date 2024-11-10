@@ -1,10 +1,10 @@
-"use client";
+'use client';
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
-import { useSpecifications } from "@/hooks/useSpecifications";
-import { Brand, Category, SpecificationKey } from '@/lib/types';
+import { Brand, Category } from '@/lib/types';
 import { FormEvent, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
+
 interface Specification {
     id: number | null;
     specification_key: number | null;
@@ -12,227 +12,180 @@ interface Specification {
 
 interface PageProps {
     params: {
-        id: number; // Type for the slug
+        id: number;
     };
 }
 
 const Specification = ({ params }: PageProps) => {
-
-
     const { id: category_id } = params;
 
-    const { getSpecificationsByCategory, getFormSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
     const { getCategories, getCategoryRelBrands } = useCategory();
     const { getAllBrands, submitBrands } = useBrands();
 
-    const [specifications, setSpecifications] = useState<Specification[]>([]);
-    const [activeSpecifications, setActiveSpecigications] = useState<SpecificationKey[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [activeBrands, setActiveBrands] = useState<Brand[]>([]);
-    const [formStatus, setFormStatus] = useState<string[]>();
     const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id);
     const [productName, setProductName] = useState<string>('');
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id); // To store the selected category
+    const [formStatus, setFormStatus] = useState<string | null>(null);
 
-    // Function to handle category selection
-    const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) {
-            setSelectedCategory(selectedOption.value);
-        }
-    };
-
-    // Function to handle specification key selection
-    const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) {
-            const values = [...activeBrands];
-            values[index].id = selectedOption.value; // Ensure it's a number
-            values[index].name = selectedOption.label; // Ensure it's a number
-            setActiveBrands(values);
-
-        }
-    };
-
-    // Function to handle adding more specifications
-    const addMoreBrands = () => {
-        setActiveBrands([...activeBrands, { id: null, name: '' }]);
-    };
-
-    // Function to handle form submission
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        // Submit the form data including the selected category and specifications
-        const response = await submitBrands(selectedCategory ?? 0, activeBrands);
-        if (response.success) {
-            setFormStatus(response.data.message)
-        }
-    };
-
-    // Fetch the specification keys
-    const fetchBrands = async (searchTerm = "") => {
-        try {
-            const dataset = await getAllBrands();
-            //   const result = await getAllBrands({ per_page: perPage, search: searchTerm, paginate });
-            setBrands(dataset.data.data);
-        } catch (error) {
-            console.error("Error fetching specifications:", error);
-        }
-    };
-
-
-
+    // Fetch categories
     const fetchCategories = async () => {
         try {
             const categoriesResponse = await getCategories({
-                perPage: 10,        // Number of items per page (optional)
-                search: 'airline',   // Search term (optional)
-                paginate: 'true',   // 'true' or 'false' to enable/disable pagination
-                locale: 'en',        // Locale, e.g., 'en', 'bn', etc.
-                categoryId: '',      // Category ID (optional, can be empty)
-                status: 1            // Status filter (optional)
+                perPage: 10,
+                search: '',
+                paginate: 'true',
+                locale: 'en',
+                categoryId: '',
             });
-
             if (categoriesResponse.success) {
-                console.log('Fetched Categories:', categoriesResponse.data);
-            } else {
-                console.error('Failed to fetch categories');
+                setCategories(categoriesResponse.data.data);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
     };
 
-
-
-    const fetchAvtiveBrands = async () => {
+    // Fetch brands
+    const fetchBrands = async () => {
         try {
-            if (selectedCategory) {
+            const response = await getAllBrands();
+            setBrands(response.data.data);
+        } catch (error) {
+            console.error("Error fetching brands:", error);
+        }
+    };
 
+    // Fetch active brands for selected category
+    const fetchActiveBrands = async () => {
+        if (selectedCategory) {
+            try {
                 const response = await getCategoryRelBrands({ category_id: selectedCategory });
                 setActiveBrands(response.data.data);
-
+            } catch (error) {
+                console.error("Error fetching category brands:", error);
             }
-        } catch (error) {
-            console.error("Error fetching specifications:", error);
         }
     };
 
     useEffect(() => {
         fetchCategories();
-        fetchBrands()
+        fetchBrands();
     }, []);
 
     useEffect(() => {
-        if (selectedCategory) {
-            fetchAvtiveBrands();
-        }
+        fetchActiveBrands();
     }, [selectedCategory]);
 
+    // Handle category selection
+    const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
+        if (selectedOption) setSelectedCategory(selectedOption.value);
+    };
+
+    // Handle brand selection
+    const handleBrandChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
+        if (selectedOption) {
+            const updatedBrands = [...activeBrands];
+            updatedBrands[index].id = selectedOption.value;
+            updatedBrands[index].name = selectedOption.label;
+            setActiveBrands(updatedBrands);
+        }
+    };
+
+    // Add more brands
+    const addMoreBrands = () => setActiveBrands([...activeBrands, { id: null, name: '' }]);
+
+    // Remove brand
+    const removeBrand = (index: number) => setActiveBrands(activeBrands.filter((_, i) => i !== index));
+
+    // Handle form submission
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const response = await submitBrands(selectedCategory ?? 0, activeBrands);
+        if (response.success) {
+            setFormStatus(response.data.message);
+        } else {
+            setFormStatus("Failed to submit data");
+        }
+    };
+
     return (
-        <div className="flex flex-row gap-4">
-            <div className="w-full">
-                <div className="bg-white shadow-md rounded-lg p-8">
-                    <h1 className="text-2xl font-semibold mb-6">Add Related Brands for  Category</h1>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-
-                        {/* Category Select Dropdown */}
-
-                        {selectedCategory &&
-                            <div>
-                                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                                    Category {selectedCategory}
-                                </label>
-                                <Select
-                                    name="category"
-                                    value={categories
-                                        .map((cat) => ({
-                                            value: cat.id,
-                                            label: cat.name,
-                                        }))
-                                        .find((option) => option.value === +selectedCategory) || null}
-                                    onChange={handleCategoryChange}
-                                    options={categories.map((cat) => ({
-                                        value: cat.id,
-                                        label: cat.name,
-                                    }))}
-                                    className="mt-1 block w-full"
-                                    placeholder="Select a category"
-                                    isSearchable
-                                    required
-                                />
-                            </div>
-                        }
-
-                        {activeBrands.map((item, index) => (
-                            <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <div>
-                                    <Select
-                                        name="specification_key_id"
-                                        value={brands
-                                            .map((brand) => ({
-                                                value: brand.id!, // Use non-null assertion if you're sure it's not null
-                                                label: brand.name?.toString() || "", // Convert to string or handle null
-                                            }))
-                                            .find((option) => option.value === item.id) || null}
-                                        onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
-                                        options={brands.map((brand) => ({
-                                            value: brand.id ?? 0, // Ensure it's a number
-                                            label: brand.name?.toString() || "", // Handle null labels
-                                        }))}
-
-                                        className="mt-1 block w-full"
-                                        placeholder="Search and select a specification key"
-                                        isSearchable
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setActiveBrands(activeBrands.filter((_, i) => i !== index))}
-                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-
-                        {selectedCategory &&
-
-                            <div className="flex justify-between">
-                                <button
-                                    type="button"
-                                    onClick={addMoreBrands}
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Add More
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                >
-                                    Submit
-                                </button>
-                            </div>
-
-                        }
-
-
-                        {formStatus && (
-                            <div
-                                className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
-                                    ? 'text-green-700 bg-green-100'
-                                    : 'text-black-700 bg-green-100'
-                                    }`}
-                                role="alert">
-                                {formStatus}
-                            </div>
-                        )}
-
-
-                    </form>
+        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+            <h1 className="text-2xl font-bold mb-6">Manage Related Brands for Category</h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Category Select Dropdown */}
+                <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Category
+                    </label>
+                    <Select
+                        name="category"
+                        value={categories
+                            .map((cat) => ({ value: cat.id, label: cat.name }))
+                            .find((option) => option.value === selectedCategory) || null}
+                        onChange={handleCategoryChange}
+                        options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+                        className="block w-full"
+                        placeholder="Select a category"
+                        isSearchable
+                        required
+                    />
                 </div>
-            </div>
+
+                {/* Brands List */}
+                {activeBrands.map((item, index) => (
+                    <div key={index} className="flex gap-4 items-center">
+                        <Select
+                            value={brands
+                                .map((brand) => ({ value: brand.id!, label: brand.name || "" }))
+                                .find((option) => option.value === item.id) || null}
+                            onChange={(selectedOption) => handleBrandChange(index, selectedOption)}
+                            options={brands.map((brand) => ({
+                                value: brand.id ?? 0,
+                                label: brand.name?.toString() || "",
+                            }))}
+                            className="flex-1"
+                            placeholder="Select a brand"
+                            isSearchable
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => removeBrand(index)}
+                            className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                ))}
+
+                {/* Add Brand Button */}
+                <div className="flex justify-between items-center">
+                    <button
+                        type="button"
+                        onClick={addMoreBrands}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                        Add More
+                    </button>
+                    <button
+                        type="submit"
+                        className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+                    >
+                        Submit
+                    </button>
+                </div>
+
+                {/* Form Status Message */}
+                {formStatus && (
+                    <div
+                        className={`p-4 mt-4 text-sm rounded-lg ${formStatus.includes('success') ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
+                    >
+                        {formStatus}
+                    </div>
+                )}
+            </form>
         </div>
     );
 };
