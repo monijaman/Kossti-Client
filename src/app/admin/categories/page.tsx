@@ -69,7 +69,7 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
 
     useEffect(() => {
         fetchCategories();
-    }, [searchTerm, perPage]);
+    }, []);
 
     return (
         <div className="container mx-auto p-6 bg-white shadow-md rounded-lg">
