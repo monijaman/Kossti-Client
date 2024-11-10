@@ -22,7 +22,7 @@ const Specification = ({ params }: PageProps) => {
     const { id: category_id } = params;
 
     const { getSpecificationsByCategory, getFormSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
-    const { getAllCategory, getCategoryRelBrands } = useCategory();
+    const { getCategories, getCategoryRelBrands } = useCategory();
     const { getAllBrands, submitBrands } = useBrands();
 
     const [specifications, setSpecifications] = useState<Specification[]>([]);
@@ -78,15 +78,30 @@ const Specification = ({ params }: PageProps) => {
         }
     };
 
-    // Fetch categories
+
+
     const fetchCategories = async () => {
         try {
-            const dataset = await getAllCategory();
-            setCategories(dataset.data);
+            const categoriesResponse = await getCategories({
+                perPage: 10,        // Number of items per page (optional)
+                search: 'airline',   // Search term (optional)
+                paginate: 'true',   // 'true' or 'false' to enable/disable pagination
+                locale: 'en',        // Locale, e.g., 'en', 'bn', etc.
+                categoryId: '',      // Category ID (optional, can be empty)
+                status: 1            // Status filter (optional)
+            });
+
+            if (categoriesResponse.success) {
+                console.log('Fetched Categories:', categoriesResponse.data);
+            } else {
+                console.error('Failed to fetch categories');
+            }
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            console.error('Error fetching categories:', error);
         }
     };
+
+
 
     const fetchAvtiveBrands = async () => {
         try {

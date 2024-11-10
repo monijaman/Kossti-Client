@@ -24,7 +24,7 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
 
     useEffect(() => {
         fetchbrands();
-    }, [activeCategory])
+    }, [activeCategory, countryCode])
 
     const categories = activeCategory || '';
     const searchterm = searchTerm || '';

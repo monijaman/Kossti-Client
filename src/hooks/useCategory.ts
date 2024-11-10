@@ -29,8 +29,34 @@ export const useCategory = () => {
   };
 
   // get all categories
-  const getAllCategory = async () => {
-    const apiEndpoint = `wide-categories?per_page=&search&paginate=false`;
+  const getCategories = async ({
+    perPage = "",
+    search = "",
+    paginate = "false",
+    locale = "en",
+    categoryId = "",
+    status = null,
+    page = null,
+  }: {
+    perPage?: number | string;
+    search?: string;
+    paginate?: "true" | "false";
+    locale?: string;
+    categoryId?: number | string;
+    status?: number | null;
+    page?: number | null;
+  }) => {
+    // Construct query parameters dynamically
+    const queryParams = new URLSearchParams({
+      per_page: perPage.toString(),
+      search,
+      paginate,
+      locale,
+      category_id: categoryId.toString(),
+    });
+
+    queryParams.append("status", status !== null ? status.toString() : "");
+    queryParams.append("page", page !== null ? page.toString() : "");
 
     if (!apiUrl) {
       return Promise.reject(
@@ -38,10 +64,16 @@ export const useCategory = () => {
       );
     }
 
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
+    // Construct the full URL with the query string
+    const fullUrl = `${apiUrl}/wide-categories?${queryParams.toString()}`;
 
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
+      const response = await fetch(fullUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const dataset = await response.json();
 
       return {
@@ -54,11 +86,12 @@ export const useCategory = () => {
     }
   };
 
-  const getCategories = async ({
+  const getCategoriess = async ({
     perPage = 10,
     searchTerm = "",
     paginate = false,
     page = 1,
+    locale = "en",
   } = {}) => {
     // Construct query parameters
     const params = new URLSearchParams({
@@ -67,11 +100,14 @@ export const useCategory = () => {
       per_page: perPage.toString(),
       paginate: paginate.toString(),
       page: page.toString(),
+      locale: page.toString(),
     });
 
-    // Define the API endpoint
-    const apiEndpoint = `/api/get?${params.toString()}`;
+    // const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
+    // Define the API endpoint
+    const apiEndpoint = `${apiUrl}/api/get?${params.toString()}`;
+    console.log(" apiEndpointapiEndpoint", apiEndpoint);
     try {
       // Fetch data with 'no-store' cache policy to avoid cached responses
       const response = await fetch(apiEndpoint, { cache: "no-store" });
@@ -280,7 +316,6 @@ export const useCategory = () => {
 
   return {
     getCategory,
-    getAllCategory,
     getCategories,
     submitCategory,
     getCategoryById,

@@ -1,14 +1,26 @@
 import { useCategory } from "@/hooks/useCategory";
 import { categoryInt, SearchParams } from '@/lib/types';
+import { cookies } from 'next/headers';
+
 
 
 const Categories = async ({ category }: SearchParams) => {
   // const Categories: FC<{ searchParams?: SearchParams }> = async ({ searchParams = {} }) => {
-  const { getCategory } = useCategory();
+  const { getCategories } = useCategory();
+  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+
+
 
   // Fetch the category data using the async function
-  const response = await getCategory();
-  const dataset = response.success ? response.data : [];
+  const response = await getCategories({
+    perPage: 10,        // Number of items per page (optional)
+    search: '',   // Search term (optional)
+    paginate: 'false',   // 'true' or 'false' to enable/disable pagination
+    locale: countryCode,        // Locale, e.g., 'en', 'bn', etc.
+    categoryId: '',      // Category ID (optional, can be empty)
+    status: 1            // Status filter (optional)
+  });
+  const dataset = response.success ? response.data.data : [];
 
   // Handle undefined searchParams with a default empty string
   const activeCategory = category || "";
@@ -25,8 +37,8 @@ const Categories = async ({ category }: SearchParams) => {
                   key={category.id || index} // Fallback to index if category.id is undefined
                   href={`/?category=${category.slug}`}
                   className={`block px-4 py-2 rounded-md ${activeCategory === category.name
-                      ? "bg-blue-100"
-                      : "bg-gray-200"
+                    ? "bg-blue-100"
+                    : "bg-gray-200"
                     }`}
                 >
                   {category.name}
