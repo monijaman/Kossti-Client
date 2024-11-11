@@ -22,10 +22,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
 
 ## 2. Load nvm into your shell:
-After installing nvm, you'll need to load it into your current shell session. You can do this by running the following command or by adding it to your .bashrc, .zshrc, or .profile file:
+
+### After installing nvm, you'll need to load it into your current shell session. You can do this by running the following command or by adding it to your .bashrc, .zshrc, or .profile file:
 
 bash
- 
+
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -122,3 +123,7 @@ php artisan make:command GenerateBrandSlugs
 php artisan generate:brand-slugs
 
 # Typescript Error
+
+# Internationlization
+https://crowdin.com/blog/2024/02/19/next-js-internationalization
+```
