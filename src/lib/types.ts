@@ -184,3 +184,6 @@ export interface country {
   org: string;
   as: string;
 }
+export type SupportedLocale = "en" | "bn";
+
+export const supportedLocales: SupportedLocale[] = ["en", "bn"];
