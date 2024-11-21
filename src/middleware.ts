@@ -40,9 +40,9 @@ function internationalization(req: NextRequest, res: NextResponse) {
     detectedLocale = defaultLocale;
   }
 
-  // res.cookies.set("country-code", detectedLocale, {
-  //   httpOnly: false,
-  // });
+  res.cookies.set("country-code", detectedLocale, {
+    httpOnly: false,
+  });
 
   console.log("detectedLocale: = ", detectedLocale);
 
@@ -174,20 +174,21 @@ export async function middleware(request: NextRequest) {
     return await handleTokenAndRedirect(request, response);
   } else if (!request.cookies.get("country-code")) {
     const redirectUrl = internationalization(request, response);
+    console.log("redirectUrlredirectUrl", redirectUrl);
+    // if (redirectUrl) {
+    //   response.cookies.set("country-code", redirectUrl, {
+    //     httpOnly: false,
+    //   });
 
-    if (redirectUrl) {
-      response.cookies.set("country-code", redirectUrl, {
-        httpOnly: false,
-      });
-
-      //   return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
+    //   //   return NextResponse.redirect(new URL(redirectUrl, request.url));
+    // }
     // return NextResponse.redirect(new URL(redirectUrl, request.url));
   } else {
-    const redirectUrl = await handleIpAddress(request, response);
-    if (redirectUrl) {
-      //  return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
+    // console.log("elseee");
+    // const redirectUrl = await handleIpAddress(request, response);
+    // if (redirectUrl) {
+    //    return NextResponse.redirect(new URL(redirectUrl, request.url));
+    // }
   }
 
   // Continue to next response if no further handling is needed
