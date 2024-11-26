@@ -10,8 +10,8 @@ const Page = async ({ params }: PageProps) => {
   return (
     <>
       <h2>This is {lang}</h2>
-      <h1>{t("title")}</h1>
-      <p>{t("content")}</p>
+      {/* <h1>{t("title")}</h1> */}
+      {/* <p>{t("content")}</p> */}
 
     </>
   );
