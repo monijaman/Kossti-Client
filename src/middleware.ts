@@ -3,6 +3,64 @@ import { checkToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
+const PUBLIC_FILE = /\.(.*)$/;
+
+function internationalization(req: NextRequest, res: NextResponse) {
+  // List of supported locales (as defined in next.config.js)
+  const supportedLocales = ["en", "bn", "fr"];
+  const defaultLocale = "en"; // Your default locale
+
+  // Skip Next.js internal routes, API routes, and public files
+  if (
+    req.nextUrl.pathname.startsWith("/_next") ||
+    req.nextUrl.pathname.includes("/api/") ||
+    PUBLIC_FILE.test(req.nextUrl.pathname)
+  ) {
+    return null; // No redirect if internal or public file
+  }
+  // Extract the locale from cookies, Accept-Language, or use the default
+  const cookieLocale = req.cookies.get("country-code")?.value;
+  const browserLocale = req.headers
+    .get("accept-language")
+    ?.split(",")[0]
+    ?.split("-")[0];
+
+  let detectedLocale: string;
+
+  // Check if the locale is available in the cookies and is supported
+  if (cookieLocale && supportedLocales.includes(cookieLocale)) {
+    detectedLocale = cookieLocale;
+  }
+  // Otherwise, check if the browser's locale is supported
+  else if (browserLocale && supportedLocales.includes(browserLocale)) {
+    detectedLocale = browserLocale;
+  }
+  // Fallback to the default locale
+  else {
+    detectedLocale = defaultLocale;
+  }
+
+  res.cookies.set("country-code", detectedLocale, {
+    httpOnly: false,
+  });
+
+  console.log("detectedLocale: = ", detectedLocale);
+
+  // Check if the path already has a locale prefix
+  const pathnameParts = req.nextUrl.pathname.split("/");
+  const currentLocale = pathnameParts[1];
+
+  // If the locale prefix is missing or incorrect, return the correct redirect URL
+  if (currentLocale !== detectedLocale) {
+    const redirectUrl = `${detectedLocale}${
+      req.nextUrl.pathname === "/" ? "" : req.nextUrl.pathname
+    }`;
+    return redirectUrl; // Return the correct redirect URL
+  }
+
+  // Return null if no redirection is needed
+  return null;
+}
 
 // Function to handle IP Address extraction and setting
 async function handleIpAddress(request: NextRequest, response: NextResponse) {
@@ -25,9 +83,9 @@ async function handleIpAddress(request: NextRequest, response: NextResponse) {
     if (fetchResponse.ok) {
       const data: country = await fetchResponse.json();
       let ccode = data.countryCode;
-      if (data.countryCode == "BD") {
-        ccode = "bn";
-      }
+      // if (data.countryCode == "BD") {
+      //   ccode = "bn";
+      // }
 
       response.cookies.set("country-code", ccode, {
         httpOnly: false,
@@ -55,6 +113,7 @@ async function handleTokenAndRedirect(
   const tokenStatus = await checkToken(token, apiUrl, refreshToken);
   const { isValidToken, accessToken } = tokenStatus;
 
+  console.log("------------------------------", request.nextUrl.locale);
   // console.log("accessToken:", token);
   // console.log("Token Status:", tokenStatus);
   // console.log("Request URL:", request.nextUrl.href);
@@ -113,10 +172,25 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/signup")
   ) {
     return await handleTokenAndRedirect(request, response);
-  } else if (!request.cookies.get("user-ip")) {
-    // Call IP Address handling function
-    await handleIpAddress(request, response);
+  } else if (!request.cookies.get("country-code")) {
+    const redirectUrl = internationalization(request, response);
+    console.log("redirectUrlredirectUrl", redirectUrl);
+    if (redirectUrl) {
+      response.cookies.set("country-code", redirectUrl, {
+        httpOnly: false,
+      });
+
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
+    }
+    // return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
+
+  // else {
+  //   const redirectUrl = await handleIpAddress(request, response);
+  //   if (redirectUrl) {
+  //     return NextResponse.redirect(new URL(redirectUrl, request.url));
+  //   }
+  // }
 
   // Continue to next response if no further handling is needed
   return response;
