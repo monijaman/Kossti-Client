@@ -1,14 +1,13 @@
+import { DEFAULT_LOCALE, LOCALES } from "@/lib/constants";
 import { country } from "@/lib/types";
 import { checkToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
 const PUBLIC_FILE = /\.(.*)$/;
-const supportedLocales = ["en", "bn", "fr"];
+
 function internationalization(req: NextRequest, res: NextResponse) {
   // List of supported locales
-  const supportedLocales = ["en", "bn"];
-  const defaultLocale = "en"; // Your default locale
 
   // Skip Next.js internal routes, API routes, and public files
   if (
@@ -29,12 +28,12 @@ function internationalization(req: NextRequest, res: NextResponse) {
   let detectedLocale: string;
 
   // Determine the detected locale
-  if (cookieLocale && supportedLocales.includes(cookieLocale)) {
+  if (cookieLocale && LOCALES.includes(cookieLocale)) {
     detectedLocale = cookieLocale;
-  } else if (browserLocale && supportedLocales.includes(browserLocale)) {
+  } else if (browserLocale && LOCALES.includes(browserLocale)) {
     detectedLocale = browserLocale;
   } else {
-    detectedLocale = defaultLocale;
+    detectedLocale = DEFAULT_LOCALE;
   }
 
   // Update the cookie with the detected locale
@@ -46,7 +45,7 @@ function internationalization(req: NextRequest, res: NextResponse) {
   const pathnameParts = req.nextUrl.pathname.split("/");
   const currentLocale = pathnameParts[1];
 
-  if (supportedLocales.includes(currentLocale)) {
+  if (LOCALES.includes(currentLocale)) {
     // If the locale in the path matches the detected locale, do nothing
     if (currentLocale === detectedLocale) {
       return null; // No redirection needed
@@ -191,27 +190,64 @@ export async function middleware(request: NextRequest) {
     // Get the current pathname
     const pathname = request.nextUrl.pathname;
 
+    // Get the 'country-code' cookie value
+    const countryCodeCookie = request.cookies.get("country-code");
+    const countryCode = countryCodeCookie?.value;
+
     // Check if the pathname already includes a valid locale
     const firstPathSegment = pathname.split("/")[1]; // Extract the first segment
-    if (supportedLocales.includes(firstPathSegment)) {
-      // If a valid locale is present, do nothing
-      return NextResponse.next();
-    }
+    // If the first path segment is a valid locale and differs from the stored cookie value
 
-    // Get the 'country-code' cookie
-    const countryCodeCookie = request.cookies.get("country-code");
-    const countryCode = countryCodeCookie?.value; // Extract the cookie value
+    // Check if the first path segment is a valid locale
+    if (firstPathSegment && LOCALES.includes(firstPathSegment)) {
+      // If the locale in the URL matches the cookie, do nothing and continue
+      if (firstPathSegment === countryCode) {
+        return response; // No redirect needed, continue with the response
+      }
 
-    if (countryCode && supportedLocales.includes(countryCode)) {
-      // Redirect to the URL with the locale prepended
+      // If the locale in the URL is different from the cookie, update the cookie
       const url = new URL(request.url);
-      url.pathname = `/${countryCode}${pathname}`;
+      url.pathname = `/${firstPathSegment}${pathname.substring(
+        firstPathSegment.length + 1
+      )}`;
+
+      // Set the 'country-code' cookie with the new locale
+      response.cookies.set("country-code", firstPathSegment, {
+        httpOnly: false, // Make the cookie accessible from JavaScript
+      });
+
       console.log("Redirecting to:", url.href);
-      return NextResponse.redirect(url);
+
+      // Redirect to the updated URL with the new locale
+    } else if (!firstPathSegment) {
+      // If the country code cookie is available, prepend it to the URL
+      if (countryCode && LOCALES.includes(countryCode)) {
+        const url = new URL(request.url);
+        url.pathname = `/${countryCode}${pathname}`; // Add the country-code as the first segment
+
+        // Set the 'country-code' cookie with the new locale
+        response.cookies.set("country-code", countryCode, {
+          httpOnly: false, // Make the cookie accessible from JavaScript
+        });
+
+        return NextResponse.redirect(url); // Redirect to the URL with the new locale
+      }
+
+      // If no valid cookie is set, default to a supported locale (e.g., "en")
+      const url = new URL(request.url);
+      url.pathname = `/${DEFAULT_LOCALE}${pathname}`; // Prepend the default locale
+
+      // Set the 'country-code' cookie with the default locale
+      response.cookies.set("country-code", DEFAULT_LOCALE, {
+        httpOnly: false,
+      });
+
+      console.log("Redirecting to:", url.href);
+      return NextResponse.redirect(url); // Redirect to the default locale
     }
 
-    // If no valid locale is found, proceed without redirect
-    return NextResponse.next();
+    // If no valid locale is found in the URL path, do nothing and continue
+    return response;
   }
 
   // else {
