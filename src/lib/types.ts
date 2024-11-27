@@ -187,3 +187,9 @@ export interface country {
 export type SupportedLocale = "en" | "bn";
 
 export const supportedLocales: SupportedLocale[] = ["en", "bn"];
+
+export interface Translations {
+  [key: string]: string; // Optional: Allows additional keys
+}
+
+export type LocaleKeys = "en" | "bn";
