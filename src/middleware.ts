@@ -214,6 +214,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // else {
+  //   const redirectUrl = await handleIpAddress(request, response);
+  //   if (redirectUrl) {
+  //     return NextResponse.redirect(new URL(redirectUrl, request.url));
+  //   }
+  // }
+
   // Continue to next response if no further handling is needed
   return response;
 }
