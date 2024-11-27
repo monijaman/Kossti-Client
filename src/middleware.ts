@@ -4,10 +4,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
 const PUBLIC_FILE = /\.(.*)$/;
-
+const supportedLocales = ["en", "bn", "fr"];
 function internationalization(req: NextRequest, res: NextResponse) {
-  // List of supported locales (as defined in next.config.js)
-  const supportedLocales = ["en", "bn", "fr"];
+  // List of supported locales
+  const supportedLocales = ["en", "bn"];
   const defaultLocale = "en"; // Your default locale
 
   // Skip Next.js internal routes, API routes, and public files
@@ -18,7 +18,8 @@ function internationalization(req: NextRequest, res: NextResponse) {
   ) {
     return null; // No redirect if internal or public file
   }
-  // Extract the locale from cookies, Accept-Language, or use the default
+
+  // Extract the locale from cookies or headers
   const cookieLocale = req.cookies.get("country-code")?.value;
   const browserLocale = req.headers
     .get("accept-language")
@@ -27,39 +28,42 @@ function internationalization(req: NextRequest, res: NextResponse) {
 
   let detectedLocale: string;
 
-  // Check if the locale is available in the cookies and is supported
+  // Determine the detected locale
   if (cookieLocale && supportedLocales.includes(cookieLocale)) {
     detectedLocale = cookieLocale;
-  }
-  // Otherwise, check if the browser's locale is supported
-  else if (browserLocale && supportedLocales.includes(browserLocale)) {
+  } else if (browserLocale && supportedLocales.includes(browserLocale)) {
     detectedLocale = browserLocale;
-  }
-  // Fallback to the default locale
-  else {
+  } else {
     detectedLocale = defaultLocale;
   }
 
+  // Update the cookie with the detected locale
   res.cookies.set("country-code", detectedLocale, {
     httpOnly: false,
   });
 
-  console.log("detectedLocale: = ", detectedLocale);
-
-  // Check if the path already has a locale prefix
+  // Check if the URL already has a valid locale prefix
   const pathnameParts = req.nextUrl.pathname.split("/");
   const currentLocale = pathnameParts[1];
 
-  // If the locale prefix is missing or incorrect, return the correct redirect URL
-  if (currentLocale !== detectedLocale) {
-    const redirectUrl = `${detectedLocale}${
-      req.nextUrl.pathname === "/" ? "" : req.nextUrl.pathname
-    }`;
-    return redirectUrl; // Return the correct redirect URL
+  if (supportedLocales.includes(currentLocale)) {
+    // If the locale in the path matches the detected locale, do nothing
+    if (currentLocale === detectedLocale) {
+      return null; // No redirection needed
+    }
+
+    // If the locale in the path differs, update the cookie but avoid redirect
+    res.cookies.set("country-code", currentLocale, {
+      httpOnly: false,
+    });
+    return null; // No redirection needed
   }
 
-  // Return null if no redirection is needed
-  return null;
+  // Redirect to the correct locale if no valid locale is present in the path
+  const redirectUrl = `/${detectedLocale}${
+    req.nextUrl.pathname === "/" ? "" : req.nextUrl.pathname
+  }`;
+  return redirectUrl; // Return the correct redirect URL
 }
 
 // Function to handle IP Address extraction and setting
@@ -174,21 +178,40 @@ export async function middleware(request: NextRequest) {
     return await handleTokenAndRedirect(request, response);
   } else if (!request.cookies.get("country-code")) {
     const redirectUrl = internationalization(request, response);
-    console.log("redirectUrlredirectUrl", redirectUrl);
-    // if (redirectUrl) {
-    //   response.cookies.set("country-code", redirectUrl, {
-    //     httpOnly: false,
-    //   });
 
-    //   //   return NextResponse.redirect(new URL(redirectUrl, request.url));
-    // }
+    if (redirectUrl) {
+      // response.cookies.set("country-code", redirectUrl, {
+      //   httpOnly: false,
+      // });
+
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
+    }
     // return NextResponse.redirect(new URL(redirectUrl, request.url));
-  } else {
-    // console.log("elseee");
-    // const redirectUrl = await handleIpAddress(request, response);
-    // if (redirectUrl) {
-    //    return NextResponse.redirect(new URL(redirectUrl, request.url));
-    // }
+  } else if (request.cookies.get("country-code")) {
+    // Get the current pathname
+    const pathname = request.nextUrl.pathname;
+
+    // Check if the pathname already includes a valid locale
+    const firstPathSegment = pathname.split("/")[1]; // Extract the first segment
+    if (supportedLocales.includes(firstPathSegment)) {
+      // If a valid locale is present, do nothing
+      return NextResponse.next();
+    }
+
+    // Get the 'country-code' cookie
+    const countryCodeCookie = request.cookies.get("country-code");
+    const countryCode = countryCodeCookie?.value; // Extract the cookie value
+
+    if (countryCode && supportedLocales.includes(countryCode)) {
+      // Redirect to the URL with the locale prepended
+      const url = new URL(request.url);
+      url.pathname = `/${countryCode}${pathname}`;
+      console.log("Redirecting to:", url.href);
+      return NextResponse.redirect(url);
+    }
+
+    // If no valid locale is found, proceed without redirect
+    return NextResponse.next();
   }
 
   // Continue to next response if no further handling is needed
