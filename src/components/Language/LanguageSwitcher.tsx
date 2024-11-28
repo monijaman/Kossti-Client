@@ -1,10 +1,10 @@
 "use client";
-import { LOCALES } from '@/lib/constants';
+import { DEFAULT_LOCALE, LOCALES } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const LanguageSwitcher = () => {
-    const [locale, setLocale] = useState<string>('en'); // Default locale
+    const [locale, setLocale] = useState<string>(DEFAULT_LOCALE); // Default locale
     const router = useRouter();
 
     // Load the locale from local storage or cookies when the component mounts
@@ -39,16 +39,31 @@ const LanguageSwitcher = () => {
         }
     }, []);
 
+
     const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newLocale = event.target.value;
+        localStorage.setItem('locale', newLocale)
         setLocale(newLocale);
-        localStorage.setItem('locale', newLocale);
 
-        // Update the cookie when language is changed
-        document.cookie = `country-code=${newLocale}; path=/`; // Sets cookie for the entire site
+        // Update the cookie
+        document.cookie = `country-code=${newLocale}; path=/`;
 
-        // Trigger a router refresh to re-render components without full page reload
-        router.refresh();
+        // Use window.location to manage the URL dynamically
+        const currentUrl = window.location.pathname;
+        const pathSegments = currentUrl.split("/");
+
+        // Detect if the first path segment is a valid locale
+        const isValidLocale = LOCALES.includes(pathSegments[1]);
+
+        // Replace or prepend the locale in the URL
+        if (isValidLocale) {
+            pathSegments[1] = newLocale; // Replace the current locale
+        } else {
+            pathSegments.unshift(newLocale); // Add the new locale as the first segment
+        }
+
+        const newPath = pathSegments.join("/");
+        router.push(newPath); // Navigate to the updated path
     };
 
     return (

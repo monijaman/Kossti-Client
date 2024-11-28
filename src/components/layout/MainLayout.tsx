@@ -2,9 +2,11 @@
 import LanguageSwitcher from '@/components/Language/LanguageSwitcher';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import Navigation from '@/components/ui/Navigation';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
-import { FC, ReactNode } from 'react';
+import { useTranslation } from "@/hooks/useLocale";
+import { DEFAULT_LOCALE } from '@/lib/constants';
+import { cookies } from 'next/headers';
+import { ReactNode } from 'react';
 interface MainLayoutProps {
   children: ReactNode;
   sidebarProps?: {
@@ -15,7 +17,11 @@ interface MainLayoutProps {
   };
 }
 
-const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
+const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
+
+
+  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const translation = useTranslation(countryCode);
 
   return (
     <div className="min-h-screen flex flex-col mx-auto">
@@ -30,7 +36,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
       {/* <div className="w-full max-w-[1600px] mx-auto"> */}
 
       <Breadcrumbs />
-      <Navigation />
+      {/* <Navigation /> */}
 
       <div className="flex flex-grow">
         <Sidebar {...sidebarProps} />
@@ -42,7 +48,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children, sidebarProps }) => {
       {/* </div> */}
 
       <footer className="bg-gray-800 text-white p-4 mt-auto">
-        <p className="text-center">&copy; 2024 Your Site. All rights reserved.</p>
+        <p className="text-center">&copy; {translation.copyright}</p>
       </footer>
     </div>
   );

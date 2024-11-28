@@ -1,4 +1,6 @@
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { Product } from '@/lib/types';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 interface PopularProductsProps {
@@ -6,13 +8,14 @@ interface PopularProductsProps {
 }
 
 const ProducShortDetails = ({ product }: PopularProductsProps) => {
+  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
   return (
     <div className="p-1">
 
       <Link
         key={product.id}
-        href={`/${product.category_slug}/${product.slug}`}
+        href={`${countryCode}/${product.category_slug}/${product.slug}`}
         className="flex items-center space-x-6 p-4 bg-white border border-gray-200 rounded-sm shadow-md hover:bg-gray-50 transition"
       >
         {/* Product Image */}

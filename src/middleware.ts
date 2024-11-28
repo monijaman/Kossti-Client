@@ -116,7 +116,6 @@ async function handleTokenAndRedirect(
   const tokenStatus = await checkToken(token, apiUrl, refreshToken);
   const { isValidToken, accessToken } = tokenStatus;
 
-  console.log("------------------------------", request.nextUrl.locale);
   // console.log("accessToken:", token);
   // console.log("Token Status:", tokenStatus);
   // console.log("Request URL:", request.nextUrl.href);
@@ -216,8 +215,6 @@ export async function middleware(request: NextRequest) {
         httpOnly: false, // Make the cookie accessible from JavaScript
       });
 
-      console.log("Redirecting to:", url.href);
-
       // Redirect to the updated URL with the new locale
     } else if (!firstPathSegment) {
       // If the country code cookie is available, prepend it to the URL
@@ -242,7 +239,6 @@ export async function middleware(request: NextRequest) {
         httpOnly: false,
       });
 
-      console.log("Redirecting to:", url.href);
       return NextResponse.redirect(url); // Redirect to the default locale
     }
 
