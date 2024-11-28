@@ -33,7 +33,7 @@ const Categories = async ({ category }: SearchParams) => {
               return (
                 <a
                   key={category.id || index} // Fallback to index if category.id is undefined
-                  href={`${countryCode}?category=${category.slug}`}
+                  href={`/${countryCode}?category=${category.slug}`}
                   className={`block px-4 py-2 rounded-md ${activeCategory === category.name
                     ? "bg-blue-100"
                     : "bg-gray-200"
