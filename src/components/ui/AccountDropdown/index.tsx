@@ -31,7 +31,7 @@ const AccountDropdown = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         className="text-white bg-blue-600 px-4 py-2 rounded-md focus:outline-none"
       >
-        Account
+        Account // {isAuthenticated}
       </button>
       {isOpen && (
         <div
