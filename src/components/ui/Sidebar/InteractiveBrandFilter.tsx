@@ -1,6 +1,5 @@
 'use client';
 
-import Checkbox from '@/components/ui/checkbox';
 import { Brand, SidebarParams } from '@/lib/types';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
@@ -23,7 +22,7 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             if (selected.length) {
                 currentParams.set('brand', selected.join(','));
             } else {
-                // currentParams.delete('brand');
+                currentParams.delete('brand');
             }
             // Generate the new query string
             const newQueryString = `/?${currentParams.toString()}`;
@@ -43,23 +42,39 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
         );
     };
 
+
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const brandQuery = params.get('brand'); // Get brand query parameter
+
+        if (brandQuery) {
+            setSelected(brandQuery.split(',')); // Set selected brands
+        }
+    }, []); // Run once on component mount
+
+
+
     return (
         <>
+
             <div className="mb-4">
                 {dataset && dataset.map((brand: Brand) => (
-                    <div key={brand.id} className="flex items-center mb-2">
-
-
-                        <Checkbox
-                            key={brand.id}
-                            name={brand.slug ?? ''} // Use empty string if brand.slug is undefined or null
-                            value={selected.includes(brand.slug ?? '')} // Ensure brand.slug is always a string
-                            updateValue={handleBrandChange}
-                            label={brand.name ?? 'Unknown'} // Provide a fallback for brand.name
+                    <div
+                        key={brand.id}
+                        className={`flex items-center mb-2 p-2 rounded-md cursor-pointer 
+                        ${selected.includes(brand.slug || '') ? 'bg-gray-300 text-gray-800' : 'bg-white text-gray-700'}
+                        hover:bg-gray-200 transition duration-300`}
+                        onClick={() => handleBrandChange(!selected.includes(brand.slug ?? ''), brand.slug ?? '')}
+                    >
+                        {/* Circle with a more subtle background color when selected */}
+                        <div
+                            className={`w-5 h-5 rounded-full ${selected.includes(brand.slug || '') ? 'bg-gray-300' : 'border-2 border-gray-400'}`}
                         />
-
-
+                        <span className="ml-2">{brand.name || 'Unknown Brand'}</span>
                     </div>
+
+
                 ))}
             </div>
 
