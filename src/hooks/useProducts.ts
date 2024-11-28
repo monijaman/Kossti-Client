@@ -37,7 +37,6 @@ export const useProducts = () => {
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
-    console.log("fullUrl", fullUrl);
 
     try {
       const response = await fetch(fullUrl);

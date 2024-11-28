@@ -106,15 +106,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
         }
     };
 
-    // Function to handle specification key selection from react-select
-    // const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number | null; label: string }>) => {
-    //     const values = [...tranSpecifications];
-    //     console.log('valuesvalues', values[index])
-    //     if (selectedOption) {
-    //         values[index].specification_id = selectedOption.value; // Set the selected key ID as string
-    //         setTranSpecifications(values);
-    //     }
-    // };
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">

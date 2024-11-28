@@ -107,7 +107,6 @@ export const useCategory = () => {
 
     // Define the API endpoint
     const apiEndpoint = `${apiUrl}/api/get?${params.toString()}`;
-    console.log(" apiEndpointapiEndpoint", apiEndpoint);
     try {
       // Fetch data with 'no-store' cache policy to avoid cached responses
       const response = await fetch(apiEndpoint, { cache: "no-store" });
@@ -251,7 +250,6 @@ export const useCategory = () => {
     // Construct the full URL with query parameters
     const apiEndpoint = `category-brands`;
     const fullUrl = `${apiUrl}/${apiEndpoint}?${queryParams.toString()}`;
-    console.log("fullUrlfullUrl", fullUrl);
     try {
       // Fetch data from the API
       const response = await fetch(fullUrl, {

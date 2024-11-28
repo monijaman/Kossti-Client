@@ -1,19 +1,19 @@
 "use client";
 
 import { useProducts } from '@/hooks/useProducts';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { Product, SearchBoxProps } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
 const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
     const { getProducts } = useProducts()
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
-
+    const [locale, setLocale] = useState(DEFAULT_LOCALE); // Initialize with default locale
     useEffect(() => {
         if (debouncedSearchTerm) {
             fetchData();
@@ -22,6 +22,15 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
             setSuggestions([]); // Clear suggestions when input is empty
         }
     }, [debouncedSearchTerm]);
+
+    useEffect(() => {
+        // Safely access localStorage on the client side
+        const storedLocale = localStorage.getItem('locale');
+        if (storedLocale) {
+            setLocale(storedLocale);
+        }
+    }, []); // Run only on component mount
+
 
 
     // Handle search input change and update suggestions
@@ -43,7 +52,6 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                 const activeCategory = '';
                 const activeBrands = '';
                 const activePriceRange = '';
-                const locale = 'en';
 
                 // Make the getProducts call to fetch suggestions
                 const response = await getProducts(page, productsPerPage, activeCategory, activeBrands, activePriceRange, debouncedSearchTerm, locale);
@@ -86,8 +94,8 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                                 <Link
                                     href={
                                         searchUrl
-                                            ? `${searchUrl}/${product.id}`
-                                            : `/${product.category_slug}/${product.slug}`
+                                            ? `/${locale}/${searchUrl}/${product.id}`
+                                            : `/${locale}/${product.category_slug}/${product.slug}`
                                     }
                                     className="flex items-center space-x-4"
                                 >

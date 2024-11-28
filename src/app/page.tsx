@@ -26,7 +26,6 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   };
 
   const dataset = await fetchProductData();
-  // console.log('dataset', dataset)
   const totalPages = Math.ceil(dataset.totalProducts / limit);
 
   // Prepare sidebarProps from searchParams

@@ -14,7 +14,6 @@ const CategoryForm = ({ categoryData }: PageProps) => {
     const router = useRouter();
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
-    console.log('categoryData', categoryData)
     const { submitCategory } = useCategory();
 
     useEffect(() => {
