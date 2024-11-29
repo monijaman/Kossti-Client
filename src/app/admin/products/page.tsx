@@ -76,7 +76,7 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
 
             {/* Add your review management functionalities here */}
             <ProductDetails
-                products={products}
+                products={products} countryCode='en'
             />
             <Pagination
                 category={activeCategory}
