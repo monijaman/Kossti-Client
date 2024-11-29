@@ -1,11 +1,11 @@
 import MainLayout from '@/components/layout/MainLayout';
 import Pagination from '@/components/Pagination/index';
+import PopularProducts from '@/components/Products/PopularProducts';
 import ProductReview from '@/components/Products/ProductReview';
 import SearchBox from '@/components/Search';
 import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from "@/lib/types";
 import { cookies } from 'next/headers';
-
 interface PageProps {
   params: {
     lang: string; // Type for the slug
@@ -54,13 +54,15 @@ const Page = async ({ searchParams, params }: PageProps) => {
         <SearchBox initialSearchTerm={searchTerm} />
 
 
-        <ProductReview products={dataset.products} />
+
+        <ProductReview products={dataset.products} countryCode={countryCode} />
         <Pagination
           category={activeCategory}
           selectedBrands={activeBrands}
           currentPage={page}
           totalPages={totalPages}
         />
+        <PopularProducts countryCode={countryCode} />
       </MainLayout>
     </>
   );

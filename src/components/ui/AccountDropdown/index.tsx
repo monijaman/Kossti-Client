@@ -42,6 +42,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
       });
 
       if (response) {
+
         // Redirect the user after successful logout
         router.refresh();
       } else {

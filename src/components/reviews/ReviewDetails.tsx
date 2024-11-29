@@ -45,7 +45,7 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
             <span className="font-bold text-lg">{review.data.rating} / 5</span>
           </div>
 
-          <VideoAndLinks dataset={review.data.additional_details} />
+          <VideoAndLinks dataset={review.data.additional_details} productId={productId} />
         </div>
       ) : (
         <p className="text-red-500">Error fetching specifications.</p>

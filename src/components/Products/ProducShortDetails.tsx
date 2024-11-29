@@ -1,15 +1,12 @@
-import { DEFAULT_LOCALE } from '@/lib/constants';
 import { Product } from '@/lib/types';
-import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 interface PopularProductsProps {
   product: Product;
+  countryCode: string;
 }
 
-const ProducShortDetails = ({ product }: PopularProductsProps) => {
-  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
-
+const ProducShortDetails = ({ product, countryCode }: PopularProductsProps) => {
   return (
     <div className="p-1">
 
@@ -35,8 +32,6 @@ const ProducShortDetails = ({ product }: PopularProductsProps) => {
         </div>
       </Link>
     </div>
-
-
   );
 };
 

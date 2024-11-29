@@ -1,19 +1,21 @@
 'use client';
 import { Product } from '@/lib/types';
 import Link from 'next/link';
-import { FC } from 'react';
 
 interface ProductDetailsProps {
   products: Product[];
+  countryCode: string;
 }
 
-const ProductDetails: FC<ProductDetailsProps> = ({ products }) => {
+const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
   const deleteProduct = (id: number) => {
   };
 
   return (
     <div className="overflow-x-auto">
       <div className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+
+        <h2>{countryCode}</h2>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

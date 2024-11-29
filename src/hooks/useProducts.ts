@@ -11,7 +11,8 @@ export const useProducts = () => {
     brands?: string,
     priceRange?: string,
     searchTerm?: string,
-    locale?: string
+    locale?: string,
+    sortby?: string
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -25,6 +26,7 @@ export const useProducts = () => {
     if (priceRange) params.pricerange = priceRange;
     if (searchTerm) params.searchterm = searchTerm;
     if (locale) params.locale = locale;
+    if (sortby) params.sortby = sortby;
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
@@ -312,6 +314,46 @@ export const useProducts = () => {
     }
   };
 
+  const incrementViews = async (productId: number) => {
+    try {
+      const apiUrl = `products/${productId}/increment-views`; // Assuming this is the API route
+
+      // Append apiUrl to productData
+      const payload = { apiUrl };
+
+      // Make the POST request to the backend API
+      const response = await fetch("/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Ensure you're sending JSON data
+        },
+        body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
+      });
+
+      if (!response.ok) {
+        // If the response status is not OK, throw an error
+        const errorData = await response.json();
+        throw new Error(
+          `Error creating product: ${errorData.message || response.statusText}`
+        );
+      }
+
+      // Parse the response body as JSON if the request was successful
+      const dataset = await response.json();
+
+      // Return success along with the data
+      return {
+        success: true,
+        ...dataset,
+      };
+    } catch (error) {
+      const err = error as Error;
+      console.error("Error updating product:", err.message);
+
+      return { success: false, data: [], error: err.message };
+    }
+  };
+
   const MakePhotoDefault = async (photoId: number | string) => {
     try {
       const payload = {
@@ -355,5 +397,6 @@ export const useProducts = () => {
     updateProduct,
     getPhotosByProductId,
     MakePhotoDefault,
+    incrementViews,
   };
 };

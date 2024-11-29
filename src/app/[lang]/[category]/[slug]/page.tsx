@@ -30,11 +30,9 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const dataset = await fetchProductData();
 
   return (
-    <MainLayout >
+    <MainLayout>
       <SearchBox initialSearchTerm={searchTerm} />
-
       <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
-
       <ProductPhotosPage productId={dataset.id} />
       <ReviewDetails productId={dataset.id} />
       <ProducDetails product={dataset} />
