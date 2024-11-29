@@ -3,6 +3,7 @@
 import { Brand, SidebarParams } from '@/lib/types';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
+
 const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm }: SidebarParams) => {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
@@ -53,11 +54,8 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
         }
     }, []); // Run once on component mount
 
-
-
     return (
         <>
-
             <div className="mb-4">
                 {dataset && dataset.map((brand: Brand) => (
                     <div
@@ -70,8 +68,9 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
                         {/* Circle with a more subtle background color when selected */}
                         <div
                             className={`w-5 h-5 rounded-full ${selected.includes(brand.slug || '') ? 'bg-gray-300' : 'border-2 border-gray-400'}`}
+
                         />
-                        <span className="ml-2">{brand.name || 'Unknown Brand'}</span>
+                        <span className="ml-2">{brand.name || 'Unknown Brand'} ({brand.total})</span>
                     </div>
 
 

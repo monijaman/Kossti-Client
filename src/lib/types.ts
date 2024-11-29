@@ -14,6 +14,7 @@ export interface categoryInt {
   category_slug: string;
   slug: string;
   status?: boolean;
+  total?: number;
   priority: number;
   deleted_at: null;
   created_at: string;
@@ -135,6 +136,7 @@ export interface Brand {
   name: string | null;
   slug?: string;
   status?: boolean;
+  total?: number;
 }
 
 export interface ProductPhotos {

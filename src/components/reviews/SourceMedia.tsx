@@ -67,7 +67,7 @@ const VideoGrid = ({ dataset, productId }: VideoGridProps) => {
                                     sizes="100vw"
                                     style={{
                                         width: "400px",
-                                        height: "4503px",
+                                        height: "450px",
                                     }}
                                     width={201}
                                     height={150}
