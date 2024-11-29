@@ -53,16 +53,11 @@ export const useUsers = () => {
 
   const logoutUser = async () => {
     try {
-      const newFormData = {
-        ...formData,
-        apiUrl: `logout`,
-      };
       const response = await fetch("/api/post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newFormData),
       });
       if (!response.ok) {
         throw new Error("Failed to add campaign");

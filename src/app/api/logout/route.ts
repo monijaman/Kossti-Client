@@ -1,20 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// Get the API URL from environment variables
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
 
 export const dynamic = "force-dynamic"; // Force the route to be dynamic
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const responseApi = await fetch(`${apiUrl}/api/logout`);
-    const resApiJson = await responseApi.json(); // Make sure to await the response
+    // Get the access token from cookies
+    const accessToken = req.cookies.get("accessToken")?.value;
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: "Access token not found" },
+        { status: 401 }
+      );
+    }
+    // Make a logout request to your API
+    const apiResponse = await fetch(`${apiUrl}/api/v1/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-    const response = NextResponse.json(resApiJson);
-    response.cookies.delete('accessToken');
-    response.cookies.delete('refreshToken');
+    if (!apiResponse.ok) {
+      return NextResponse.json(
+        { error: "Failed to logout from API" },
+        { status: apiResponse.status }
+      );
+    }
+
+    // Delete the access token and refresh token cookies
+    const response = NextResponse.json({ message: "Successfully logged out" });
+    response.cookies.delete("accessToken");
+    response.cookies.delete("refreshToken");
+
     return response;
   } catch (error) {
+    console.error("Logout Error:", error);
     return NextResponse.json({ error: "Failed to logout" }, { status: 500 });
   }
 }

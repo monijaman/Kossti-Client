@@ -19,16 +19,16 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
 
-
+  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
   const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
 
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">CritBrit</h1>
-        <div className="ml-auto flex items-center space-x-4">
-          <AccountDropdown />
+        <h1 className="text-xl font-bold">CritBrit  </h1>
+        <div className="ml-auto flex items-center space-x-4">{accessToken}
+          <AccountDropdown isAuthenticated={!!accessToken} />
           <LanguageSwitcher />
         </div>
       </header>

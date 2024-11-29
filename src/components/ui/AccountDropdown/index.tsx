@@ -1,12 +1,18 @@
 'use client'; // This directive makes this component a client component
 
-import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+type AccountDropdownProps = {
+  isAuthenticated: boolean; // Define the type for the prop
+};
 
-const AccountDropdown = () => {
+const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
-  const isAuthenticated = useAuth();
+  // const isAuthenticated = useAuth();
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -25,13 +31,34 @@ const AccountDropdown = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (response) {
+        // Redirect the user after successful logout
+        router.refresh();
+      } else {
+        console.error('Failed to logout');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="text-white bg-blue-600 px-4 py-2 rounded-md focus:outline-none"
       >
-        Account // {isAuthenticated}
+        Account
       </button>
       {isOpen && (
         <div
@@ -59,7 +86,9 @@ const AccountDropdown = () => {
               <a href="/profile" className="block px-4 py-2 hover:bg-gray-100">
                 Profile
               </a>
-              <a href="/logout" className="block px-4 py-2 hover:bg-gray-100">
+              <a
+                onClick={handleLogout}
+                className="block px-4 py-2 hover:bg-gray-100">
                 Logout
               </a>
               <>
