@@ -316,18 +316,17 @@ export const useProducts = () => {
 
   const incrementViews = async (productId: number) => {
     try {
-      const apiUrl = `products/${productId}/increment-views`; // Assuming this is the API route
+      const fullUrl = `${apiUrl}/products/${productId}/increment-views`; // Assuming this is the API route
 
       // Append apiUrl to productData
       const payload = { apiUrl };
 
       // Make the POST request to the backend API
-      const response = await fetch("/api/post", {
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Ensure you're sending JSON data
         },
-        body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
       });
 
       if (!response.ok) {
