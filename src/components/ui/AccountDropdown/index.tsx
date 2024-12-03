@@ -33,7 +33,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
   const handleLogout = async () => {
     try {
-
+      console.log('logout accoutn drop')
       const response = await fetch("/api/logout", {
         method: "POST",
         headers: {
