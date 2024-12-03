@@ -95,7 +95,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
               <>
                 <hr className="my-1" />
                 <a
-                  href="/admin/dashboard"
+                  href="/admin"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Admin Dashboard
