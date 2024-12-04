@@ -3,32 +3,44 @@ import { NextResponse } from "next/server";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
 
-export async function gettokenbyrefreshToken(refreshToken: string) {
-  // Check for refresh token and issue a new access token if needed
-
-  if (refreshToken) {
-    try {
-      const response = await fetch(`${apiUrl}/api/get-access-token`, {
-        method: "POST", // Assuming you are sending a POST request to get the access token
-        headers: {
-          Authorization: `Bearer ${refreshToken}`,
-          "Content-Type": "application/json", // Set content type if sending JSON payload
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const newAccessToken = data.accessToken;
-
-        if (newAccessToken) {
-          return newAccessToken;
-        }
-      }
-    } catch (error) {
-      console.error("Error refreshing access token:", error);
-    }
+export async function gettokenbyrefreshToken(
+  refreshToken: string
+): Promise<string | undefined> {
+  if (!refreshToken) {
+    console.error("No refresh token provided.");
+    return undefined;
   }
+
+  try {
+    const response = await fetch(`${apiUrl}/api/v1/refresh-token`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Check if the response was successful
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data?.access_token) {
+        return data.access_token; // Use `access_token` as per your API response
+      } else {
+        console.error("No access token in response:", data);
+      }
+    } else {
+      console.error(`Failed to refresh token. Status: ${response.status}`);
+      console.log("Response details:", await response.text());
+    }
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+  }
+
+  // Return undefined as a fallback
+  return undefined;
 }
+
 export async function checkToken(
   token: string | undefined,
   apiUrl: string,

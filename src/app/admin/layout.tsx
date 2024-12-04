@@ -20,12 +20,14 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const accessToken = cookies().get('theAccessToken')?.value; // Default to 'en' if not found
+  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">Admin Panel</h1>
+
+
         <AccountDropdown isAuthenticated={!!accessToken} />
 
       </header>
