@@ -70,8 +70,10 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
             <>
               <a
                 href="/signin"
-                className="block px-4 py-2 hover:bg-gray-200 rounded-md transition-colors"
+                className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors"
               >
+
+
                 Signin
               </a>
               <a
@@ -84,10 +86,11 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
             </>
           ) : (
             <>
-              <a href="/profile" className="block px-4 py-2 hover:bg-gray-100">
+              <a href="/profile" className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors">
                 Profile
               </a>
               <a
+                href='#'
                 onClick={handleLogout}
                 className="block px-4 py-2 hover:bg-gray-100">
                 Logout
@@ -100,7 +103,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
                 >
                   Admin Dashboard
                 </a>
-                <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100">
+                <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
                   Manage Users
                 </a>
               </>
