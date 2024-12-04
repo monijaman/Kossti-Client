@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
 
     // Delete the access token and refresh token cookies
     const response = NextResponse.json({ message: "Successfully logged out" });
-    // response.cookies.delete("accessToken");
-    //  response.cookies.delete("refreshToken");
+    response.cookies.delete("theAccessToken");
+    response.cookies.delete("theRefreshToken");
 
     return response;
   } catch (error) {

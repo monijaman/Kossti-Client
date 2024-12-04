@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 // Define a function to handle common DELETE requests
 async function handleDeleteRequest(req: NextRequest, apiUrl: string) {
@@ -7,20 +7,23 @@ async function handleDeleteRequest(req: NextRequest, apiUrl: string) {
     const body = await req.json();
 
     // Get the access token from cookies
-    const accessToken = req.cookies.get("accessToken")?.value;
+    const accessToken = req.cookies.get("theAccessToken")?.value;
 
     if (!accessToken) {
-      return NextResponse.json({
-        success: false,
-        error: 'Unauthorized. No access token found.',
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Unauthorized. No access token found.",
+        },
+        { status: 401 }
+      );
     }
 
     // Send a DELETE request to the API endpoint
     const response = await fetch(`${apiUrl}/api/${body.apiUrl}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
     });
@@ -29,23 +32,26 @@ async function handleDeleteRequest(req: NextRequest, apiUrl: string) {
     if (response.ok) {
       return NextResponse.json({
         success: true,
-        message: 'Resource deleted successfully.',
+        message: "Resource deleted successfully.",
       });
     } else {
       // Parse the JSON error response from the API
       const resJson = await response.json();
       return NextResponse.json({
         success: false,
-        error: resJson.error || 'Unknown error occurred.',
+        error: resJson.error || "Unknown error occurred.",
       });
     }
   } catch (error) {
     // Handle errors during the DELETE request
-    console.error('Error during DELETE request:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'An unexpected error occurred during deletion.',
-    }, { status: 500 });
+    console.error("Error during DELETE request:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "An unexpected error occurred during deletion.",
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -58,10 +64,13 @@ export async function DELETE(req: NextRequest) {
     // Call the common DELETE request handler function
     return handleDeleteRequest(req, apiUrl);
   } catch (error) {
-    console.error('Error during DELETE request:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'An unexpected error occurred.',
-    }, { status: 500 });
+    console.error("Error during DELETE request:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "An unexpected error occurred.",
+      },
+      { status: 500 }
+    );
   }
 }

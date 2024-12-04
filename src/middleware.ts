@@ -110,8 +110,8 @@ async function handleTokenAndRedirect(
   request: NextRequest,
   response: NextResponse
 ) {
-  const token = request.cookies.get("accessToken")?.value;
-  const refreshToken = request.cookies.get("refreshToken")?.value;
+  const token = request.cookies.get("theAccessToken")?.value;
+  const refreshToken = request.cookies.get("theRefreshToken")?.value;
 
   const tokenStatus = await checkToken(token, apiUrl, refreshToken);
   const { isValidToken, accessToken } = tokenStatus;
@@ -128,15 +128,19 @@ async function handleTokenAndRedirect(
     const redirectResponse = NextResponse.redirect(
       new URL("/signin", request.url)
     );
-    redirectResponse.cookies.set("accessToken", "", { expires: new Date(0) });
-    redirectResponse.cookies.set("refreshToken", "", { expires: new Date(0) });
+    redirectResponse.cookies.set("theAccessToken", "", {
+      expires: new Date(0),
+    });
+    redirectResponse.cookies.set("theRefreshToken", "", {
+      expires: new Date(0),
+    });
     redirectResponse.cookies.set("XSRF-TOKEN", "", { expires: new Date(0) });
     return redirectResponse;
   }
 
   // If token is valid and a new access token is provided, set it and redirect
   if (isValidToken && accessToken) {
-    response.cookies.set("accessToken", accessToken);
+    response.cookies.set("theAccessToken", accessToken);
     return response;
   }
 
