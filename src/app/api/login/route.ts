@@ -42,14 +42,6 @@ export async function POST(req: NextRequest) {
         maxAge: 7 * 24 * 60 * 60, // 7 days
       });
 
-      nextResponse.cookies.set("theAccessToken", resJson.access_token, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60, // 1 day
-      });
-      nextResponse.cookies.set("theRefreshToken", resJson.refresh_token, {
-        httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60, // 7 days
-      });
       // Remove sensitive data from the response before sending it back
       delete resJson.access_token;
       delete resJson.refresh_token;

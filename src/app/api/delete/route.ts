@@ -7,7 +7,7 @@ async function handleDeleteRequest(req: NextRequest, apiUrl: string) {
     const body = await req.json();
 
     // Get the access token from cookies
-    const accessToken = req.cookies.get("theAccessToken")?.value;
+    const accessToken = req.cookies.get("accessToken")?.value;
 
     if (!accessToken) {
       return NextResponse.json(

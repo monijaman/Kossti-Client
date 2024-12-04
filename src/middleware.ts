@@ -110,8 +110,8 @@ async function handleTokenAndRedirect(
   request: NextRequest,
   response: NextResponse
 ) {
-  const token = request.cookies.get("theAccessToken")?.value;
-  const refreshToken = request.cookies.get("theRefreshToken")?.value;
+  const token = request.cookies.get("cccessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
   const tokenStatus = await checkToken(token, apiUrl, refreshToken);
   const { isValidToken, accessToken } = tokenStatus;
@@ -124,7 +124,7 @@ async function handleTokenAndRedirect(
   // console.log("Pathname:", request.nextUrl.pathname);
 
   // Redirect to signin if token is invalid and clear cookies
-  if (token && !isValidToken) {
+  if (!token) {
     const redirectResponse = NextResponse.redirect(
       new URL("/signin", request.url)
     );
@@ -134,16 +134,10 @@ async function handleTokenAndRedirect(
     return redirectResponse;
   }
 
-  // If token is valid and a new access token is provided, set it and redirect
-  if (isValidToken && accessToken) {
-    response.cookies.set("accessToken", accessToken);
-    return response;
-  }
-
   // Redirect to admin if signed in and trying to access signin
-  if (token && isValidToken && request.nextUrl.pathname.startsWith("/signin")) {
-    return NextResponse.redirect(new URL("/admin", request.url));
-  }
+  // if (token && isValidToken && request.nextUrl.pathname.startsWith("/signin")) {
+  //   return NextResponse.redirect(new URL("/admin", request.url));
+  // }
 
   // Redirect to signin if trying to access protected routes without a token
   if (
