@@ -1,5 +1,5 @@
 "use server";
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 // Get the API URL from environment variables
 const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
 
     // Send a POST request to the API endpoint for login
     const response = await fetch(`${apiUrl}/api/v1/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email: body.email,
@@ -33,15 +33,23 @@ export async function POST(req: NextRequest) {
         dataset: resJson,
       });
 
-      nextResponse.cookies.set('accessToken', resJson.access_token, {
+      nextResponse.cookies.set("accessToken", resJson.access_token, {
         httpOnly: true,
         maxAge: 24 * 60 * 60, // 1 day
       });
-      nextResponse.cookies.set('refreshToken', resJson.refresh_token, {
+      nextResponse.cookies.set("refreshToken", resJson.refresh_token, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60, // 7 days
       });
 
+      nextResponse.cookies.set("theAccessToken", resJson.access_token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60, // 1 day
+      });
+      nextResponse.cookies.set("theRefreshToken", resJson.refresh_token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      });
       // Remove sensitive data from the response before sending it back
       delete resJson.access_token;
       delete resJson.refresh_token;
@@ -57,12 +65,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     // Handle errors during the login process
-    console.error('Error during login:', error);
+    console.error("Error during login:", error);
 
     // Return an error response
-    return NextResponse.json({
-      success: false,
-      message: 'An unexpected error occurred',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        message: "An unexpected error occurred",
+      },
+      { status: 500 }
+    );
   }
 }
