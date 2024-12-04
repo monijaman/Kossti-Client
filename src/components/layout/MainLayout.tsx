@@ -19,7 +19,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
 
-  const accessToken = cookies().get('theAccessToken')?.value; // Default to 'en' if not found
+  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
   const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
 
