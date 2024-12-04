@@ -25,7 +25,7 @@ const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">CritBrit  </h1>
+        <h1 className="text-xl font-bold">CritBrit   </h1>
         <div className="ml-auto flex items-center space-x-4">
 
           <AccountDropdown isAuthenticated={!!accessToken} />

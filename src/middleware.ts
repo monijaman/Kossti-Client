@@ -108,37 +108,15 @@ async function handleIpAddress(request: NextRequest, response: NextResponse) {
 // Function to handle token checking and redirection
 async function handleTokenAndRedirect(
   request: NextRequest,
-  response: NextResponse
+  response: NextResponse,
+  refToken?: string
 ) {
   let token = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
-  // const { isValidToken, accessToken } = tokenStatus;
-
-  // console.log("accessToken:", token);
-  // console.log("Token Status:", tokenStatus);
-  // console.log("Request URL:", request.nextUrl.href);
-  // console.log("Is Valid Token:", isValidToken);
-  // console.log("Access Token:", accessToken);
-  // console.log("Pathname:", request.nextUrl.pathname);
-
-  // Redirect to signin if token is invalid and clear cookies
-
-  // if (!token) {
-  //   console.log("ddddddddddd");
-  //   const redirectResponse = NextResponse.redirect(
-  //     new URL("/signin", request.url)
-  //   );
-  //   // redirectResponse.cookies.set("accessToken", "", { expires: new Date(0) });
-  //   // redirectResponse.cookies.set("refreshToken", "", { expires: new Date(0) });
-  //   // redirectResponse.cookies.set("XSRF-TOKEN", "", { expires: new Date(0) });
-  //   return redirectResponse;
-  // }
-
-  // Redirect to admin if signed in and trying to access signin
-  // if (token && isValidToken && request.nextUrl.pathname.startsWith("/signin")) {
-  //   return NextResponse.redirect(new URL("/admin", request.url));
-  // }
+  if (refToken) {
+    return NextResponse.redirect(new URL("/redirect", request.url));
+  }
 
   // Redirect to signin if trying to access protected routes without a token
   if (!token && request.nextUrl.pathname.startsWith("/signin")) {
@@ -166,15 +144,15 @@ async function handleTokenAndRedirect(
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  let token = request.cookies.get("accessToken")?.value;
+  const token = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-
+  let refToken = undefined;
   if (!token && refreshToken) {
     try {
-      token = await gettokenbyrefreshToken(refreshToken);
+      refToken = await gettokenbyrefreshToken(refreshToken);
 
-      if (token) {
-        response.cookies.set("accessToken", token, {
+      if (refToken) {
+        response.cookies.set("accessToken", refToken, {
           httpOnly: true,
           maxAge: 24 * 60 * 60, // 1 day
           path: "/", // Ensure cookie is accessible site-wide
@@ -193,7 +171,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/signin") ||
     pathname.startsWith("/signup")
   ) {
-    return await handleTokenAndRedirect(request, response);
+    return await handleTokenAndRedirect(request, response, refToken);
   } else if (!request.cookies.get("country-code")) {
     const redirectUrl = internationalization(request, response);
 
