@@ -126,11 +126,11 @@ async function handleTokenAndRedirect(
   // Redirect to signin if token is invalid and clear cookies
   if (token && !isValidToken) {
     const redirectResponse = NextResponse.redirect(
-      new URL("/signinholla", request.url)
+      new URL("/signin", request.url)
     );
-    redirectResponse.cookies.set("accessToken", "", { expires: new Date(0) });
-    redirectResponse.cookies.set("refreshToken", "", { expires: new Date(0) });
-    redirectResponse.cookies.set("XSRF-TOKEN", "", { expires: new Date(0) });
+    // redirectResponse.cookies.set("accessToken", "", { expires: new Date(0) });
+    // redirectResponse.cookies.set("refreshToken", "", { expires: new Date(0) });
+    // redirectResponse.cookies.set("XSRF-TOKEN", "", { expires: new Date(0) });
     return redirectResponse;
   }
 
