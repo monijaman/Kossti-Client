@@ -78,6 +78,7 @@ export interface SearchBoxProps {
 export interface SearchParams {
   page?: string;
   slug?: string;
+  limit?: number;
   category?: string;
   brand?: string;
   price?: string;

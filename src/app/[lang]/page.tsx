@@ -4,33 +4,39 @@ import PopularProducts from '@/components/Products/PopularProducts';
 import ProductReview from '@/components/Products/ProductReview';
 import SearchBox from '@/components/Search';
 import { useProducts } from '@/hooks/useProducts';
-import { SearchParams } from "@/lib/types";
+import { DEFAULT_LOCALE } from "@/lib/constants";
+
 import { cookies } from 'next/headers';
 interface PageProps {
-  params: Promise<{
-    lang: string; // Type for the slug
-  }>,
-  searchParams: Promise<SearchParams>
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 // Define the type for valid locale keys
 const Page = async (props: PageProps) => {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
 
   // const Page = async ({ params }: PageProps) => {
-  const { lang } = params;
+  const searchParams = await props.searchParams;
 
 
   const { getProducts } = useProducts();
 
   const page = parseInt(searchParams.page as string, 10) || 1;
   const limit = 20;
-  const activeCategory = searchParams.category || '';
-  const activeBrands = searchParams.brand || '';
-  const activePriceRange = searchParams.price || '';
-  const searchTerm = searchParams.searchterm || '';
-  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
+  // Ensure values are strings
+  const activeCategory = Array.isArray(searchParams.category)
+    ? searchParams.category.join(',')
+    : searchParams.category || '';
+
+  const activeBrands = Array.isArray(searchParams.brand)
+    ? searchParams.brand.join(',')
+    : searchParams.brand || '';
+
+  const activePriceRange = Array.isArray(searchParams.price)
+    ? searchParams.price.join(',')
+    : searchParams.price || '';
+  const searchTerm = Array.isArray(searchParams.searchterm)
+    ? searchParams.searchterm.join(',')
+    : searchParams.searchterm || ''; const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE;; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);

@@ -1,42 +1,47 @@
- 
 import ProductForm from "@/components/admin/ProductForm";
 import ProductTransForm from "@/components/admin/ProductTransForm";
-import { useProducts } from "@/hooks/useProducts";
-import { Product } from '@/lib/types'; // Assuming you have a Product type
-import React, { useEffect, useState, useRef } from 'react';
 
 interface PageProps {
-    params: Promise<{
+    params: {
         id: number; // Type for the slug
-    }>;
+    };
 }
 
-const Products = async (props: PageProps) => {
-    const params = await props.params;
-    const { getAProductById } = useProducts();
+// Function to fetch a product by ID
+const fetchAProductData = async (id: number) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1"; // Replace with your actual API URL
+    if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+    }
+
+    const fullUrl = `${apiUrl}/products/${id}`;
+
+    try {
+        const response = await fetch(fullUrl);
+        const data = await response.json();
+        return data.success ? data : { products: [], totalProducts: 0 };
+    } catch (error) {
+        console.error("Error fetching product data:", error);
+        return { products: [], totalProducts: 0 };
+    }
+};
+
+const Products = async ({ params }: PageProps) => {
     const { id } = params;
 
-    const fetchAProductData = async () => {
-        const response = await getAProductById(id);
-        return response.success ? response.data : { products: [], totalProducts: 0 };
-    };
+    // Fetch product data directly
+    const dataset = await fetchAProductData(id);
 
-    const dataset = await fetchAProductData();
-
-    return <>
-
-       
-
+    return (
         <div className="flex flex-row gap-4">
-            <div className="w-1/2  bg-gray-100 border rounded">
+            <div className="w-1/2 bg-gray-100 border rounded">
                 <ProductForm product={dataset.products} />
             </div>
-
             <div className="w-1/2">
                 <ProductTransForm product={dataset.products} />
             </div>
         </div>
-    </>
+    );
 };
 
 export default Products;

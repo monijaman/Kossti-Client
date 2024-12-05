@@ -1,4 +1,4 @@
-import { useSpecifications } from '@/hooks/useSpecifications';
+import fetchPublicSpecs from '@/app/ServerCalls/fetchPublicSpecs';
 import { cookies } from 'next/headers';
 
 interface PopularProductsProps {
@@ -6,20 +6,10 @@ interface PopularProductsProps {
 }
 
 const SpecDetails = async ({ productId }: PopularProductsProps) => {
-  const { getPublicSpecs } = useSpecifications();
 
   const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
-  const fetchSpecifications = async () => {
-    const response = await getPublicSpecs(productId, countryCode);
-
-
-
-    return response;
-  }
-
-  // Await the fetch to get the actual data
-  const specs = await fetchSpecifications();
+  const specs = await fetchPublicSpecs(productId, countryCode);
 
 
   return (

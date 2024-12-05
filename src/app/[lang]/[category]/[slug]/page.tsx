@@ -1,12 +1,11 @@
+import fetchProductBySlug from '@/app/ServerCalls/fetchProductBySlug';
 import MainLayout from '@/components/layout/MainLayout';
 import ProducDetails from '@/components/Products/ProducDetails';
 import ProductPhotosPage from '@/components/reviews/ProductPhotos';
 import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
-import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
-
 interface PageProps {
   params: Promise<{
     category: string; // category parameter
@@ -18,18 +17,14 @@ interface PageProps {
 const Page = async (props: PageProps) => {
   const searchParams = await props.searchParams;
   const params = await props.params;
-  const { getAProductBySlug } = useProducts();
   const { slug } = params
   const countryCode = (await cookies()).get('country-code')?.value; // Default to 'en' if not found
 
+
+  // Fetch product data
+  const dataset = await fetchProductBySlug(slug, countryCode);
+
   const searchTerm = searchParams.searchterm || '';
-
-  const fetchProductData = async () => {
-    const response = await getAProductBySlug(slug, countryCode);
-    return response.success ? response.data : { products: [], totalProducts: 0 };
-  };
-
-  const dataset = await fetchProductData();
 
   return (
     <MainLayout>

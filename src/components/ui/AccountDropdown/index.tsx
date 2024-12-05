@@ -1,7 +1,9 @@
 'use client'; // This directive makes this component a client component
 
+import Link from 'next/link'; // Import Link component from Next.js
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+
 type AccountDropdownProps = {
   isAuthenticated: boolean; // Define the type for the prop
 };
@@ -11,8 +13,6 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
-  // const isAuthenticated = useAuth();
-
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -33,7 +33,6 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
   const handleLogout = async () => {
     try {
-      console.log('logout accoutn drop')
       const response = await fetch("/api/logout", {
         method: "POST",
         headers: {
@@ -41,10 +40,8 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
         }
       });
 
-      if (response) {
-
-        // Redirect the user after successful logout
-        router.refresh();
+      if (response.ok) {
+        router.refresh(); // Refresh the page after logout
       } else {
         console.error('Failed to logout');
       }
@@ -68,44 +65,47 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
         >
           {!isAuthenticated ? (
             <>
-              <a
+              <Link
                 href="/signin"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors"
               >
-
-
                 Signin
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/signup"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-md transition-colors"
               >
                 Signup
-              </a>
-
+              </Link>
             </>
           ) : (
             <>
-              <a href="/profile" className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors">
+              <Link
+                href="/profile"
+                className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors"
+              >
                 Profile
-              </a>
-              <a
-                href='#'
+              </Link>
+              <button
                 onClick={handleLogout}
-                className="block px-4 py-2 hover:bg-gray-100">
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
                 Logout
-              </a>
+              </button>
               <>
                 <hr className="my-1" />
-                <a
+                <Link
                   href="/admin"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Admin Dashboard
-                </a>
-                <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
+                </Link>
+                <Link
+                  href="/admin/users"
+                  className="block px-4 py-2 hover:bg-gray-100 rounded-bl-md rounded-br-md"
+                >
                   Manage Users
-                </a>
+                </Link>
               </>
             </>
           )}

@@ -1,7 +1,8 @@
+import fetchPublicReviewsByProductId from '@/app/ServerCalls/fetchPublicReviewsByProductId';
 import VideoAndLinks from '@/components/reviews/SourceMedia';
-import { useReviews } from '@/hooks/useReviews';
 import { Review } from '@/lib/types';
 import { cookies } from 'next/headers';
+
 interface revieResponse {
   success: boolean,
   data: Review,
@@ -12,17 +13,10 @@ interface PopularProductsProps {
 }
 
 const ReviewDetails = async ({ productId }: PopularProductsProps) => {
-  const { getPublicReviewsByProductId } = useReviews();
-  const locale = 'bn';
   const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
-  // Fetch specifications based on product ID and country code
-  const fetchSpecifications = async (): Promise<revieResponse> => {
-    return await getPublicReviewsByProductId(productId, countryCode);
-  };
+  const review = await fetchPublicReviewsByProductId(productId, countryCode);
 
-  // Await the fetch to get the actual data
-  const review = await fetchSpecifications();
 
 
   return (

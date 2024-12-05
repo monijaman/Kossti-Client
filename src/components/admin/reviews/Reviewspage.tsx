@@ -11,7 +11,7 @@ interface PageProps {
   searchParams: SearchParams; // Include searchParams
 }
 
-const ManageReviews = async ({ params, searchParams }: PageProps) => {
+const ManageReviews = ({ params, searchParams }: PageProps) => {
 
   const { slug } = params;
   const { getReviews } = useReviews();

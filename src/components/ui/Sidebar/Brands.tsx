@@ -1,10 +1,7 @@
-// components/BrandsList.tsx
+import { getPublicBrands } from '@/app/ServerCalls/fetchPublicBrands';
 import InteractiveBrandFilter from '@/components/ui/Sidebar/InteractiveBrandFilter';
-import { useBrands } from '@/hooks/useBrands';
 import { brandInt, SidebarParams } from '@/lib/types';
-
 const BrandsList = async ({ activeCategory, selectedBrands, searchTerm }: SidebarParams) => {
-    const { getPublicBrands } = useBrands();
 
     // Fetch brand data server-side
     const response = await getPublicBrands();
