@@ -4,8 +4,6 @@ import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import { useTranslation } from "@/hooks/useLocale";
-import { DEFAULT_LOCALE } from '@/lib/constants';
-import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { ReactNode } from 'react';
 interface MainLayoutProps {
   children: ReactNode;
@@ -15,17 +13,19 @@ interface MainLayoutProps {
     activePriceRange?: string;
     searchTerm?: string;
   };
+  accessToken: string | null;
+  countryCode: string;
 }
 
-const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
 
-  const accessToken = (cookies() as unknown as UnsafeUnwrappedCookies).get('accessToken')?.value; // Default to 'en' if not found
-  const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+const MainLayout = ({ children, sidebarProps, accessToken, countryCode }: MainLayoutProps) => {
+
+  // const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">CritBrit   </h1>
+        <h1 className="text-xl font-bold">CritBrit    </h1>
         <div className="ml-auto flex items-center space-x-4">
 
           <AccountDropdown isAuthenticated={!!accessToken} />

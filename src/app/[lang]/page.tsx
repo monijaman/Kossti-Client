@@ -1,4 +1,4 @@
-import MainLayout from '@/components/layout/MainLayout';
+import PageWrapper from '@/components/layout/Wrapper';
 import Pagination from '@/components/Pagination/index';
 import PopularProducts from '@/components/Products/PopularProducts';
 import ProductReview from '@/components/Products/ProductReview';
@@ -16,7 +16,6 @@ const Page = async (props: PageProps) => {
 
   // const Page = async ({ params }: PageProps) => {
   const searchParams = await props.searchParams;
-
 
   const { getProducts } = useProducts();
 
@@ -47,18 +46,13 @@ const Page = async (props: PageProps) => {
   const totalPages = Math.ceil(dataset.totalProducts / limit);
 
   // Prepare sidebarProps from searchParams
-  const sidebarProps = {
-    activeCategory,
-    selectedBrands: activeBrands,
-    activePriceRange,
-    searchTerm,
-  };
+
 
   return (
     <>
 
 
-      <MainLayout sidebarProps={sidebarProps}>
+      <PageWrapper >
         <SearchBox initialSearchTerm={searchTerm} />
 
         <ProductReview products={dataset.products} countryCode={countryCode} />
@@ -69,7 +63,7 @@ const Page = async (props: PageProps) => {
           totalPages={totalPages}
         />
         <PopularProducts countryCode={countryCode} />
-      </MainLayout>
+      </PageWrapper>
     </>
   );
 };
