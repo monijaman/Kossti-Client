@@ -21,7 +21,6 @@ const VideoGrid = ({ dataset, productId }: VideoGridProps) => {
     const incrementViewsFunc = async () => {
         try {
             const response = await incrementViews(productId);
-
             if (!response.ok) {
                 console.error('Failed to increment views count');
             }
