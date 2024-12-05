@@ -6,16 +6,17 @@ import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { categoryInt, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string; // Type for the slug
-    };
-    searchParams: SearchParams; // Include searchParams
+    }>;
+    searchParams: Promise<SearchParams>; // Include searchParams
 }
 
-const ListSpecifications = ({ params, searchParams }: PageProps) => {
+const ListSpecifications = (props: PageProps) => {
+    const searchParams = use(props.searchParams);
     const [totalPages, setTotalPages] = useState(0);
     const [categories, setCategories] = useState<categoryInt[]>([]);
     const [perPage, setPerPage] = useState(10);

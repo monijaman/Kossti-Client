@@ -7,14 +7,16 @@ import { useProducts } from '@/hooks/useProducts';
 import { SearchParams } from "@/lib/types";
 import { cookies } from 'next/headers';
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: string; // Type for the slug
-  },
-  searchParams: SearchParams
+  }>,
+  searchParams: Promise<SearchParams>
 }
 
 // Define the type for valid locale keys
-const Page = async ({ searchParams, params }: PageProps) => {
+const Page = async (props: PageProps) => {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
 
   // const Page = async ({ params }: PageProps) => {
   const { lang } = params;
@@ -28,7 +30,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);

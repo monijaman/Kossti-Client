@@ -4,14 +4,15 @@ import CategoryTransForm from "@/components/admin/categories/CategoryTransForm";
 import { useCategory } from '@/hooks/useCategory';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { Category } from '@/lib/types'; // Assuming you have a Product type
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
-const CreateSpecificationKeys = ({ params }: PageProps) => {
+const CreateSpecificationKeys = (props: PageProps) => {
+    const params = use(props.params);
 
     const { getSpecificationsKeysById } = useSpecificationsKeys();
     const { getCategoryById } = useCategory();

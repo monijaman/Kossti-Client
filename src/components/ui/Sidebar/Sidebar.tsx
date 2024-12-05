@@ -6,7 +6,7 @@ import Categories from './Categories';
 const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searchTerm }: SidebarParams) => {
 
   const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
 
   return (

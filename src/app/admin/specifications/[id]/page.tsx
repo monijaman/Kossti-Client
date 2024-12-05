@@ -1,17 +1,18 @@
 "use client";
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, use, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 import SpecTranslations from '@/components/admin/specifications/SpecTranslations';
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number;
-    };
+    }>;
 }
 
-const Specification = ({ params }: PageProps) => {
+const Specification = (props: PageProps) => {
+    const params = use(props.params);
     const { id } = params;
     const { getSpecifications, getSpecificationsKeys, submitSpecificationsKeys } = useSpecifications();
 
@@ -115,7 +116,7 @@ const Specification = ({ params }: PageProps) => {
                                                 label: key.specification_key,
                                             }))
                                             .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
-                                        onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
+                                        onChange={(selectedOption: SingleValue<{ value: number; label: string }>) => handleSelectChange(index, selectedOption)}
                                         options={specKeys.map((key) => ({
                                             value: key.id,
                                             label: key.specification_key,

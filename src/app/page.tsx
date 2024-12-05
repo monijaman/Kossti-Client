@@ -9,7 +9,8 @@ import { DEFAULT_LOCALE } from '@/lib/constants';
 import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 // Server Component
-const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+const Page = async (props: { searchParams: Promise<SearchParams> }) => {
+  const searchParams = await props.searchParams;
   const { getProducts } = useProducts();
 
   const page = parseInt(searchParams.page as string, 10) || 1;
@@ -18,7 +19,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
-  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);

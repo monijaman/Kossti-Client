@@ -149,7 +149,7 @@ const Specification = () => {
                                                 label: key.specification_key?.toString() || "", // Convert to string or handle null
                                             }))
                                             .find((option) => option.value === spec.id) || null}
-                                        onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
+                                        onChange={(selectedOption: SingleValue<{ value: number; label: string }>) => handleSelectChange(index, selectedOption)}
                                         options={specifications.map((key) => ({
                                             value: key.id ?? 0, // Ensure it's a number
                                             label: key.specification_key?.toString() || "", // Handle null labels

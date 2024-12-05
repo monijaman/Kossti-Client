@@ -5,16 +5,18 @@ import { useProducts } from '@/hooks/useProducts';
 import { Product, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string; // Type for the slug
-    };
-    searchParams: SearchParams; // Include searchParams
+    }>;
+    searchParams: Promise<SearchParams>; // Include searchParams
 }
 
-const ManageReviews = ({ params, searchParams }: PageProps) => {
+const ManageReviews = (props: PageProps) => {
+    const searchParams = use(props.searchParams);
+    const params = use(props.params);
 
     const { slug } = params;
     const { getProducts } = useProducts();

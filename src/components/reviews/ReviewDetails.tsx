@@ -14,7 +14,7 @@ interface PopularProductsProps {
 const ReviewDetails = async ({ productId }: PopularProductsProps) => {
   const { getPublicReviewsByProductId } = useReviews();
   const locale = 'bn';
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   // Fetch specifications based on product ID and country code
   const fetchSpecifications = async (): Promise<revieResponse> => {

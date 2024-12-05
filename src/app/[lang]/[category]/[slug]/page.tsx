@@ -8,17 +8,19 @@ import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string; // category parameter
     slug: string; // slug parameter
-  };
-  searchParams: SearchParams; // or use a more specific type if needed
+  }>;
+  searchParams: Promise<SearchParams>; // or use a more specific type if needed
 }
 
-const Page = async ({ params, searchParams }: PageProps) => {
+const Page = async (props: PageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { getAProductBySlug } = useProducts();
   const { slug } = params
-  const countryCode = cookies().get('country-code')?.value; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value; // Default to 'en' if not found
 
   const searchTerm = searchParams.searchterm || '';
 

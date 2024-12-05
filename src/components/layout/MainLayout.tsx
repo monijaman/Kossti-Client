@@ -5,7 +5,7 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import { useTranslation } from "@/hooks/useLocale";
 import { DEFAULT_LOCALE } from '@/lib/constants';
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { ReactNode } from 'react';
 interface MainLayoutProps {
   children: ReactNode;
@@ -19,8 +19,8 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
 
-  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
-  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const accessToken = (cookies() as unknown as UnsafeUnwrappedCookies).get('accessToken')?.value; // Default to 'en' if not found
+  const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
   return (
     <div className="min-h-screen flex flex-col mx-auto">

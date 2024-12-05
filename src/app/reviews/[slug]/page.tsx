@@ -7,21 +7,23 @@ import Pagination from '@/components/Pagination/index';
 import SearchBox from '@/components/Search';
 import ProducDetails from '@/components/Products/ProducDetails';
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string; // Type for the slug
-  };
-  searchParams: SearchParams; // Include searchParams
+  }>;
+  searchParams: Promise<SearchParams>; // Include searchParams
 }
 
 
-const Page = async ({ params, searchParams }: PageProps) => {
+const Page = async (props: PageProps) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
 
   // const Page = async ({ params }: PageProps) => {
   const { slug } = params;
 
   const { getAProductBySlug } = useProducts()
 
-  
+
   const activeCategory = searchParams.category || '';
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
@@ -53,11 +55,11 @@ const Page = async ({ params, searchParams }: PageProps) => {
   
     return product;
   };
-  
+
 
   // Fetch product data based on the slug
   const productData: Product = await fetchProductData(); // Notice the array type here
- 
+
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} />

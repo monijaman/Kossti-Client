@@ -1,17 +1,18 @@
 'use client'
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState, use } from 'react';
 import KeyForm from "@/components/admin/keys/KeyForm";
 import KeyTransForm from "@/components/admin/keys/KeyTransForm";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
-const CreateSpecificationKeys = ({ params }: PageProps) => {
+const CreateSpecificationKeys = (props: PageProps) => {
+    const params = use(props.params);
 
     const { getSpecificationsKeysById } = useSpecificationsKeys();
     const { id } = params;

@@ -6,12 +6,13 @@ import { Product } from '@/lib/types'; // Assuming you have a Product type
 import React, { useEffect, useState, useRef } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
-const Products = async ({ params }: PageProps) => {
+const Products = async (props: PageProps) => {
+    const params = await props.params;
     const { getAProductById } = useProducts();
     const { id } = params;
 
@@ -21,7 +22,7 @@ const Products = async ({ params }: PageProps) => {
     };
 
     const dataset = await fetchAProductData();
- 
+
     return <>
 
        

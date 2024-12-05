@@ -7,7 +7,7 @@ import { Inter } from 'next/font/google';
 import Sidebar from '@/components/admin/Sidebar';
 import AccountDropdown from '@/components/ui/AccountDropdown'; // Import your account dropdown or user info component
 import Navigation from '@/components/ui/Navigation'; // A navigation component for admin
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
+  const accessToken = (cookies() as unknown as UnsafeUnwrappedCookies).get('accessToken')?.value; // Default to 'en' if not found
 
   return (
     <div className="min-h-screen flex flex-col">

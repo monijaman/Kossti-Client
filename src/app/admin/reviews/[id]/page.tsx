@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, use } from 'react';
 import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
@@ -14,12 +14,13 @@ import 'react-quill/dist/quill.snow.css'; // Import styles
 import DragNdrop from "@/components/Uploader/Uploader";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
-const ReviewForm = ({ params }: PageProps) => {
+const ReviewForm = (props: PageProps) => {
+    const params = use(props.params);
     const { id } = params;
     const [reviewData, setReviewData] = useState<Review>();
     const [reviews, setReviews] = useState<string>('');

@@ -8,7 +8,7 @@ interface PopularProductsProps {
 const SpecDetails = async ({ productId }: PopularProductsProps) => {
   const { getPublicSpecs } = useSpecifications();
 
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const fetchSpecifications = async () => {
     const response = await getPublicSpecs(productId, countryCode);

@@ -2,7 +2,7 @@
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
 import { Brand, Category } from '@/lib/types';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, use, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 interface Specification {
@@ -11,12 +11,13 @@ interface Specification {
 }
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number;
-    };
+    }>;
 }
 
-const Specification = ({ params }: PageProps) => {
+const Specification = (props: PageProps) => {
+    const params = use(props.params);
     const { id: category_id } = params;
 
     const { getCategories, getCategoryRelBrands } = useCategory();
@@ -140,7 +141,7 @@ const Specification = ({ params }: PageProps) => {
                             value={brands
                                 .map((brand) => ({ value: brand.id!, label: brand.name || "" }))
                                 .find((option) => option.value === item.id) || null}
-                            onChange={(selectedOption) => handleBrandChange(index, selectedOption)}
+                            onChange={(selectedOption: SingleValue<{ value: number; label: string }>) => handleBrandChange(index, selectedOption)}
                             options={brands.map((brand) => ({
                                 value: brand.id ?? 0,
                                 label: brand.name?.toString() || "",

@@ -127,3 +127,11 @@ php artisan generate:brand-slugs
 # Internationlization
 https://crowdin.com/blog/2024/02/19/next-js-internationalization
 ```
+
+## Stop fetch cathe
+
+      const response = await fetch(apiEndpoint, { cache: "no-store" });
+
+      Upgrade:
+
+       npx @next/codemod@canary upgrade latest
