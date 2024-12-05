@@ -4,7 +4,6 @@ import ProducDetails from '@/components/Products/ProducDetails';
 import ProductPhotosPage from '@/components/reviews/ProductPhotos';
 import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
-import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 
 interface PageProps {
@@ -12,7 +11,7 @@ interface PageProps {
     category: string; // category parameter
     slug: string; // slug parameter
   }>;
-  searchParams: Promise<SearchParams>; // or use a more specific type if needed
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const Page = async (props: PageProps) => {
@@ -25,10 +24,13 @@ const Page = async (props: PageProps) => {
   // Fetch product data
   const dataset = await fetchProductBySlug(slug, countryCode);
 
-  const searchTerm = searchParams.searchterm || '';
+  const searchTerm =
+    Array.isArray(searchParams.searchterm)
+      ? searchParams.searchterm.join(',') // Convert array to a comma-separated string
+      : searchParams.searchterm || ''; // Use string directly or fallback to an empty string
 
   return (
-    <PageWrapper >
+    <PageWrapper searchParams={searchParams}>
       <SearchBox initialSearchTerm={searchTerm} />
       <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
       <ProductPhotosPage productId={dataset.id} />
