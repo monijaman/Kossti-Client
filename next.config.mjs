@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    reactRoot: true, // Enable React 19 features
+  },
   // i18n: {
   //   locales: ['en', 'bn', 'fr', 'es', 'de'], // Add your supported locales here
   //   defaultLocale: 'en', // Set your default locale
