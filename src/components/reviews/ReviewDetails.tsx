@@ -17,7 +17,7 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
 
   const review = await fetchPublicReviewsByProductId(productId, countryCode);
 
-
+  console.log('reviewreview', productId)
 
   return (
     <div>

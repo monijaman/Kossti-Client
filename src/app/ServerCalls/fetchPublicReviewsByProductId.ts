@@ -14,7 +14,7 @@ const fetchPublicReviewsByProductId = async (id: number, locale?: string) => {
   const fullUrl = `${apiUrl}/public-reviews/${id}/?${queryString}`;
 
   try {
-    const response = await fetch(fullUrl, { cache: "no-store" }); // Use `no-store` to prevent caching
+    const response = await fetch(fullUrl); // Use `no-store` to prevent caching
     if (!response.ok) {
       throw new Error(`Failed to fetch reviews: ${response.statusText}`);
     }

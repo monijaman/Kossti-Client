@@ -23,12 +23,10 @@ const Page = async (props: PageProps) => {
 
   // Fetch product data
   const dataset = await fetchProductBySlug(slug, countryCode);
-
   const searchTerm =
     Array.isArray(searchParams.searchterm)
       ? searchParams.searchterm.join(',') // Convert array to a comma-separated string
       : searchParams.searchterm || ''; // Use string directly or fallback to an empty string
-
   return (
     <PageWrapper searchParams={searchParams}>
       <SearchBox initialSearchTerm={searchTerm} />

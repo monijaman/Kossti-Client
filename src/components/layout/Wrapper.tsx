@@ -46,11 +46,10 @@ export default async function PageWrapper({ children, searchParams }: PageWrappe
         searchTerm,
     };
 
-    console.log('ddd', accessToken)
 
     return (
         <MainLayout accessToken={accessToken} countryCode={countryCode} sidebarProps={sidebarProps}>
-            33333333333 {searchParams.category}  {children}
+            {children}
         </MainLayout>
     );
 }
