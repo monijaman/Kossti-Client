@@ -1,11 +1,12 @@
 import fetchProductBySlug from '@/app/ServerCalls/fetchProductBySlug';
-import MainLayout from '@/components/layout/MainLayout';
+import PageWrapper from '@/components/layout/Wrapper';
 import ProducDetails from '@/components/Products/ProducDetails';
 import ProductPhotosPage from '@/components/reviews/ProductPhotos';
 import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
 import { SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
+
 interface PageProps {
   params: Promise<{
     category: string; // category parameter
@@ -27,13 +28,13 @@ const Page = async (props: PageProps) => {
   const searchTerm = searchParams.searchterm || '';
 
   return (
-    <MainLayout>
+    <PageWrapper >
       <SearchBox initialSearchTerm={searchTerm} />
       <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
       <ProductPhotosPage productId={dataset.id} />
       <ReviewDetails productId={dataset.id} />
       <ProducDetails product={dataset} />
-    </MainLayout>
+    </PageWrapper>
   );
 };
 

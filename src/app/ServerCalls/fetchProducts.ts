@@ -1,6 +1,22 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+interface ProductData {
+  products: any[]; // Replace `any` with the actual product type
+  totalProducts: number;
+}
 
-// Reusable function to fetch products
+interface FetchSuccessResponse {
+  success: true;
+  products: any[];
+  totalProducts: number;
+}
+
+interface FetchErrorResponse {
+  success: false;
+  products: [];
+  totalProducts: 0;
+}
+
+type FetchResponse = FetchSuccessResponse | FetchErrorResponse;
+
 const fetchProductData = async (
   page: number,
   limit: number,
@@ -8,46 +24,38 @@ const fetchProductData = async (
   brands?: string,
   priceRange?: string,
   searchTerm?: string,
-  locale?: string,
-  sortby?: string
-) => {
+  locale?: string
+): Promise<FetchResponse> => {
   const params: Record<string, string> = {
     page: page.toString(),
     limit: limit.toString(),
   };
 
-  // Add optional parameters only if they are defined
   if (category) params.category = category;
   if (brands) params.brand = brands;
   if (priceRange) params.pricerange = priceRange;
   if (searchTerm) params.searchterm = searchTerm;
   if (locale) params.locale = locale;
-  if (sortby) params.sortby = sortby;
 
-  // Build the query string
   const queryString = new URLSearchParams(params).toString();
-
-  // Ensure API URL is defined
-  if (!apiUrl) {
-    return Promise.reject(
-      new Error("API URL is not defined in environment variables")
-    );
-  }
-
-  const fullUrl = `${apiUrl}/products?${queryString}`;
+  const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}/products?${queryString}`;
 
   try {
     const response = await fetch(fullUrl);
-    const dataset = await response.json();
+    const data = await response.json();
 
     return {
       success: true,
-      data: dataset,
-      totalProducts: dataset.totalProducts,
+      products: data.products || [],
+      totalProducts: data.totalProducts || 0,
     };
   } catch (error) {
     console.error("Error fetching products:", error);
-    return { success: false, data: [] };
+    return {
+      success: false,
+      products: [],
+      totalProducts: 0,
+    };
   }
 };
 
