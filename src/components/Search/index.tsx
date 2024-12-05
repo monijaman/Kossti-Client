@@ -7,6 +7,7 @@ import useDebounce from '@/lib/useDebounce';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
 const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
@@ -31,15 +32,11 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
         }
     }, []); // Run only on component mount
 
-
-
     // Handle search input change and update suggestions
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchTag = e.target.value;
         setSearchTerm(searchTag)
-
     };
-
 
     // Handle search input change and update suggestions
     const fetchData = async () => {
@@ -66,12 +63,10 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                 console.error('Error fetching suggestions:', error);
             }
         } else {
-
             setShowSuggestions(false)
             setSuggestions([]); // Clear suggestions when input is empty
         }
     };
-
 
     return (
         <div className="relative w-full pb-4">
@@ -116,7 +111,6 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                             </li>
                         ))}
                     </ul>
-
                 </div>
             )}
         </div>
