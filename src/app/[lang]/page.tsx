@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE } from "@/lib/constants";
 
 import { cookies } from 'next/headers';
 interface PageProps {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
 // Define the type for valid locale keys
@@ -26,16 +26,11 @@ const Page = async (props: PageProps) => {
     ? searchParams.category.join(',')
     : searchParams.category || '';
 
-  const activeBrands = Array.isArray(searchParams.brand)
-    ? searchParams.brand.join(',')
-    : searchParams.brand || '';
+  const activeBrands = searchParams.brand || '';
 
-  const activePriceRange = Array.isArray(searchParams.price)
-    ? searchParams.price.join(',')
-    : searchParams.price || '';
-  const searchTerm = Array.isArray(searchParams.searchterm)
-    ? searchParams.searchterm.join(',')
-    : searchParams.searchterm || ''; const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE;; // Default to 'en' if not found
+  const activePriceRange = searchParams.price || '';
+  const searchTerm = searchParams.searchterm || '';
+  const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE;; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);
