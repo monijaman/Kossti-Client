@@ -33,6 +33,7 @@ const VideoGrid = ({ dataset, productId }: VideoGridProps) => {
         incrementViewsFunc();
     }, [])
 
+
     // Open the modal with the selected video URL
     const openModal = (url: string) => {
         setSelectedVideoUrl(url);
