@@ -1,3 +1,5 @@
+const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1"; // Update to match your API structure
+
 interface ProductData {
   products: any[]; // Replace `any` with the actual product type
   totalProducts: number;
@@ -38,7 +40,7 @@ const fetchProductData = async (
   if (locale) params.locale = locale;
 
   const queryString = new URLSearchParams(params).toString();
-  const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}/products?${queryString}`;
+  const fullUrl = `${apiUrl}/products?${queryString}`;
 
   try {
     const response = await fetch(fullUrl);

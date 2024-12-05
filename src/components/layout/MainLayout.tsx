@@ -20,6 +20,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, sidebarProps, accessToken, countryCode }: MainLayoutProps) => {
 
+  console.log('sidebarPropssidebarProps', sidebarProps)
   // const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
   return (

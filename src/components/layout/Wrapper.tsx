@@ -5,7 +5,7 @@ import MainLayout from './MainLayout';
 
 interface PageWrapperProps {
     children: ReactNode;
-    // searchParams: Record<string, string | string[] | undefined>;
+    searchParams: Record<string, string | string[] | undefined>;
 }
 
 interface SearchParams {
@@ -15,11 +15,11 @@ interface SearchParams {
     searchterm?: string | string[];
 }
 
-export default async function PageWrapper({ children }: PageWrapperProps) {
+export default async function PageWrapper({ children, searchParams }: PageWrapperProps) {
     const cookieStore = cookies();
     const accessToken = (await cookieStore).get('accessToken')?.value || null;
     const countryCode = (await cookieStore).get('country-code')?.value || DEFAULT_LOCALE;
-    const searchParams = (await cookieStore).get('searchParams')?.value as SearchParams || {};
+    // const searchParams = (await cookieStore).get('searchParams')?.value as SearchParams || {};
 
     // Type assertion for searchParams to have the correct shape
     const activeCategory = Array.isArray(searchParams.category)
@@ -46,9 +46,11 @@ export default async function PageWrapper({ children }: PageWrapperProps) {
         searchTerm,
     };
 
+    console.log('ddd', accessToken)
+
     return (
         <MainLayout accessToken={accessToken} countryCode={countryCode} sidebarProps={sidebarProps}>
-            {children}
+            33333333333 {searchParams.category}  {children}
         </MainLayout>
     );
 }

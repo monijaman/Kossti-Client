@@ -59,7 +59,7 @@ const Page = async (props: PageProps) => {
     <>
 
 
-      <PageWrapper >
+      <PageWrapper searchParams={searchParams}>
         <SearchBox initialSearchTerm={searchTerm} />
 
         <ProductReview products={dataset.products} countryCode={countryCode} />
