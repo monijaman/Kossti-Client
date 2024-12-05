@@ -15,16 +15,12 @@ const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
     const fetchPhotos = async () => {
         const response = await getPhotosByProductId(productId);
         setPhotos(response.data);
-
     };
 
     // Await the fetch to get the actual data
-
-
     useEffect(() => {
         fetchPhotos();
     }, [])
-
 
     return (
 
