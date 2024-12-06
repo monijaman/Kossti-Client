@@ -38,7 +38,7 @@ export const useReviews = () => {
     const fullUrl = `${apiUrl}/products?${queryString}`;
 
     try {
-      const response = await fetch(fullUrl);
+      const response = await fetch(fullUrl, { cache: "no-store" });
       const dataset = await response.json();
 
       return {
@@ -307,7 +307,7 @@ export const useReviews = () => {
     const fullUrl = `${apiUrl}/public-reviews/${id}/?${queryString}`;
 
     try {
-      const response = await fetch(fullUrl);
+      const response = await fetch(fullUrl, { cache: "no-store" });
       const dataset = await response.json();
 
       return {
