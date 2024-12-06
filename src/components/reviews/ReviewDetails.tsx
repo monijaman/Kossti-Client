@@ -2,6 +2,8 @@ import VideoAndLinks from '@/components/reviews/SourceMedia';
 import { useReviews } from '@/hooks/useReviews';
 import { Review } from '@/lib/types';
 import { cookies } from 'next/headers';
+import styles from './ReviewDetails.module.scss';
+
 interface revieResponse {
   success: boolean,
   data: Review,
@@ -31,15 +33,11 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
       {review.success ? (
         <div className="p-4 bg-white border rounded shadow-md">
 
-          <div className="mb-4">
-            <span className="text-gray-600">Review: </span>
+          <div className={`mb-4 ${styles['review-section']}`}>
             <div className="text-gray-800" dangerouslySetInnerHTML={{ __html: review.data.reviews }} />
           </div>
 
-          <div className="mb-4">
-            <span className="text-gray-600">Price: </span>
-            <span className="font-bold text-lg">${review.data.price}</span>
-          </div>
+
           <div className="mb-4">
             <span className="text-gray-600">Rating: </span>
             <span className="font-bold text-lg">{review.data.rating} / 5</span>
