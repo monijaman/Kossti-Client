@@ -19,7 +19,7 @@ export const useSpecifications = () => {
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
+      const response = await fetch(fullUrl, { cache: "no-store" }); // Adjust API endpoint
       const dataset = await response.json();
 
       return {
@@ -44,7 +44,7 @@ export const useSpecifications = () => {
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
+      const response = await fetch(fullUrl, { cache: "no-store" }); // Adjust API endpoint
       const dataset = await response.json();
 
       return {
@@ -262,7 +262,7 @@ export const useSpecifications = () => {
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
+      const response = await fetch(fullUrl, { cache: "no-store" }); // Adjust API endpoint
       const dataset = await response.json();
 
       return {

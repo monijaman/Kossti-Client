@@ -61,7 +61,7 @@ const useSpecificationsKeys = () => {
     const apiEndpoint = `/api/get?${params.toString()}`;
 
     try {
-      const response = await fetch(apiEndpoint); // Adjust API endpoint
+      const response = await fetch(apiEndpoint, { cache: "no-store" }); // Adjust API endpoint
 
       const dataset = await response.json();
       return dataset;
