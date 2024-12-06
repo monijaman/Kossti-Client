@@ -1,9 +1,9 @@
 'use client'
-import { FormEvent, useEffect, useState } from 'react';
 import KeyForm from "@/components/admin/keys/KeyForm";
 import KeyTransForm from "@/components/admin/keys/KeyTransForm";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
+import { useEffect, useState } from 'react';
 
 interface PageProps {
     params: {
@@ -21,16 +21,13 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
         const response = await getSpecificationsKeysById(id);
         if (response.success) {
             setKey(response.data)
-
         }
-
     };
 
     useEffect(() => {
         if (id) {
             fetchKeys();
         }
-
     }, [])
 
     return (
@@ -39,9 +36,8 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
                 <div className="w-1/2  bg-gray-100 border rounded">
                     <KeyForm speckeyData={key} />
                 </div>
-
                 <div className="w-1/2">
-                {key && <KeyTransForm speckeyData={key} />}
+                    {key && <KeyTransForm speckeyData={key} />}
                 </div>
             </div>
         </>

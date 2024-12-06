@@ -3,6 +3,7 @@
 import KeyDetails from '@/components/admin/keys/KeyDetails';
 import Pagination from '@/components/Pagination/index';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
@@ -33,7 +34,7 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     const activeCategory = searchParams.category || '';
     const activeBrands = searchParams.brand || '';
     const activePriceRange = searchParams.price || '';
-    const locale = searchParams.locale || 'bn';
+    const locale = searchParams.locale || DEFAULT_LOCALE;
 
 
     const fetchKeys = async () => {
@@ -71,16 +72,18 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
     return (
         <div>
             <h2 className="text-2xl font-bold mb-4"> Specification Keys</h2>
-            <Link className='bg-blue-500 text-white px-2 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
+            <Link className='bg-blue-500 text-white p-4 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
 
+            <div className='my-4'>
 
-            <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                placeholder="Search products..."
-                className="border border-gray-300 p-2 w-full rounded"
-            />
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search products..."
+                    className="border border-gray-300 p-2 w-full rounded"
+                />
+            </div>
 
             {/* Add your review management functionalities here */}
             <KeyDetails

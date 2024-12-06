@@ -1,11 +1,9 @@
 "use client";
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { SpecificationKey, SpecKeyTranslation } from '@/lib/types'; // Assuming you have a Product type
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
 import useSpecificationsKeys from "@/hooks/useSpecificationsKeys";
 import { LOCALES } from '@/lib/constants';
+import { SpecificationKey, SpecKeyTranslation } from '@/lib/types'; // Assuming you have a Product type
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 
 interface PageProps {
@@ -20,6 +18,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
     const [translations, setTranslations] = useState<SpecKeyTranslation>();
+    const router = useRouter();
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -32,16 +31,16 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
 
     const fetchKeyTranslation = async () => {
         if (speckeyId !== null) {
-          
+
             const response = await getKeysTranslationById({
                 key_id: speckeyData.id ?? undefined,
                 locale: selectedTranslation,
-              });
-              
+            });
+
             if (response.success && response.data.translated_key) {
                 setTranslated_key(response.data.translated_key)
 
-            }  
+            }
         }
     };
 
@@ -50,18 +49,18 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
     // Select 'bn' translation by default on mount
     useEffect(() => {
         handleLanguageSwitch('bn');
- 
+
     }, []);
- 
+
     useEffect(() => {
         if (speckeyData && speckeyData.id) {
-          setSpeckeyId(speckeyData.id);
-          fetchKeyTranslation();
+            setSpeckeyId(speckeyData.id);
+            fetchKeyTranslation();
 
         }
-      }, [ speckeyData, selectedTranslation]);
+    }, [speckeyData, selectedTranslation]);
 
-      
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -88,6 +87,10 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
 
             if (response.success) {
                 setSubmitStatus('Form Submitted successfully');
+
+                setTimeout(() => {
+                    router.push(`/admin/keys`); // Redirect to the product's page
+                }, 1000);
             } else {
                 console.error('Error submitting form', response);
             }
@@ -123,7 +126,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="name"
                         type="text"
-                        placeholder="Enter product name"
+                        placeholder="Enter Key name"
                         value={translated_key}
                         onChange={(e) => setTranslated_key(e.target.value)}
                     />
@@ -134,7 +137,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
                     >
-                        {speckeyId ? 'Update Product' : 'Create Product'}
+                        {speckeyId ? 'Update Translation' : 'Create Key'}
                     </button>
                 </div>
 

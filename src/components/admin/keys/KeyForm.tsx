@@ -37,9 +37,15 @@ const KeyForm = ({ speckeyData }: PageProps) => {
             // Update existing product
             const response = await submitSpecificationsKeys({ speckeyId, speckey });
 
+            console.log(response)
             if (response.success) {
-                setSubmitStatus(response.data.message);
+                setSubmitStatus("Key created successfully");
                 setLoading(false)
+                const keyId = response.data.id;
+
+                setTimeout(() => {
+                    router.push(`/admin/keys/manage/${keyId}`); // Redirect to the product's page
+                }, 1000);
             } else {
                 setLoading(false)
                 setSubmitStatus(response.error);
@@ -64,7 +70,7 @@ const KeyForm = ({ speckeyData }: PageProps) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     id="specification_key"
                     type="text"
-                    placeholder="Enter product name"
+                    placeholder="Enter key name"
                     value={speckey && speckey}
                     onChange={(e) => setSpeckey(e.target.value)}
                     required
@@ -80,7 +86,7 @@ const KeyForm = ({ speckeyData }: PageProps) => {
                     type="submit"
                     disabled={loading}
                 >
-                    {loading ? 'Submitting...' : speckeyId ? 'Update Product' : 'Create Product'}
+                    {loading ? 'Submitting...' : speckeyId ? 'Update Key' : 'Create Key'}
                 </button>
             </div>
 
