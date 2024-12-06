@@ -74,7 +74,7 @@ export const useProducts = () => {
     const fullUrl = `${apiUrl}/products/${slug}?${queryString}`;
 
     try {
-      const response = await fetch(fullUrl);
+      const response = await fetch(fullUrl, { cache: "no-cache" });
       const dataset = await response.json();
 
       return {
