@@ -1,18 +1,17 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
-import dynamic from 'next/dynamic';
-import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
+import { useReviews } from '@/hooks/useReviews';
+import dynamic from 'next/dynamic';
+import React, { useEffect, useRef, useState } from 'react';
 
 import ReviewTransForm from '@/components/admin/reviews/ReviewTransForm';
-import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
-import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
 import Modal from '@/components/Modal/client';
+import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
+import DragNdrop from "@/components/Uploader/Uploader";
+import { AdditionalDetails, Product, ProductTranslation, Review } from '@/lib/types';
+import 'react-quill/dist/quill.snow.css'; // Import styles
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; // Import styles
-import DragNdrop from "@/components/Uploader/Uploader";
-
 interface PageProps {
     params: {
         id: number; // Type for the slug
@@ -90,7 +89,15 @@ const ReviewForm = ({ params }: PageProps) => {
                 reviews,
                 additionalDetails,
             );
-            setFormStatus('Review submitted!');
+
+            if (response.success) {
+                setFormStatus(response.data.message);
+
+                if (!reviewData) {
+                    location.reload()
+                }
+
+            }
         } catch (error) {
             console.error('Error submitting review:', error);
         }
@@ -138,14 +145,14 @@ const ReviewForm = ({ params }: PageProps) => {
                         />
 
                         {/* Rich Text Editor for Reviews */}
-                        <div className="row" style={{ minHeight: '320px' }}>
+                        <div className="row"  >
                             <label htmlFor="reviews" className="block mb-2">Review</label>
                             <ReactQuill
                                 value={reviews}
                                 onChange={setReviews}
                                 className="mb-4"
                                 id="reviews"
-                                style={{ backgroundColor: '#f9f9f9', height: '200px' }}
+                                style={{ backgroundColor: '#f9f9f9', overflow: 'hidden', minHeight: '100px', height: 'auto' }}
                             />
                             {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                         </div>
@@ -180,10 +187,10 @@ const ReviewForm = ({ params }: PageProps) => {
                 </div>
 
                 {/* Translation Form */}
-                {reviewData && 
-                <div className="w-1/2">
-                    <ReviewTransForm productId={id} productName={productName} translations={reviewData.translations} />
-                </div>
+                {reviewData &&
+                    <div className="w-1/2">
+                        <ReviewTransForm productId={id} productName={productName} translations={reviewData.translations} />
+                    </div>
                 }
             </div>
         </>

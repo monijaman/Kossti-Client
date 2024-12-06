@@ -150,7 +150,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                     </div>
 
                     {/* Review Input */}
-                    <div className="relative min-h-[400px]">
+                    <div className="relative">
                         <label htmlFor="review" className="block text-sm font-medium  text-gray-700 mb-2">Review ({selectedTranslation.locale})</label>
                         <ReactQuill
                             value={selectedTranslation.review || ''}
@@ -162,9 +162,9 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                             modules={{
                                 clipboard: { matchVisual: false }
                             }}
-                            className="w-full mb-4 border border-gray-300 rounded-md"
+                            className="w-full mb-4   rounded-md"
                             id="review"
-                            style={{ height: "350px", backgroundColor: "#f9f9f9" }}
+                            style={{ overflow: 'hidden', minHeight: '100px', height: 'auto' }}
                         />
                     </div>
 
