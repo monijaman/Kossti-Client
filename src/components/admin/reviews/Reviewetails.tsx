@@ -63,13 +63,13 @@ const Reviewetails = ({ reviews }: PageProps) => {
                 </Link>
                 <Link
                   href={`products/${dataset.id}`}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
+                  className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition duration-200"
                 >
                   Product
                 </Link>
                 <Link
                   href={`specifications/${dataset.id}`}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
+                  className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition duration-200"
                 >
                   Spect
                 </Link>
