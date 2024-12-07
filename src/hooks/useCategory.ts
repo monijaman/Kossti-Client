@@ -145,12 +145,13 @@ export const useCategory = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       // Return the JSON response
-      return await response.json();
+      const dataset = await response.json();
+      console.log("dataset", dataset);
+      return dataset;
     } catch (error) {
-      console.error("Error submitting specifications:", error);
-      throw error; // Properly propagate the error
+      // console.error("Error submitting specifications:", error);
+      // throw error; // Properly propagate the error
     }
   };
 

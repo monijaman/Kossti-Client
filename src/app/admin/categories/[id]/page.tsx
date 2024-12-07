@@ -26,17 +26,17 @@ const Specification = ({ params }: PageProps) => {
     const [activeBrands, setActiveBrands] = useState<Brand[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id);
-    const [productName, setProductName] = useState<string>('');
     const [formStatus, setFormStatus] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     // Fetch categories
     const fetchCategories = async () => {
         try {
             const categoriesResponse = await getCategories({
-                perPage: 10,
+                perPage: undefined,
                 search: '',
-                paginate: 'true',
-                locale: 'en',
+                paginate: 'false',
+                locale: undefined,
                 categoryId: '',
             });
             if (categoriesResponse.success) {
@@ -101,13 +101,15 @@ const Specification = ({ params }: PageProps) => {
 
     // Handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        setLoading(true);
         event.preventDefault();
         const response = await submitBrands(selectedCategory ?? 0, activeBrands);
         if (response.success) {
-            setFormStatus(response.data.message);
+            setFormStatus("Brand added successfully");
         } else {
             setFormStatus("Failed to submit data");
         }
+        setLoading(false);
     };
 
     return (
@@ -123,7 +125,7 @@ const Specification = ({ params }: PageProps) => {
                         name="category"
                         value={categories
                             .map((cat) => ({ value: cat.id, label: cat.name }))
-                            .find((option) => option.value === selectedCategory) || null}
+                            .find((option) => option.value == selectedCategory) || null}
                         onChange={handleCategoryChange}
                         options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
                         className="block w-full"
@@ -169,18 +171,22 @@ const Specification = ({ params }: PageProps) => {
                     >
                         Add More
                     </button>
+
+
                     <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
-                        className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+                        disabled={loading}
                     >
-                        Submit
+                        {loading ? 'Submitting...' : 'Save  Brand'}
                     </button>
+
                 </div>
 
                 {/* Form Status Message */}
                 {formStatus && (
                     <div
-                        className={`p-4 mt-4 text-sm rounded-lg ${formStatus.includes('success') ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
+                        className={`p-4 mt-4 text-sm rounded-lg ${formStatus.includes('successfully') ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
                     >
                         {formStatus}
                     </div>

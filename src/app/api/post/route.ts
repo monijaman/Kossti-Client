@@ -55,7 +55,7 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
         return NextResponse.json(
           {
             success: false,
-            error: resJson.error || "Unknown error",
+            ...resJson,
           },
           { status: response.status }
         );

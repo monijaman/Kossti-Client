@@ -39,7 +39,7 @@ const CategoryForm = ({ categoryData }: PageProps) => {
                 setLoading(false)
             } else {
                 setLoading(false)
-                setSubmitStatus(response.error);
+                setSubmitStatus(response.message);
             }
         } catch (error) {
             console.error('Error submitting form', error);
@@ -75,7 +75,7 @@ const CategoryForm = ({ categoryData }: PageProps) => {
                     type="submit"
                     disabled={loading}
                 >
-                    {loading ? 'Submitting...' : categoryId ? 'Update Product' : 'Create Product'}
+                    {loading ? 'Submitting...' : categoryId ? 'Update Category' : 'Create Category'}
                 </button>
             </div>
 
