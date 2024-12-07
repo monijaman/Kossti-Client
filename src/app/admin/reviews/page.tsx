@@ -29,7 +29,7 @@ const ManageReviews = ({ params, searchParams }: PageProps) => {
 
   const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
   const page = parseInt(searchParams.page as string, 10) || 1;
-  const limit = 10;
+  const limit = 12;
 
   // State to hold reviews and total products
   const [reviews, setReviews] = useState<reviweData[]>([]);

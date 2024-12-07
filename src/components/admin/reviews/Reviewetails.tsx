@@ -71,7 +71,7 @@ const Reviewetails = ({ reviews }: PageProps) => {
                   href={`specifications/${dataset.id}`}
                   className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition duration-200"
                 >
-                  Spect
+                  Specs
                 </Link>
               </td>
             </tr>

@@ -128,11 +128,11 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="price"
-                        type="number"
-                        step="0.01"
+                        type="text"
+
                         placeholder="Enter product price"
                         value={price}
-                        onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => setPrice(e.target.value || 0)}
                     />
                 </div>
 
