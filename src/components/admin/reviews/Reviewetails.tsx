@@ -61,12 +61,18 @@ const Reviewetails = ({ reviews }: PageProps) => {
                 >
                   Edit
                 </Link>
-                {/* <Link
-                  href={`reviews/${dataset.id}`}
+                <Link
+                  href={`products/${dataset.id}`}
                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
                 >
-                  Delete
-                </Link> */}
+                  Product
+                </Link>
+                <Link
+                  href={`specifications/${dataset.id}`}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
+                >
+                  Spect
+                </Link>
               </td>
             </tr>
           ))}
