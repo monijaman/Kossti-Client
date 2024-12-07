@@ -1,10 +1,11 @@
   {
     "title": "Welcome to ReviewHub",
     "content": "Find honest reviews and ratings to make better decisions.",
-    "latest_review": "Latest User Reviews",
+    "latest_review": "Latest   Reviews",
     "category": "Categoriy",
     "brand": "Categorie",
     "clear_Category": "Clear Selected Categories",
+    "clear_brand": "Clear Brand",
     "search_products": "Search Product",
     "popular_product": "Popular Products This Week",
     "featured_reviews": "Top Expert Reviews",

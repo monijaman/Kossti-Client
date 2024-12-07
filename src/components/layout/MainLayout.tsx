@@ -6,6 +6,8 @@ import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import { useTranslation } from "@/hooks/useLocale";
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import { cookies } from 'next/headers';
+import Image from 'next/image';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 interface MainLayoutProps {
   children: ReactNode;
@@ -24,8 +26,23 @@ const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
   const translation = useTranslation(countryCode);
   return (
     <div className="min-h-screen flex flex-col mx-auto">
-      <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">CritBrit   </h1>
+      <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
+
+        <Link href="/">
+          <Image
+            src="/kossti.png"
+            alt="Kosti"
+            style={{
+              width: "auto",
+              height: "90px",
+            }}
+            width={300}
+            height={90}
+            className="rounded"
+          />
+        </Link>
+
+
         <div className="ml-auto flex items-center space-x-4">
 
           <AccountDropdown isAuthenticated={!!accessToken} />

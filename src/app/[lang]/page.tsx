@@ -53,7 +53,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
       <MainLayout sidebarProps={sidebarProps}>
         <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-        <PopularProducts countryCode={countryCode} />
 
         <ProductReview products={dataset.products} countryCode={countryCode} />
         <Pagination
@@ -62,6 +61,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
           currentPage={page}
           totalPages={totalPages}
         />
+        <PopularProducts countryCode={countryCode} />
       </MainLayout>
     </>
   );
