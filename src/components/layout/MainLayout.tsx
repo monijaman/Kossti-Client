@@ -27,7 +27,6 @@ const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
-        <h1 className='text-[3rem] text-black'>KOSTI</h1>
         <Link href="/">
           <Image
             src="/kossti.png"
