@@ -50,23 +50,23 @@ const Reviewetails = ({ reviews }: PageProps) => {
               <td className="py-3 px-4 border">{dataset.review.rating}</td>
               <td className="py-3 px-4 border text-center">
                 <Link
-                  href={`reviews/${dataset.id}`}
+                  href={`reviews/${dataset.product.id}`}
                   className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition duration-200"
                 >
                   View
                 </Link>
                 <Link
-                  href={`reviews/${dataset.id}`}
+                  href={`reviews/${dataset.product.id}`}
                   className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600 transition duration-200"
                 >
                   Edit
                 </Link>
-                <Link
+                {/* <Link
                   href={`reviews/${dataset.id}`}
                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
                 >
                   Delete
-                </Link>
+                </Link> */}
               </td>
             </tr>
           ))}
