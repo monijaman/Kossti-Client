@@ -10,16 +10,14 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
     const [brands, setBrands] = useState<Brand[]>();
     const fetchbrands = async () => {
         // Fetch brand data server-side
+        const response = await getCategoryRelBrands({
+            category_id: undefined,
+            category_slug: activeCategory,
+            locale: countryCode,
+        });
 
-        if (activeCategory) {
-            const response = await getCategoryRelBrands({
-                category_id: undefined,
-                category_slug: activeCategory,
-                locale: countryCode,
-            });
+        setBrands(response.success ? response.data.data : []);
 
-            setBrands(response.success ? response.data.data : []);
-        }
     }
 
     useEffect(() => {

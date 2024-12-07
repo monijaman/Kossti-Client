@@ -15,9 +15,9 @@ const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searc
       <Categories category={activeCategory} locale={countryCode} />
 
 
-      {activeCategory &&
-        <BrandsListClient selectedBrands={selectedBrands} activeCategory={activeCategory} searchTerm={searchTerm} countryCode={countryCode} />
-      }
+
+      <BrandsListClient selectedBrands={selectedBrands} activeCategory={activeCategory} searchTerm={searchTerm} countryCode={countryCode} />
+
 
     </aside>
   );
