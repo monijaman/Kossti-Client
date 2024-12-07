@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/useLocale";
 import { useProducts } from '@/hooks/useProducts';
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import { Product, SearchBoxProps } from '@/lib/types';
@@ -8,13 +9,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) => {
+const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
     const { getProducts } = useProducts()
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
     const [locale, setLocale] = useState(DEFAULT_LOCALE); // Initialize with default locale
+    const translation = useTranslation(countryCode ?? DEFAULT_LOCALE);
+
     useEffect(() => {
         if (debouncedSearchTerm) {
             fetchData();
@@ -74,7 +77,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '' }: SearchBoxProps) =
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                placeholder="Search products..."
+                placeholder={translation.search_products}
                 className="border border-gray-300 p-2 w-full rounded"
             />
 

@@ -73,6 +73,7 @@ export interface ProductApiResponse {
 export interface SearchBoxProps {
   initialSearchTerm?: string;
   searchUrl?: string;
+  countryCode?: string;
 }
 
 export interface SearchParams {

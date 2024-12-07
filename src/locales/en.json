@@ -1,9 +1,18 @@
-{
-    "title": "Welcome",
-    "content": "This is the English content.",
-    "latest_review": " Latest Reviews",
-    "clear_Category": " Clear Categories",
-    "popupar_product": " Popular Products",
-    "copyright": "© 2024 Your Site. All rights reserved."
+  {
+    "title": "Welcome to ReviewHub",
+    "content": "Find honest reviews and ratings to make better decisions.",
+    "latest_review": "Latest User Reviews",
+    "category": "Categoriy",
+    "brand": "Categorie",
+    "clear_Category": "Clear Selected Categories",
+    "search_products": "Search Product",
+    "popular_product": "Popular Products This Week",
+    "featured_reviews": "Top Expert Reviews",
+    "submit_review": "Write a Review and Share Your Opinion",
+    "categories": "Browse Categories for Detailed Insights",
+    "contact_us": "Contact Us for Support or Feedback",
+    "privacy_policy": "Privacy Policy - Your Data Matters to Us",
+    "terms_conditions": "Terms and Conditions - Know Your Rights",
+    "copyright": "© 2024 ReviewHub. All rights reserved."
   }
   

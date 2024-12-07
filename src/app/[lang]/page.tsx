@@ -4,6 +4,7 @@ import PopularProducts from '@/components/Products/PopularProducts';
 import ProductReview from '@/components/Products/ProductReview';
 import SearchBox from '@/components/Search';
 import { useProducts } from '@/hooks/useProducts';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { SearchParams } from "@/lib/types";
 import { cookies } from 'next/headers';
 interface PageProps {
@@ -28,7 +29,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);
@@ -51,7 +52,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
 
       <MainLayout sidebarProps={sidebarProps}>
-        <SearchBox initialSearchTerm={searchTerm} />
+        <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+        <PopularProducts countryCode={countryCode} />
 
         <ProductReview products={dataset.products} countryCode={countryCode} />
         <Pagination
@@ -60,7 +62,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
           currentPage={page}
           totalPages={totalPages}
         />
-        <PopularProducts countryCode={countryCode} />
       </MainLayout>
     </>
   );

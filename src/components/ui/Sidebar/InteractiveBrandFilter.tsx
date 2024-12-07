@@ -1,12 +1,15 @@
 'use client';
 
+import { useTranslation } from "@/hooks/useLocale";
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { Brand, SidebarParams } from '@/lib/types';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
-
-const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm }: SidebarParams) => {
+const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm, countryCode }: SidebarParams) => {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
+    const translation = useTranslation(countryCode ?? DEFAULT_LOCALE);
+
     // Update the URL whenever the selected brands change
     useEffect(() => {
         if (!searchTerm) {
@@ -78,7 +81,7 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             </div>
 
             <a href="/" className="text-blue-500 hover:underline mb-4 block">
-                Clear Brands
+                {translation.clear_brand}
             </a>
         </>
     );

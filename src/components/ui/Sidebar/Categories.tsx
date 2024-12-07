@@ -3,6 +3,7 @@ import { useTranslation } from "@/hooks/useLocale";
 import { DEFAULT_LOCALE } from "@/lib/constants";
 import { categoryInt, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
+
 const Categories = async ({ category }: SearchParams) => {
   // const Categories: FC<{ searchParams?: SearchParams }> = async ({ searchParams = {} }) => {
   const { getCategories } = useCategory();
@@ -25,7 +26,7 @@ const Categories = async ({ category }: SearchParams) => {
   const clearCategoryUrl = `/`;
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">{translation.title}</h2>
+      <h2 className="text-lg font-semibold mb-4">{translation.category}</h2>
       <div className="mb-4">
         <div className="mb-4">
           {dataset &&
@@ -47,7 +48,7 @@ const Categories = async ({ category }: SearchParams) => {
         href={clearCategoryUrl}
         className="text-blue-500 hover:underline mb-4 block"
       >
-        {translation.clear_Category}
+        {translation.clear_category}
       </a>
     </>
   );
