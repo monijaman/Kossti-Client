@@ -6,7 +6,7 @@ const nextConfig = {
   //   localeDetection: false, // Automatically detect user locale (default is true)
   // },
   images: {
-    domains: ['127.0.0.1', 'img.youtube.com', 'localhost', 'viper.monirspace.com'], // Add your local domains here
+    domains: ['127.0.0.1', 'img.youtube.com', 'kossti.com', 'localhost', 'viper.monirspace.com'], // Add your local domains here
     unoptimized: true,
   },
 };
