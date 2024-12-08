@@ -21,8 +21,6 @@ const CategoryForm = ({ categoryData }: PageProps) => {
         setCategoryId(categoryData?.id || null); // Fallback to null
     }, [categoryData]);
 
-
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true)
@@ -52,7 +50,7 @@ const CategoryForm = ({ categoryData }: PageProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="rounded px-8 pt-6 pb-8 mb-4">
-            {/* Product Name */}
+
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                     Category  Name {category}
