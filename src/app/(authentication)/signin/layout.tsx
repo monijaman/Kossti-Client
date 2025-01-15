@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-interface AuthLayoutProps {
+interface pageProps {
   children: ReactNode;
 }
 
-export default function DashboardLayout({ children }: AuthLayoutProps) {
+export default function DashboardLayout({ children }: pageProps) {
   return <>{children}</>;
 }

@@ -11,13 +11,13 @@ export async function POST(req: NextRequest) {
 
     // Parse the request body
     const body = await req.json();
-    const { prompt } = body;
+    const { messages } = body;
 
-    if (!prompt) {
+    if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
         {
           success: false,
-          error: "Prompt is required",
+          error: "Messages array is required",
         },
         { status: 400 }
       );
@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
 
     // Call OpenAI API
     const response = await openai.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
+      messages,
       model: "gpt-4", // or 'gpt-3.5-turbo'
-      max_tokens: 150,
+      max_tokens: 2000,
     });
 
     const content = response.choices[0]?.message?.content || "";

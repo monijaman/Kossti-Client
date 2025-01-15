@@ -1,30 +1,65 @@
-'use client'
+'use client';
 import { useState } from 'react';
 
 const ChatComponent = () => {
-    const [prompt, setPrompt] = useState('');
-    const [response, setResponse] = useState('');
+    const [messages, setMessages] = useState([
+        { role: 'assistant', content: 'Hello! How can I assist you today?' },
+    ]);
+    const [userInput, setUserInput] = useState('show now');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!userInput.trim()) return;
+
+        const updatedMessages = [
+            ...messages,
+
+            {
+                role: "system",
+                content:
+                    "You are an expert in consumer electronics. Generate a comprehensive and structured report for a given smartphone model, including specifications, detailed features, pros, cons, use cases, pricing, and comparisons with similar devices in its category."
+            },
+            {
+                role: "user",
+                "content": "Provide a detailed review and specifications for Yamaha MT-15. Include specs, performance, design, features, use cases, pricing, pros/cons, and competitor comparisons. then review in html. then convert to bangla "
+                // "content": "Provide a detailed review of the Walton XANON X90 smartphone including the following details: display size, resolution, aspect ratio, brightness, and protection type; processor details; storage options; camera specifications for both rear and front cameras, including additional features like night mode, portrait mode, and HDR; battery capacity and charging speed; connectivity options; security features; build quality; software features; and audio features. Also, include pros, cons, use cases, pricing, and compare with similar models. data fromat json. key in lower cse. then convert to bangla "
+
+            }
+
+
+        ];
+
+        setMessages(updatedMessages); // Update UI with the user's input immediately
+        setUserInput('');
+
         try {
             const res = await fetch('/api/openai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({ messages: updatedMessages }),
             });
 
             const data = await res.json();
             if (res.ok) {
-                setResponse(data.result);
+                setMessages([
+                    ...updatedMessages,
+                    { role: 'assistant', content: data.result },
+                ]);
             } else {
-                setResponse(`Error: ${data.error}`);
+                setMessages([
+                    ...updatedMessages,
+                    { role: 'assistant', content: `Error: ${data.error}` },
+                ]);
             }
         } catch (error) {
-            console.log(error)
-            setResponse('Something went wrong');
+            console.error('Something went wrong:', error);
+            setMessages([
+                ...updatedMessages,
+                { role: 'assistant', content: 'Something went wrong. Please try again.' },
+            ]);
         }
     };
 
@@ -34,26 +69,33 @@ const ChatComponent = () => {
                 <h1 className="text-2xl font-semibold text-gray-800 mb-4">
                     OpenAI Chat
                 </h1>
+                <div className="flex flex-col space-y-4 mb-6">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`p-4 rounded-lg ${msg.role === 'user'
+                                ? 'bg-blue-100 text-right self-end'
+                                : 'bg-gray-100 text-left self-start'
+                                }`}
+                        >
+                            <p className="text-gray-800 whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                    ))}
+                </div>
                 <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                     <textarea
                         className="w-full p-4 h-32 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Enter your prompt here..."
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        placeholder="Type your message..."
                     />
                     <button
                         type="submit"
                         className="px-6 py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     >
-                        Generate
+                        Send
                     </button>
                 </form>
-                {response && (
-                    <div className="mt-6 p-4 bg-gray-100 border border-gray-300 rounded-lg">
-                        <h2 className="text-lg font-medium text-gray-700 mb-2">Response:</h2>
-                        <p className="text-gray-800 whitespace-pre-wrap">{response}</p>
-                    </div>
-                )}
             </div>
         </div>
     );
