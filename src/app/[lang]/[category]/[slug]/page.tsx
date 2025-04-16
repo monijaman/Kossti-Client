@@ -3,42 +3,56 @@ import ProducDetails from '@/components/Products/ProducDetails';
 import ProductPhotosPage from '@/components/reviews/ProductPhotos';
 import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
-import { useProducts } from '@/hooks/useProducts';
-import { SearchParams } from '@/lib/types';
+import { getAProductBySlug } from '@/lib/products';
 import { cookies } from 'next/headers';
+export type PageParams = {
+  lang: string;
+  slug: string;
+  category?: string;
+};
 
-interface PageProps {
-  params: {
-    category: string; // category parameter
-    slug: string; // slug parameter
+export type PageSearchParams = {
+  [key: string]: string | string[] | undefined;
+};
+
+export type PageProps = {
+  params: PageParams;
+  searchParams: PageSearchParams;
+};
+
+// For type-checking compatibility with generated `.next/types/app/**`
+export type PagePropsPromised = {
+  params: Promise<PageParams>;
+  searchParams: Promise<PageSearchParams>;
+};
+
+export const generateMetadata = async ({ params }: PageProps) => {
+  const { slug } = params;
+  return {
+    title: `Product: ${slug}`,
   };
-  searchParams: SearchParams; // or use a more specific type if needed
-}
+};
 
 const Page = async ({ params, searchParams }: PageProps) => {
-  const { getAProductBySlug } = useProducts();
-  const { slug } = params
-  const countryCode = cookies().get('country-code')?.value; // Default to 'en' if not found
+  const { slug, lang } = params;
+  const cookieStore = await cookies();
+  const countryCode = lang || cookieStore.get('country-code')?.value || 'en';
+  const searchTerm = searchParams?.searchterm?.toString() || '';
+  const { success, data } = await getAProductBySlug(slug, countryCode);
 
-  const searchTerm = searchParams.searchterm || '';
-
-  const fetchProductData = async () => {
-    const response = await getAProductBySlug(slug, countryCode);
-    return response.success ? response.data : { products: [], totalProducts: 0 };
-  };
-
-  const dataset = await fetchProductData();
+  if (!success || !data) return <div>Product not found.</div>;
 
   return (
     <MainLayout>
       <SearchBox initialSearchTerm={searchTerm} />
-      <h3 className="font-semibold py-4"> {dataset.name} - {dataset.brand} -    {dataset.category}</h3>
-      <ProductPhotosPage productId={dataset.id} />
-      <ReviewDetails productId={dataset.id} />
-      <ProducDetails product={dataset} />
+      <h3 className="font-semibold py-4">
+        {data.name} - {data.brand} - {data.category}
+      </h3>
+      <ProductPhotosPage productId={data.id} />
+      <ReviewDetails productId={data.id} />
+      <ProducDetails product={data} />
     </MainLayout>
   );
 };
 
 export default Page;
-

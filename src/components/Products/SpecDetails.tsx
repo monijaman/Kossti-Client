@@ -1,4 +1,5 @@
 import { useSpecifications } from '@/hooks/useSpecifications';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { cookies } from 'next/headers';
 
 interface PopularProductsProps {
@@ -7,8 +8,8 @@ interface PopularProductsProps {
 
 const SpecDetails = async ({ productId }: PopularProductsProps) => {
   const { getPublicSpecs } = useSpecifications();
-
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const cookieStore = await cookies();
+  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
   const fetchSpecifications = async () => {
     const response = await getPublicSpecs(productId, countryCode);

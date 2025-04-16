@@ -1,9 +1,9 @@
 'use client';
 
 import { Brand, SidebarParams } from '@/lib/types';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
-
 const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm }: SidebarParams) => {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
@@ -77,9 +77,9 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
                 ))}
             </div>
 
-            <a href="/" className="text-blue-500 hover:underline mb-4 block">
+            <Link href="/" className="text-blue-500 hover:underline mb-4 block">
                 Clear Brands
-            </a>
+            </Link>
         </>
     );
 };

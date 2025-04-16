@@ -1,5 +1,6 @@
 'use client'; // This directive makes this component a client component
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
@@ -68,44 +69,44 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
         >
           {!isAuthenticated ? (
             <>
-              <a
+              <Link
                 href="/signin"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors"
               >
 
 
                 Signin
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/signup"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-md transition-colors"
               >
                 Signup
-              </a>
+              </Link>
 
             </>
           ) : (
             <>
-              <a href="/profile" className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors">
+              <Link href="/profile" className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors">
                 Profile
-              </a>
-              <a
+              </Link>
+              <Link
                 href='#'
                 onClick={handleLogout}
                 className="block px-4 py-2 hover:bg-gray-100">
                 Logout
-              </a>
+              </Link>
               <>
                 <hr className="my-1" />
-                <a
+                <Link
                   href="/admin"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   Admin Dashboard
-                </a>
-                <a href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
+                </Link>
+                <Link href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
                   Manage Users
-                </a>
+                </Link>
               </>
             </>
           )}

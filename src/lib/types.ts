@@ -70,6 +70,13 @@ export interface ProductApiResponse {
 //   activePriceRange?: string; // Change from string[] to string
 // }
 
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T | null; // Data will be null if the request fails
+  error?: string; // Error message if something goes wrong
+  status?: number; // Server status code
+}
+
 export interface SearchBoxProps {
   initialSearchTerm?: string;
   searchUrl?: string;
