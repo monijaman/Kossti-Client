@@ -5,42 +5,52 @@ import ReviewDetails from '@/components/reviews/ReviewDetails';
 import SearchBox from '@/components/Search';
 import { getAProductBySlug } from '@/lib/products';
 import { cookies } from 'next/headers';
-export type PageParams = {
+
+type PageParams = {
   lang: string;
   slug: string;
   category?: string;
 };
 
-export type PageSearchParams = {
+type PageSearchParams = {
   [key: string]: string | string[] | undefined;
 };
 
-export type PageProps = {
-  params: PageParams;
-  searchParams: PageSearchParams;
-};
-
-// For type-checking compatibility with generated `.next/types/app/**`
-export type PagePropsPromised = {
+// 🟩 Only `generateMetadata` should use promised arguments
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
   params: Promise<PageParams>;
   searchParams: Promise<PageSearchParams>;
-};
+}) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
 
-export const generateMetadata = async ({ params }: PageProps) => {
-  const { slug } = params;
   return {
-    title: `Product: ${slug}`,
+    title: `Viewing ${resolvedParams.slug}`,
   };
-};
+}
 
-const Page = async ({ params, searchParams }: PageProps) => {
+// 🟩 Your Page function gets resolved values, not Promises
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: PageParams;
+  searchParams: PageSearchParams;
+}) {
   const { slug, lang } = params;
+
   const cookieStore = await cookies();
   const countryCode = lang || cookieStore.get('country-code')?.value || 'en';
   const searchTerm = searchParams?.searchterm?.toString() || '';
+
   const { success, data } = await getAProductBySlug(slug, countryCode);
 
-  if (!success || !data) return <div>Product not found.</div>;
+  if (!success || !data) {
+    return <div>Product not found.</div>;
+  }
 
   return (
     <MainLayout>
@@ -53,6 +63,4 @@ const Page = async ({ params, searchParams }: PageProps) => {
       <ProducDetails product={data} />
     </MainLayout>
   );
-};
-
-export default Page;
+}
