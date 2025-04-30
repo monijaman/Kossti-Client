@@ -4,5 +4,7 @@
         "public/locales",
         "src/app/locales",
         "src/app/public/locales"
-    ]
+    ],
+    "files.autoSave": "onWindowChange",
+    "editor.cursorStyle": "line"
 }
