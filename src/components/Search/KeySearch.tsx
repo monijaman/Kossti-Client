@@ -1,18 +1,15 @@
 "use client";
-
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SearchBoxProps, SpecificationKey } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<SpecificationKey[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
-    const router = useRouter();
-    const { getSpecificationsKeys } = useSpecificationsKeys()
+     const { getSpecificationsKeys } = useSpecificationsKeys()
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
     useEffect(() => {
@@ -44,8 +41,7 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                 const page = 1; // Default page
 
                 const paginate = false;
-                const locale = 'en';
-
+ 
                 // Make the getProducts call to fetch suggestions
                 const response = await getSpecificationsKeys({ page, searchTerm, paginate });
 

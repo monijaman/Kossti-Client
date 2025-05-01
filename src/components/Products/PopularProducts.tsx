@@ -35,7 +35,7 @@ const PopularProducts = ({ countryCode }: pageProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
 
-        {dataset && dataset.map((product, i) => (
+        {dataset && dataset.map((product) => (
           <ProducShortDetails key={product.id} product={product} countryCode={countryCode} />
         ))}
       </div>

@@ -9,12 +9,8 @@ const Sidebar: React.FC = () => {
     const toggleSpecifications = () => {
         setShowSpecifications(!showSpecifications);
     };
-    const [showCategories, setShowCategories] = useState(false);
-
-    const toggleCategories = () => {
-        setShowCategories(!showCategories);
-    };
-
+    
+    
     return (
         <nav className="bg-gray-900 text-white w-64 p-4">
             <ul>

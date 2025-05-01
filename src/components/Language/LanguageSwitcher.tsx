@@ -18,7 +18,7 @@ const LanguageSwitcher = () => {
                 .find((row) => row.startsWith('country-code='))
                 ?.split('=')[1];
             if (countryCookie) {
-                let activeLocale = countryCookie.toLowerCase();
+                const activeLocale = countryCookie.toLowerCase();
 
 
                 // Set locale in localStorage, update state, and set cookie

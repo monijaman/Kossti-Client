@@ -22,7 +22,7 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
 
         {products.map((product, i) => (
-          <ProducShortDetails key={product.id} product={product} countryCode={countryCode} />
+          <ProducShortDetails key={product.id+i} product={product} countryCode={countryCode} />
         ))}
       </div>
     </>

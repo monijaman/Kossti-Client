@@ -1,7 +1,5 @@
 "use client"
-import { FC } from 'react';
-import { SearchParams, brandInt, Product, ProductApiResponse } from '@/lib/types';
-import ProducDetails from '@/components/admin/ProducDetails';
+import { Product} from '@/lib/types';
 
 interface ProductDetailsProps {
   products: Product[];

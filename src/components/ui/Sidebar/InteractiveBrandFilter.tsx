@@ -4,7 +4,7 @@ import { Brand, SidebarParams } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
-const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm }: SidebarParams) => {
+const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm }: SidebarParams) => {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
     // Update the URL whenever the selected brands change

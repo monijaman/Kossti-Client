@@ -11,19 +11,16 @@ interface PageProps {
   searchParams: SearchParams; // Include searchParams
 }
 
-const ManageReviews = async ({ params, searchParams }: PageProps) => {
+const ManageReviews = async ({  searchParams }: PageProps) => {
 
-  const { slug } = params;
-  const { getReviews } = useReviews();
+   const { getReviews } = useReviews();
 
 
   const page = parseInt(searchParams.page as string, 10) || 1;
   const limit = 10;
-  const activeCategory = searchParams.category || '';
-  const activeBrands = searchParams.brand || '';
-  const activePriceRange = searchParams.price || '';
+   
   const searchTerm = searchParams.searchterm || '';
-  const locale = searchParams.locale || 'bn';
+ 
 
 
   // Mock function to fetch product data

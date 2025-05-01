@@ -9,7 +9,7 @@ interface PopularProductsProps {
 
 const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
     const { getPhotosByProductId } = useProducts();
-    const locale = 'bn';
+   
     const [photos, setPhotos] = useState<ProductPhotos[]>([]);
     // Fetch specifications based on product ID and country code
     const fetchPhotos = async () => {

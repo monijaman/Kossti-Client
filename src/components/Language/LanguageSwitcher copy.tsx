@@ -20,7 +20,7 @@ const LanguageSwitcher = () => {
                     ?.split('=')[1];
 
                 if (countryCookie) {
-                    let activeLocale = countryCookie.toLowerCase();
+                    const activeLocale = countryCookie.toLowerCase();
 
                     // Set locale in localStorage, update state, and set cookie
                     localStorage.setItem('locale', activeLocale);

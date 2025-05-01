@@ -1,9 +1,6 @@
-import { FC } from 'react';
-import Categories from './Categories';
-import Brands from './Brands';
-import { brandInt, SidebarParams } from '@/lib/types';
+import { SidebarParams } from '@/lib/types';
 
-const Price = async ({ activeCategory, selectedBrands, activePriceRange, searchTerm }: SidebarParams) => {
+const Price = async ({ activeCategory, selectedBrands, activePriceRange }: SidebarParams) => {
 
     const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
     return (

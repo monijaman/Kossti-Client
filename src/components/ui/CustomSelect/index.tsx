@@ -11,12 +11,9 @@ interface CustomSelectProps {
   onChange: (value: OptionType | null) => void;
 }
 
-const CustomSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredOptions, setFilteredOptions] = useState<OptionType[]>(options);
-  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
-  const selectRef = useRef<HTMLDivElement>(null);
+const CustomSelect: React.FC<CustomSelectProps> = () => {
+   const [searchTerm, setSearchTerm] = useState('');
+   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -27,28 +24,20 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
 
   const handleClickOutside = (event: MouseEvent) => {
     if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
+      // Handle click outside the select component
+      console.log('Clicked outside the select component');
     }
   };
 
   
 
-  const handleSelectOption = (option: OptionType) => {
-    setSelectedOption(option);
-    onChange(option);
-    setIsOpen(false);
-  };
+ 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  useEffect(() => {
-    const filtered = options.filter(option =>
-      option.label.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredOptions(filtered);
-  }, [searchTerm, options]);
+ 
 
   return (
     <div className="custom-select" ref={selectRef}>

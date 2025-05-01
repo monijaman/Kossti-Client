@@ -11,11 +11,10 @@ interface PageProps {
 const BrandTransForm = ({ brandData }: PageProps) => {
 
     const [brandName, setBrandName] = useState('');
-    const { addNewBrand, getWideBrands, submitBrandTranslation } = useBrands();
+    const {  getWideBrands, submitBrandTranslation } = useBrands();
     const [brandId, setBrandId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('bn');
-    const [translations, setTranslations] = useState<Brand>();
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {

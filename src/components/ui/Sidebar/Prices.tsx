@@ -1,6 +1,5 @@
-import { FC } from "react";
-import { useCategory } from "@/hooks/useCategory";
-
+import fetchApi from "@/lib/fetchApi";
+import { apiEndpoints } from "@/lib/constants";
 interface categoryInt {
   id: number;
   name: string;
@@ -17,18 +16,18 @@ interface SearchParams {
 }
 
 const Prices = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const { getCategory } = useCategory();
 
-  // Fetch the products data using the async function
-  const response = await getCategory();
+   const response = await fetchApi(apiEndpoints.getCategories);
+
+  // const response = await getCategory();
   // Handle the fetched data
-  const dataset = response.success ? response.data : [];
+  // const dataset = response.success ? response.data : [];
+  const dataset = (response.success ? response.data : []) as categoryInt[];
 
   const activeCategory = searchParams.category || "";
 
-  const clearCategoryUrl = `/?branch=${activeCategory || ""}${
-    activeCategory ? `&price=${activeCategory}` : ""
-  }`;
+  const clearCategoryUrl = `/?branch=${activeCategory || ""}${activeCategory ? `&price=${activeCategory}` : ""
+    }`;
 
   return (
     <>
@@ -40,11 +39,10 @@ const Prices = async ({ searchParams }: { searchParams: SearchParams }) => {
               <a
                 key={category.id}
                 href={`/?category=${activeCategory}`}
-                className={`block px-4 py-2 rounded-md ${
-                  activeCategory === category.name
+                className={`block px-4 py-2 rounded-md ${activeCategory === category.name
                     ? "bg-blue-100"
                     : "bg-gray-200"
-                }`}
+                  }`}
               >
                 {category.name}
               </a>

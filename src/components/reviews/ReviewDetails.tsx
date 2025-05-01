@@ -1,10 +1,11 @@
 import VideoAndLinks from '@/components/reviews/SourceMedia';
-import { useReviews } from '@/hooks/useReviews';
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
 import { Review } from '@/lib/types';
 import { cookies } from 'next/headers';
 interface revieResponse {
   success: boolean,
-  data: Review,
+  data?: Review | null | undefined;
 }
 
 interface PopularProductsProps {
@@ -12,13 +13,13 @@ interface PopularProductsProps {
 }
 
 const ReviewDetails = async ({ productId }: PopularProductsProps) => {
-  const { getPublicReviewsByProductId } = useReviews();
-  const locale = 'bn';
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  
+  const countryCode = (await cookies()).get('country-code')?.value || 'en'; // Default to 'en' if not found
 
   // Fetch specifications based on product ID and country code
   const fetchSpecifications = async (): Promise<revieResponse> => {
-    return await getPublicReviewsByProductId(productId, countryCode);
+    return await fetchApi(apiEndpoints.getPublicReviewsByProductId(productId, countryCode))
+ 
   };
 
   // Await the fetch to get the actual data
@@ -28,7 +29,7 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
   return (
     <div>
 
-      {review.success ? (
+      {review.success &&  review.data ? (
         <div className="p-4 bg-white border rounded shadow-md">
 
           <div className="mb-4">

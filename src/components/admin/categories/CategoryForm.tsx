@@ -21,8 +21,6 @@ const CategoryForm = ({ categoryData }: PageProps) => {
         setCategoryId(categoryData?.id || null); // Fallback to null
     }, [categoryData]);
 
-
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true)
@@ -33,13 +31,13 @@ const CategoryForm = ({ categoryData }: PageProps) => {
             // Update existing product
             const response = await submitCategory({ categoryId, category });
 
-            if (response.success) {
+            if (response.success && response.data) {
                 router.push("/admin/categories");
                 setSubmitStatus(response.data.message);
                 setLoading(false)
             } else {
                 setLoading(false)
-                setSubmitStatus(response.error);
+                setSubmitStatus(response.error ?? "Something went wrong");
             }
         } catch (error) {
             console.error('Error submitting form', error);

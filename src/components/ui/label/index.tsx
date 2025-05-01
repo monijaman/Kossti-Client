@@ -5,7 +5,7 @@ import * as React from 'react'
 
 // Define your custom Label component without exposing LabelPrimitive
 const Label = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(
-  ({ className, ...props }, ref) => (
+  ({  ...props }, ref) => (
     <label
       ref={ref}
       // className={cn(

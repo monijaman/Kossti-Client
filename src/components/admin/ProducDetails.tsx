@@ -9,6 +9,7 @@ interface ProductDetailsProps {
 
 const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
   const deleteProduct = (id: number) => {
+    console.log(`Delete product with ID: ${id}`);
   };
 
   return (

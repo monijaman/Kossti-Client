@@ -1,9 +1,8 @@
 "use client";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
+import { SubmitSpecResponse } from '@/lib/types';
 interface PageProps {
     speckeyData?: SpecificationKey; // Optional for create case
 
@@ -18,8 +17,7 @@ const KeyForm = ({ speckeyData }: PageProps) => {
     const [loading, setLoading] = useState(false);
 
     const { submitSpecificationsKeys } = useSpecificationsKeys();
-    const router = useRouter();
-
+ 
     useEffect(() => {
         setSpeckey(speckeyData?.specification_key || ''); // Fallback to empty string
         setSpeckeyID(speckeyData?.id || null); // Fallback to null
@@ -35,14 +33,14 @@ const KeyForm = ({ speckeyData }: PageProps) => {
             setSubmitStatus('')
 
             // Update existing product
-            const response = await submitSpecificationsKeys({ speckeyId, speckey });
+            const response = await submitSpecificationsKeys({ speckeyId, speckey }) as SubmitSpecResponse;
 
             if (response.success) {
-                setSubmitStatus(response.data.message);
+                setSubmitStatus(response?.data?.message ?? '');
                 setLoading(false)
             } else {
                 setLoading(false)
-                setSubmitStatus(response.error);
+                setSubmitStatus(response?.error ?? '');
             }
         } catch (error) {
             console.error('Error submitting form', error);

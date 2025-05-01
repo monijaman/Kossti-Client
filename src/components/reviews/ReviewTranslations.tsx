@@ -5,6 +5,13 @@ import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslati
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css'; // Import styles
 import Select from 'react-select';
+type SubmitSpecResponse = {
+    success: boolean;
+    data: {
+        message: string;
+        // other fields if any
+    };
+};
 
 // Dynamically import React Quill to avoid SSR issues
 
@@ -42,7 +49,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
             // Set translated specifications
             setTranslatedSpecifications(dataset.dataset);
-
+console.log('dataset', translatedSpecifications)
             // Return the dataset so we can use it immediately
             return dataset.dataset;
         }
@@ -84,7 +91,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
         if (productId) {
 
-            const response = await submitSpecKeyTranslation(productId, tranSpecifications);
+            const response = await submitSpecKeyTranslation(productId, tranSpecifications) as SubmitSpecResponse;
 
             if (response.success) {
 
@@ -192,18 +199,18 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
     );
 
-    {
-        formStatus && (
-            <div
-                className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
-                    ? 'text-green-700 bg-green-100'
-                    : 'text-black-700 bg-green-100'
-                    }`}
-                role="alert">
-                {formStatus}
-            </div>
-        )
-    }
+    // {
+    //     formStatus && (
+    //         <div
+    //             className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
+    //                 ? 'text-green-700 bg-green-100'
+    //                 : 'text-black-700 bg-green-100'
+    //                 }`}
+    //             role="alert">
+    //             {formStatus}
+    //         </div>
+    //     )
+    // }
 };
 
 export default ReviewTransForm;

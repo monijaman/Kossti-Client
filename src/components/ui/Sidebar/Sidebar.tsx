@@ -3,10 +3,8 @@ import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import Categories from './Categories';
 
-const Sidebar = async ({ activeCategory, selectedBrands, activePriceRange, searchTerm }: SidebarParams) => {
-
-  const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarParams) => {
+  const countryCode = (await cookies()).get('country-code')?.value ?? 'en';
 
 
   return (

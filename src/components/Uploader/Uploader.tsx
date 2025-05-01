@@ -7,8 +7,7 @@ import { ProductPhotos } from '@/lib/types';
 import {
   removeMedia,
   selectstatus,
-  selectUploadedFiles,
-  uploadmedia,
+  uploadmedia
 } from "@/redux/features/upload/uploadSlice";
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
@@ -32,7 +31,7 @@ const DragNdrop = ({
   const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif"];
   const dispatch = useAppDispatch();
   const selectedFilesRef = useRef<File[]>([]);
-  const uploadedDataset = useAppSelector(selectUploadedFiles);
+ 
   const status = useAppSelector(selectstatus);
   const [selectedValue, setSelectedValue] = useState<string | number>("");
 
@@ -147,7 +146,7 @@ const DragNdrop = ({
 
 
 
-  const handleRadioChange = (newValue: string | number, name: string) => {
+  const handleRadioChange = (newValue: string | number ) => {
     setSelectedValue(newValue); // Store the selected id
     makePhotoDefault(+newValue);
 

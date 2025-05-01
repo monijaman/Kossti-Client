@@ -1,16 +1,19 @@
 "use client";
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { SpecificationKey, SpecKeyTranslation } from '@/lib/types'; // Assuming you have a Product type
-import { useCategory } from "@/hooks/useCategory";
-import { useBrands } from "@/hooks/useBrands";
+import { useState, useEffect } from 'react';
+import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 import useSpecificationsKeys from "@/hooks/useSpecificationsKeys";
 import { LOCALES } from '@/lib/constants';
-
 
 interface PageProps {
     speckeyData: SpecificationKey; // Optional for create case
 }
+type SubmitSpecResponse = {
+    success: boolean;
+    data: {
+        message: string;
+        // other fields if any
+    };
+};
 
 const KeyTransForm = ({ speckeyData }: PageProps) => {
 
@@ -19,7 +22,6 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
     const [speckeyId, setSpeckeyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
-    const [translations, setTranslations] = useState<SpecKeyTranslation>();
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -32,16 +34,16 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
 
     const fetchKeyTranslation = async () => {
         if (speckeyId !== null) {
-          
+
             const response = await getKeysTranslationById({
                 key_id: speckeyData.id ?? undefined,
                 locale: selectedTranslation,
-              });
-              
+            });
+
             if (response.success && response.data.translated_key) {
                 setTranslated_key(response.data.translated_key)
 
-            }  
+            }
         }
     };
 
@@ -50,18 +52,18 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
     // Select 'bn' translation by default on mount
     useEffect(() => {
         handleLanguageSwitch('bn');
- 
+
     }, []);
- 
+
     useEffect(() => {
         if (speckeyData && speckeyData.id) {
-          setSpeckeyId(speckeyData.id);
-          fetchKeyTranslation();
+            setSpeckeyId(speckeyData.id);
+            fetchKeyTranslation();
 
         }
-      }, [ speckeyData, selectedTranslation]);
+    }, [speckeyData, selectedTranslation]);
 
-      
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -84,7 +86,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
             }
 
             // Submit the translation
-            const response = await submitKeysTranslation(payload);
+            const response = await submitKeysTranslation(payload) as SubmitSpecResponse;
 
             if (response.success) {
                 setSubmitStatus('Form Submitted successfully');

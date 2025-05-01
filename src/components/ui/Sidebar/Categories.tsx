@@ -1,27 +1,41 @@
-import { useCategory } from "@/hooks/useCategory";
-import { useTranslation } from "@/hooks/useLocale";
 import { DEFAULT_LOCALE } from "@/lib/constants";
 import { categoryInt, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
+import fetchApi from "@/lib/fetchApi";
+import { apiEndpoints } from "@/lib/constants";
+import { getTranslation } from "@/lib/locale";
+
+
+
 const Categories = async ({ category }: SearchParams) => {
   // const Categories: FC<{ searchParams?: SearchParams }> = async ({ searchParams = {} }) => {
-  const { getCategories } = useCategory();
   const cookieStore = await cookies();
 
 
-  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
-  const translation = useTranslation(countryCode);
 
-  // Fetch the category data using the async function
-  const response = await getCategories({
-    perPage: 10,        // Number of items per page (optional)
-    search: '',   // Search term (optional)
-    paginate: 'false',   // 'true' or 'false' to enable/disable pagination
-    locale: countryCode,        // Locale, e.g., 'en', 'bn', etc.
-    categoryId: '',      // Category ID (optional, can be empty)
-    status: 1            // Status filter (optional)
+  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const translation = getTranslation(countryCode);
+
+  // const response = await fetchApi<{ data: categoryInt[] }>(apiEndpoints.getCategories);
+
+
+  const response = await fetchApi<{ data: categoryInt[] }>(apiEndpoints.getWideCategories, {
+    queryParams: {
+      perPage: 10,        // Number of items per page (optional)
+      search: '',   // Search term (optional)
+      paginate: 'false',   // 'true' or 'false' to enable/disable pagination
+      locale: countryCode,        // Locale, e.g., 'en', 'bn', etc.
+      categoryId: '',      // Category ID (optional, can be empty)
+      status: 1            // Status filter (optional)
+    },
   });
-  const dataset = response.success ? response.data.data : [];
+
+
+  const dataset: categoryInt[] =
+    response.success && response.data?.data
+      ? response.data.data
+      : [];
+
 
   // Handle undefined searchParams with a default empty string
   const activeCategory = category || "";

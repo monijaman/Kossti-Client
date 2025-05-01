@@ -22,7 +22,7 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails }:
 
     // Remove a YouTube URL or Source Link by index
     const handleRemoveDetail = (index: number) => {
-        let currentDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
+        const currentDetails: AdditionalDetail[] = Array.isArray(additionalDetails) ? additionalDetails : [];
         // Proceed to remove the detail if we have a valid array
         const updatedDetails = currentDetails.filter((_, i) => i !== index);
         setAdditionalDetails(updatedDetails); // Update the state

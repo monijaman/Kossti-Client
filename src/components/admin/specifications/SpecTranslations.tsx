@@ -2,15 +2,18 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
-import dynamic from 'next/dynamic';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css'; // Import styles
 import Select from 'react-select';
+type SubmitSpecResponse = {
+    success: boolean;
+    data: {
+        message: string;
+        // other fields if any
+    };
+};
 
-// Dynamically import React Quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-
-
+ 
 interface transDataSet {
     specification_key_id: number;
     translations: {
@@ -37,6 +40,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const { submitSpecKeyTranslation, getSpecTranslations } = useSpecifications();
+    // const [ setTranslatedSpecifications] = useState<transDataSet[]>([]);
     const [translatedSpecifications, setTranslatedSpecifications] = useState<transDataSet[]>([]);
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
@@ -47,7 +51,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
             // Set translated specifications
             setTranslatedSpecifications(dataset.dataset);
-
+console.log('dataset', translatedSpecifications)
             // Return the dataset so we can use it immediately
             return dataset.dataset;
         }
@@ -89,7 +93,8 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
         if (productId) {
 
-            const response = await submitSpecKeyTranslation(productId, tranSpecifications);
+            const response = await submitSpecKeyTranslation(productId, tranSpecifications) as SubmitSpecResponse;
+
 
             if (response.success) {
 
@@ -204,18 +209,18 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
     );
 
-    {
-        formStatus && (
-            <div
-                className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
-                    ? 'text-green-700 bg-green-100'
-                    : 'text-black-700 bg-green-100'
-                    }`}
-                role="alert">
-                {formStatus}
-            </div>
-        )
-    }
+    // {
+    //     formStatus && (
+    //         <div
+    //             className={`p-4 mb-4 text-sm rounded-lg ${formStatus.includes('success')
+    //                 ? 'text-green-700 bg-green-100'
+    //                 : 'text-black-700 bg-green-100'
+    //                 }`}
+    //             role="alert">
+    //             {formStatus}
+    //         </div>
+    //     )
+    // }
 };
 
 export default SpecTranslations;

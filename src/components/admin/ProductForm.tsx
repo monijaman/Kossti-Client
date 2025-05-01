@@ -94,15 +94,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
     };
 
-    const resetForm = () => {
-        setName('');
-        setCategory('');
-        setBrand('');
-        setModel('');
-        setPrice(0);
-        setStatus(false);
-        setPriority(1);
-    };
+ 
 
     const [files, setFiles] = useState<File[]>([]);
 
@@ -111,6 +103,12 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const openModal = () => {
         setIsModalOpen(true);
     };
+
+
+    useEffect(() => {
+        console.log('Files selected:', files);
+    }, [files]);
+
 
     const closeModal = () => {
         setIsModalOpen(false);

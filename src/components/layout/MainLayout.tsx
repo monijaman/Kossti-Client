@@ -3,9 +3,9 @@ import LanguageSwitcher from '@/components/Language/LanguageSwitcher';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
-import { useTranslation } from "@/hooks/useLocale";
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import { cookies } from 'next/headers';
+import { getTranslation } from '@/lib/locale';
 import { ReactNode } from 'react';
 interface MainLayoutProps {
   children: ReactNode;
@@ -17,11 +17,13 @@ interface MainLayoutProps {
   };
 }
 
-const MainLayout = ({ children, sidebarProps }: MainLayoutProps) => {
+const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
+  const cookieStore = await cookies()
 
-  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
-  const countryCode = cookies().get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
-  const translation = useTranslation(countryCode);
+  const accessToken = cookieStore.get('accessToken')?.value; // Default to 'en' if not found
+  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const translation = getTranslation(countryCode);
+  
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
