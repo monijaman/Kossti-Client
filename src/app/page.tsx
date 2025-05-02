@@ -1,103 +1,126 @@
-import Image from "next/image";
+// src/app/products/page.tsx
+import MainLayout from '@/components/layout/MainLayout';
+import Pagination from '@/components/Pagination/index';
+import PopularProducts from '@/components/Products/PopularProducts';
+import ProductReview from '@/components/Products/ProductReview';
+import SearchBox from '@/components/Search';
+import { DEFAULT_LOCALE } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
+import { Product, SearchParams } from '@/lib/types';
+import { cookies } from 'next/headers';
+import { apiEndpoints } from '@/lib/constants';
+type ProductApiResponse = {
+  products: Product[];
+  totalProducts: number;
+};
 
-export default function Home() {
+// Server Component
+const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+  // const { getProducts } = useProducts();
+  /*
+    const getProductsd = async (
+      page: number,
+      limit: number,
+      category?: string,
+      brands?: string,
+      priceRange?: string,
+      searchTerm?: string,
+      locale?: string,
+      sortby?: string
+    ) => {
+      const params: Record<string, string> = {
+        page: page.toString(),
+        limit: limit.toString(),
+        // _: cacheBuster.toString(), // Cache-busting parameter
+      };
+  
+      // Add optional parameters only if they are defined
+      if (category) params.category = category;
+      if (brands) params.brand = brands;
+      if (priceRange) params.pricerange = priceRange;
+      if (searchTerm) params.searchterm = searchTerm;
+      if (locale) params.locale = locale;
+      if (sortby) params.sortby = sortby;
+  
+      // Build the query string
+      // const queryString = new URLSearchParams(params).toString();
+  
+  
+      // const fullUrl = `${fetchApi}/products?${queryString}`;
+  
+      try {
+        const dataset = await fetchApi<ProductApiResponse>('/products', {
+          method: 'GET',
+          queryParams: params,
+        });
+  
+        return dataset;
+  
+  
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        return { success: false, data: [] };
+      }
+    };
+  */
+  const page = parseInt(searchParams.page as string, 10) || 1;
+  const limit = 20;
+  const activeCategory = searchParams.category || '';
+  const activeBrands = searchParams.brand || '';
+  const activePriceRange = searchParams.price || '';
+  const searchTerm = searchParams.searchterm || '';
+  const cookieStore = await cookies();
+  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+
+  const fetchProductData = async (): Promise<{ products: Product[]; totalProducts: number }> => {
+
+    const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+      method: 'GET',
+      queryParams: {
+        page: page.toString(),
+        limit: limit.toString(),
+        category: activeCategory,
+        brand: activeBrands,
+        pricerange: activePriceRange,
+        searchterm: searchTerm,
+        locale: countryCode,
+      },
+    });
+
+ return {
+      products: response.data?.products ?? [],
+      totalProducts: response.data?.totalProducts ?? 0,
+    };
+    
+
+  };
+
+  const dataset = await fetchProductData();
+  const totalPages = 0;//Math.ceil(dataset.totalProducts / limit);
+
+  // Prepare sidebarProps from searchParams
+  const sidebarProps = {
+    activeCategory,
+    selectedBrands: activeBrands,
+    activePriceRange,
+    searchTerm,
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <MainLayout sidebarProps={sidebarProps}>
+      <SearchBox initialSearchTerm={searchTerm} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
+      <PopularProducts countryCode={countryCode} />
+      <Pagination
+        category={activeCategory}
+        selectedBrands={activeBrands}
+        currentPage={page}
+        totalPages={totalPages}
+      />
+    </MainLayout>
   );
-}
+};
+
+// Note: `getServerSideProps` is not available in the `app/` directory, so we fetch the data directly here
+export default Page;
