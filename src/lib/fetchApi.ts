@@ -127,16 +127,15 @@ export default async function fetchApi<T>(
 
 /**
  * * Usage Example:
- *
- * ```typescript
- * const { success, data, error } = await fetchApi('/path/to/resource', {
- *   method: 'POST',
- *  body: { key: 'value' },
- *  headers: { 'Custom-Header': 'value' },
- *  queryParams: { page: 1, limit: 10 },
- *  signal: 5000, // 5 seconds timeout
- *  }
- * });
- *
- * *
+  
+  const { success, data, error } = await fetchApi('/path/to/resource', {
+    method: 'POST',
+   body: { key: 'value' },
+   headers: { 'Custom-Header': 'value' },
+   queryParams: { page: 1, limit: 10 },
+   signal: 5000, // 5 seconds timeout
+   }
+  );
+ 
+
  */

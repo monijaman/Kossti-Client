@@ -1,14 +1,20 @@
 // components/BrandsList.tsx
 import InteractiveBrandFilter from '@/components/ui/Sidebar/InteractiveBrandFilter';
-import { useBrands } from '@/hooks/useBrands';
 import { brandInt, SidebarParams } from '@/lib/types';
+import fetchApi from "@/lib/fetchApi";
+import { apiEndpoints } from "@/lib/constants";
 
 const BrandsList = async ({ activeCategory, selectedBrands, searchTerm }: SidebarParams) => {
-    const { getPublicBrands } = useBrands();
 
     // Fetch brand data server-side
-    const response = await getPublicBrands();
-    const dataset: brandInt[] = response.success ? response.data : [];
+    // const response = await getPublicBrands();
+    const response = await fetchApi<{ data: brandInt[] }>(apiEndpoints.getPublicBrands);
+
+    // return await fetchApi(apiEndpoints.getPublicBrands())
+
+    const dataset: brandInt[] = response && response.success && Array.isArray(response.data)
+        ? response.data
+        : [];
 
     // Convert the selectedBrands and activeCategory to the appropriate format
     const brands = selectedBrands ? selectedBrands : '';

@@ -2,8 +2,10 @@
 import Link from 'next/link';
 
 import SearchBox from '@/components/Search';
-import { useReviews } from '@/hooks/useReviews';
 import { SearchParams } from '@/lib/types';
+import fetchApi from "@/lib/fetchApi";
+import { apiEndpoints } from "@/lib/constants";
+
 interface PageProps {
   params: {
     slug: string; // Type for the slug
@@ -11,22 +13,33 @@ interface PageProps {
   searchParams: SearchParams; // Include searchParams
 }
 
-const ManageReviews = async ({  searchParams }: PageProps) => {
+const ManageReviews = async ({ searchParams }: PageProps) => {
 
-   const { getReviews } = useReviews();
-
+ 
 
   const page = parseInt(searchParams.page as string, 10) || 1;
   const limit = 10;
-   
+
   const searchTerm = searchParams.searchterm || '';
- 
+
 
 
   // Mock function to fetch product data
   const fetchReviewsData = async () => {
+    //     const apiEndpoint = `/api/get?action=reviews&${queryString}`;
 
-    const response = await getReviews(page, limit, searchTerm);
+    // const response = await getReviews(page, limit, searchTerm);
+
+    const response = await fetchApi(apiEndpoints.getPublicBrands,{
+      queryParams: {
+        action: 'reviews',
+        page: page.toString(),
+        limit: limit.toString(),
+        searchterm: searchTerm,
+      },
+    });
+
+
     return response.success ? response.data : { reviews: [], totalProducts: 0 };
   };
 
