@@ -1,7 +1,7 @@
 'use client'
 import { FormEvent, useEffect, useState } from 'react';
-import KeyForm from "@/components/admin/keys/KeyForm";
-import KeyTransForm from "@/components/admin/keys/KeyTransForm";
+import KeyForm from "@/app/components/admin/keys/KeyForm";
+import KeyTransForm from "@/app/components/admin/keys/KeyTransForm";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 

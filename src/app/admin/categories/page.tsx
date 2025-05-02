@@ -1,6 +1,6 @@
 'use client'
-import CategoryDetails from '@/components/admin/categories/CategoryDetails';
-import Pagination from '@/components/Pagination/index';
+import CategoryDetails from '@/app/components/admin/categories/CategoryDetails';
+import Pagination from '@/app/components/Pagination/index';
 import { useCategory } from '@/hooks/useCategory';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { categoryInt, SearchParams } from '@/lib/types';

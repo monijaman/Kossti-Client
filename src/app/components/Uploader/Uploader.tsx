@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import RadioButton from "@/components/ui/Radio";
-import RenderPreview from "@/components/Uploader/RenderPreview";
+import { Button } from "@/app/components/ui/button";
+import RadioButton from "@/app/components/ui/Radio";
+import RenderPreview from "@/app/components/Uploader/RenderPreview";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductPhotos } from '@/lib/types';

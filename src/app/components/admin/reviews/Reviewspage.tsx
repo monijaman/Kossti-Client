@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 
-import SearchBox from '@/components/Search';
+import SearchBox from '@/app/components/Search';
 import { SearchParams } from '@/lib/types';
 import fetchApi from "@/lib/fetchApi";
 import { apiEndpoints } from "@/lib/constants";

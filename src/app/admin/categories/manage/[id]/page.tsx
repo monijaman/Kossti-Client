@@ -1,6 +1,6 @@
 'use client'
-import CategoryForm from "@/components/admin/categories/CategoryForm";
-import CategoryTransForm from "@/components/admin/categories/CategoryTransForm";
+import CategoryForm from "@/app/components/admin/categories/CategoryForm";
+import CategoryTransForm from "@/app/components/admin/categories/CategoryTransForm";
 import { useCategory } from '@/hooks/useCategory';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { Category } from '@/lib/types'; // Assuming you have a Product type

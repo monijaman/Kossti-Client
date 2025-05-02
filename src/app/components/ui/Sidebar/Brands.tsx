@@ -1,5 +1,5 @@
 // components/BrandsList.tsx
-import InteractiveBrandFilter from '@/components/ui/Sidebar/InteractiveBrandFilter';
+import InteractiveBrandFilter from '@/app/components/ui/Sidebar/InteractiveBrandFilter';
 import { brandInt, SidebarParams } from '@/lib/types';
 import fetchApi from "@/lib/fetchApi";
 import { apiEndpoints } from "@/lib/constants";

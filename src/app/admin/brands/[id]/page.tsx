@@ -4,12 +4,19 @@ import { useCategory } from "@/hooks/useCategory";
 import { Brand, Category } from '@/lib/types';
 import { FormEvent, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
+import fetchApi  from "@/lib/fetchApi";
+import { apiEndpoints } from "@/lib/constants";
 
 interface Specification {
     id: number | null;
     specification_key: number | null;
 }
 
+type SubmitBrandResponse = {
+    message: string;
+  };
+
+  
 interface PageProps {
     params: {
         id: number;
@@ -20,13 +27,13 @@ const Specification = ({ params }: PageProps) => {
     const { id: category_id } = params;
 
     const { getCategories, getCategoryRelBrands } = useCategory();
-    const { getAllBrands, submitBrands } = useBrands();
+    const { getAllBrands } = useBrands();
 
     const [brands, setBrands] = useState<Brand[]>([]);
     const [activeBrands, setActiveBrands] = useState<Brand[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id);
-    const [productName, setProductName] = useState<string>('');
+
     const [formStatus, setFormStatus] = useState<string | null>(null);
 
     // Fetch categories
@@ -102,12 +109,30 @@ const Specification = ({ params }: PageProps) => {
     // Handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const response = await submitBrands(selectedCategory ?? 0, activeBrands);
+        // const response = await submitBrands(selectedCategory ?? 0, activeBrands);
+        //   const token = (await cookies()).get("accessToken")?.value || "";
+
+        const brandArrays = brands
+        .map((brand) => brand.id) // Return the `id` directly
+        .filter((id): id is number => id !== null) // Ensure non-null values
+        .sort((a, b) => a - b); // Sort numerically
+        const response = await fetchApi<SubmitBrandResponse>(
+            apiEndpoints.submitBrands(selectedCategory ?? 0),
+            {
+                method: 'POST',
+                body: {
+                    category_id:selectedCategory,
+                    brands:brandArrays
+                },
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
+
         if (response.success) {
-            setFormStatus(response.data.message);
-        } else {
+            setFormStatus(response.data ? response.data.message:" ");
+          } else {
             setFormStatus("Failed to submit data");
-        }
+          }
     };
 
     return (

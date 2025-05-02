@@ -1,6 +1,6 @@
 'use client'
-import BrandDetails from '@/components/admin/brands/BrandDetails';
-import Pagination from '@/components/Pagination/index';
+import BrandDetails from '@/app/components/admin/brands/BrandDetails';
+import Pagination from '@/app/components/Pagination/index';
 import { useBrands } from '@/hooks/useBrands';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { Brand, SearchParams } from '@/lib/types';

@@ -1,5 +1,5 @@
 
-import BrandForm from "@/components/admin/brands/BrandForm";
+import BrandForm from "@/app/components/admin/brands/BrandForm";
 
 export default function CreateSpecification() {
 

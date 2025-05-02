@@ -1,4 +1,4 @@
-import BrandsListClient from '@/components/ui/Sidebar/BrandsClient';
+import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
 import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import Categories from './Categories';

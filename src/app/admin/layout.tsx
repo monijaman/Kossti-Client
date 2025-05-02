@@ -1,15 +1,13 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-
+ 
 
 // import './globals.css';
-import Sidebar from '@/components/admin/Sidebar';
-import AccountDropdown from '@/components/ui/AccountDropdown'; // Import your account dropdown or user info component
-import Navigation from '@/components/ui/Navigation'; // A navigation component for admin
+import Sidebar from '@/app/components/admin/Sidebar';
+import AccountDropdown from '@/app/components/ui/AccountDropdown'; // Import your account dropdown or user info component
+import Navigation from '@/app/components/ui/Navigation'; // A navigation component for admin
 import { cookies } from 'next/headers';
-const inter = Inter({ subsets: ['latin'] });
-
+ 
 export const metadata: Metadata = {
   title: 'Viper Front',
   description: 'By Monir dev',
@@ -19,8 +17,10 @@ interface AdminLayoutProps {
   children: React.ReactNode; // Children components
 }
 
-const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const accessToken = cookies().get('accessToken')?.value; // Default to 'en' if not found
+const AdminLayout = async({ children }: AdminLayoutProps) => {
+  const cookieStore = await cookies()
+
+  const accessToken = cookieStore.get('accessToken')?.value; // Default to 'en' if not found
 
   return (
     <div className="min-h-screen flex flex-col">

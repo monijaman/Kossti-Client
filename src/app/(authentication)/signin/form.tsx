@@ -1,5 +1,5 @@
 
-import getErrors from '@/components/Form/validation';
+import getErrors from '@/app/components/Form/validation';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

@@ -1,5 +1,5 @@
 "use client"
-import PhotoCarousel from '@/components/Photo/PhotoCarousel';
+import PhotoCarousel from '@/app/components/Photo/PhotoCarousel';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductPhotos } from '@/lib/types';
 import { useEffect, useState } from 'react';

@@ -4,14 +4,14 @@ import dynamic from 'next/dynamic';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 
-import ReviewTransForm from '@/components/admin/reviews/ReviewTransForm';
+import ReviewTransForm from '@/app/components/admin/reviews/ReviewTransForm';
 import { ProductTranslation, AdditionalDetails, Review, Product } from '@/lib/types';
-import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
-import Modal from '@/components/Modal/client';
+import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
+import Modal from '@/app/components/Modal/client';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
-import DragNdrop from "@/components/Uploader/Uploader";
+import DragNdrop from "@/app/components/Uploader/Uploader";
 
 interface PageProps {
     params: {

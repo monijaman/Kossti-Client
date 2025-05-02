@@ -1,4 +1,4 @@
-import VideoAndLinks from '@/components/reviews/SourceMedia';
+import VideoAndLinks from '@/app/components/reviews/SourceMedia';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Review } from '@/lib/types';

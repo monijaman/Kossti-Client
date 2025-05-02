@@ -1,7 +1,7 @@
 'use client';
 
-import GeneralPagination from '@/components/Pagination/general';
-import Reviewetails from '@/components/admin/reviews/Reviewetails';
+import GeneralPagination from '@/app/components/Pagination/general';
+import Reviewetails from '@/app/components/admin/reviews/Reviewetails';
 import { useReviews } from '@/hooks/useReviews';
 import { Product, Review, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';

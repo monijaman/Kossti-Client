@@ -1,5 +1,5 @@
 "use client"
-import YouTubeModal from '@/components/reviews/YouTubeVideoPlayer';
+import YouTubeModal from '@/app/components/reviews/YouTubeVideoPlayer';
 import { useProducts } from '@/hooks/useProducts';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';

@@ -1,5 +1,5 @@
 "use client";
-import AdditionalDetailsForm from '@/components/reviews/AdditionalDetails';
+import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';

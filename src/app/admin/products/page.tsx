@@ -1,6 +1,6 @@
 "use client"
-import Pagination from '@/components/Pagination/index';
-import ProductDetails from '@/components/admin/ProducDetails';
+import Pagination from '@/app/components/Pagination/index';
+import ProductDetails from '@/app/components/admin/ProducDetails';
 import { useProducts } from '@/hooks/useProducts';
 import { Product, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';

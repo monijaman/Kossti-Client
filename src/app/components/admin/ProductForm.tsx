@@ -1,6 +1,6 @@
 "use client";
-import Modal from '@/components/Modal/client';
-import DragNdrop from "@/components/Uploader/Uploader";
+import Modal from '@/app/components/Modal/client';
+import DragNdrop from "@/app/components/Uploader/Uploader";
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
 import { useProducts } from "@/hooks/useProducts";

@@ -2,7 +2,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
-import KeyForm from "@/components/admin/keys/KeyForm";
+import KeyForm from "@/app/components/admin/keys/KeyForm";
 
 export default function CreateSpecification() {
 

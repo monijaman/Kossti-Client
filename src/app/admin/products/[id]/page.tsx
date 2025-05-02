@@ -1,6 +1,6 @@
  
-import ProductForm from "@/components/admin/ProductForm";
-import ProductTransForm from "@/components/admin/ProductTransForm";
+import ProductForm from "@/app/components/admin/ProductForm";
+import ProductTransForm from "@/app/components/admin/ProductTransForm";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from '@/lib/types'; // Assuming you have a Product type
 import React, { useEffect, useState, useRef } from 'react';

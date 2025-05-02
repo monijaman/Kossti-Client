@@ -1,6 +1,6 @@
 'use client'
-import BrandForm from "@/components/admin/brands/BrandForm";
-import BrandTransForm from "@/components/admin/brands/BrandTransForm";
+import BrandForm from "@/app/components/admin/brands/BrandForm";
+import BrandTransForm from "@/app/components/admin/brands/BrandTransForm";
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from '@/hooks/useCategory';
 import { Category } from '@/lib/types'; // Assuming you have a Product type

@@ -1,4 +1,4 @@
-import SpecDetails from '@/components/Products/SpecDetails';
+import SpecDetails from '@/app/components/Products/SpecDetails';
 import { Product } from '@/lib/types';
 interface PopularProductsProps {
   product: Product;

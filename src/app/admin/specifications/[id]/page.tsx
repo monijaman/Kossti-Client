@@ -4,7 +4,7 @@ import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
-import SpecTranslations from '@/components/admin/specifications/SpecTranslations';
+import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 interface PageProps {
     params: {
         id: number;

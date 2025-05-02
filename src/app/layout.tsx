@@ -1,5 +1,5 @@
 // app/layout.tsx
-import ClientProvider from '@/components/Provider/ClientProvider';
+import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ReactNode } from 'react';

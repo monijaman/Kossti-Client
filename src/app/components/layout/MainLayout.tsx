@@ -1,8 +1,8 @@
 // MainLayout.tsx
-import LanguageSwitcher from '@/components/Language/LanguageSwitcher';
-import AccountDropdown from '@/components/ui/AccountDropdown';
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import Sidebar from '@/components/ui/Sidebar/Sidebar';
+import LanguageSwitcher from '@/app/components/Language/LanguageSwitcher';
+import AccountDropdown from '@/app/components/ui/AccountDropdown';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import Sidebar from '@/app/components/ui/Sidebar/Sidebar';
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import { cookies } from 'next/headers';
 import { getTranslation } from '@/lib/locale';

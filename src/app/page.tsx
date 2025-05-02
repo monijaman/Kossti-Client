@@ -1,14 +1,14 @@
 // src/app/products/page.tsx
-import MainLayout from '@/components/layout/MainLayout';
-import Pagination from '@/components/Pagination/index';
-import PopularProducts from '@/components/Products/PopularProducts';
-import ProductReview from '@/components/Products/ProductReview';
-import SearchBox from '@/components/Search';
+import MainLayout from '@/app/components/layout/MainLayout';
+import Pagination from '@/app/components/Pagination/index';
+import PopularProducts from '@/app/components/Products/PopularProducts';
+import ProductReview from '@/app/components/Products/ProductReview';
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { apiEndpoints } from '@/lib/constants';
+
 type ProductApiResponse = {
   products: Product[];
   totalProducts: number;
@@ -71,11 +71,13 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const searchTerm = searchParams.searchterm || '';
   const cookieStore = await cookies();
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const token = cookieStore.get("accessToken")?.value || "";
 
   const fetchProductData = async (): Promise<{ products: Product[]; totalProducts: number }> => {
 
     const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: 'GET',
+      accessToken: token,
       queryParams: {
         page: page.toString(),
         limit: limit.toString(),
@@ -108,7 +110,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   return (
     <MainLayout sidebarProps={sidebarProps}>
-      <SearchBox initialSearchTerm={searchTerm} />
+      {/* <SearchBox initialSearchTerm={searchTerm} /> */}
 
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
       <PopularProducts countryCode={countryCode} />

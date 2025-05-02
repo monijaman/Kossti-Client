@@ -1,7 +1,7 @@
 'use client'
 // pages/specifications/index.js
-import KeyDetails from '@/components/admin/keys/KeyDetails';
-import Pagination from '@/components/Pagination/index';
+import KeyDetails from '@/app/components/admin/keys/KeyDetails';
+import Pagination from '@/app/components/Pagination/index';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';

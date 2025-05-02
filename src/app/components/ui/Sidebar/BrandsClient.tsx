@@ -1,6 +1,6 @@
 "use client"
 // components/BrandsList.tsx
-import InteractiveBrandFilter from '@/components/ui/Sidebar/InteractiveBrandFilter';
+import InteractiveBrandFilter from '@/app/components/ui/Sidebar/InteractiveBrandFilter';
 import { useBrands } from '@/hooks/useBrands';
 import { Brand, SidebarParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
