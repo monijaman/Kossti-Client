@@ -14,6 +14,8 @@ export const apiEndpoints = {
   getPublicSpecs: (productId :number) =>`get-public-spec/${productId}`,
   getReviews:  `get`,
   submitBrands: (brandid :number) =>`category-brands/${brandid}`,
+  getAProductById: (id :number) =>`product/${id}`,
+  
 };
 
 //   usage const endpoint = apiEndpoints.getPublicReviewsByProductId(123);
