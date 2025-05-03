@@ -4,22 +4,23 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { Category, SpecificationKey } from '@/lib/types';
 import { FormEvent, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
-
 interface Specification {
     id: number | null;
     specification_key: number | null;
 }
-
+interface SpecResponse {
+    message: string;
+  }
 const Specification = () => {
 
-    const { getSpecificationsByCategory, getFormSpecifications, getSpecificationsKeys, submitSpecifications } = useSpecifications();
+    const { getSpecificationsByCategory,  getSpecificationsKeys, submitSpecifications } = useSpecifications();
     const { getCategory } = useCategory();
 
     const [specifications, setSpecifications] = useState<Specification[]>([]);
     const [activeSpecifications, setActiveSpecigications] = useState<SpecificationKey[]>([]);
     const [formStatus, setFormStatus] = useState<string[]>();
     const [categories, setCategories] = useState<Category[]>([]);
-    const [productName, setProductName] = useState<string>('');
+    const productName ='';
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // To store the selected category
 
     // Function to handle category selection
@@ -29,13 +30,17 @@ const Specification = () => {
         }
     };
 
-    const saveSpecs = async () => {
+   
+      
+      const saveSpecs = async () => {
         const response = await submitSpecifications(selectedCategory ?? 0, activeSpecifications);
-        if (response.success) {
-
-            setFormStatus(response.data.message)
+      
+        if (response.success && response.data) {
+          const data = response.data as SpecResponse; // ✅ safely assert the expected shape
+          setFormStatus([data.message]);
         }
-    }
+      };
+      
 
     // Function to handle specification key selection
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {

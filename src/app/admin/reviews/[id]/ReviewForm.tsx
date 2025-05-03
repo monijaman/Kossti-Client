@@ -7,7 +7,7 @@ import { AdditionalDetails, Review, Product } from '@/lib/types';
 import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import Modal from '@/app/components/Modal/client';
 // Dynamically import React Quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'){ ssr: false });
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css'; // Import styles
 import DragNdrop from "@/app/components/Uploader/Uploader";
 
@@ -28,7 +28,8 @@ const ReviewForm = ({ params }: PageProps) => {
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [formStatus, setFormStatus] = useState("");
     const [products, setProducts] = useState<Product>();
- 
+    const productName = ""
+    const [files, setFiles] = useState<File[]>([]);
 
     const fetchProductData = async () => {
         try {
@@ -57,6 +58,19 @@ const ReviewForm = ({ params }: PageProps) => {
         }
     }, []);
 
+    useEffect(() => {
+
+        if (files.length > 0) {
+            const formData = new FormData();
+            files.forEach((file) => {
+                formData.append('files', file);
+            });
+            // Assuming you have a function to handle the file upload
+            // handleFileUpload(formData);
+        }
+    }
+    , [files]);
+
 
    
     const handleReviewSubmit = async (event: React.FormEvent) => {
@@ -75,7 +89,7 @@ const ReviewForm = ({ params }: PageProps) => {
         }
 
         try {
-            const response = await addReview(
+          await addReview(
                 id,
                 rating,
                 reviews,

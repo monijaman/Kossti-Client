@@ -17,52 +17,7 @@ type ProductApiResponse = {
 // Server Component
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   // const { getProducts } = useProducts();
-  /*
-    const getProductsd = async (
-      page: number,
-      limit: number,
-      category?: string,
-      brands?: string,
-      priceRange?: string,
-      searchTerm?: string,
-      locale?: string,
-      sortby?: string
-    ) => {
-      const params: Record<string, string> = {
-        page: page.toString(),
-        limit: limit.toString(),
-        // _: cacheBuster.toString(), // Cache-busting parameter
-      };
-  
-      // Add optional parameters only if they are defined
-      if (category) params.category = category;
-      if (brands) params.brand = brands;
-      if (priceRange) params.pricerange = priceRange;
-      if (searchTerm) params.searchterm = searchTerm;
-      if (locale) params.locale = locale;
-      if (sortby) params.sortby = sortby;
-  
-      // Build the query string
-      // const queryString = new URLSearchParams(params).toString();
-  
-  
-      // const fullUrl = `${fetchApi}/products?${queryString}`;
-  
-      try {
-        const dataset = await fetchApi<ProductApiResponse>('/products', {
-          method: 'GET',
-          queryParams: params,
-        });
-  
-        return dataset;
-  
-  
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        return { success: false, data: [] };
-      }
-    };
-  */
+ 
   const page = parseInt(searchParams.page as string, 10) || 1;
   const limit = 20;
   const activeCategory = searchParams.category || '';

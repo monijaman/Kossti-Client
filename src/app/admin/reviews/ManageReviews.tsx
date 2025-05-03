@@ -22,8 +22,8 @@ interface reviweData {
 
 
 
-const ManageReviews = ({ params, searchParams }: PageProps) => {
-  const { slug } = params;
+const ManageReviews = ({  searchParams }: PageProps) => {
+ 
   const { getReviews } = useReviews();
   const [searchTerm, setSearchTerm] = useState('');
 
