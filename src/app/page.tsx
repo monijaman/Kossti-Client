@@ -13,9 +13,12 @@ type ProductApiResponse = {
   products: Product[];
   totalProducts: number;
 };
+interface PageProps {
+  searchParams: SearchParams;
+}
 
 // Server Component
-const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+const Page = async ({ searchParams }: PageProps) => {
   // const { getProducts } = useProducts();
  
   const page = parseInt(searchParams.page as string, 10) || 1;
