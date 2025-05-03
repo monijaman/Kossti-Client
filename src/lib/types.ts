@@ -12,11 +12,10 @@ export type SubmitSpecResponse = {
   success: boolean;
   error?: string;
   data?: {
-      message: string;
-      // other fields if any
+    message: string;
+    // other fields if any
   };
 };
-
 
 export interface categoryInt {
   id: number;
@@ -26,10 +25,9 @@ export interface categoryInt {
   status?: boolean;
   total?: number;
   priority: number;
-  deleted_at:string | null;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
-  
 }
 
 export interface Product {
