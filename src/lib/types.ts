@@ -8,6 +8,15 @@ export interface brandInt {
   updated_at: string;
 }
 
+export type SubmitSpecResponse = {
+  success: boolean;
+  error?: string;
+  data?: {
+    message: string;
+    // other fields if any
+  };
+};
+
 export interface categoryInt {
   id: number;
   name: string;
@@ -16,7 +25,7 @@ export interface categoryInt {
   status?: boolean;
   total?: number;
   priority: number;
-  deleted_at: null;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -69,6 +78,15 @@ export interface ProductApiResponse {
 //   activeCategory?: string; // Change from string[] to string
 //   activePriceRange?: string; // Change from string[] to string
 // }
+export interface MessageInfo {
+  message: string;
+}
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T | null; // Data will be null if the request fails
+  error?: string; // Error message if something goes wrong
+  status?: number; // Server status code
+}
 
 export interface SearchBoxProps {
   initialSearchTerm?: string;
@@ -78,7 +96,6 @@ export interface SearchBoxProps {
 export interface SearchParams {
   page?: string;
   slug?: string;
-  limit?: number;
   category?: string;
   brand?: string;
   price?: string;

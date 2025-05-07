@@ -5,6 +5,9 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
 import { useTranslation } from "@/hooks/useLocale";
 import { ReactNode } from 'react';
+import { cookies } from 'next/headers';
+import { DEFAULT_LOCALE } from '@/lib/constants';
+
 interface MainLayoutProps {
   children: ReactNode;
   sidebarProps?: {
@@ -13,12 +16,15 @@ interface MainLayoutProps {
     activePriceRange?: string;
     searchTerm?: string;
   };
-  accessToken: string | null;
-  countryCode: string;
+  accessToken?: string | null;
+  countryCode?: string;
 }
 
 
-const MainLayout = ({ children, sidebarProps, accessToken, countryCode }: MainLayoutProps) => {
+const MainLayout = async({ children, sidebarProps }: MainLayoutProps) => {
+
+    const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+    const accessToken =  (await cookies()).get('accessToken')?.value || null;
 
   // const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const translation = useTranslation(countryCode);
