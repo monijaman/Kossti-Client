@@ -1,12 +1,9 @@
-interface PageProps {
-  params: {
-    category: string; // Type for the slug
-  };
-}
+ 
 
-const Page = async ({ params }: PageProps) => {
+const Page = async (  params: Promise<{ category: string }>
+) => {
 
-  const { category } = params
+  const { category } = await params
   return (
     <h2>This is {category}</h2>
 

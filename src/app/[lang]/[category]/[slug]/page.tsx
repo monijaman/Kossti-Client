@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 type PageParams = {
   lang: string;
   slug: string;
-  category?: string;
+  category: string;
 };
 
 type PageSearchParams = {
@@ -37,15 +37,16 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: PageParams;
-  searchParams: PageSearchParams;
+  params: Promise<PageParams>;
+  searchParams: Promise<PageSearchParams>;
 }) {
-  const { slug, lang } = params;
+  const { slug, lang } = await params;
 
   const cookieStore = await cookies();
   const countryCode = lang || cookieStore.get('country-code')?.value || 'en';
-  const searchTerm = searchParams?.searchterm?.toString() || '';
-
+  const resolvedSearchParams = await searchParams;
+  const searchTerm = resolvedSearchParams?.searchterm?.toString() || '';
+  
   const { success, data } = await getAProductBySlug(slug, countryCode);
 
   if (!success || !data) {

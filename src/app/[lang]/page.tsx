@@ -28,7 +28,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activeBrands = searchParams.brand || '';
   const activePriceRange = searchParams.price || '';
   const searchTerm = searchParams.searchterm || '';
-  const countryCode = cookies().get('country-code')?.value || 'en'; // Default to 'en' if not found
+  const countryCode = (cookies().get).('country-code')?.value || 'en'; // Default to 'en' if not found
 
   const fetchProductData = async () => {
     const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);
