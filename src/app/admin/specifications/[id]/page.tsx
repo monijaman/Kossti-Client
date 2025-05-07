@@ -10,7 +10,10 @@ interface PageProps {
         id: number;
     }>;
 }
-
+type SelectOption = {
+    value: number | null;
+    label: string;
+  };
 const Specification = (props: PageProps) => {
     const params = use(props.params);
     const { id } = params;
@@ -116,7 +119,7 @@ const Specification = (props: PageProps) => {
                                                 label: key.specification_key,
                                             }))
                                             .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
-                                        onChange={(selectedOption: SingleValue<{ value: number; label: string }>) => handleSelectChange(index, selectedOption)}
+                                        onChange={(selectedOption: SingleValue<SelectOption>) => handleSelectChange(index, selectedOption)}
                                         options={specKeys.map((key) => ({
                                             value: key.id,
                                             label: key.specification_key,
