@@ -3,7 +3,7 @@ import LanguageSwitcher from '@/components/Language/LanguageSwitcher';
 import AccountDropdown from '@/components/ui/AccountDropdown';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Sidebar from '@/components/ui/Sidebar/Sidebar';
-import { useTranslation } from "@/hooks/useLocale";
+import { getTranslation } from "@/lib/serverTranslation";
 import { ReactNode } from 'react';
 import { cookies } from 'next/headers';
 import { DEFAULT_LOCALE } from '@/lib/constants';
@@ -27,7 +27,7 @@ const MainLayout = async({ children, sidebarProps }: MainLayoutProps) => {
     const accessToken =  (await cookies()).get('accessToken')?.value || null;
 
   // const countryCode = (cookies() as unknown as UnsafeUnwrappedCookies).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
-  const translation = useTranslation(countryCode);
+  const translation = getTranslation(countryCode);
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-800 text-white p-4 flex items-center justify-between">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCategory } from "@/hooks/useCategory";
-import { useTranslation } from "@/hooks/useLocale";
+import { getTranslation } from "@/lib/serverTranslation";
 import { DEFAULT_LOCALE } from "@/lib/constants";
 import { categoryInt, SearchParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ const Categories = ({ category }: SearchParams) => {
   // const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const countryCode = DEFAULT_LOCALE; // Default to 'en' if not found
 
-  const translation = useTranslation(countryCode);
+  const translation = getTranslation(countryCode);
 
   useEffect(() => {
     // Fetch the category data

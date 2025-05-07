@@ -1,6 +1,6 @@
 
 
-import { useTranslation } from "@/hooks/useLocale";
+import { getTranslation } from "@/lib/serverTranslation";
 import { Product } from '@/lib/types';
 import ProducShortDetails from './ProducShortDetails';
 
@@ -12,7 +12,7 @@ interface pageProps {
 const ProductReview = ({ products, countryCode }: pageProps) => {
   // Retrieve the 'country-code' cookie directly in a server component
 
-  const translation = useTranslation(countryCode);
+  const translation = getTranslation(countryCode);
 
   return (
     <>

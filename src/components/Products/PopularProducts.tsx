@@ -1,6 +1,6 @@
 
 "use client"
-import { useTranslation } from "@/hooks/useLocale";
+import { getTranslation } from "@/lib/serverTranslation";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/lib/types";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ interface pageProps {
 }
 
 const PopularProducts = ({ countryCode }: pageProps) => {
-  const translation = useTranslation(countryCode);
+  const translation = getTranslation(countryCode);
   const { getProducts } = useProducts();
   const [dataset, setDataSet] = useState<Product[]>();
   const page = 1;
