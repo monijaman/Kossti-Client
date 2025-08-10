@@ -1,5 +1,5 @@
 "use client"
-import { Product} from '@/lib/types';
+import { Product } from '@/lib/types';
 
 interface ProductDetailsProps {
   products: Product[];
@@ -8,9 +8,9 @@ interface ProductDetailsProps {
   onReview: (id: number) => void; // Function to handle review action
 }
 
-const PopularProducts = ({ products, onEdit, onDelete, onReview }:ProductDetailsProps) => {
+const PopularProducts = ({ products, onEdit, onDelete, onReview }: ProductDetailsProps) => {
 
- 
+
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -33,8 +33,8 @@ const PopularProducts = ({ products, onEdit, onDelete, onReview }:ProductDetails
                 <tr key={product.id}>
                   <td className="py-2 px-4 border">{product.id}</td>
                   <td className="py-2 px-4 border">{product.name}</td>
-                  <td className="py-2 px-4 border">{product.brand}</td>
-                  <td className="py-2 px-4 border">{product.category}</td>
+                  <td className="py-2 px-4 border">{product.brand?.name}</td>
+                  <td className="py-2 px-4 border">{product.category?.name}</td>
                   <td className="py-2 px-4 border">{product.price}</td>
                   <td className="py-2 px-4 border">
                     <button

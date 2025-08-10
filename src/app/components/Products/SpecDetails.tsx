@@ -1,8 +1,8 @@
 // import { useSpecifications } from '@/hooks/useSpecifications';
-import fetchApi from "@/lib/fetchApi";
 import { apiEndpoints, DEFAULT_LOCALE } from "@/lib/constants";
-import { cookies } from 'next/headers';
+import fetchApi from "@/lib/fetchApi";
 import { ApiResponse } from "@/lib/types";
+import { cookies } from 'next/headers';
 interface PopularProductsProps {
   productId: number;
 }
@@ -21,10 +21,11 @@ const SpecDetails = async ({ productId }: PopularProductsProps) => {
   const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
   const fetchSpecifications = async (): Promise<ApiResponse<SpecsResponse>> => {
-
+    console.log('Fetching specifications for product ID:', apiEndpoints.getPublicSpecs(productId));
     const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(productId), {
       queryParams: { locale: countryCode }, // Pass the locale as a query parameter
     });
+
 
     return response;
   };
@@ -35,6 +36,7 @@ const SpecDetails = async ({ productId }: PopularProductsProps) => {
     ? specsResponse.data.dataset
     : [];
 
+  console.log('F-------------------------------:', apiEndpoints.getPublicSpecs(productId));
 
   return (
     <div>

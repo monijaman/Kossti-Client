@@ -33,8 +33,8 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
               <tr key={product.id} className="hover:bg-gray-100 transition duration-300 ease-in-out">
                 <td className="py-4 px-6">{product.id}</td>
                 <td className="py-4 px-6">{product.name}</td>
-                <td className="py-4 px-6">{product.brand}</td>
-                <td className="py-4 px-6">{product.category}</td>
+                <td className="py-4 px-6">{product.brand?.name}</td>
+                <td className="py-4 px-6">{product.category?.name}</td>
                 {/* Safely handle product.price to avoid TypeError */}
                 <td className="py-4 px-6">
                   {typeof product.price === 'number'

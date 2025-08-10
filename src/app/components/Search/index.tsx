@@ -99,7 +99,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                 >
                                     {/* Image */}
                                     <Image
-                                        src={product.photo}
+                                        src={product.photo || '/placeholder-image.jpg'}
                                         alt={product.name}
                                         width={50}
                                         height={50}
@@ -109,7 +109,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                     {/* Text */}
                                     <div className="flex-1">
                                         <span className="text-gray-800 font-medium block">{product.name}</span>
-                                        <span className="text-gray-600 text-sm">{product.brand} • {product.category}</span>
+                                        <span className="text-gray-600 text-sm">{product.brand?.name} • {product.category?.name}</span>
                                     </div>
                                 </Link>
                             </li>

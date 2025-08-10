@@ -10,7 +10,7 @@ export const apiEndpoints = {
   getWideCategories: "wide-categories",
   getPublicBrands: `public-brands`,
   // getPublicSpecs: (productId:number, countryCode:string)=> `get-public-spec/${productId}/}`,
-  getPublicSpecs: (productId: number) => `get-public-spec/${productId}`,
+  getPublicSpecs: (productId: number) => `/get-public-spec/${productId}`,
   getReviews: `get`,
   submitBrands: (brandid: number) => `category-brands/${brandid}`,
   getAProductById: (id: number) => `product/${id}`,

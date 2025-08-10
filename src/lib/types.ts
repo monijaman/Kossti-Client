@@ -40,6 +40,10 @@ export interface Product {
   brand_id?: number;
   category_slug?: string;
   brand_slug?: string;
+  model?: string;
+  status?: boolean;
+  priority?: number;
+  translations?: ProductTranslation[];
 
   // Enhanced fields - full objects (like Laravel relationships)
   category?: {
@@ -136,6 +140,7 @@ export interface Review {
   locale: string;
   created_at: string; // Added created_at field
   updated_at: string;
+  translations?: ReviewTranslation[];
 }
 
 export interface ReviewTranslation {

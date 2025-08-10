@@ -1,7 +1,7 @@
 "use client";
 import { useProducts } from "@/hooks/useProducts";
 import { LOCALES } from '@/lib/constants';
-import { Product } from '@/lib/types'; // Assuming you have a Product type
+import { Product, ProductTranslation } from '@/lib/types'; // Assuming you have a Product type
 import { useEffect, useState } from 'react';
 
 interface ProductFormProps {
@@ -29,7 +29,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         }
 
         if (product && translations) {
-            const item = translations.find((item) => {
+            const item = translations.find((item: ProductTranslation) => {
                 return item.locale == locale
             })
 
@@ -72,7 +72,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
             if (response.success) {
                 setSubmitStatus('Form Submitted successfully');
 
-                setTranslations((prevItem) => [
+                setTranslations((prevItem: ProductTranslation[] | undefined) => [
                     ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
                     response.data.translation  // append the new translation to the array
                 ]);

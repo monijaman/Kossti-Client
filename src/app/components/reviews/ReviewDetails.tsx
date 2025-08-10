@@ -21,7 +21,6 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
   const fetchReviews = async (): Promise<ReviewResponse> => {
     try {
       const response = await fetchApi(apiEndpoints.getPublicReviewsByProductId(productId, countryCode));
-      console.log('Fetched reviews:', response);
       return {
         success: response.success,
         data: response.data as Review[]
@@ -35,10 +34,6 @@ const ReviewDetails = async ({ productId }: PopularProductsProps) => {
 
   // Await the fetch to get the actual data
   const reviewResponse = await fetchReviews();
-  console.log('ReviewResponse:', reviewResponse);
-  console.log('ReviewResponse.data:', reviewResponse.data);
-  console.log('Type of reviewResponse.data:', typeof reviewResponse.data);
-  console.log('Is reviewResponse.data an array?', Array.isArray(reviewResponse.data));
 
   // Handle the case where the API response has nested data structure
   let reviewsData = reviewResponse.data;
