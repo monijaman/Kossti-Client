@@ -9,7 +9,7 @@ interface PopularProductsProps {
 
 const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
     const { getPhotosByProductId } = useProducts();
-   
+
     const [photos, setPhotos] = useState<ProductPhotos[]>([]);
     // Fetch specifications based on product ID and country code
     const fetchPhotos = async () => {
@@ -33,7 +33,7 @@ const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
                 <PhotoCarousel photos={photos} />
 
             ) : (
-                <p className="text-red-500">Error fetching specifications.</p>
+                <p className="text-red-500">No PHotos available</p>
             )}
         </div>
 

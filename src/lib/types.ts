@@ -33,21 +33,31 @@ export interface categoryInt {
 export interface Product {
   id: number;
   name: string;
-  category_id: number;
-  brand_id: number;
+  description?: string;
   slug: string;
-  category_slug: string;
-  brand: string;
-  category: string;
-  model?: string | null;
-  photo: string;
-  price: number; // or number
-  status?: number; // or whatever type it is
-  priority?: number; // or whatever type it is
-  reviews?: Review[];
-  translations?: ProductTranslation[]; // or whatever type it is
+  price: number;
+  category_id?: number;
+  brand_id?: number;
+  category_slug?: string;
+  brand_slug?: string;
 
-  specifications?: SpecificationInt[]; // Ensure specifications is included here
+  // Enhanced fields - full objects (like Laravel relationships)
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+
+  brand?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+
+  photo?: string;
+  views_count?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductTranslation {
@@ -118,12 +128,14 @@ export interface SpecTranslation {
 
 export interface Review {
   id: number;
-  user_id: string;
+  product_id: number;
+  rating: number;
   reviews: string;
-  rating: string;
+  additional_details: string | VideoItem[]; // Allow both string and VideoItem[]
   price: number;
-  additional_details: [];
-  translations: ReviewTranslation[];
+  locale: string;
+  created_at: string; // Added created_at field
+  updated_at: string;
 }
 
 export interface ReviewTranslation {
@@ -214,3 +226,10 @@ export interface Translations {
 }
 
 export type LocaleKeys = "en" | "bn";
+
+export interface VideoItem {
+  id: number;
+  url: string;
+  title: string;
+  youtubeUrl?: string; // Optional property to resolve the issue
+}

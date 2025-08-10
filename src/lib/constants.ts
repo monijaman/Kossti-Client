@@ -4,7 +4,7 @@ export const DEFAULT_LOCALE = "en";
 export const apiEndpoints = {
   getProducts: "/products",
   getPublicReviewsByProductId: (id: number | string, countryCode: string) =>
-    `public-reviews/${id}/${countryCode}`,
+    `/public-reviews/${id}?locale=${countryCode}`,
   updateBrandStatus: (brand_id: number) => `brand-status/${brand_id}`,
   getCategories: "categories",
   getWideCategories: "wide-categories",

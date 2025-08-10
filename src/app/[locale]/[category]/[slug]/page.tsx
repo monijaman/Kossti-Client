@@ -29,7 +29,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
           'Accept': 'application/json',
         },
       });
-
+      console.log('slugslugslug', slug);
       return response.success ? response.data : null;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -57,7 +57,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       <h3 className="font-semibold py-4">
         {dataset.name}
         {dataset.brand && ` - ${dataset.brand}`}
-        {dataset.category && ` - ${dataset.category}`}
+        {dataset.category && ` - ${dataset.category.name}`}
       </h3>
       <ProductPhotosPage productId={dataset.id} />
       <ReviewDetails productId={dataset.id} />
