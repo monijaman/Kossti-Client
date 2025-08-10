@@ -3,30 +3,30 @@ import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
-import { DEFAULT_LOCALE } from '@/lib/constants';
+import { apiEndpoints, DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
-import { apiEndpoints } from '@/lib/constants';
 
 type ProductApiResponse = {
   products: Product[];
   totalProducts: number;
 };
 interface PageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
 // Server Component
 const Page = async ({ searchParams }: PageProps) => {
   // const { getProducts } = useProducts();
- 
-  const page = parseInt(searchParams.page as string, 10) || 1;
+  const resolvedSearchParams = await searchParams;
+
+  const page = parseInt(resolvedSearchParams.page as string, 10) || 1;
   const limit = 20;
-  const activeCategory = searchParams.category || '';
-  const activeBrands = searchParams.brand || '';
-  const activePriceRange = searchParams.price || '';
-  const searchTerm = searchParams.searchterm || '';
+  const activeCategory = resolvedSearchParams.category || '';
+  const activeBrands = resolvedSearchParams.brand || '';
+  const activePriceRange = resolvedSearchParams.price || '';
+  const searchTerm = resolvedSearchParams.searchterm || '';
   const cookieStore = await cookies();
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
   const token = cookieStore.get("accessToken")?.value || "";
@@ -47,11 +47,11 @@ const Page = async ({ searchParams }: PageProps) => {
       },
     });
 
- return {
+    return {
       products: response.data?.products ?? [],
       totalProducts: response.data?.totalProducts ?? 0,
     };
-    
+
 
   };
 
