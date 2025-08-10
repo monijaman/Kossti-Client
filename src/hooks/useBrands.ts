@@ -12,7 +12,7 @@ interface AddBrandData {
 export const useBrands = () => {
   // get all categories
   const getBrands = async () => {
-    const apiEndpoint = `brands`;
+    const apiEndpoint = `api/brands`; // Keep /api for brands since they might still use the old format
     // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
 
     if (!apiUrl) {

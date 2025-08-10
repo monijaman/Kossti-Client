@@ -5,7 +5,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const useCategory = () => {
   // get all categories
   const getCategory = async () => {
-    const apiEndpoint = `categories`;
+    const apiEndpoint = `api/categories`; // Keep /api for categories since they might still use the old format
 
     if (!apiUrl) {
       return Promise.reject(
@@ -66,7 +66,7 @@ export const useCategory = () => {
     }
 
     // Construct the full URL with the query string
-    const fullUrl = `${apiUrl}/wide-categories?${queryParams.toString()}`;
+    const fullUrl = `${apiUrl}/api/wide-categories?${queryParams.toString()}`;
 
     try {
       const response = await fetch(fullUrl);

@@ -20,11 +20,11 @@ export const useProducts = () => {
     };
 
     // Add optional parameters only if they are defined
+    if (locale) params.locale = locale;
     if (category) params.category = category;
     if (brands) params.brand = brands;
-    if (priceRange) params.pricerange = priceRange;
+    if (priceRange) params.priceRange = priceRange; // Updated to match Go server format
     if (searchTerm) params.searchterm = searchTerm;
-    if (locale) params.locale = locale;
     if (sortby) params.sortby = sortby;
 
     // Build the query string
@@ -43,10 +43,14 @@ export const useProducts = () => {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
 
+      // Handle Laravel-compatible response format
       return {
         success: true,
-        data: dataset,
-        totalProducts: dataset.totalProducts,
+        data: {
+          products: dataset.data || [], // Laravel format uses 'data' field
+          totalProducts: dataset.meta?.total || 0, // Laravel format uses 'meta.total'
+        },
+        totalProducts: dataset.meta?.total || 0,
       };
     } catch (error) {
       console.error("Error fetching products:", error);

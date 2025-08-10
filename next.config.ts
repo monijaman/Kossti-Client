@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    appDir: true,
+  },
   images: {
     domains: [
       "127.0.0.1",

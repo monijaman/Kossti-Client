@@ -91,6 +91,7 @@ export interface ApiResponse<T = unknown> {
 export interface SearchBoxProps {
   initialSearchTerm?: string;
   searchUrl?: string;
+  countryCode?: string;
 }
 
 export interface SearchParams {
