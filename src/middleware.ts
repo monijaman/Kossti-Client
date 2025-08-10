@@ -2,7 +2,7 @@ import { DEFAULT_LOCALE, LOCALES } from "@/lib/constants";
 import { gettokenbyrefreshToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
- const PUBLIC_FILE = /\.(.*)$/;
+const PUBLIC_FILE = /\.(.*)$/;
 
 function internationalization(req: NextRequest, res: NextResponse) {
   // List of supported locales
@@ -62,7 +62,6 @@ function internationalization(req: NextRequest, res: NextResponse) {
   }`;
   return redirectUrl; // Return the correct redirect URL
 }
- 
 
 // Function to handle token checking and redirection
 async function handleTokenAndRedirect(
@@ -71,7 +70,7 @@ async function handleTokenAndRedirect(
   refToken?: string
 ) {
   const token = request.cookies.get("accessToken")?.value;
- 
+
   if (refToken) {
     return NextResponse.redirect(new URL("/redirect", request.url));
   }
@@ -124,13 +123,18 @@ export async function middleware(request: NextRequest) {
 
   // Only call handleTokenAndRedirect for specified routes
   const pathname = request.nextUrl.pathname;
+
+  // Skip internationalization for admin routes - keep them in English only
   if (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/signin") ||
     pathname.startsWith("/signup")
   ) {
     return await handleTokenAndRedirect(request, response, refToken);
-  } else if (!request.cookies.get("country-code")) {
+  }
+
+  // Apply internationalization only to non-admin routes
+  if (!request.cookies.get("country-code")) {
     const redirectUrl = internationalization(request, response);
 
     if (redirectUrl) {
@@ -144,6 +148,15 @@ export async function middleware(request: NextRequest) {
   } else if (request.cookies.get("country-code")) {
     // Get the current pathname
     const pathname = request.nextUrl.pathname;
+
+    // Skip internationalization for admin routes - they should stay English only
+    if (
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/signin") ||
+      pathname.startsWith("/signup")
+    ) {
+      return response;
+    }
 
     // Get the 'country-code' cookie value
     const countryCodeCookie = request.cookies.get("country-code");
@@ -213,8 +226,17 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-// Middleware configuration to apply to all routes
+// Middleware configuration to apply to all routes except admin
 export const config = {
-  matcher: "/:path*",
-  // matcher: ["/admin/:path*", "/signin/:path*", "/signup/:path*", "/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - admin (admin routes - no internationalization)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

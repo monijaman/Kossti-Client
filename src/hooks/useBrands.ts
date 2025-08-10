@@ -1,6 +1,5 @@
-import { Brand } from "@/lib/types";
-import { ApiResponse } from "@/lib/types";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+import { ApiResponse, Brand } from "@/lib/types";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 interface CategoryOptions {
   per_page?: string;
   search?: string;
@@ -245,20 +244,19 @@ export const useBrands = () => {
       };
     } catch (error: unknown) {
       console.error("Error fetching category:", error);
-    
+
       let errorMessage = "An unknown error occurred";
-    
+
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-    
+
       return {
         success: false,
         data: [],
         error: errorMessage,
       };
     }
-    
   };
 
   // get all categories

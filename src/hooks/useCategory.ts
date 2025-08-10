@@ -1,6 +1,6 @@
 import { ApiResponse, MessageInfo } from "@/lib/types";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const useCategory = () => {
   // get all categories
@@ -87,7 +87,6 @@ export const useCategory = () => {
     }
   };
 
- 
   const submitCategory = async ({
     categoryId = null,
     category,
@@ -238,20 +237,19 @@ export const useCategory = () => {
       };
     } catch (error: unknown) {
       console.error("Error fetching category:", error);
-    
+
       let errorMessage = "An unknown error occurred";
-    
+
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-    
+
       return {
         success: false,
         data: [],
         error: errorMessage,
       };
     }
-    
   };
 
   const categoryStatUpdate = async ({

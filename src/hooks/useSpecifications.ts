@@ -1,10 +1,10 @@
- import { ApiResponse } from "@/lib/types";
- const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
 import {
+  ApiResponse,
   SpecificationInt,
   SpecificationKey,
   SpecKeyTranslation,
-} from "@/lib/types"; // Assuming you have a Product type
+} from "@/lib/types";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const useSpecifications = () => {
   const getSpecificationsKeys = async (serachTem = "") => {

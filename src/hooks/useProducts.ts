@@ -1,4 +1,4 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // Function to get cookie by name
 
@@ -209,9 +209,10 @@ export const useProducts = () => {
     }
   };
 
-   
-
-  const Translation = async (productData: Record<string, unknown>, id: number) => {
+  const Translation = async (
+    productData: Record<string, unknown>,
+    id: number
+  ) => {
     try {
       const apiUrl = `product-trans/${id}`; // Assuming this is the API route
 
@@ -273,7 +274,7 @@ export const useProducts = () => {
       const fullUrl = `${apiUrl}/products/${productId}/increment-views`; // Assuming this is the API route
 
       // Append apiUrl to productData
- 
+
       // Make the POST request to the backend API
       const response = await fetch(fullUrl, {
         method: "POST",

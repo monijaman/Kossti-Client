@@ -1,4 +1,4 @@
- const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import { AdditionalDetails } from "@/lib/types";
 
 export const useReviews = () => {
@@ -51,7 +51,6 @@ export const useReviews = () => {
     }
   };
 
-   
   const getReviewByProductId = async (id: number, locale?: string) => {
     const params: Record<string, string> = {};
 
@@ -85,7 +84,6 @@ export const useReviews = () => {
   };
 
   const getImagesByProductId = async (id: number) => {
-  
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
@@ -187,8 +185,6 @@ export const useReviews = () => {
       throw error;
     }
   };
-
-  
 
   const getReviews = async (
     page: number,
