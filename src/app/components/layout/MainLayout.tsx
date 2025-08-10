@@ -1,30 +1,20 @@
-// MainLayout.tsx
-import LanguageSwitcher from '@/app/components/Language/LanguageSwitcher';
-import AccountDropdown from '@/app/components/ui/AccountDropdown';
-import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import Sidebar from '@/app/components/ui/Sidebar/Sidebar';
-import { useTranslation } from "@/hooks/useLocale";
-import { DEFAULT_LOCALE } from '@/lib/constants';
-import { cookies } from 'next/headers';
+import { SidebarParams } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import LanguageSwitcher from '../Language/LanguageSwitcher';
+import Sidebar from '../ui/Sidebar/Sidebar';
+
+// const DEFAULT_LOCALE = 'en';
+
 interface MainLayoutProps {
   children: ReactNode;
-  sidebarProps?: {
-    activeCategory?: string;
-    selectedBrands?: string;
-    activePriceRange?: string;
-    searchTerm?: string;
-  };
+  sidebarProps?: SidebarParams;
 }
 
 const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
-  const cookieStore = await cookies()
-
-  const accessToken = cookieStore.get('accessToken')?.value; // Default to 'en' if not found
-  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
-  const translation = useTranslation(countryCode);
+  // const cookieStore = await cookies()
+  // const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
 
   return (
     <div className="min-h-screen flex flex-col mx-auto">
@@ -33,37 +23,25 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
           <Image
             src="/kossti.png"
             alt="Kosti"
-            style={{
-              width: "auto",
-              height: "90px",
-            }}
-            width={300}
-            height={90}
-            className="rounded"
+            width={100}
+            height={40}
+            className="cursor-pointer"
           />
         </Link>
-
-        <div className="ml-auto flex items-center space-x-4">
-          <AccountDropdown isAuthenticated={!!accessToken} />
+        <div className="text-black">
           <LanguageSwitcher />
         </div>
       </header>
 
-      {/* <div className="w-full max-w-[1600px] mx-auto"> */}
-      <Breadcrumbs />
-      {/* <Navigation /> */}
-
-      <div className="flex flex-grow">
-        <Sidebar {...sidebarProps} />
-
-        <main className="flex-1 bg-white p-4">
+      <div className="flex flex-1">
+        {sidebarProps && <Sidebar {...sidebarProps} />}
+        <main className="flex-1 p-4">
           {children}
         </main>
       </div>
-      {/* </div> */}
 
-      <footer className="bg-gray-800 text-white p-4 mt-auto">
-        <p className="text-center">&copy; {translation.copyright}</p>
+      <footer className="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2024 Kosti. All rights reserved.</p>
       </footer>
     </div>
   );

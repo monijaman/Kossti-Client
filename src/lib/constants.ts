@@ -6,8 +6,8 @@ export const apiEndpoints = {
   getPublicReviewsByProductId: (id: number | string, countryCode: string) =>
     `public-reviews/${id}/${countryCode}`,
   updateBrandStatus: (brand_id: number) => `brand-status/${brand_id}`,
-  getCategories: "api/categories",
-  getWideCategories: "api/wide-categories",
+  getCategories: "categories",
+  getWideCategories: "wide-categories",
   getPublicBrands: `public-brands`,
   // getPublicSpecs: (productId:number, countryCode:string)=> `get-public-spec/${productId}/}`,
   getPublicSpecs: (productId: number) => `get-public-spec/${productId}`,
@@ -16,5 +16,9 @@ export const apiEndpoints = {
   getAProductById: (id: number) => `product/${id}`,
 };
 
-//   usage const endpoint = apiEndpoints.getPublicReviewsByProductId(123);
-//  `brand-status/${brand_id}`,
+export const API_ROUTES = {
+  categories: "wide-categories",
+  brands: "wide-brands",
+  products: "products",
+  popularProducts: "popular-products",
+};
