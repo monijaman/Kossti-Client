@@ -1,11 +1,14 @@
 import { SidebarParams } from '@/lib/types';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import LanguageSwitcher from '../Language/LanguageSwitcher';
+import AccountDropdown from '../ui/AccountDropdown';
+import Breadcrumbs from '../ui/Breadcrumbs';
 import Sidebar from '../ui/Sidebar/Sidebar';
 
-// const DEFAULT_LOCALE = 'en';
+const DEFAULT_LOCALE = 'en';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -13,9 +16,9 @@ interface MainLayoutProps {
 }
 
 const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
-  // const cookieStore = await cookies()
-  // const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
-
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('accessToken')?.value; // Default to 'en' if not found
+  const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
@@ -23,19 +26,28 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
           <Image
             src="/kossti.png"
             alt="Kosti"
-            width={100}
-            height={40}
-            className="cursor-pointer"
+            style={{
+              width: "auto",
+              height: "90px",
+            }}
+            width={300}
+            height={90}
+            className="rounded"
           />
         </Link>
-        <div className="text-black">
+        <div className="ml-auto flex items-center space-x-4">
+
+          <AccountDropdown isAuthenticated={!!accessToken} />
           <LanguageSwitcher />
         </div>
       </header>
+      <Breadcrumbs />
 
-      <div className="flex flex-1">
-        {sidebarProps && <Sidebar {...sidebarProps} />}
-        <main className="flex-1 p-4">
+
+      <div className="flex flex-grow">
+        <Sidebar {...sidebarProps} />
+
+        <main className="flex-1 bg-white p-4">
           {children}
         </main>
       </div>

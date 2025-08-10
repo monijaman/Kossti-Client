@@ -1,5 +1,8 @@
-import { Inter } from 'next/font/google'
-import './globals.css'
+import { Inter } from 'next/font/google';
+// Ensure globals.scss is imported for Tailwind CSS
+import './globals.scss';
+
+// ...existing code...
 
 const inter = Inter({ subsets: ['latin'] })
 
