@@ -69,7 +69,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         sortby: '', // Add sorting if needed
       },
     });
-
+    console.log('API Response:', response); // Debugging line to check the response structure
     // Handle Laravel-compatible response format
     return {
       products: response.data?.data ?? [], // Laravel format uses 'data' field

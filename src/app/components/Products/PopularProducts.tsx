@@ -18,7 +18,9 @@ const PopularProducts = ({ countryCode }: pageProps) => {
 
   // Retrieve the 'country-code' cookie directly in a server component
   const fetchProductData = async () => {
+
     const response = await getProducts(page, limit, '', '', '', '', countryCode, 'popular');
+
     if (response.success && response.data && typeof response.data === 'object' && 'products' in response.data) {
       const dataset = response.data.products;
       setDataSet(dataset);
