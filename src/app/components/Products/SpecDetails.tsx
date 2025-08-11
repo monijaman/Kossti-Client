@@ -36,7 +36,7 @@ const SpecDetails = async ({ productId }: PopularProductsProps) => {
     ? specsResponse.data.dataset
     : [];
 
-  console.log('F-------------------------------:', apiEndpoints.getPublicSpecs(productId));
+  console.log('F-------------------------------:', dataset);
 
   return (
     <div>

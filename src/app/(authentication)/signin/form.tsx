@@ -1,12 +1,21 @@
 
 import getErrors from '@/app/components/Form/validation';
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
-
 interface FormData {
   [key: string]: string; // Define the type of form data fields
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  refresh_token: string;
+  email: string;
 }
 interface FormErrors {
   [key: string]: string[]; // Allow arrays of strings for each error field
@@ -28,6 +37,9 @@ export const LoginForm = () => {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
+
+
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -35,36 +47,38 @@ export const LoginForm = () => {
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
+
+      const requestBody = {
+        email: formData.email,
+        password: formData.password
+      };
+
+
       try {
-        const response = await fetch("/api/login", {
+        const response = await fetchApi(apiEndpoints.login, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(requestBody),
         });
 
-
-        const resJson = await response.json();
-
-        if (!resJson.success) {
-          setError(resJson.error || "An unexpected error occurred.");
-        } else if (resJson.success) {
+        if (response.success) {
           setError(null);
-          localStorage.setItem('userName', resJson.dataset.username);
-          localStorage.setItem('avatar', resJson.dataset.avatar);
-          localStorage.setItem('email', resJson.dataset.email);
+          // Store the tokens and user info
+          const loginData = response.data as LoginResponse;
+          localStorage.setItem('token', loginData.token);
+          localStorage.setItem('refresh_token', loginData.refresh_token);
+          localStorage.setItem('email', loginData.email);
 
-          router.push("/");
+          router.push("/admin");
         } else {
-          setError(resJson.error || "Login failed.");
+          setError(response.error || "Login failed.");
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error.message);
         } else {
           setError("An unknown error occurred.");
-        }      }
+        }
+      }
     }
   };
 

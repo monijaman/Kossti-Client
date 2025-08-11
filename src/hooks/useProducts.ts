@@ -1,15 +1,3 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-// Update all API endpoints to remove /api prefix
-// const endpoints = {
-//   products: "/products",
-//   popularProducts: "/popular-products",
-//   categories: "/wide-categories",
-//   brands: "/wide-brands",
-// };
-
-// Function to get cookie by name
-
 export const useProducts = () => {
   const getProducts = async (
     page: number,

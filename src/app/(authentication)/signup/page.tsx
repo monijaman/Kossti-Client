@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { RegisterForm } from './form'
-export default function RegisterPage() {
 
+export default function RegisterPage() {
 
   return (
     <>
@@ -19,7 +19,6 @@ export default function RegisterPage() {
           </Link>
         </div>
       </main>
-
     </>
   )
 }

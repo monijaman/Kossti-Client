@@ -90,7 +90,7 @@ async function handleTokenAndRedirect(
     return NextResponse.redirect(new URL("/admin", request.url));
   } else if (!token) {
     console.log("No token, redirecting to signin...");
-    return NextResponse.redirect(new URL("/signin", request.url));
+    // return NextResponse.redirect(new URL("/signin", request.url));
   }
 
   // Allow access to other routes

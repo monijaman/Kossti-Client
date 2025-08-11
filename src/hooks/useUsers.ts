@@ -1,26 +1,21 @@
 "use client";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 
 interface loginInt {
   email: string;
   password: string;
 }
 export const useUsers = () => {
-  const formData = {
-    apiUrl: "",
-    id: "",
-    name: "",
-    email: "",
-  };
-
   const searchUsers = async (keyword: string) => {
     if (!keyword) {
       return;
     }
 
-    const apiEndpoint = `?action=search-users&keyword=${keyword}`;
     try {
-      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
-      const dataset = await response.json();
+      const dataset = await fetchApi(
+        `${apiEndpoints.searchUsersApi}?keyword=${keyword}`
+      );
       return dataset;
     } catch (error) {
       console.error("Error fetching campaigns:", error);
@@ -29,22 +24,15 @@ export const useUsers = () => {
 
   const addClient = async (name: number | null, email: string) => {
     try {
-      const newFormData = {
-        ...formData,
+      const payload = {
         name: "test title",
         email: email,
-        apiUrl: `clients`,
       };
-      const response = await fetch("/api/post", {
+      const response = await fetchApi(apiEndpoints.users, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify(payload),
       });
-      if (!response.ok) {
-        throw new Error("Failed to add campaign");
-      }
+      return response;
     } catch (error) {
       console.error("Error adding campaign:", error);
     }
@@ -52,15 +40,9 @@ export const useUsers = () => {
 
   const logoutUser = async () => {
     try {
-      const response = await fetch("/api/post", {
+      await fetchApi(apiEndpoints.logout, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      if (!response.ok) {
-        throw new Error("Failed to add campaign");
-      }
       return { success: true };
     } catch (error) {
       console.error("Error adding campaign:", error);
@@ -68,29 +50,18 @@ export const useUsers = () => {
   };
 
   const loginUser = async ({ email, password }: loginInt) => {
-    const newFormData = {
-      ...formData,
+    const payload = {
       email: email,
       password: password,
-      apiUrl: `login`,
     };
 
     try {
-      const response = await fetch("/api/post", {
+      const response = await fetchApi(apiEndpoints.login, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const resJson = await response.json();
-
-      return resJson;
+      return response;
     } catch (error: unknown) {
       console.error("Error logging in:", error);
     }

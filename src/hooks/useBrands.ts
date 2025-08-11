@@ -1,5 +1,6 @@
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 import { ApiResponse, Brand } from "@/lib/types";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 interface CategoryOptions {
   per_page?: string;
   search?: string;
@@ -12,20 +13,8 @@ interface AddBrandData {
 export const useBrands = () => {
   // get all categories
   const getBrands = async () => {
-    const apiEndpoint = `api/brands`; // Keep /api for brands since they might still use the old format
-    // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
-      const dataset = await response.json();
+      const dataset = await fetchApi(apiEndpoints.getBrands);
 
       return {
         success: true,
@@ -38,20 +27,8 @@ export const useBrands = () => {
   };
 
   const getPublicBrands = async () => {
-    const apiEndpoint = `public-brands`;
-    // const apiEndpoint = `/api/v1/products?page=1&productsPerPage=10&category=&branch=&priceRange=`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
-      const dataset = await response.json();
+      const dataset = await fetchApi(apiEndpoints.getPublicBrands);
 
       return {
         success: true,
@@ -67,13 +44,6 @@ export const useBrands = () => {
   const getAllBrands = async (options: CategoryOptions = {}) => {
     const { per_page, search, paginate } = options;
 
-    // Ensure the API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
     // Build query string based on optional parameters
     const queryParams = new URLSearchParams();
     if (per_page !== undefined) queryParams.append("per_page", per_page);
@@ -81,22 +51,11 @@ export const useBrands = () => {
     if (paginate !== undefined)
       queryParams.append("paginate", String(paginate));
 
-    // Construct the full URL with query parameters
-    const apiEndpoint = `wide-brands`;
-    const fullUrl = `${apiUrl}/${apiEndpoint}?${queryParams.toString()}`;
     try {
-      // Fetch data from the API
-      const response = await fetch(fullUrl);
-
-      // Check if the response is OK
-      if (!response.ok) {
-        throw new Error(
-          `Error fetching category: ${response.status} ${response.statusText}`
-        );
-      }
-
-      // Parse the JSON data
-      const dataset = await response.json();
+      // Fetch data from the API using fetchApi
+      const dataset = await fetchApi(
+        `${apiEndpoints.getBrands}?${queryParams.toString()}`
+      );
 
       // Return success with data
       return {
@@ -128,22 +87,25 @@ export const useBrands = () => {
     brandId?: number | null;
   }): Promise<ApiResponse<AddBrandData>> => {
     try {
-      // Prepare the payload with productId, specificationKey, and apiUrl
+      // Prepare the payload
       const payload = {
-        id: brandId, // Consistent naming with snake_case
+        id: brandId,
         name: brand,
-        apiUrl: "brands",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      // Send the request to the backend using fetchApi
+      const endpoint = brandId
+        ? apiEndpoints.updateBrand(brandId)
+        : apiEndpoints.createBrand;
+      const method = brandId ? "PUT" : "POST";
+
+      const response = await fetchApi(endpoint, {
+        method,
         body: JSON.stringify(payload),
       });
 
-      // Return the JSON response
-      return await response.json();
+      // Return the response
+      return response as ApiResponse<AddBrandData>;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error
@@ -156,7 +118,7 @@ export const useBrands = () => {
     brands: Brand[]
   ): Promise<unknown> => {
     try {
-      // Prepare the payload with productId, specifications, and apiUrl
+      // Prepare the payload
 
       const brandArrays = brands
         .map((brand) => brand.id) // Return the `id` directly
@@ -166,23 +128,16 @@ export const useBrands = () => {
       const payload = {
         category_id: categoryId,
         brands: brandArrays,
-        apiUrl: "category-brands",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
+      // Send the request to the backend using fetchApi
+      const response = await fetchApi(apiEndpoints.createCategoryBrands, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), // Send payload including apiUrl
+        body: JSON.stringify(payload),
       });
 
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error("Failed to submit specifications");
-      }
-
-      // Return the JSON response if the request was successful
-      return await response.json();
+      // Return the response
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error
@@ -197,13 +152,6 @@ export const useBrands = () => {
   }) => {
     const { category_id, category_slug, locale } = options;
 
-    // Ensure the API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
     // Build query string based on optional parameters
     const queryParams = new URLSearchParams();
     if (category_id !== undefined) {
@@ -216,26 +164,11 @@ export const useBrands = () => {
       queryParams.append("locale", locale);
     }
 
-    // Construct the full URL with query parameters
-    const apiEndpoint = `category-brands`;
-    const fullUrl = `${apiUrl}/${apiEndpoint}?${queryParams.toString()}`;
-
     try {
-      // Fetch data from the API
-      const response = await fetch(fullUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.statusText}`);
-      }
-
-      // Parse the JSON data
-      const dataset = await response.json();
+      // Fetch data from the API using fetchApi
+      const dataset = await fetchApi(
+        `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`
+      );
 
       // Return success with data
       return {
@@ -289,23 +222,10 @@ export const useBrands = () => {
     queryParams.append("status", status !== null ? status.toString() : "");
     queryParams.append("page", page !== null ? page.toString() : "");
 
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    // Construct the full URL with the query string
-    const fullUrl = `${apiUrl}/wide-brands?${queryParams.toString()}`;
-
     try {
-      const response = await fetch(fullUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const dataset = await response.json();
+      const dataset = await fetchApi(
+        `${apiEndpoints.getBrands}?${queryParams.toString()}`
+      );
 
       return {
         success: true,
@@ -327,19 +247,20 @@ export const useBrands = () => {
     try {
       // Prepare the payload with consistent naming
       const payload = {
-        status: status, // Use speckeyId as the identifier
-        apiUrl: `brand-status/${brand_id}`,
+        status: status,
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Send the request to the backend using fetchApi
+      const response = await fetchApi(
+        apiEndpoints.updateBrandStatus(brand_id),
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        }
+      );
 
-      // Return the JSON response
-      return await response.json();
+      // Return the response
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error
@@ -358,21 +279,19 @@ export const useBrands = () => {
     try {
       // Prepare the payload with consistent naming
       const payload = {
-        brand_id: brandId, // Use speckeyId as the identifier
-        name: brand, // Ensure this matches the key you expect on the server
+        brand_id: brandId,
+        name: brand,
         locale,
-        apiUrl: "brand-translation",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
+      // Send the request to the backend using fetchApi (assuming brand-translation endpoint exists)
+      const response = await fetchApi("/brand-translation", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      // Return the JSON response
-      return await response.json();
+      // Return the response
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error
