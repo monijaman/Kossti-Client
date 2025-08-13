@@ -48,7 +48,9 @@ export const apiEndpoints = {
   updateCategoryStatus: (id: number | string) => `/category-status/${id}`,
 
   // Brand endpoints
+
   getBrands: "/brands",
+  Brands: (brandId: number) => `/brands/${brandId}`,
   createBrand: "/brands",
   getBrandById: (id: number | string) => `/brands/${id}`,
   updateBrand: (id: number | string) => `/brands/${id}`,

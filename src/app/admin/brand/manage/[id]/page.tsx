@@ -1,10 +1,12 @@
 'use client'
+
 import BrandForm from "@/app/components/admin/brands/BrandForm";
 import BrandTransForm from "@/app/components/admin/brands/BrandTransForm";
 import { useBrands } from "@/hooks/useBrands";
-
-import { Category } from '@/lib/types'; // Assuming you have a Product type
-import { useEffect, useState } from 'react';
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+import { Brand } from '@/lib/types'; // Assuming you have a Product type
+import { useCallback, useEffect, useState } from 'react';
 interface PageProps {
     params: {
         id: number; // Type for the slug
@@ -16,31 +18,25 @@ const ManageBrands = ({ params }: PageProps) => {
     const { getWideBrands } = useBrands();
 
     const { id: brandId } = params;
-    const [brand, setBrand] = useState<Category>()
+    const [brand, setBrand] = useState<Brand | null>(null)
 
-    const fetchBrand = async () => {
-        try {
-            const brandResponse = await getWideBrands({
-                limit: 10,        // Number of items per page (optional)
-                search: '',   // Search term (optional)
-                paginate: false,   // 'true' or 'false' to enable/disable pagination
-                locale: 'en',        // Locale, e.g., 'en', 'bn', etc.
-                brandId: brandId,      // Category ID (optional, can be empty)
+    const { id } = params;
+    const [brands, setBrands] = useState<Brand | null>(null)
 
-            });
+    const fetchBrands = useCallback(async () => {
 
-            if (Array.isArray(brandResponse.data)) {
-                setBrand(brandResponse.data[0]);
-            }
-
-        } catch (error) {
-            console.error('Error fetching categories:', error);
+        const response = await fetchApi(`${apiEndpoints.Brands(brandId)}`, {
+            method: 'GET',
+        });
+        if (response && response.success && response.data) {
+            setBrands(response.data as Brand);
         }
-    };
+    }, [id]);
+
 
     useEffect(() => {
         if (brandId) {
-            fetchBrand();
+            fetchBrands();
         }
 
     }, [])
@@ -48,9 +44,11 @@ const ManageBrands = ({ params }: PageProps) => {
     return (
         <>
             <div className="flex flex-row gap-4">
-                <div className="w-1/2  bg-gray-100 border rounded">
-                    <BrandForm brandData={brand} />
-                </div>
+                {brands &&
+                    <div className="w-1/2  bg-gray-100 border rounded">
+                        <BrandForm brandData={brands} />
+                    </div>
+                }
 
                 <div className="w-1/2">
                     {brand && <BrandTransForm brandData={brand} />}

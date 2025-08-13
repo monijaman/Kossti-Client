@@ -9,16 +9,16 @@ const Sidebar: React.FC = () => {
     const toggleSpecifications = () => {
         setShowSpecifications(!showSpecifications);
     };
-    
-    
+
+
     return (
         <nav className="bg-gray-900 text-white w-64 p-4">
             <ul>
-                <li>
+                <li className="mb-2">
                     <Link href="/admin/categories" className="hover:underline">Categories</Link>
                 </li>
                 <li className="mb-2">
-                    <Link href="/admin/brands" className="hover:underline">Brands</Link>
+                    <Link href="/admin/brand" className="hover:underline">Brands</Link>
                 </li>
                 <li className="mb-2">
                     <Link href="/admin/reviews" className="hover:underline">Manage Reviews</Link>
