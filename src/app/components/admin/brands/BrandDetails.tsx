@@ -1,14 +1,42 @@
 // BrandDetails.tsx (must be in /app directory or imported into a Server Component)
-
+import { updateBrandStatus } from '@/app/actions/updateBrandStatus';
 import { Brand } from '@/lib/types';
 import Link from 'next/link';
-import { updateBrandStatus } from '@/app/actions/updateBrandStatus';
+import { useState } from 'react';
 
 interface PageProps {
   brands: Brand[];
 }
 
 const BrandDetails = ({ brands }: PageProps) => {
+  // Ensure brands is an array
+
+  const [brandList, setBrandList] = useState<Brand[]>(Array.isArray(brands) ? brands : []);
+
+  if (brandList.length === 0) {
+    return (
+      <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6">
+        <p className="text-center text-gray-500">No brands found.</p>
+      </div>
+    );
+  }
+
+  const brandStatusUpdate = async (brand_id: number, status: number) => {
+    const response = await updateBrandStatus(brand_id, status);
+
+    if (response?.success) {
+
+      // Update brand status in the state
+      setBrandList((prevBrands) =>
+        prevBrands.map((brand) =>
+          brand.id === brand_id
+            ? { ...brand, status: !!status } // Convert status to boolean
+            : brand
+        )
+      );
+    }
+  };
+
   return (
     <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6">
       <table className="min-w-full bg-white border-collapse">
@@ -21,7 +49,7 @@ const BrandDetails = ({ brands }: PageProps) => {
           </tr>
         </thead>
         <tbody>
-          {brands.map((brand) => (
+          {brandList.map((brand) => (
             <tr key={brand.id ?? `null-${Math.random()}`} className="border-b hover:bg-gray-100">
               <td className="py-2 px-4 text-sm">{brand.id}</td>
               <td className="py-2 px-4 text-sm">{brand.name}</td>
@@ -35,20 +63,20 @@ const BrandDetails = ({ brands }: PageProps) => {
               <td className="py-2 px-4">
                 <Link
                   className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
-                  href={`/admin/brands/manage/${brand.id}`}
+                  href={`/admin/brand/manage/${brand.id}`}
                 >
                   Edit
                 </Link>
 
+
+
                 {brand.id !== null && (
-                  <form action={() => updateBrandStatus(brand.id!, brand.status ? 0 : 1)}>
-                    <button
-                      type="submit"
-                      className={`${brand.status ? 'bg-green-500' : 'bg-red-500'} text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
-                    >
-                      {brand.status ? 'Deactivate' : 'Activate'}
-                    </button>
-                  </form>
+                  <button
+                    className={`${brand.status ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
+                    onClick={() => brandStatusUpdate(brand.id!, brand.status ? 0 : 1)}
+                  >
+                    {brand.status ? 'Deactivate' : 'Activate'}
+                  </button>
                 )}
               </td>
             </tr>

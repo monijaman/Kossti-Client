@@ -8,10 +8,21 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
+  // Ensure keys is an array
+  const keyList = Array.isArray(keys) ? keys : [];
+
   const deleteKey = (id: number) => {
     console.log(`Key with ID ${id} deleted.`);
     // Add your delete logic here
   };
+
+  if (keyList.length === 0) {
+    return (
+      <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6">
+        <p className="text-center text-gray-500">No keys found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -31,7 +42,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {keys.map((key) => (
+            {keyList.map((key) => (
               <tr
                 key={key.id}
                 className="hover:bg-gray-50 transition duration-200 ease-in-out"

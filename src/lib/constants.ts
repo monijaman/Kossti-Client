@@ -54,7 +54,7 @@ export const apiEndpoints = {
   updateBrand: (id: number | string) => `/brands/${id}`,
   deleteBrand: (id: number | string) => `/brands/${id}`,
   getPublicBrands: "/public-brands",
-  updateBrandStatus: (brand_id: number) => `/brand-status/${brand_id}`,
+  BrandStatus: (brand_id: number) => `/brand-status/${brand_id}`, //post
 
   // Specification endpoints
   getSpecificationById: (id: number | string) => `/specifications/${id}`,

@@ -42,7 +42,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
         };
 
         fetchCategoriesAndBrands();
-    }, []);
+    }, [getBrands, getCategory]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -161,7 +161,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             required
                         >
                             <option value="" disabled>Select category</option>
-                            {categories.map((item) => (
+                            {Array.isArray(categories) && categories.map((item) => (
                                 <option key={item.id} value={item.id}>
                                     {item.name}
                                 </option>
@@ -183,7 +183,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             required
                         >
                             <option value="" disabled>Select brand</option>
-                            {brands.map((item) => (
+                            {Array.isArray(brands) && brands.map((item) => (
                                 <option key={item.id as number} value={item.id as number}>
                                     {item.name}
                                 </option>

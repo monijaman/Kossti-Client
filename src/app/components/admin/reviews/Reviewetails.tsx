@@ -13,6 +13,18 @@ interface PageProps {
 }
 
 const Reviewetails = ({ reviews }: PageProps) => {
+  // Ensure reviews is an array
+  const reviewList = Array.isArray(reviews) ? reviews : [];
+
+  if (reviewList.length === 0) {
+    return (
+      <div className="overflow-x-auto bg-gray-50 p-6 rounded-lg shadow-md">
+        <h2 className="text-3xl font-semibold text-center mb-6">Reviews Management</h2>
+        <p className="text-center text-gray-500">No reviews found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto bg-gray-50 p-6 rounded-lg shadow-md">
       <h2 className="text-3xl font-semibold text-center mb-6">Reviews Management</h2>
@@ -28,7 +40,7 @@ const Reviewetails = ({ reviews }: PageProps) => {
           </tr>
         </thead>
         <tbody>
-          {reviews.map((dataset) => (
+          {reviewList.map((dataset) => (
             <tr key={dataset.id} className="hover:bg-gray-100">
               <td className="py-3 px-4 border">{dataset.id}</td>
               <td className="py-3 px-4 border">

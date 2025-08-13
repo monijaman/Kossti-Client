@@ -2,19 +2,30 @@
 import BrandDetails from '@/app/components/admin/brands/BrandDetails';
 import Pagination from '@/app/components/Pagination/index';
 import { useBrands } from '@/hooks/useBrands';
-import { Brand, SearchParams } from '@/lib/types';
+import { Brand, brandInt, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string; // Type for the slug
-    };
-    searchParams: SearchParams; // Include searchParams
+    }>;
+    searchParams: Promise<SearchParams>; // Include searchParams as Promise
 }
 
-const Brands = ({ searchParams }: PageProps) => {
+
+interface BrandList {
+    data: {
+        brands: brandInt[];
+        total: number;
+    };
+}
+
+const BrandPage = ({ searchParams }: PageProps) => {
+    // Unwrap searchParams using React.use()
+    const resolvedSearchParams = use(searchParams);
+
     const [totalPages, setTotalPages] = useState(0);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -24,17 +35,17 @@ const Brands = ({ searchParams }: PageProps) => {
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
-    const page = parseInt(searchParams.page as string, 10) || 1;
+    const page = parseInt(resolvedSearchParams.page as string, 10) || 1;
     const limit = 10;
-    const locale = searchParams.locale || 'en';
+    const locale = resolvedSearchParams.locale || 'en';
 
     const fetchBrandsBase = useCallback(async (searchQuery: string = '') => {
         try {
             setLoading(true);
             const brandResponse = await getWideBrands({
-                perPage: limit,        // Number of items per page (optional)
+                limit: limit,        // Number of items per page (optional)
                 search: searchQuery,   // Search term (optional)
-                paginate: 'true',   // 'true' or 'false' to enable/disable pagination
+                paginate: true,   // 'true' or 'false' to enable/disable pagination
                 locale: locale,        // Locale, e.g., 'en', 'bn', etc.
                 brandId: '',      // Category ID (optional, can be empty)
                 status: null,         // Status filter (optional)
@@ -42,17 +53,10 @@ const Brands = ({ searchParams }: PageProps) => {
             });
 
             if (brandResponse.success && brandResponse.data) {
-                const data = brandResponse.data as { data?: Brand[], total?: number } | Brand[];
-
-                if (Array.isArray(data)) {
-                    setBrands(data);
-                    setTotalPages(Math.ceil(data.length / limit));
-                } else {
-                    const brandList = data.data || [];
-                    const total = data.total || brandList.length;
-                    setBrands(brandList);
-                    setTotalPages(Math.ceil(total / limit));
-                }
+                const dataObj = brandResponse.data as BrandList;
+                setBrands(dataObj.data.brands);
+                setTotalPages(Math.ceil(dataObj.data.total / limit));
+                setLoading(false);
             }
 
         } catch (error) {
@@ -64,13 +68,13 @@ const Brands = ({ searchParams }: PageProps) => {
 
     useEffect(() => {
         fetchBrandsBase('');
-    }, [fetchBrandsBase]); // Initial load
+    }, []); // Initial load
 
     useEffect(() => {
         if (debouncedSearchTerm !== undefined) {
             fetchBrandsBase(debouncedSearchTerm);
         }
-    }, [debouncedSearchTerm, fetchBrandsBase]); // Search term changes
+    }, [debouncedSearchTerm]); // Search term changes
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -82,7 +86,7 @@ const Brands = ({ searchParams }: PageProps) => {
 
             <Link
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                href="/admin/brands/manage"
+                href="/admin/brand/manage"
             >
                 Add New Brand
             </Link>
@@ -116,4 +120,4 @@ const Brands = ({ searchParams }: PageProps) => {
     );
 };
 
-export default Brands;
+export default BrandPage;

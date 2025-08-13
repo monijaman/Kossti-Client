@@ -1,0 +1,63 @@
+'use client'
+import BrandForm from "@/app/components/admin/brands/BrandForm";
+import BrandTransForm from "@/app/components/admin/brands/BrandTransForm";
+import { useBrands } from "@/hooks/useBrands";
+
+import { Category } from '@/lib/types'; // Assuming you have a Product type
+import { useEffect, useState } from 'react';
+interface PageProps {
+    params: {
+        id: number; // Type for the slug
+    };
+}
+
+const ManageBrands = ({ params }: PageProps) => {
+
+    const { getWideBrands } = useBrands();
+
+    const { id: brandId } = params;
+    const [brand, setBrand] = useState<Category>()
+
+    const fetchBrand = async () => {
+        try {
+            const brandResponse = await getWideBrands({
+                limit: 10,        // Number of items per page (optional)
+                search: '',   // Search term (optional)
+                paginate: false,   // 'true' or 'false' to enable/disable pagination
+                locale: 'en',        // Locale, e.g., 'en', 'bn', etc.
+                brandId: brandId,      // Category ID (optional, can be empty)
+
+            });
+
+            if (Array.isArray(brandResponse.data)) {
+                setBrand(brandResponse.data[0]);
+            }
+
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (brandId) {
+            fetchBrand();
+        }
+
+    }, [])
+
+    return (
+        <>
+            <div className="flex flex-row gap-4">
+                <div className="w-1/2  bg-gray-100 border rounded">
+                    <BrandForm brandData={brand} />
+                </div>
+
+                <div className="w-1/2">
+                    {brand && <BrandTransForm brandData={brand} />}
+                </div>
+            </div>
+        </>
+    );
+}
+
+export default ManageBrands;

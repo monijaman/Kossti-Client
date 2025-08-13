@@ -36,16 +36,16 @@ const BrandForm = ({ brandData }: PageProps) => {
             // Update existing product
             const response = await addNewBrand({ brand, brandId });
 
-         
+
             if (response.success && response.data) {
-              router.push(`/admin/brands`);
-              setSubmitStatus(response.data.message);
+                router.push(`/admin/brand`);
+                setSubmitStatus(response.data.message);
             } else {
-              setSubmitStatus(response.error || "Failed to add brand");
+                setSubmitStatus(response.error || "Failed to add brand");
             }
-            
+
             setLoading(false);
-            
+
         } catch (error) {
             console.error('Error submitting form', error);
             setSubmitStatus('Error submitting the form');

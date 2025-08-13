@@ -109,7 +109,7 @@ const Pagination = ({
 
     // Build the final URL using baseUrl or current pathname
     const queryString = params.toString();
-    const base = baseUrl || window.location.pathname;
+    const base = baseUrl || (typeof window !== 'undefined' ? window.location.pathname : '/');
     return `${base}${queryString ? `?${queryString}` : ''}`;
   };
 

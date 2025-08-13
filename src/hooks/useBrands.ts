@@ -101,7 +101,7 @@ export const useBrands = () => {
 
       const response = await fetchApi(endpoint, {
         method,
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
       // Return the response
@@ -194,17 +194,17 @@ export const useBrands = () => {
 
   // get all categories
   const getWideBrands = async ({
-    perPage = "",
+    limit = "",
     search = "",
-    paginate = "false",
+    paginate = false,
     locale = "en",
     brandId = "",
     status = null,
     page = null,
   }: {
-    perPage?: number | string;
+    limit?: number | string;
     search?: string;
-    paginate?: "true" | "false";
+    paginate?: boolean;
     locale?: string;
     brandId?: number | string;
     status?: number | null;
@@ -212,9 +212,9 @@ export const useBrands = () => {
   }) => {
     // Construct query parameters dynamically
     const queryParams = new URLSearchParams({
-      per_page: perPage.toString(),
+      limit: limit.toString(),
       search,
-      paginate,
+      paginate: paginate.toString(),
       locale,
       brand_id: brandId.toString(),
     });
@@ -251,13 +251,10 @@ export const useBrands = () => {
       };
 
       // Send the request to the backend using fetchApi
-      const response = await fetchApi(
-        apiEndpoints.updateBrandStatus(brand_id),
-        {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetchApi(apiEndpoints.BrandStatus(brand_id), {
+        method: "PUT",
+        body: payload,
+      });
 
       // Return the response
       return response;

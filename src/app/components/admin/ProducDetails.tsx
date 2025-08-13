@@ -8,9 +8,22 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
+  // Ensure products is an array
+  const productList = Array.isArray(products) ? products : [];
+
   const deleteProduct = (id: number) => {
     console.log(`Delete product with ID: ${id}`);
   };
+
+  if (productList.length === 0) {
+    return (
+      <div className="overflow-x-auto">
+        <div className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden p-6">
+          <p className="text-center text-gray-500">No products found.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -29,7 +42,7 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
+            {productList.map((product) => (
               <tr key={product.id} className="hover:bg-gray-100 transition duration-300 ease-in-out">
                 <td className="py-4 px-6">{product.id}</td>
                 <td className="py-4 px-6">{product.name}</td>
