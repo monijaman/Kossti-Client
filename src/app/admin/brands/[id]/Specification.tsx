@@ -1,18 +1,18 @@
 'use client';
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 import { Brand, Category } from '@/lib/types';
 import { FormEvent, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
-import fetchApi  from "@/lib/fetchApi";
-import { apiEndpoints } from "@/lib/constants";
 
- 
+
 type SubmitBrandResponse = {
     message: string;
-  };
+};
 
-  
+
 // interface PageProps {
 //     params: {
 //         id: string;
@@ -34,54 +34,63 @@ export default function SpecificationPage({ params }: { params: { id: number } }
 
     const [formStatus, setFormStatus] = useState<string | null>(null);
 
-    // Fetch categories
-    const fetchCategories = async () => {
-        try {
-            const categoriesResponse = await getCategories({
-                perPage: 10,
-                search: '',
-                paginate: 'true',
-                locale: 'en',
-                categoryId: '',
-            });
-            if (categoriesResponse.success) {
-                setCategories(categoriesResponse.data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
-    // Fetch brands
-    const fetchBrands = async () => {
-        try {
-            const response = await getAllBrands();
-            setBrands(response.data.data);
-        } catch (error) {
-            console.error("Error fetching brands:", error);
-        }
-    };
-
-    // Fetch active brands for selected category
-    const fetchActiveBrands = async () => {
-        if (selectedCategory) {
-            try {
-                const response = await getCategoryRelBrands({ category_id: selectedCategory });
-                setActiveBrands(response.data.data);
-            } catch (error) {
-                console.error("Error fetching category brands:", error);
-            }
-        }
-    };
-
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const categoriesResponse = await getCategories({
+                    perPage: 10,
+                    search: '',
+                    paginate: true,
+                    locale: 'en',
+                    categoryId: '',
+                    status: null,
+                });
+
+                if (categoriesResponse.success && categoriesResponse.data) {
+                    const data = categoriesResponse.data as { data?: Category[] } | Category[];
+                    const categoryList = Array.isArray(data) ? data : (data.data || []);
+                    setCategories(categoryList);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        const fetchBrands = async () => {
+            try {
+                const response = await getAllBrands();
+
+                if (response.success && response.data) {
+                    const data = response.data as { data?: Brand[] } | Brand[];
+                    const brandList = Array.isArray(data) ? data : (data.data || []);
+                    setBrands(brandList);
+                }
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+
         fetchCategories();
         fetchBrands();
-    }, []);
+    }, [getCategories, getAllBrands]);
 
     useEffect(() => {
+        const fetchActiveBrands = async () => {
+            if (selectedCategory) {
+                try {
+                    const response = await getCategoryRelBrands({ category_id: selectedCategory });
+                    if (response && response.data && typeof response.data === 'object' && 'data' in response.data) {
+                        const data = response.data.data as Brand[] || [];
+                        setActiveBrands(data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching category brands:", error);
+                }
+            }
+        };
+
         fetchActiveBrands();
-    }, [selectedCategory]);
+    }, [selectedCategory, getCategoryRelBrands]);
 
     // Handle category selection
     const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
@@ -111,26 +120,26 @@ export default function SpecificationPage({ params }: { params: { id: number } }
         //   const token = (await cookies()).get("accessToken")?.value || "";
 
         const brandArrays = brands
-        .map((brand) => brand.id) // Return the `id` directly
-        .filter((id): id is number => id !== null) // Ensure non-null values
-        .sort((a, b) => a - b); // Sort numerically
+            .map((brand) => brand.id) // Return the `id` directly
+            .filter((id): id is number => id !== null) // Ensure non-null values
+            .sort((a, b) => a - b); // Sort numerically
         const response = await fetchApi<SubmitBrandResponse>(
             apiEndpoints.submitBrands(selectedCategory ?? 0),
             {
                 method: 'POST',
                 body: {
-                    category_id:selectedCategory,
-                    brands:brandArrays
+                    category_id: selectedCategory,
+                    brands: brandArrays
                 },
                 headers: { 'Content-Type': 'application/json' },
             }
         );
 
         if (response.success) {
-            setFormStatus(response.data ? response.data.message:" ");
-          } else {
+            setFormStatus(response.data ? response.data.message : " ");
+        } else {
             setFormStatus("Failed to submit data");
-          }
+        }
     };
 
     return (

@@ -6,7 +6,7 @@ import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PageProps {
     params: {
@@ -15,7 +15,7 @@ interface PageProps {
     searchParams: SearchParams; // Include searchParams
 }
 
-const ListSpecifications = ({  searchParams }: PageProps) => {
+const ListSpecifications = ({ searchParams }: PageProps) => {
 
 
     const [totalPages, setTotalPages] = useState(0);
@@ -30,33 +30,31 @@ const ListSpecifications = ({  searchParams }: PageProps) => {
 
     const page = parseInt(searchParams.page as string, 10) || 1;
     const limit = 10;
-    const activeCategory = searchParams.category || '';
-    const activeBrands = searchParams.brand || '';
     // const activePriceRange = searchParams.price || '';
     // const locale = searchParams.locale || 'bn';
 
 
-    const fetchKeys = async () => {
-     
+    const fetchKeys = useCallback(async () => {
+
         const response = await getSpecificationsKeys({ perPage, searchTerm, paginate, page });
         setSpecificationsKeys(response.data);
 
         setTotalPages(Math.ceil(response.total / limit));
 
         // setSpecifications(response);
-     
-    };
+
+    }, [perPage, searchTerm, paginate, page, limit, getSpecificationsKeys]);
 
     useEffect(() => {
         fetchKeys();
-    }, [searchTerm, perPage]);
+    }, [searchTerm, perPage, fetchKeys]);
 
 
     useEffect(() => {
         if (debouncedSearchTerm) {
             fetchKeys();
         }
-    }, [debouncedSearchTerm]);
+    }, [debouncedSearchTerm, fetchKeys]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -64,7 +62,7 @@ const ListSpecifications = ({  searchParams }: PageProps) => {
 
     useEffect(() => {
         fetchKeys();
-    }, []);
+    }, [fetchKeys]);
 
 
 
@@ -87,8 +85,6 @@ const ListSpecifications = ({  searchParams }: PageProps) => {
                 keys={specificationsKeys}
             />
             <Pagination
-                category={activeCategory}
-                selectedBrands={activeBrands}
                 currentPage={page}
                 totalPages={totalPages}
             />

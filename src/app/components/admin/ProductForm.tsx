@@ -37,8 +37,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
         const fetchCategoriesAndBrands = async () => {
             const categories = await getCategory();
             const brands = await getBrands();
-            setCategories(categories.data);
-            setBrands(brands.data);
+            setCategories(categories.data as Category[]);
+            setBrands(brands.data as Brand[]);
         };
 
         fetchCategoriesAndBrands();
@@ -94,7 +94,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
     };
 
- 
+
 
     const [files, setFiles] = useState<File[]>([]);
 

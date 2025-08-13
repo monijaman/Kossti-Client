@@ -1,3 +1,5 @@
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export const useProducts = () => {
   const getProducts = async (
     page: number,

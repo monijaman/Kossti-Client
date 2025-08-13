@@ -11,7 +11,7 @@ interface PageProps {
 const BrandTransForm = ({ brandData }: PageProps) => {
 
     const [brandName, setBrandName] = useState('');
-    const {  getWideBrands, submitBrandTranslation } = useBrands();
+    const { getWideBrands, submitBrandTranslation } = useBrands();
     const [brandId, setBrandId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('bn');
@@ -40,8 +40,10 @@ const BrandTransForm = ({ brandData }: PageProps) => {
                     page: null         // current page (optional)
                 });
 
-                if (brandResponse.success) {
-                    setBrandName(brandResponse.data.data.name);
+                if (brandResponse.success && brandResponse.data) {
+                    const data = brandResponse.data as { data?: Brand } | Brand;
+                    const brandObj = (data && typeof data === 'object' && 'data' in data) ? (data.data as Brand) : (data as Brand);
+                    setBrandName(brandObj.name ?? "");
                 } else {
                     console.error('Failed to fetch categories');
                 }

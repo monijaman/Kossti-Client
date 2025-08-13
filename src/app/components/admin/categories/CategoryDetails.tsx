@@ -9,8 +9,8 @@ interface PageProps {
 }
 
 const CategoryDetails = ({ categories }: PageProps) => {
-  // Initialize state with categories prop
-  const [categoryList, setCategoryList] = useState<Category[]>([]);
+  // Always initialize with an array
+  const [categoryList, setCategoryList] = useState<Category[]>(Array.isArray(categories) ? categories : []);
 
   const { categoryStatUpdate } = useCategory();
 
@@ -29,7 +29,7 @@ const CategoryDetails = ({ categories }: PageProps) => {
   };
 
   useEffect(() => {
-    setCategoryList(categories);
+    setCategoryList(Array.isArray(categories) ? categories : []);
   }, [categories]);
 
   return (

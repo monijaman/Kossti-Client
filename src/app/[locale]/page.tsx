@@ -97,8 +97,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
       <PopularProducts countryCode={countryCode} />
       <Pagination
-        category={activeCategory}
-        selectedBrands={activeBrands}
         currentPage={page}
         totalPages={totalPages}
       />

@@ -1,11 +1,11 @@
 'use client';
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
-import { Brand, Category } from '@/lib/types';
-import { FormEvent, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
+import { Brand, Category } from '@/lib/types';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
+import Select, { SingleValue } from 'react-select';
 type SubmitBrandResponse = {
     message: string;
 };
@@ -34,53 +34,63 @@ const Specification = ({ params }: PageProps) => {
     const [formStatus, setFormStatus] = useState<string | null>(null);
 
     // Fetch categories
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
             const categoriesResponse = await getCategories({
                 perPage: 10,
                 search: '',
-                paginate: 'true',
+                paginate: true,
                 locale: 'en',
                 categoryId: '',
+                status: null,
             });
-            if (categoriesResponse.success) {
-                setCategories(categoriesResponse.data.data);
+            if (categoriesResponse.success && categoriesResponse.data) {
+                const data = categoriesResponse.data as { data?: Category[] } | Category[];
+                const categoryList = Array.isArray(data) ? data : (data.data || []);
+                setCategories(categoryList);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
-    };
+    }, [getCategories]);
 
     // Fetch brands
-    const fetchBrands = async () => {
+    const fetchBrands = useCallback(async () => {
         try {
             const response = await getAllBrands();
-            setBrands(response.data.data);
+            if (response && typeof response === 'object' && 'data' in response) {
+                const data = response.data as { data?: Brand[] } | Brand[];
+                const brandList = Array.isArray(data) ? data : (data.data || []);
+                setBrands(brandList);
+            }
         } catch (error) {
             console.error("Error fetching brands:", error);
         }
-    };
+    }, [getAllBrands]);
 
     // Fetch active brands for selected category
-    const fetchActiveBrands = async () => {
+    const fetchActiveBrands = useCallback(async () => {
         if (selectedCategory) {
             try {
                 const response = await getCategoryRelBrands({ category_id: selectedCategory });
-                setActiveBrands(response.data.data);
+                if (response && response.data && typeof response.data === 'object' && 'data' in response.data) {
+                    const data = response.data.data as Brand[] || [];
+                    setActiveBrands(data);
+                }
             } catch (error) {
                 console.error("Error fetching category brands:", error);
             }
         }
-    };
+    }, [selectedCategory, getCategoryRelBrands]);
 
     useEffect(() => {
         fetchCategories();
         fetchBrands();
-    }, []);
+    }, [fetchCategories, fetchBrands]);
 
     useEffect(() => {
         fetchActiveBrands();
-    }, [selectedCategory]);
+    }, [fetchActiveBrands]);
 
     // Handle category selection
     const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {

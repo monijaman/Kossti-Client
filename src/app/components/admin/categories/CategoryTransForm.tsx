@@ -15,7 +15,7 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
     const [categotyId, setCategotyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
- 
+
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
 
@@ -33,9 +33,11 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
                 locale: selectedTranslation,
             });
 
-            if (response && response.name) {
-                setCategoryName(response.name)
-
+            if (response && response.data) {
+                const data = response.data as { name?: string };
+                if (data.name) {
+                    setCategoryName(data.name);
+                }
             }
         }
     };

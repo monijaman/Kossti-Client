@@ -4,7 +4,10 @@ import { ApiResponse, MessageInfo } from "@/lib/types";
 
 export const useCategory = () => {
   // get all categories
-  const getCategory = async () => {
+  const getCategory = async (): Promise<{
+    success: boolean;
+    data: unknown;
+  }> => {
     try {
       const dataset = await fetchApi(apiEndpoints.getCategories);
 
@@ -22,7 +25,7 @@ export const useCategory = () => {
   const getCategories = async ({
     perPage = "",
     search = "",
-    paginate = "false",
+    paginate = false,
     locale = "en",
     categoryId = "",
     status = null,
@@ -30,23 +33,30 @@ export const useCategory = () => {
   }: {
     perPage?: number | string;
     search?: string;
-    paginate?: "true" | "false";
+    paginate?: boolean;
     locale?: string;
     categoryId?: number | string;
-    status?: number | null;
+    status: string | null;
     page?: number | null;
-  }) => {
+  }): Promise<{ success: boolean; data: unknown }> => {
     // Construct query parameters dynamically
     const queryParams = new URLSearchParams({
       per_page: perPage.toString(),
       search,
-      paginate,
+      paginate: paginate.toString(),
       locale,
       category_id: categoryId.toString(),
     });
 
-    queryParams.append("status", status !== null ? status.toString() : "");
-    queryParams.append("page", page !== null ? page.toString() : "");
+    // Only append status if it's not null
+    if (status !== null) {
+      queryParams.append("status", status.toString());
+    }
+
+    // Only append page if it's not null
+    if (page !== null) {
+      queryParams.append("page", page.toString());
+    }
 
     try {
       const dataset = await fetchApi(
@@ -85,7 +95,7 @@ export const useCategory = () => {
 
       const response = await fetchApi(endpoint, {
         method,
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
       return response as ApiResponse<MessageInfo>;
@@ -218,7 +228,7 @@ export const useCategory = () => {
         apiEndpoints.updateCategoryStatus(category_id),
         {
           method: "PUT",
-          body: JSON.stringify(payload),
+          body: payload,
         }
       );
 

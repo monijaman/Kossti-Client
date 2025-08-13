@@ -57,7 +57,8 @@ export const LoginForm = () => {
       try {
         const response = await fetchApi(apiEndpoints.login, {
           method: "POST",
-          body: JSON.stringify(requestBody),
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
         });
 
         if (response.success) {

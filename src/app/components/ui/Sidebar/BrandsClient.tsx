@@ -3,12 +3,12 @@
 import InteractiveBrandFilter from '@/app/components/ui/Sidebar/InteractiveBrandFilter';
 import { useBrands } from '@/hooks/useBrands';
 import { Brand, SidebarParams } from '@/lib/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
     const { getCategoryRelBrands } = useBrands();
-    const [brands, setBrands] = useState<Brand[]>();
-    const fetchbrands = async () => {
+    const [brands, setBrands] = useState<Brand[]>([]);
+    const fetchbrands = useCallback(async () => {
         // Fetch brand data server-side
 
         if (activeCategory) {
@@ -18,18 +18,24 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
                 locale: countryCode,
             });
 
-            setBrands(response.success ? response.data.data : []);
+            if (response.success && response.data) {
+                const data = response.data as { data?: Brand[] } | Brand[];
+                const brandList = Array.isArray(data) ? data : (data.data || []);
+                setBrands(brandList);
+            } else {
+                setBrands([]);
+            }
         }
-    }
+    }, [activeCategory, countryCode, getCategoryRelBrands]);
 
     useEffect(() => {
         fetchbrands();
-    }, [activeCategory, countryCode])
+    }, [fetchbrands])
 
     const categories = activeCategory || '';
     const searchterm = searchTerm || '';
     return (
-        brands && brands?.length > 0 ?
+        brands.length > 0 ? (
             <div>
                 <h2 className="text-lg font-semibold mb-4">Brands</h2>
                 <InteractiveBrandFilter
@@ -39,7 +45,7 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
                     searchTerm={searchterm}
                 />
             </div>
-            : null
+        ) : null
     );
 };
 

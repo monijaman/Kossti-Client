@@ -2,7 +2,7 @@
 import BrandForm from "@/app/components/admin/brands/BrandForm";
 import BrandTransForm from "@/app/components/admin/brands/BrandTransForm";
 import { useBrands } from "@/hooks/useBrands";
- 
+
 import { Category } from '@/lib/types'; // Assuming you have a Product type
 import { useEffect, useState } from 'react';
 interface PageProps {
@@ -13,7 +13,7 @@ interface PageProps {
 
 const ManageBrands = ({ params }: PageProps) => {
 
-     const { getWideBrands } = useBrands();
+    const { getWideBrands } = useBrands();
 
     const { id: brandId } = params;
     const [brand, setBrand] = useState<Category>()
@@ -29,11 +29,10 @@ const ManageBrands = ({ params }: PageProps) => {
 
             });
 
-            if (brandResponse.success) {
-                setBrand(brandResponse.data.data)
-            } else {
-                console.error('Failed to fetch categories');
+            if (Array.isArray(brandResponse.data)) {
+                setBrand(brandResponse.data[0]);
             }
+
         } catch (error) {
             console.error('Error fetching categories:', error);
         }

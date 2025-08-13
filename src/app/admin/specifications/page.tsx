@@ -10,17 +10,17 @@ interface Specification {
 }
 interface SpecResponse {
     message: string;
-  }
+}
 const Specification = () => {
 
-    const { getSpecificationsByCategory,  getSpecificationsKeys, submitSpecifications } = useSpecifications();
+    const { getSpecificationsByCategory, getSpecificationsKeys, submitSpecifications } = useSpecifications();
     const { getCategory } = useCategory();
 
     const [specifications, setSpecifications] = useState<Specification[]>([]);
     const [activeSpecifications, setActiveSpecigications] = useState<SpecificationKey[]>([]);
     const [formStatus, setFormStatus] = useState<string[]>();
     const [categories, setCategories] = useState<Category[]>([]);
-    const productName ='';
+    const productName = '';
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // To store the selected category
 
     // Function to handle category selection
@@ -30,17 +30,17 @@ const Specification = () => {
         }
     };
 
-   
-      
-      const saveSpecs = async () => {
+
+
+    const saveSpecs = async () => {
         const response = await submitSpecifications(selectedCategory ?? 0, activeSpecifications);
-      
+
         if (response.success && response.data) {
-          const data = response.data as SpecResponse; // ✅ safely assert the expected shape
-          setFormStatus([data.message]);
+            const data = response.data as SpecResponse; // ✅ safely assert the expected shape
+            setFormStatus([data.message]);
         }
-      };
-      
+    };
+
 
     // Function to handle specification key selection
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
@@ -80,7 +80,7 @@ const Specification = () => {
     const fetchCategories = async () => {
         try {
             const dataset = await getCategory();
-            setCategories(dataset.data);
+            setCategories(dataset.data as Category[]);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }

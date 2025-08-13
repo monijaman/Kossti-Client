@@ -9,7 +9,7 @@ interface CategoriesProps {
 
 const Categories = ({ categories, activeCategory, locale, clearCategoryText }: CategoriesProps) => {
   const clearCategoryUrl = `/`;
-
+  // console.log('Categories:', categories);
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">Categories</h2>

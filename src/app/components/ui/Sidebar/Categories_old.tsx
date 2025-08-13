@@ -18,33 +18,35 @@ const Categories = ({ category, locale }: CategoriesProps) => {
   const countryCode = locale || DEFAULT_LOCALE;
   const translation = useTranslation(countryCode);
 
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetchApi<{ categories: categoryInt[] }>(apiEndpoints.getWideCategories, {
+        queryParams: {
+          perPage: 10,
+          search: '',
+          paginate: 'false',
+          locale: countryCode,
+          categoryId: '',
+          status: 1
+        },
+      });
+
+      const categories: categoryInt[] =
+        response.success && response.data?.categories
+          ? response.data.categories
+          : [];
+
+      setDataset(categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setDataset([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetchApi<{ categories: categoryInt[] }>(apiEndpoints.getWideCategories, {
-          queryParams: {
-            perPage: 10,
-            search: '',
-            paginate: 'false',
-            locale: countryCode,
-            categoryId: '',
-            status: 1
-          },
-        });
-
-        const categories: categoryInt[] =
-          response.success && response.data?.categories
-            ? response.data.categories
-            : [];
-
-        setDataset(categories);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        setDataset([]);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchCategories();
   }, [countryCode]);

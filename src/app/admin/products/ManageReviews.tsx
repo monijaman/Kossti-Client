@@ -5,7 +5,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { Product, SearchParams } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PageProps {
     params: {
@@ -31,7 +31,7 @@ const ManageReviews = ({ searchParams }: PageProps) => {
     const [totalPage, setTotalPage] = useState(0);
 
     // Mock function to fetch product data
-    const fetchProductData = async () => {
+    const fetchProductData = useCallback(async () => {
         const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, locale);
         if (response.success && response.data && typeof response.data === 'object' && 'products' in response.data) {
             setTotalPage(Math.ceil(response.totalProducts / limit))
@@ -40,20 +40,20 @@ const ManageReviews = ({ searchParams }: PageProps) => {
             setProducts([]);
             setTotalPage(0);
         }
-    };
+    }, [page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, locale, getProducts]);
 
 
 
     useEffect(() => {
         fetchProductData();
-    }, [])
+    }, [fetchProductData])
 
 
     useEffect(() => {
         if (debouncedSearchTerm) {
             fetchProductData();
         }
-    }, [debouncedSearchTerm]);
+    }, [debouncedSearchTerm, fetchProductData]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -82,8 +82,6 @@ const ManageReviews = ({ searchParams }: PageProps) => {
                 products={products} countryCode='en'
             />
             <Pagination
-                category={activeCategory}
-                selectedBrands={activeBrands}
                 currentPage={page}
                 totalPages={totalPage}
             />
