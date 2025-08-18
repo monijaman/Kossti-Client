@@ -3,14 +3,14 @@ import ProductForm from "@/app/components/admin/ProductForm";
 import ProductTransForm from "@/app/components/admin/ProductTransForm";
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { cookies } from "next/headers";
 import { Product } from "@/lib/types";
- 
+import { cookies } from "next/headers";
+
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
 
@@ -21,7 +21,7 @@ interface ProductResponse {
 
 const Products = async ({ params }: PageProps) => {
 
-    const { id } = params;
+    const { id } = await params;
 
     const fetchAProductData = async (): Promise<ProductResponse> => {
         const response = await fetchApi(
@@ -35,7 +35,7 @@ const Products = async ({ params }: PageProps) => {
         );
 
         return response.data as ProductResponse
-      
+
     };
 
     const dataset = await fetchAProductData();

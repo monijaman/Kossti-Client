@@ -32,7 +32,7 @@ const CategoryForm = ({ categoryData }: PageProps) => {
             const response = await submitCategory({ categoryId, category });
 
             if (response.success && response.data) {
-                router.push("/admin/categories");
+                router.push(`/admin/categories/manage/${response.data.id}`);
                 setSubmitStatus(response.data.message);
                 setLoading(false)
             } else {

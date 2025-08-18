@@ -1,6 +1,10 @@
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { ApiResponse, MessageInfo } from "@/lib/types";
+import {
+  ApiResponse,
+  CategoryTranslationResponse,
+  MessageInfo,
+} from "@/lib/types";
 
 export const useCategory = () => {
   // get all categories
@@ -83,13 +87,12 @@ export const useCategory = () => {
     try {
       // Prepare the payload
       const payload = {
-        id: categoryId,
         name: category,
       };
 
       // Send the request to the backend using fetchApi
       const endpoint = categoryId
-        ? apiEndpoints.updateCategory(categoryId)
+        ? apiEndpoints.category(categoryId)
         : apiEndpoints.createCategory;
       const method = categoryId ? "PUT" : "POST";
 
@@ -117,9 +120,11 @@ export const useCategory = () => {
   const getCategoryTranslationById = async ({
     category_id = 0,
     locale = "",
-  } = {}) => {
+  } = {}): Promise<
+    { success: boolean; data: CategoryTranslationResponse } | undefined
+  > => {
     try {
-      const dataset = await fetchApi(
+      const response = await fetchApi(
         apiEndpoints.getCategoryTranslation(category_id),
         {
           method: "GET",
@@ -129,9 +134,20 @@ export const useCategory = () => {
         }
       );
 
-      return dataset;
+      if (response && response.success && response.data) {
+        return {
+          success: true,
+          data: response.data as CategoryTranslationResponse,
+        };
+      }
+
+      return {
+        success: false,
+        data: { category_id: 0, count: 0, translations: [] },
+      };
     } catch (error) {
       console.error("Error fetching category translation:", error);
+      return undefined;
     }
   };
 
@@ -147,16 +163,24 @@ export const useCategory = () => {
     try {
       // Prepare the payload with consistent naming
       const payload = {
-        category_id: categoryId,
         name: category,
         locale,
       };
 
+      if (!categoryId) {
+        throw new Error("Category ID is required for translation submission");
+      }
+
+      const methodType = categoryId ? "PUT" : "POST";
+
       // Send the request to the backend using fetchApi
-      const response = await fetchApi(apiEndpoints.createCategoryTranslation, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      const response = await fetchApi(
+        apiEndpoints.categoryTranslationById(categoryId),
+        {
+          method: methodType,
+          body: payload,
+        }
+      );
 
       // Return the response
       return response;

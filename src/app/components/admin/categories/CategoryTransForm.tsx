@@ -1,7 +1,7 @@
 "use client";
 import { useCategory } from "@/hooks/useCategory";
 import { LOCALES } from '@/lib/constants';
-import { Category } from '@/lib/types'; // Assuming you have a Product type
+import { Category, CategoryTranslation } from '@/lib/types'; // Updated import
 import { useEffect, useState } from 'react';
 
 interface PageProps {
@@ -33,28 +33,24 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
                 locale: selectedTranslation,
             });
 
-            if (response && response.data) {
-                const data = response.data as { name?: string };
-                if (data.name) {
-                    setCategoryName(data.name);
+            if (response && response.success && response.data) {
+                const dataset = response.data.translations.find((item: CategoryTranslation) => item.locale === selectedTranslation);
+                if (dataset?.translated_name) {
+                    setCategoryName(dataset.translated_name || '');
                 }
             }
         }
     };
 
-
-
     // Select 'bn' translation by default on mount
     useEffect(() => {
         handleLanguageSwitch('bn');
-
     }, []);
 
     useEffect(() => {
         if (categoryData && categoryData.id) {
             setCategotyId(categoryData.id);
             fetchCategoryTranslation();
-
         }
     }, [categoryData, selectedTranslation]);
 
@@ -113,9 +109,7 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
 
             <form onSubmit={handleSubmit} className="    rounded px-8 pt-6 pb-8 mb-4 ">
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                        {categoryName}
-                    </label>
+
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="name"

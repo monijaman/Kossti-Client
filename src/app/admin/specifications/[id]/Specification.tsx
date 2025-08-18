@@ -1,18 +1,18 @@
 "use client";
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number;
-    };
+    }>;
 }
 
 const Specification = ({ params }: PageProps) => {
-    const { id } = params;
+    const { id } = use(params);
     const { getSpecifications, getSpecificationsKeys, submitSpecificationsKeys } = useSpecifications();
 
     const [specifications, setSpecifications] = useState<SpecificationInt[]>([]);
@@ -43,7 +43,7 @@ const Specification = ({ params }: PageProps) => {
     };
 
     // Function to handle adding more specifications
-  
+
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -55,7 +55,7 @@ const Specification = ({ params }: PageProps) => {
     };
 
     // Fetch the specification keys
-    const fetchSpecificationKeys = async () => {
+    const fetchSpecificationKeys = useCallback(async () => {
         try {
             const dataset = await getSpecificationsKeys();
             setSpecKeys(dataset.data);
@@ -63,11 +63,11 @@ const Specification = ({ params }: PageProps) => {
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
-    };
+    }, [getSpecificationsKeys]);
 
 
     // fetch all specificatiosn for dropdown option
-    const fetchSpecifications = async () => {
+    const fetchSpecifications = useCallback(async () => {
         try {
             const response = await getSpecifications(id);
 
@@ -86,12 +86,12 @@ const Specification = ({ params }: PageProps) => {
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
-    };
+    }, [id, getSpecifications]);
 
     useEffect(() => {
         fetchSpecificationKeys();
         fetchSpecifications();
-    }, []);
+    }, [fetchSpecificationKeys, fetchSpecifications]);
 
     return (
 

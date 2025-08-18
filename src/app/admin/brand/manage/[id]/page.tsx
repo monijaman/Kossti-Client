@@ -6,26 +6,24 @@ import { useBrands } from "@/hooks/useBrands";
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Brand } from '@/lib/types'; // Assuming you have a Product type
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
 const ManageBrands = ({ params }: PageProps) => {
 
     const { getWideBrands } = useBrands();
 
-    const { id: brandId } = params;
+    const { id } = use(params);
     const [brand, setBrand] = useState<Brand | null>(null)
-
-    const { id } = params;
     const [brands, setBrands] = useState<Brand | null>(null)
 
     const fetchBrands = useCallback(async () => {
 
-        const response = await fetchApi(`${apiEndpoints.Brands(brandId)}`, {
+        const response = await fetchApi(`${apiEndpoints.Brands(id)}`, {
             method: 'GET',
         });
         if (response && response.success && response.data) {
@@ -35,11 +33,11 @@ const ManageBrands = ({ params }: PageProps) => {
 
 
     useEffect(() => {
-        if (brandId) {
+        if (id) {
             fetchBrands();
         }
 
-    }, [])
+    }, [fetchBrands, id])
 
     return (
         <>

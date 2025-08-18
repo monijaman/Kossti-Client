@@ -4,7 +4,7 @@ import { useCategory } from "@/hooks/useCategory";
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Brand, Category } from '@/lib/types';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, use, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 
@@ -12,17 +12,10 @@ type SubmitBrandResponse = {
     message: string;
 };
 
+export default function SpecificationPage({ params }: { params: Promise<{ id: number }> }) {
 
-// interface PageProps {
-//     params: {
-//         id: string;
-//     };
-// }
-
-export default function SpecificationPage({ params }: { params: { id: number } }) {
-
-
-    const category_id = Number(params.id);
+    const { id } = use(params);
+    const category_id = Number(id);
 
     const { getCategories, getCategoryRelBrands } = useCategory();
     const { getAllBrands } = useBrands();

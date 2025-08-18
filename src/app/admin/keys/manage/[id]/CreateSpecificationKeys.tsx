@@ -1,37 +1,37 @@
 'use client'
-import {  useEffect, useState } from 'react';
 import KeyForm from "@/app/components/admin/keys/KeyForm";
 import KeyTransForm from "@/app/components/admin/keys/KeyTransForm";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
+import { use, useCallback, useEffect, useState } from 'react';
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
 const CreateSpecificationKeys = ({ params }: PageProps) => {
 
     const { getSpecificationsKeysById } = useSpecificationsKeys();
-    const { id } = params;
+    const { id } = use(params);
     const [key, setKey] = useState<SpecificationKey>()
 
-    const fetchKeys = async () => {
+    const fetchKeys = useCallback(async () => {
         const response = await getSpecificationsKeysById(id);
         if (response.success) {
             setKey(response.data)
 
         }
 
-    };
+    }, [id, getSpecificationsKeysById]);
 
     useEffect(() => {
         if (id) {
             fetchKeys();
         }
 
-    }, [])
+    }, [id, fetchKeys])
 
     return (
         <>
@@ -41,7 +41,7 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
                 </div>
 
                 <div className="w-1/2">
-                {key && <KeyTransForm speckeyData={key} />}
+                    {key && <KeyTransForm speckeyData={key} />}
                 </div>
             </div>
         </>

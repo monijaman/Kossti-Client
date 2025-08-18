@@ -5,17 +5,17 @@ import { useCategory } from '@/hooks/useCategory';
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Category } from '@/lib/types'; // Assuming you have a Product type
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 interface PageProps {
-  params: {
+  params: Promise<{
     id: number; // Type for the slug
-  };
+  }>;
 }
 
 const CreateSpecificationKeys = ({ params }: PageProps) => {
 
   const { getCategoryById } = useCategory();
-  const { id } = params;
+  const { id } = use(params);
   const [category, setCategory] = useState<Category | null>(null)
 
 

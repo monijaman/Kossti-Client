@@ -1,37 +1,37 @@
 "use client";
-import React, { useEffect, useState} from 'react';
-import dynamic from 'next/dynamic';
-import { useReviews } from '@/hooks/useReviews';
 import ReviewTransForm from '@/app/components/admin/reviews/ReviewTransForm';
-import { AdditionalDetails, Review, Product } from '@/lib/types';
-import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import Modal from '@/app/components/Modal/client';
+import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
+import DragNdrop from "@/app/components/Uploader/Uploader";
+import { useReviews } from '@/hooks/useReviews';
+import { AdditionalDetails, Product, Review } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import React, { use, useCallback, useEffect, useState } from 'react';
+import 'react-quill/dist/quill.snow.css'; // Import styles
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; // Import styles
-import DragNdrop from "@/app/components/Uploader/Uploader";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: number; // Type for the slug
-    };
+    }>;
 }
 
 const ReviewForm = ({ params }: PageProps) => {
-    const { id } = params;
+    const { id } = use(params);
     const [reviewData, setReviewData] = useState<Review>();
     const [reviews, setReviews] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
     const { addReview, getReviewByProductId } = useReviews();
-     // const [productId, setProductId] = useState<number | null>(id); // To hold the fetched product ID
-     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
+    // const [productId, setProductId] = useState<number | null>(id); // To hold the fetched product ID
+    const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [formStatus, setFormStatus] = useState("");
     const [products, setProducts] = useState<Product>();
     const productName = ""
     const [files, setFiles] = useState<File[]>([]);
 
-    const fetchProductData = async () => {
+    const fetchProductData = useCallback(async () => {
         try {
             const response = await getReviewByProductId(+id); // Fetch product by ID
             if (response?.success && response?.data) {
@@ -50,13 +50,13 @@ const ReviewForm = ({ params }: PageProps) => {
         } catch (error) {
             console.error('Error fetching product:', error);
         }
-    };
+    }, [id, getReviewByProductId]);
 
     useEffect(() => {
         if (id) {
             fetchProductData();
         }
-    }, []);
+    }, [id, fetchProductData]);
 
     useEffect(() => {
 
@@ -69,10 +69,10 @@ const ReviewForm = ({ params }: PageProps) => {
             // handleFileUpload(formData);
         }
     }
-    , [files]);
+        , [files]);
 
 
-   
+
     const handleReviewSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setReviewsError('');
@@ -89,7 +89,7 @@ const ReviewForm = ({ params }: PageProps) => {
         }
 
         try {
-          await addReview(
+            await addReview(
                 id,
                 rating,
                 reviews,
@@ -185,10 +185,10 @@ const ReviewForm = ({ params }: PageProps) => {
                 </div>
 
                 {/* Translation Form */}
-                {reviewData && 
-                <div className="w-1/2">
-                    <ReviewTransForm productId={id} productName={productName} translations={reviewData.translations} />
-                </div>
+                {reviewData &&
+                    <div className="w-1/2">
+                        <ReviewTransForm productId={id} productName={productName} translations={reviewData.translations} />
+                    </div>
                 }
             </div>
         </>

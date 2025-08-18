@@ -94,6 +94,7 @@ export interface ProductApiResponse {
 // }
 export interface MessageInfo {
   message: string;
+  id: number;
 }
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -228,6 +229,21 @@ export const supportedLocales: SupportedLocale[] = ["en", "bn"];
 
 export interface Translations {
   [key: string]: string; // Optional: Allows additional keys
+}
+
+export interface CategoryTranslation {
+  id: number;
+  category_id: number;
+  locale: string;
+  translated_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoryTranslationResponse {
+  category_id: number;
+  count: number;
+  translations: CategoryTranslation[];
 }
 
 export type LocaleKeys = "en" | "bn";

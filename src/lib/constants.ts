@@ -37,10 +37,12 @@ export const apiEndpoints = {
   getCategories: "/categories",
   createCategory: "/categories",
   getCategoryById: (id: number | string) => `/categories/${id}`,
-  updateCategory: (id: number | string) => `/categories/${id}`,
+  category: (id: number | string) => `/categories/${id}`,
   deleteCategory: (id: number | string) => `/categories/${id}`,
   getWideCategories: "/wide-categories",
-  createCategoryTranslation: "/category-translation",
+  categoryTranslation: "/category-translation",
+  categoryTranslationById: (categoryId: number | string) =>
+    `/category-translation/${categoryId}`,
   getCategoryTranslation: (id: number | string) =>
     `/category-translation/${id}`,
   createCategoryBrands: "/category-brands",
