@@ -1,5 +1,7 @@
 "use client";
 import { useCategory } from '@/hooks/useCategory';
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from "@/lib/fetchApi";
 import { Category } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -19,6 +21,8 @@ const CategoryForm = ({ categoryData }: PageProps) => {
     useEffect(() => {
         setCategory(categoryData?.name || ''); // Fallback to empty string
         setCategoryId(categoryData?.id || null); // Fallback to null
+
+        console.log('Category Data:', categoryData);
     }, [categoryData]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,11 +33,32 @@ const CategoryForm = ({ categoryData }: PageProps) => {
             setSubmitStatus('')
 
             // Update existing product
-            const response = await submitCategory({ categoryId, category });
+
+            const payload = {
+                name: category,
+            };
+
+            // Send the request to the backend using fetchApi
+            const endpoint = categoryId
+                ? apiEndpoints.category(categoryId)
+                : apiEndpoints.createCategory;
+            const method = categoryId ? "PUT" : "POST";
+
+            const response = await fetchApi(endpoint, {
+                method,
+                body: payload,
+            });
+
 
             if (response.success && response.data) {
-                router.push(`/admin/categories/manage/${response.data.id}`);
-                setSubmitStatus(response.data.message);
+                // The response.data contains the entire response from Go API
+                const apiResponse = response.data as { data?: Category; message?: string };
+
+                if (apiResponse.data?.id) {
+                    router.push(`/admin/categories/manage/${apiResponse.data.id}`);
+                }
+
+                setSubmitStatus(apiResponse.message || "Category submitted successfully");
                 setLoading(false)
             } else {
                 setLoading(false)
@@ -60,7 +85,7 @@ const CategoryForm = ({ categoryData }: PageProps) => {
                     id="specification_key"
                     type="text"
                     placeholder="Enter product name"
-                    value={category && category}
+                    value={category ?? ""}
                     onChange={(e) => setCategory(e.target.value)}
                     required
                 />

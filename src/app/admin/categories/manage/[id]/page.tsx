@@ -25,7 +25,8 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
       const response = await fetchApi(apiEndpoints.getCategoryById(id));
 
       if (response && response.success && response.data) {
-        setCategory(response.data as Category);
+        const apiResponse = response.data as { data?: Category; message?: string };
+        setCategory(apiResponse.data || null);
       }
     } catch (error) {
       console.error("Error fetching category:", error);

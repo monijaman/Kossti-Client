@@ -7,8 +7,8 @@ interface FetchOptions {
   body?: FormData | Record<string, unknown> | unknown;
   queryParams?: Record<string, string | number | null | undefined>;
   signal?: number;
-  accessToken?: string;     // Optional Bearer token
-  countryCode?: string;     // Optional country code
+  accessToken?: string; // Optional Bearer token
+  countryCode?: string; // Optional country code
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
@@ -67,7 +67,9 @@ export default async function fetchApi<T>(
     errorStatus = res.status;
 
     if (res.ok || res.status === 201) {
-      const isJson = res.headers.get("Content-Type")?.includes("application/json");
+      const isJson = res.headers
+        .get("Content-Type")
+        ?.includes("application/json");
       const data = isJson ? await res.json() : null;
       return { success: true, status: res.status, data };
     }
@@ -79,7 +81,17 @@ export default async function fetchApi<T>(
 
     try {
       const errorData = await res.json();
-      errorDetail = errorData?.detail || errorData?.title || errorDetail;
+      // Handle standardized Go API response format
+      if (errorData?.success === false && errorData?.error) {
+        errorDetail = errorData.error;
+      } else {
+        // Fallback to other error formats
+        errorDetail =
+          errorData?.detail ||
+          errorData?.title ||
+          errorData?.message ||
+          errorDetail;
+      }
     } catch {}
 
     return {

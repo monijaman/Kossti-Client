@@ -1,9 +1,8 @@
 "use client";
-import { useCategory } from "@/hooks/useCategory";
-import { LOCALES } from '@/lib/constants';
+import { apiEndpoints, LOCALES } from '@/lib/constants';
+import fetchApi from "@/lib/fetchApi";
 import { Category, CategoryTranslation } from '@/lib/types'; // Updated import
 import { useEffect, useState } from 'react';
-
 interface PageProps {
     categoryData: Category; // Optional for create case
 }
@@ -11,11 +10,10 @@ interface PageProps {
 const CategoryTransForm = ({ categoryData }: PageProps) => {
 
     const [categoryName, setCategoryName] = useState('');
-    const { submitKeysTranslation, getCategoryTranslationById } = useCategory();
     const [categotyId, setCategotyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
-
+    const [selectedCategory, setSelectedCategory] = useState<CategoryTranslation | null>(null);
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
 
@@ -28,15 +26,41 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
     const fetchCategoryTranslation = async () => {
         if (categotyId !== null) {
 
-            const response = await getCategoryTranslationById({
-                category_id: categoryData.id ?? undefined,
-                locale: selectedTranslation,
-            });
+
+            const response = await fetchApi(
+                apiEndpoints.getCategoryTranslation(categoryData.id),
+                {
+                    method: "GET",
+                }
+            );
+
 
             if (response && response.success && response.data) {
-                const dataset = response.data.translations.find((item: CategoryTranslation) => item.locale === selectedTranslation);
+
+
+                // The fetchApi returns the full response in response.data
+                const apiResponse = response.data as { data?: CategoryTranslation[]; translations?: CategoryTranslation[]; message?: string };
+
+                let translationsArray: CategoryTranslation[] = [];
+
+                // Check if it's the flattened format (data is directly an array)
+                if (Array.isArray(apiResponse)) {
+                    translationsArray = apiResponse;
+                }
+                // Check if it's the updated backend format (data contains translations array)
+                else if (apiResponse.data && Array.isArray(apiResponse.data)) {
+                    translationsArray = apiResponse.data;
+                }
+                // Check if it's the old format (translations property)
+                else if (apiResponse.translations && Array.isArray(apiResponse.translations)) {
+                    translationsArray = apiResponse.translations;
+                }
+
+                const dataset = translationsArray.find((item: CategoryTranslation) => item.locale === selectedTranslation);
                 if (dataset?.translated_name) {
+                    console.log(dataset)
                     setCategoryName(dataset.translated_name || '');
+                    setSelectedCategory(dataset);
                 }
             }
         }
@@ -64,11 +88,6 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
             return; // Handle this error case appropriately
         }
 
-        const payload = {
-            locale: selectedTranslation,
-            categoryId: categotyId, // Use speckeyId instead of specification_key_id
-            category: categoryName // Use the correct key for translated_key
-        };
 
         try {
             if (!categotyId) {
@@ -76,12 +95,36 @@ const CategoryTransForm = ({ categoryData }: PageProps) => {
                 return; // Handle this error case appropriately
             }
 
-            // Submit the translation
-            const response = await submitKeysTranslation(payload);
 
-            if (response.success) {
-                setSubmitStatus('Form Submitted successfully');
+            const payload = {
+                locale: selectedTranslation,
+                category_id: categotyId,
+                translated_name: categoryName // Use the correct key for translated_key
+            };
+
+            let fetchUrl = apiEndpoints.categoryTranslation;
+            let method = "POST";
+            // If selectedCategory is not null, we are updating an existing translation
+            if (selectedCategory?.category_id) {
+                method = "PUT";
+                fetchUrl = apiEndpoints.categoryTranslationById(selectedCategory.id);
+            }
+
+            const response = await fetchApi<CategoryTranslation>(fetchUrl, {
+                method: method,
+                body: payload,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Submitting payload:', payload);
+
+            if (response.success && response.data) {
+                // Type assertion for the response data structure
+                const responseData = response.data as { message?: string };
+                setSubmitStatus(responseData.message || 'Form Submitted successfully');
             } else {
+                setSubmitStatus(response.error || 'Error submitting form');
                 console.error('Error submitting form', response);
             }
         } catch (error) {

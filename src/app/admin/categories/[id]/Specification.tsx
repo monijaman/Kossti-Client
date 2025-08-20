@@ -73,8 +73,9 @@ const Specification = ({ params }: PageProps) => {
         if (selectedCategory) {
             try {
                 const response = await getCategoryRelBrands({ category_id: selectedCategory });
-                if (response && response.data && typeof response.data === 'object' && 'data' in response.data) {
-                    const data = response.data.data as Brand[] || [];
+                if (response && response.data) {
+                    // With the flattened structure, response.data directly contains the brand array
+                    const data = response.data as Brand[] || [];
                     setActiveBrands(data);
                 }
             } catch (error) {

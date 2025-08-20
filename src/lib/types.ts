@@ -176,6 +176,15 @@ export interface Brand {
   total?: number;
 }
 
+export interface BrandTranslation {
+  id: number;
+  brand_id: number;
+  locale: string;
+  translated_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProductPhotos {
   id: number;
   name: string;

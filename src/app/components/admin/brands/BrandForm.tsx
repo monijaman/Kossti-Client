@@ -1,6 +1,7 @@
 "use client";
 import { useBrands } from '@/hooks/useBrands';
-
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from "@/lib/fetchApi";
 import { Brand } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -34,12 +35,34 @@ const BrandForm = ({ brandData }: PageProps) => {
             setSubmitStatus('')
 
             // Update existing product
-            const response = await addNewBrand({ brand, brandId });
+
+            const payload = {
+                id: brandId,
+                name: brand,
+            };
+
+            // Send the request to the backend using fetchApi
+            const endpoint = brandId
+                ? apiEndpoints.updateBrand(brandId)
+                : apiEndpoints.Brand;
+
+            const method = brandId ? "PUT" : "POST";
+
+            const response = await fetchApi<Brand>(endpoint, {
+                method,
+                body: payload,
+            });
 
 
             if (response.success && response.data) {
-                router.push(`/admin/brand`);
-                setSubmitStatus(response.data.message);
+                // The response.data contains the entire response from Go API
+                const apiResponse = response.data as { data?: Brand; message?: string };
+
+                if (apiResponse.data?.id) {
+                    router.push(`/admin/brand/manage/${apiResponse.data.id}`);
+                }
+
+                setSubmitStatus(apiResponse.message || "Operation completed successfully");
             } else {
                 setSubmitStatus(response.error || "Failed to add brand");
             }

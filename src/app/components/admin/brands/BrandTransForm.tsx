@@ -1,9 +1,9 @@
 "use client";
 import { useBrands } from "@/hooks/useBrands";
-import { LOCALES } from '@/lib/constants';
-import { Brand } from '@/lib/types'; // Assuming you have a Product type
+import { apiEndpoints, LOCALES } from '@/lib/constants';
+import fetchApi from "@/lib/fetchApi";
+import { Brand, BrandTranslation } from '@/lib/types'; // Assuming you have a Product type
 import { useEffect, useState } from 'react';
-
 interface PageProps {
     brandData: Brand; // Optional for create case
 }
@@ -11,42 +11,49 @@ interface PageProps {
 const BrandTransForm = ({ brandData }: PageProps) => {
 
     const [brandName, setBrandName] = useState('');
-    const { getWideBrands, submitBrandTranslation } = useBrands();
-    const [brandId, setBrandId] = useState<number>();
+    const { submitBrandTranslation } = useBrands();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('bn');
+    const [brandTranslation, setBrandTranslation] = useState<BrandTranslation | null>(null);
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
-
         const selectedLang = LOCALES.find((lang) => lang === locale);
         if (selectedLang) {
             setSelectedTranslation(locale);
         }
     };
 
-
     const fetchBrands = async () => {
+
+
         try {
             if (selectedTranslation && brandData.id) {
 
-                const brandResponse = await getWideBrands({
-                    perPage: undefined,        // Number of items per page (optional)
-                    search: '',        // Search term (optional)
-                    paginate: 'false', // 'true' or 'false' to enable/disable pagination
-                    locale: selectedTranslation, // Locale, e.g., 'en', 'bn', etc.
-                    brandId: brandData.id ?? undefined, // Ensure brandId is either a number or undefined
-                    status: null,         // Status filter (optional)
-                    page: null         // current page (optional)
+                const queryParams = new URLSearchParams({
+                    locale: selectedTranslation,
+                    brandId: brandData.id.toString()
                 });
 
-                if (brandResponse.success && brandResponse.data) {
-                    const data = brandResponse.data as { data?: Brand } | Brand;
-                    const brandObj = (data && typeof data === 'object' && 'data' in data) ? (data.data as Brand) : (data as Brand);
-                    setBrandName(brandObj.name ?? "");
-                } else {
-                    console.error('Failed to fetch categories');
+                const response = await fetchApi<BrandTranslation>(`${apiEndpoints.brandTranslation(brandData.id)}?${queryParams.toString()}`);
+                if (!response) {
+                    console.error('Failed to fetch brand translations');
+                    return;
                 }
+
+                const apiResponse = response.data as { data?: BrandTranslation; message?: string };
+
+                console.log('Brand Translation Response:', response.data);
+
+                if (response.success && apiResponse.data) {
+                    // resp.data is the actual Brand object; set that into state
+                    setBrandTranslation(apiResponse.data);
+                    setBrandName(apiResponse.data.translated_name || ""); // Set the brand name from the translation
+                } else {
+                    setBrandTranslation(null);
+                }
+
+
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -64,11 +71,10 @@ const BrandTransForm = ({ brandData }: PageProps) => {
 
     useEffect(() => {
         if (selectedTranslation && brandData && brandData.id) {
-            setBrandId(brandData.id);
             fetchBrands();
 
         }
-    }, [brandData, selectedTranslation]);
+    }, [selectedTranslation]);
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -82,22 +88,39 @@ const BrandTransForm = ({ brandData }: PageProps) => {
 
         const payload = {
             locale: selectedTranslation,
-            brandId: brandId, // Use speckeyId instead of specification_key_id
-            brand: brandName // Use the correct key for translated_key
+            translated_name: brandName
         };
 
         try {
-            if (!brandId) {
+            console.log('Brand Translation:', brandTranslation);
+            if (!brandTranslation?.id) {
                 console.error('Product ID is undefined');
                 return; // Handle this error case appropriately
             }
+            let method = "POST";
+            // If brandTranslation is null, we are creating a new translation
+            if (brandTranslation.brand_id) {
+                method = "PUT";
+            }
 
-            // Submit the translation
-            const response = await submitBrandTranslation(payload);
+            const fetchUrl = apiEndpoints.brandTranslation(brandTranslation.brand_id);
 
-            if (response.success) {
-                setSubmitStatus('Form Submitted successfully');
+            setSubmitStatus('Submitting...');
+
+            const response = await fetchApi(fetchUrl, {
+                method: method,
+                body: payload,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.success && response.data) {
+                // Type assertion for the response data structure
+                const responseData = response.data as { message?: string };
+                setSubmitStatus(responseData.message || 'Form Submitted successfully');
             } else {
+                setSubmitStatus(response.error || 'Error submitting form');
                 console.error('Error submitting form', response);
             }
         } catch (error) {
@@ -133,7 +156,7 @@ const BrandTransForm = ({ brandData }: PageProps) => {
                         id="name"
                         type="text"
                         placeholder="Enter product name"
-                        value={brandName}
+                        value={brandName || ""}
                         onChange={(e) => setBrandName(e.target.value)}
                     />
                 </div>
@@ -143,7 +166,7 @@ const BrandTransForm = ({ brandData }: PageProps) => {
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
                     >
-                        {brandId ? 'Update Product' : 'Create Product'}
+                        {brandTranslation?.id ? 'Update Product' : 'Create Product'}
                     </button>
                 </div>
 

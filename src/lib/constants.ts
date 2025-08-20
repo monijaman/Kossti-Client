@@ -52,8 +52,10 @@ export const apiEndpoints = {
   // Brand endpoints
 
   getBrands: "/brands",
+  brandTranslation: (brandId: number) => `/brand-translation/${brandId}`,
+  brandTrans: () => `/brand-translation`,
   Brands: (brandId: number) => `/brands/${brandId}`,
-  createBrand: "/brands",
+  Brand: "/brands",
   getBrandById: (id: number | string) => `/brands/${id}`,
   updateBrand: (id: number | string) => `/brands/${id}`,
   deleteBrand: (id: number | string) => `/brands/${id}`,
