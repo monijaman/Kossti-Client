@@ -9,7 +9,7 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<SpecificationKey[]>([]); // Suggestions for search
     const [showSuggestions, setShowSuggestions] = useState(false); // Toggle suggestion dropdown
-     const { getSpecificationsKeys } = useSpecificationsKeys()
+    const { getSpecificationsKeys } = useSpecificationsKeys()
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
     useEffect(() => {
@@ -41,14 +41,14 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
                 const page = 1; // Default page
 
                 const paginate = false;
- 
+
                 // Make the getProducts call to fetch suggestions
                 const response = await getSpecificationsKeys({ page, searchTerm, paginate });
 
                 // Assuming that response.data contains products array
 
-                if (response) {
-                    setSuggestions(response); // Store suggestions
+                if (response && response.data) {
+                    setSuggestions(response.data); // Store suggestions
                     setShowSuggestions(true)
                 }
             } catch (error) {

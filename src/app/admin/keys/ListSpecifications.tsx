@@ -35,14 +35,15 @@ const ListSpecifications = ({ searchParams }: PageProps) => {
 
 
     const fetchKeys = useCallback(async () => {
-
         const response = await getSpecificationsKeys({ perPage, searchTerm, paginate, page });
-        setSpecificationsKeys(response.data);
 
-        setTotalPages(Math.ceil(response.total / limit));
-
-        // setSpecifications(response);
-
+        if (response && response.data) {
+            setSpecificationsKeys(response.data);
+            setTotalPages(Math.ceil(response.total / limit));
+        } else {
+            setSpecificationsKeys([]);
+            setTotalPages(1);
+        }
     }, [perPage, searchTerm, paginate, page, limit, getSpecificationsKeys]);
 
     useEffect(() => {

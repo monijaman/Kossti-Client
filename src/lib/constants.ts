@@ -34,6 +34,7 @@ export const apiEndpoints = {
     `/products/${id}/increment-views`,
 
   // Category endpoints
+  Categories: "/categories",
   getCategories: "/categories",
   createCategory: "/categories",
   getCategoryById: (id: number | string) => `/categories/${id}`,
@@ -52,6 +53,7 @@ export const apiEndpoints = {
   // Brand endpoints
 
   getBrands: "/brands",
+  createBrand: "/brands",
   brandTranslation: (brandId: number) => `/brand-translation/${brandId}`,
   brandTrans: () => `/brand-translation`,
   Brands: (brandId: number) => `/brands/${brandId}`,
@@ -78,11 +80,12 @@ export const apiEndpoints = {
   createSpecKeyTranslation: "/speckey-translation",
 
   // FormGenerator endpoints
-  createFormGenerator: "/formgenerator",
+  formGenerator: (categoryId: number) => `/formgenerator/${categoryId}`,
+  getFormGenerator: () => "/formgenerator",
   getFormGeneratorById: (id: number | string) => `/formgenerator/${id}`,
   updateFormGenerator: (id: number | string) => `/formgenerator/${id}`,
   getCategorySpecs: (categoryId: number | string) =>
-    `/catgory-specs/${categoryId}`,
+    `/category-specs/${categoryId}`,
 
   // Feedback endpoints
   getFeedbacks: "/feedbacks",

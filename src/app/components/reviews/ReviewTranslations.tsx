@@ -49,7 +49,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
             // Set translated specifications
             setTranslatedSpecifications(dataset.dataset);
-console.log('dataset', translatedSpecifications)
+            console.log('dataset', translatedSpecifications)
             // Return the dataset so we can use it immediately
             return dataset.dataset;
         }
@@ -70,8 +70,8 @@ console.log('dataset', translatedSpecifications)
                 return {
                     id: item.id ?? null,  // Ensure id is either a number or null
                     locale: selectedLocale,
-                    specification_id: +item.specification_key_id,  // Ensure id is either a number or null
-                    translated_key: +item.specification_key_id,
+                    specification_key_id: +item.specification_key_id,  // Ensure id is either a number or null
+                    translated_key: keyValue?.translations?.translated_value ?? '', // Use the actual translated value
                     translated_value: keyValue?.translations?.translated_value ?? '', // Provide a default value
                 };
             })
@@ -144,7 +144,7 @@ console.log('dataset', translatedSpecifications)
                                     value: key.id, // Keeping this as a number
                                     label: key.specification_key,
                                 }))
-                                .find((option) => option.value === spec.specification_id) || null}  // Comparing numbers
+                                .find((option) => option.value === spec.specification_key_id) || null}  // Comparing numbers
                             // onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
                             options={specKeys && specKeys.map((key) => ({
                                 value: key.id,  // Keeping id as a number

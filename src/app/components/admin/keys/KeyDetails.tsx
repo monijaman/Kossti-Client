@@ -1,19 +1,42 @@
 'use client';
+import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types';
 import Link from 'next/link';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 interface ProductDetailsProps {
   keys: SpecificationKey[];
+  onRefresh?: () => void;
 }
 
-const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
+const ProductDetails: FC<ProductDetailsProps> = ({ keys, onRefresh }) => {
   // Ensure keys is an array
   const keyList = Array.isArray(keys) ? keys : [];
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const { deleteSpecificationKey } = useSpecificationsKeys();
 
-  const deleteKey = (id: number) => {
-    console.log(`Key with ID ${id} deleted.`);
-    // Add your delete logic here
+  const deleteKey = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this specification key?')) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const result = await deleteSpecificationKey(id);
+      if (result.success) {
+        alert('Specification key deleted successfully');
+        if (onRefresh) {
+          onRefresh();
+        }
+      } else {
+        alert(`Failed to delete specification key: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting specification key:', error);
+      alert('An error occurred while deleting the specification key');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (keyList.length === 0) {
@@ -58,9 +81,13 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys }) => {
                   </Link>
                   <button
                     onClick={() => key.id !== null && deleteKey(key.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
+                    disabled={deletingId === key.id}
+                    className={`text-white text-sm px-3 py-1 rounded ${deletingId === key.id
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-red-500 hover:bg-red-600'
+                      }`}
                   >
-                    Delete
+                    {deletingId === key.id ? 'Deleting...' : 'Delete'}
                   </button>
 
                 </td>

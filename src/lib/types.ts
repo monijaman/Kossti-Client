@@ -206,9 +206,9 @@ export interface SpecificationInt {
 export interface SpecKeyTranslation {
   id: null | number;
   locale: string;
-  specification_id: number | null;
-  translated_key: null | number;
-  translated_value: string; // Allow undefined
+  specification_key_id: number | null;
+  translated_key: string;
+  translated_value?: string;
 }
 
 export interface SpecificationKey {

@@ -1,23 +1,22 @@
 "use client";
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SubmitSpecResponse } from '@/lib/types';
+
 interface PageProps {
     speckeyData?: SpecificationKey; // Optional for create case
-
 }
 
 const KeyForm = ({ speckeyData }: PageProps) => {
-
     const [speckey, setSpeckey] = useState('');
     const [speckeyId, setSpeckeyID] = useState<number | null>(null);
-
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
     const { submitSpecificationsKeys } = useSpecificationsKeys();
- 
+    const router = useRouter();
+
     useEffect(() => {
         setSpeckey(speckeyData?.specification_key || ''); // Fallback to empty string
         setSpeckeyID(speckeyData?.id || null); // Fallback to null
@@ -27,20 +26,28 @@ const KeyForm = ({ speckeyData }: PageProps) => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true)
+        setLoading(true);
 
         try {
-            setSubmitStatus('')
+            setSubmitStatus('');
 
-            // Update existing product
-            const response = await submitSpecificationsKeys({ speckeyId, speckey }) as SubmitSpecResponse;
+            // Create or update specification key
+            const response = await submitSpecificationsKeys({ speckeyId, speckey });
 
             if (response.success) {
-                setSubmitStatus(response?.data?.message ?? '');
-                setLoading(false)
+                setSubmitStatus("Key saved successfully");
+                setLoading(false);
+
+                // If it's a new key, redirect to edit page
+                if (!speckeyId && response.data && typeof response.data === 'object' && 'id' in response.data) {
+                    const keyData = response.data as { id: number };
+                    setTimeout(() => {
+                        router.push(`/admin/keys/manage/${keyData.id}`);
+                    }, 1000);
+                }
             } else {
-                setLoading(false)
-                setSubmitStatus(response?.error ?? '');
+                setLoading(false);
+                setSubmitStatus(response?.error ?? 'Failed to save key');
             }
         } catch (error) {
             console.error('Error submitting form', error);
@@ -48,7 +55,6 @@ const KeyForm = ({ speckeyData }: PageProps) => {
         } finally {
             setLoading(false);
         }
-
     };
 
     return (

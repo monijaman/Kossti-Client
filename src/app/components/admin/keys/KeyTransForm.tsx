@@ -1,27 +1,21 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { SpecificationKey } from '@/lib/types'; // Assuming you have a Product type
 import useSpecificationsKeys from "@/hooks/useSpecificationsKeys";
 import { LOCALES } from '@/lib/constants';
+import { SpecificationKey, SpecKeyTranslation } from '@/lib/types';
+import { useCallback, useEffect, useState } from 'react';
 
 interface PageProps {
-    speckeyData: SpecificationKey; // Optional for create case
+    speckeyData: SpecificationKey;
 }
-type SubmitSpecResponse = {
-    success: boolean;
-    data: {
-        message: string;
-        // other fields if any
-    };
-};
 
 const KeyTransForm = ({ speckeyData }: PageProps) => {
-
     const [translated_key, setTranslated_key] = useState(speckeyData?.specification_key || '');
     const { submitKeysTranslation, getKeysTranslationById } = useSpecificationsKeys();
     const [speckeyId, setSpeckeyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
+    const [translations, setTranslations] = useState<SpecKeyTranslation>();
+    const [loading, setLoading] = useState(false);
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
@@ -32,69 +26,90 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
         }
     };
 
-    const fetchKeyTranslation = async () => {
-        if (speckeyId !== null) {
-
+    const fetchKeyTranslation = useCallback(async () => {
+        if (speckeyId && selectedTranslation) {
             const response = await getKeysTranslationById({
-                key_id: speckeyData.id ?? undefined,
+                key_id: speckeyId,
                 locale: selectedTranslation,
             });
 
-            if (response.success && response.data.translated_key) {
-                setTranslated_key(response.data.translated_key)
+            if (response && response.success && response.data) {
+                const translationData = response.data as SpecKeyTranslation;
+                setTranslations(translationData);
 
+                // If translation exists, populate the form
+                if (translationData.translated_key) {
+                    setTranslated_key(translationData.translated_key);
+                } else {
+                    // Reset to original key name if no translation exists
+                    setTranslated_key(speckeyData?.specification_key || '');
+                }
             }
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [speckeyId, selectedTranslation, speckeyData?.specification_key]); // Remove getKeysTranslationById to prevent infinite loop
 
 
 
     // Select 'bn' translation by default on mount
     useEffect(() => {
         handleLanguageSwitch('bn');
-
     }, []);
 
     useEffect(() => {
         if (speckeyData && speckeyData.id) {
             setSpeckeyId(speckeyData.id);
-            fetchKeyTranslation();
-
         }
-    }, [speckeyData, selectedTranslation]);
+    }, [speckeyData]);
+
+    useEffect(() => {
+        if (selectedTranslation && speckeyId) {
+            fetchKeyTranslation();
+        }
+    }, [selectedTranslation, speckeyId, fetchKeyTranslation]);
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Ensure translated_key is defined
-        if (!translated_key) {
-            console.error('Translated key is undefined');
-            return; // Handle this error case appropriately
+        if (!selectedTranslation) {
+            setSubmitStatus('Please select a language first');
+            return;
         }
 
-        const payload = {
-            locale: selectedTranslation,
-            speckeyId: speckeyId, // Use speckeyId instead of specification_key_id
-            speckey: translated_key // Use the correct key for translated_key
-        };
+        if (!speckeyId) {
+            setSubmitStatus('No specification key selected');
+            return;
+        }
+
+        if (!translated_key) {
+            setSubmitStatus('Please enter a translated key name');
+            return;
+        }
+
+        setLoading(true);
 
         try {
-            if (!speckeyId) {
-                console.error('Product ID is undefined');
-                return; // Handle this error case appropriately
-            }
+            setSubmitStatus('');
 
-            // Submit the translation
-            const response = await submitKeysTranslation(payload) as SubmitSpecResponse;
+            const response = await submitKeysTranslation({
+                locale: selectedTranslation,
+                speckeyId: speckeyId,
+                speckey: translated_key,
+            });
 
             if (response.success) {
-                setSubmitStatus('Form Submitted successfully');
+                setSubmitStatus("Translation saved successfully");
+                // Refresh the translation data
+                fetchKeyTranslation();
             } else {
-                console.error('Error submitting form', response);
+                setSubmitStatus(response?.error ?? 'Failed to save translation');
             }
         } catch (error) {
-            console.error('Error submitting form', error);
+            console.error('Error submitting translation:', error);
+            setSubmitStatus('Error submitting the translation');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -133,10 +148,14 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
 
                 <div className="flex items-center justify-between">
                     <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className={`font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading
+                            ? 'bg-gray-400 cursor-not-allowed text-white'
+                            : 'bg-blue-500 hover:bg-blue-700 text-white'
+                            }`}
                         type="submit"
+                        disabled={loading}
                     >
-                        {speckeyId ? 'Update Product' : 'Create Product'}
+                        {loading ? 'Saving...' : 'Save Translation'}
                     </button>
                 </div>
 
