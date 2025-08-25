@@ -212,13 +212,36 @@ export const useProducts = () => {
 
       return {
         success: true,
-        data: response.data,
+        data: response,
       };
     } catch (error) {
       console.error("Error creating translation:", error);
       return {
         success: false,
         data: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  };
+
+  const getProductTranslations = async (productId: number) => {
+    try {
+      // This would need to be implemented on the Go server side
+      // For now, return empty array as translations might be included in product data
+      console.log(`Getting translations for product ${productId}`);
+
+      // If the Go server has an endpoint like /products/{id}/translations
+      // const response = await fetchApi(`/products/${productId}/translations`);
+
+      return {
+        success: true,
+        data: [], // Empty for now until Go server endpoint is available
+      };
+    } catch (error) {
+      console.error("Error fetching translations:", error);
+      return {
+        success: false,
+        data: [],
         error: error instanceof Error ? error.message : "Unknown error",
       };
     }
@@ -320,6 +343,7 @@ export const useProducts = () => {
     getAProductById,
     createProduct,
     updateProduct,
+    getProductTranslations,
     getPhotosByProductId,
     MakePhotoDefault,
     incrementViews,
