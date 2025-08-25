@@ -16,9 +16,15 @@ export const useBrands = () => {
     try {
       const dataset = await fetchApi(apiEndpoints.getBrands);
 
+      // Type the response to handle Go server structure
+      const responseData = dataset.data as {
+        brands?: unknown;
+        [key: string]: unknown;
+      };
+
       return {
         success: true,
-        data: dataset,
+        data: responseData.brands || responseData, // Extract brands from Go server response
       };
     } catch (error) {
       console.error("Error fetching category:-", error);

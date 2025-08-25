@@ -3,8 +3,9 @@ import Modal from '@/app/components/Modal/client';
 import DragNdrop from "@/app/components/Uploader/Uploader";
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
-import { useProducts } from "@/hooks/useProducts";
-import { Brand, Category, Product } from '@/lib/types';
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
+import { ApiResponse, Brand, Category, Product } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -24,9 +25,19 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Define response types for API calls
+    interface ProductCreateResponse {
+        message: string;
+        product: Product;
+    }
+
+    interface ProductUpdateResponse {
+        message: string;
+        product: Product;
+    }
+
     const { getCategory } = useCategory();
     const { getBrands } = useBrands();
-    const { createProduct, updateProduct } = useProducts();
     const router = useRouter();
 
     const [categories, setCategories] = useState<Category[]>([]);
@@ -37,51 +48,78 @@ const ProductForm = ({ product }: ProductFormProps) => {
         const fetchCategoriesAndBrands = async () => {
             const categories = await getCategory();
             const brands = await getBrands();
+
             setCategories(categories.data as Category[]);
             setBrands(brands.data as Brand[]);
         };
 
         fetchCategoriesAndBrands();
-    }, [getBrands, getCategory]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
+
+    // Update form state when product changes (on initial load)
+    useEffect(() => {
+        if (product) {
+            setName(product.name || '');
+            setCategory(product.category_id || '');
+            setBrand(product.brand_id || '');
+            setModel(product.model || '');
+            setPrice(product.price || 0);
+            setStatus(product.status || false);
+            setPriority(product.priority || 1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product?.id]); // Only depend on product ID to avoid loops
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true); // Set loading state
 
         const payload = {
-            name,
-            category_id: String(category),
-            brand_id: String(brand),
-            model,
+            name: name,
+            category_id: category ? Number(category) : null, // Go server expects snake_case and can be null
+            brand_id: brand ? Number(brand) : null, // Go server expects snake_case and can be null
             price: parseFloat(price.toString()),
-            status: status ? 1 : 0, // Convert status to integer
-            priority: Number(priority),
+            status: !!status, // Convert to boolean (true/false)
+            priority: Number(priority), // Priority field now exists in Go server's Product entity
         };
+
 
         try {
             setSubmitStatus('')
-            let response;
+            let response: ApiResponse<ProductCreateResponse | ProductUpdateResponse>;
             if (product?.id) {
                 // Update existing product
-                response = await updateProduct(product.id, payload);
+                response = await fetchApi(apiEndpoints.updateProduct(product.id), {
+                    method: "PATCH",
+                    body: payload,
+                }) as ApiResponse<ProductUpdateResponse>;
+
+                if (response.success && response.data) {
+                    setSubmitStatus(response.data.message || 'Product updated successfully');
+                }
+
             } else {
                 // Create new product
-                response = await createProduct(payload);
-                const productId = response.data.product.id;
+                response = await fetchApi(apiEndpoints.createProduct, {
+                    method: "POST",
+                    body: payload,
+                }) as ApiResponse<ProductCreateResponse>;
 
-                // Optionally: Redirect after delay or handle the newly created product
-                setTimeout(() => {
-                    router.push(`/admin/products/${productId}`); // Redirect to the product's page
-                }, 1000);
+                if (response.success && response.data) {
+                    const productId = response.data.product?.id;
+
+                    if (productId) {
+                        // Optionally: Redirect after delay or handle the newly created product
+                        setTimeout(() => {
+                            router.push(`/admin/products/${productId}`); // Redirect to the product's page
+                        }, 1000);
+                    }
+                }
             }
 
-            if (response.success) {
-
-                setSubmitStatus(response.data.message);
-
-                // Access the product ID from response.data
-
-
+            if (response.success && response.data) {
+                setSubmitStatus(response.data.message || 'Operation completed successfully');
             } else {
                 setSubmitStatus('Error submitting the form');
             }

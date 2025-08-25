@@ -104,7 +104,7 @@ export const apiEndpoints = {
     `/public-reviews/${id}?locale=${countryCode}`,
   getReviews: `get`,
   submitBrands: (brandid: number) => `category-brands/${brandid}`,
-  getAProductById: (id: number) => `product/${id}`,
+  getAProductById: (id: number) => `/products/${id}`,
 };
 
 export const API_ROUTES = {

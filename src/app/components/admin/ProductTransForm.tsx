@@ -53,10 +53,13 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         e.preventDefault();
 
         const payload = {
-            name,
-            price: parseFloat(price.toString()), // Convert price to a number
-            locale: selectedTranslation
+            locale: selectedTranslation, // Go server expects lowercase
+            translated_name: name, // Go server expects snake_case
+            // translated_description: description, // optional field
         };
+
+        console.log('Translation payload:', payload);
+        console.log('Selected locale:', selectedTranslation);
 
         try {
 
@@ -74,7 +77,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
 
                 setTranslations((prevItem: ProductTranslation[] | undefined) => [
                     ...(prevItem || []),  // ensure prevItem is an array or initialize it as an empty array
-                    response.data.translation  // append the new translation to the array
+                    (response.data as { translation: ProductTranslation })?.translation  // append the new translation to the array
                 ]);
 
 

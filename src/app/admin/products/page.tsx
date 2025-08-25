@@ -65,7 +65,7 @@ const ManageReviews = () => {
         };
 
         fetchProductData();
-    }, [page, activeCategory, activeBrands, activePriceRange, debouncedSearchTerm, locale]);
+    }, []);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);

@@ -1,3 +1,6 @@
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const useProducts = () => {
@@ -176,42 +179,23 @@ export const useProducts = () => {
     productData: Record<string, unknown>
   ) => {
     try {
-      const apiUrl = `products/update/${id}`; // Example API endpoint
-
-      // Append apiUrl to productData
-      const payload = { ...productData, apiUrl };
-
-      // Make the PUT request to the backend API
-      const response = await fetch(`/api/post/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Ensure you're sending JSON data
-        },
-        body: JSON.stringify(payload), // Convert the payload to JSON format
+      // Use the correct Go server endpoint for updating products
+      const response = await fetchApi(apiEndpoints.updateProduct(id), {
+        method: "PATCH",
+        body: productData,
       });
 
-      if (!response.ok) {
-        // If the response status is not OK, throw an error
-        const errorData = await response.json();
-        throw new Error(
-          `Error updating product: ${errorData.message || response.statusText}`
-        );
-      }
-
-      // Parse the response body as JSON if the request was successful
-      const dataset = await response.json();
-
-      // Return success along with the data
       return {
         success: true,
-        ...dataset,
+        data: response.data,
       };
     } catch (error) {
-      // Type the error as `Error` to access the `message` property
-      const err = error as Error;
-      console.error("Error updating product:", err.message);
-
-      return { success: false, data: [], error: err.message };
+      console.error("Error updating product:", error);
+      return {
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 
@@ -220,41 +204,23 @@ export const useProducts = () => {
     id: number
   ) => {
     try {
-      const apiUrl = `product-trans/${id}`; // Assuming this is the API route
-
-      // Append apiUrl to productData
-      const payload = { ...productData, apiUrl };
-
-      // Make the POST request to the backend API
-      const response = await fetch("/api/post", {
+      // Use the correct Go server endpoint for product translations
+      const response = await fetchApi(`/product-trans/${id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Ensure you're sending JSON data
-        },
-        body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
+        body: productData,
       });
 
-      if (!response.ok) {
-        // If the response status is not OK, throw an error
-        const errorData = await response.json();
-        throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
-        );
-      }
-
-      // Parse the response body as JSON if the request was successful
-      const dataset = await response.json();
-
-      // Return success along with the data
       return {
         success: true,
-        ...dataset,
+        data: response.data,
       };
     } catch (error) {
-      const err = error as Error;
-      console.error("Error updating product:", err.message);
-
-      return { success: false, data: [], error: err.message };
+      console.error("Error creating translation:", error);
+      return {
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 

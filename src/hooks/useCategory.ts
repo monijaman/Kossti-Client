@@ -15,9 +15,15 @@ export const useCategory = () => {
     try {
       const dataset = await fetchApi(apiEndpoints.getCategories);
 
+      // Type the response to handle Go server structure
+      const responseData = dataset.data as {
+        categories?: unknown;
+        [key: string]: unknown;
+      };
+
       return {
         success: true,
-        data: dataset,
+        data: responseData.categories || responseData, // Extract categories from Go server response
       };
     } catch (error) {
       console.error("Error fetching category:", error);
