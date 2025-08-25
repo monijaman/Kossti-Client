@@ -9,12 +9,11 @@ interface PageProps {
 }
 
 const KeyTransForm = ({ speckeyData }: PageProps) => {
-    const [translated_key, setTranslated_key] = useState(speckeyData?.specification_key || '');
+    const [translated_key, setTranslated_key] = useState('');
     const { submitKeysTranslation, getKeysTranslationById } = useSpecificationsKeys();
     const [speckeyId, setSpeckeyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
-    const [translations, setTranslations] = useState<SpecKeyTranslation>();
     const [loading, setLoading] = useState(false);
 
     // Handle language switch
@@ -33,9 +32,12 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                 locale: selectedTranslation,
             });
 
+            console.log(response.data)
+
             if (response && response.success && response.data) {
                 const translationData = response.data as SpecKeyTranslation;
-                setTranslations(translationData);
+
+
 
                 // If translation exists, populate the form
                 if (translationData.translated_key) {
@@ -135,7 +137,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                         Key Name
-                    </label>
+                    </label>{translated_key}
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="name"

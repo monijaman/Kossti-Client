@@ -2,14 +2,14 @@
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types';
 import Link from 'next/link';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 
 interface ProductDetailsProps {
   keys: SpecificationKey[];
   onRefresh?: () => void;
 }
 
-const ProductDetails: FC<ProductDetailsProps> = ({ keys, onRefresh }) => {
+const ProductDetails = ({ keys, onRefresh }: ProductDetailsProps) => {
   // Ensure keys is an array
   const keyList = Array.isArray(keys) ? keys : [];
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -83,8 +83,8 @@ const ProductDetails: FC<ProductDetailsProps> = ({ keys, onRefresh }) => {
                     onClick={() => key.id !== null && deleteKey(key.id)}
                     disabled={deletingId === key.id}
                     className={`text-white text-sm px-3 py-1 rounded ${deletingId === key.id
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-red-500 hover:bg-red-600'
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-red-500 hover:bg-red-600'
                       }`}
                   >
                     {deletingId === key.id ? 'Deleting...' : 'Delete'}

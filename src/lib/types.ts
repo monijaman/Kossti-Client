@@ -214,6 +214,8 @@ export interface SpecKeyTranslation {
 export interface SpecificationKey {
   id: number | null;
   specification_key: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface country {

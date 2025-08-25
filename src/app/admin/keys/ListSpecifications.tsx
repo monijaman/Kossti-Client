@@ -3,7 +3,7 @@
 import KeyDetails from '@/app/components/admin/keys/KeyDetails';
 import Pagination from '@/app/components/Pagination/index';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
-import { SearchParams } from '@/lib/types';
+import { SearchParams, SpecificationKey } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,11 +19,10 @@ const ListSpecifications = ({ searchParams }: PageProps) => {
 
 
     const [totalPages, setTotalPages] = useState(0);
-    const [specificationsKeys, setSpecificationsKeys] = useState([]);
+    const [specificationsKeys, setSpecificationsKeys] = useState<SpecificationKey[]>([]);
     const perPage = 10
     // const [loading, setLoading] = useState(true);
     const { getSpecificationsKeys } = useSpecificationsKeys();
-    const paginate = true;
     const [searchTerm, setSearchTerm] = useState('');
 
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
@@ -35,16 +34,17 @@ const ListSpecifications = ({ searchParams }: PageProps) => {
 
 
     const fetchKeys = useCallback(async () => {
-        const response = await getSpecificationsKeys({ perPage, searchTerm, paginate, page });
+        const response = await getSpecificationsKeys({ perPage, searchTerm, page });
 
         if (response && response.data) {
             setSpecificationsKeys(response.data);
             setTotalPages(Math.ceil(response.total / limit));
         } else {
+
             setSpecificationsKeys([]);
             setTotalPages(1);
         }
-    }, [perPage, searchTerm, paginate, page, limit, getSpecificationsKeys]);
+    }, [perPage, searchTerm, page, limit, getSpecificationsKeys]);
 
     useEffect(() => {
         fetchKeys();

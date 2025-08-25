@@ -17,12 +17,13 @@ export const useProducts = () => {
       // _: cacheBuster.toString(), // Cache-busting parameter
     };
 
-    // Add optional parameters only if they are defined
+    // Add optional parameters only if they are defined and not empty
     if (locale) params.locale = locale;
     if (category) params.category = category;
     if (brands) params.brand = brands;
     if (priceRange) params.priceRange = priceRange; // Updated to match Go server format
-    if (searchTerm) params.searchterm = searchTerm;
+    if (searchTerm && searchTerm.trim() !== "")
+      params.search = searchTerm.trim();
     if (sortby) params.sortby = sortby;
 
     // Build the query string
@@ -36,6 +37,9 @@ export const useProducts = () => {
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
+
+    console.log("API URL being called:", fullUrl);
+    console.log("Search term:", searchTerm);
 
     try {
       const response = await fetch(fullUrl);

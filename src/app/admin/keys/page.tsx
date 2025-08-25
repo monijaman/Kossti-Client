@@ -7,7 +7,7 @@ import { SpecificationKey } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function KeysListPage() {
     // Use useSearchParams hook for client-side access to search params
@@ -17,46 +17,37 @@ export default function KeysListPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [totalPages, setTotalPages] = useState(1);
     const [perPage] = useState(10);
-    const [paginate] = useState(true);
 
     const { getSpecificationsKeys } = useSpecificationsKeys();
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
     const page = parseInt(searchParamsFromHook.get('page') || '1', 10);
-    const limit = 10;
 
-    const fetchKeys = async () => {
+    const fetchKeys = useCallback(async () => {
         setLoading(true);
-        const response = await getSpecificationsKeys({ perPage, searchTerm, paginate, page });
+        const response = await getSpecificationsKeys({ perPage, searchTerm: debouncedSearchTerm, page });
 
         if (response && response.data) {
+
             setSpecificationsKeys(response.data);
-            setTotalPages(Math.ceil(response.total / limit));
+            setTotalPages(Math.ceil(response.total));
         } else {
             setSpecificationsKeys([]);
-            setTotalPages(1);
+            setTotalPages(0);
         }
 
         setLoading(false);
-    };
+    }, [getSpecificationsKeys, perPage, debouncedSearchTerm, page]);
 
     useEffect(() => {
         fetchKeys();
-    }, [searchTerm, perPage, page]);
-
-    useEffect(() => {
-        if (debouncedSearchTerm) {
-            fetchKeys();
-        }
-    }, [debouncedSearchTerm]);
+    }, []);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
-    useEffect(() => {
-        fetchKeys();
-    }, []);
+
 
     return (
         <div>
@@ -82,10 +73,13 @@ export default function KeysListPage() {
                         keys={specificationsKeys}
                         onRefresh={fetchKeys}
                     />
-                    <Pagination
-                        currentPage={page}
-                        totalPages={totalPages}
-                    />
+                    {totalPages > 0 && (
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                        />
+                    )}
+
                 </>
             )}
         </div>

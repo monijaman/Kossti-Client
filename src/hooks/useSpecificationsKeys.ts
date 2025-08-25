@@ -1,59 +1,56 @@
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { ApiResponse } from "@/lib/types";
+import { ApiResponse, SpecificationKey } from "@/lib/types";
+
+// Define interfaces for Go server responses
+interface GoSpecKeysResponse {
+  specification_keys: SpecificationKey[];
+  count: number;
+  total: number;
+  returned: number;
+  limit: number;
+  offset: number;
+}
 
 const useSpecificationsKeys = () => {
   const getSpecificationsKeys = async ({
     perPage = 10,
     searchTerm = "",
-    paginate = false,
     page = 1,
   } = {}) => {
     try {
-      // Calculate offset for pagination
+      // Use server-side search and pagination for all cases
       const limit = perPage;
       const offset = (page - 1) * limit;
 
-      // Build query parameters
       const queryParams: Record<string, string | number> = {
         limit: limit,
         offset: offset,
       };
 
-      // Add search if provided (we'll handle this on the server side later)
+      // Add search parameter if provided
       if (searchTerm) {
         queryParams.search = searchTerm;
       }
 
-      // Use fetchApi to call the Go server directly
       const response = await fetchApi(apiEndpoints.getSpecKeys, {
-        queryParams,
+        queryParams: queryParams,
       });
 
       if (response.success && response.data) {
-        // Transform the Go server response to match expected format
-        const goData = response.data as any;
-        let filteredKeys = goData.specification_keys || [];
-
-        // Client-side search filtering if needed
-        if (searchTerm) {
-          filteredKeys = filteredKeys.filter((key: any) =>
-            key.specification_key
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-          );
-        }
+        const goData = response.data as GoSpecKeysResponse;
+        const keys = goData.specification_keys || [];
 
         return {
-          data: filteredKeys,
-          total: filteredKeys.length,
+          data: keys,
+          total: goData.total || keys.length, // Use server total count
           per_page: perPage,
           current_page: page,
         };
-      } else {
-        console.error("API returned error:", response.error);
-        return null;
       }
+
+      console.error("API returned no data");
+      return null;
     } catch (error) {
       console.error("Error fetching specification keys:", error);
       return null;
