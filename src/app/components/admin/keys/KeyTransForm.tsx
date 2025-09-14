@@ -1,4 +1,5 @@
 "use client";
+import Input from "@/app/components/ui/input";
 import useSpecificationsKeys from "@/hooks/useSpecificationsKeys";
 import { LOCALES } from '@/lib/constants';
 import { SpecificationKey, SpecKeyTranslation } from '@/lib/types';
@@ -9,16 +10,17 @@ interface PageProps {
 }
 
 const KeyTransForm = ({ speckeyData }: PageProps) => {
-    const [translated_key, setTranslated_key] = useState('');
+
     const { submitKeysTranslation, getKeysTranslationById } = useSpecificationsKeys();
     const [speckeyId, setSpeckeyId] = useState<number>();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('');
     const [loading, setLoading] = useState(false);
+    const [translated_key, setTranslated_key] = useState('');
+
 
     // Handle language switch
     const handleLanguageSwitch = (locale: string) => {
-
         const selectedLang = LOCALES.find((lang) => lang === locale);
         if (selectedLang) {
             setSelectedTranslation(locale);
@@ -38,10 +40,9 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                 const translationData = response.data as SpecKeyTranslation;
 
 
-
                 // If translation exists, populate the form
-                if (translationData.translated_key) {
-                    setTranslated_key(translationData.translated_key);
+                if (translationData.TranslatedKey) {
+                    setTranslated_key(translationData.TranslatedKey);
                 } else {
                     // Reset to original key name if no translation exists
                     setTranslated_key(speckeyData?.specification_key || '');
@@ -116,6 +117,16 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
     };
 
 
+    const setTransKey = (transKey: string) => {
+        setTranslated_key(transKey);
+        setState((prevState) => ({
+            ...prevState,
+            translations: prevState.translations ? {
+                ...prevState.translations,
+                translated_key: transKey
+            } : null
+        }));
+    };
 
     return (
         <>
@@ -137,14 +148,14 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                         Key Name
-                    </label>{translated_key}
-                    <input
+                    </label>
+                    <Input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="name"
                         type="text"
                         placeholder="Enter product name"
                         value={translated_key}
-                        onChange={(e) => setTranslated_key(e.target.value)}
+                        onChange={(e) => setTransKey(e.target.value)}
                     />
                 </div>
 

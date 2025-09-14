@@ -23,6 +23,7 @@ const CreateSpecificationKeys = ({ params }: PageProps) => {
         if (response.success && response.data) {
             setKey(response.data as SpecificationKey);
         }
+
         setLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]); // Remove getSpecificationsKeysById from dependencies to prevent infinite loop

@@ -210,6 +210,7 @@ export interface SpecKeyTranslation {
   locale: string;
   specification_key_id: number | null;
   translated_key: string;
+  TranslatedKey?: string;
   translated_value?: string;
 }
 
