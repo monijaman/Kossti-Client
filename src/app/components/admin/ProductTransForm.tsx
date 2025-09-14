@@ -34,7 +34,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     const [translations, setTranslations] = useState(product?.translations);
 
     // Handle language switch
-    const handleLanguageSwitch = (locale: string) => {
+    const handleLanguageSwitch = (locale: string) => {þþ
         const selectedLang = LOCALES.find((lang) => lang === locale);
         if (selectedLang) {
             setSelectedTranslation(locale);

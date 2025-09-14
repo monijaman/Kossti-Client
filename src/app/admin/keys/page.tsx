@@ -2,13 +2,13 @@
 // pages/specifications/index.js
 import KeyDetails from '@/app/components/admin/keys/KeyDetails';
 import Pagination from '@/app/components/Pagination/index';
+import Input from '@/app/components/ui/input';
 import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SpecificationKey } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-
+import { useEffect, useState } from 'react';
 export default function KeysListPage() {
     // Use useSearchParams hook for client-side access to search params
     const searchParamsFromHook = useSearchParams();
@@ -23,7 +23,7 @@ export default function KeysListPage() {
 
     const page = parseInt(searchParamsFromHook.get('page') || '1', 10);
 
-    const fetchKeys = useCallback(async () => {
+    const fetchKeys = async () => {
         setLoading(true);
         const response = await getSpecificationsKeys({ perPage, searchTerm: debouncedSearchTerm, page });
 
@@ -37,7 +37,12 @@ export default function KeysListPage() {
         }
 
         setLoading(false);
-    }, [getSpecificationsKeys, perPage, debouncedSearchTerm, page]);
+    };
+
+
+    useEffect(() => {
+        if (debouncedSearchTerm) fetchKeys();
+    }, [debouncedSearchTerm]);
 
     useEffect(() => {
         fetchKeys();
@@ -55,7 +60,7 @@ export default function KeysListPage() {
             <Link className='bg-blue-500 text-white p-4 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
 
             <div className='my-4'>
-                <input
+                <Input
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
