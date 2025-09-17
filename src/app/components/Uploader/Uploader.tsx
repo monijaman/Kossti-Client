@@ -10,7 +10,7 @@ import {
   uploadmedia
 } from "@/redux/features/upload/uploadSlice";
 import Image from "next/image";
-import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, useCallback, useEffect, useRef, useState } from "react";
 import "./uploader.scss";
 
 // Define the props for the DragNdrop component
@@ -31,7 +31,7 @@ const DragNdrop = ({
   const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif"];
   const dispatch = useAppDispatch();
   const selectedFilesRef = useRef<File[]>([]);
- 
+
   const status = useAppSelector(selectstatus);
   const [selectedValue, setSelectedValue] = useState<string | number>("");
 
@@ -68,20 +68,17 @@ const DragNdrop = ({
 
   };
 
-  const getPhotos = async () => {
+  const getPhotos = useCallback(async () => {
     const response = await getPhotosByProductId(productId);
 
     setPhotos(response.data);
 
     const defaultFile = response.data.find((file: ProductPhotos) => file.defaultphoto === 1);
 
-
     if (defaultFile) {
       setSelectedValue(defaultFile.id);
     }
-
-    // setSelectedValue();
-  }
+  }, [getPhotosByProductId, productId]);
 
   // when browse input for files;
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -139,14 +136,13 @@ const DragNdrop = ({
 
 
   useEffect(() => {
-
     getPhotos();
   }, [files])
 
 
 
 
-  const handleRadioChange = (newValue: string | number ) => {
+  const handleRadioChange = (newValue: string | number) => {
     setSelectedValue(newValue); // Store the selected id
     makePhotoDefault(+newValue);
 

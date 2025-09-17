@@ -37,7 +37,7 @@ const Specification = ({ params }: PageProps) => {
     const handleSelectChange = (index: number, selectedOption: SingleValue<{ value: number | null; label: string }>) => {
         const values = [...specifications];
         if (selectedOption) {
-            values[index].specification_key_id = selectedOption.value !== undefined && selectedOption.value !== null ? selectedOption.value.toString() : "";
+            values[index].specification_key_id = selectedOption.value !== undefined && selectedOption.value !== null ? selectedOption.value : "";
             setSpecifications(values);
         }
     };
@@ -48,10 +48,22 @@ const Specification = ({ params }: PageProps) => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        try {
+            // Call the submit function with the mapped data
+            const result = await submitSpecificationsKeys(id, specifications);
 
-        // Call the submit function with the mapped data
-        await submitSpecificationsKeys(id, specifications);
-
+            if (result.success) {
+                console.log("Specifications saved successfully:", result.data);
+                // Optionally refresh the specifications
+                fetchSpecifications();
+            } else {
+                console.error("Failed to save specifications:", result.error);
+                alert(`Failed to save specifications: ${result.error}`);
+            }
+        } catch (error) {
+            console.error("Error submitting specifications:", error);
+            alert("An error occurred while saving specifications");
+        }
     };
 
     // Fetch the specification keys
@@ -71,20 +83,24 @@ const Specification = ({ params }: PageProps) => {
         try {
             const response = await getSpecifications(id);
 
-            if (response.dataset.specifications.length > 0) {
+            // Check if response exists and has the expected structure
+            if (response && response.dataset) {
+                if (response.dataset.specifications && response.dataset.specifications.length > 0) {
+                    setSpecifications(response.dataset.specifications);
+                } else if (response.dataset.formspecs) {
+                    setSpecifications(response.dataset.formspecs);
+                }
 
-                setSpecifications(response.dataset.specifications);
-
+                if (response.dataset.name) {
+                    setProductName(response.dataset.name);
+                }
             } else {
-                setSpecifications(response.dataset.formspecs);
-
+                console.warn('Unexpected response structure:', response);
+                setSpecifications([]);
             }
-
-            setProductName(response.dataset.name)
-
-            // setProduct();
         } catch (error) {
             console.error("Error fetching specifications:", error);
+            setSpecifications([]);
         }
     }, [id, getSpecifications]);
 
@@ -111,16 +127,16 @@ const Specification = ({ params }: PageProps) => {
                                                 value: key.id,
                                                 label: key.specification_key,
                                             }))
-                                            .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
+                                            .find((option) => option.value === (typeof spec.specification_key_id === 'string' ? parseInt(spec.specification_key_id) : spec.specification_key_id)) || null}
                                         onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
                                         options={specKeys.map((key) => ({
                                             value: key.id,
                                             label: key.specification_key,
                                         }))}
-
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
+                                        isDisabled={true}
                                         required
                                     />
                                 </div>

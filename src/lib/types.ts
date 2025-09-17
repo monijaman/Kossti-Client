@@ -201,8 +201,12 @@ export interface ProductPhotos {
 
 export interface SpecificationInt {
   id?: number;
-  specification_key_id: string;
+  product_id?: number;
+  specification_key_id: string | number;
+  specification_key?: string;
   value: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SpecKeyTranslation {

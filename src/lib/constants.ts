@@ -78,7 +78,7 @@ export const apiEndpoints = {
   removeSpec: (id: number | string) => `/specremove/${id}`,
   getSpecKeyTranslations: "/speckey-translation",
   createSpecKeyTranslation: "/speckey-translation",
-
+  buckSpecUpdate: `/specifications/bulk`,
   // FormGenerator endpoints
   formGenerator: (categoryId: number) => `/formgenerator/${categoryId}`,
   getFormGenerator: () => "/formgenerator",

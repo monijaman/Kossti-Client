@@ -2,7 +2,7 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css'; // Import styles
 import Select from 'react-select';
 type SubmitSpecResponse = {
@@ -40,25 +40,45 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const { submitSpecKeyTranslation, getSpecTranslations } = useSpecifications();
-    // const [ setTranslatedSpecifications] = useState<transDataSet[]>([]);
-    const [translatedSpecifications, setTranslatedSpecifications] = useState<transDataSet[]>([]);
+    // Removed unused translatedSpecifications state
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
-    const tranlatedSpecification = async () => {
+    const tranlatedSpecification = useCallback(async () => {
         if (productId) {
-            const dataset = await getSpecTranslations(productId, selectedLocale);
+            try {
+                const response = await getSpecTranslations(productId, selectedLocale);
 
-            // Set translated specifications
-            setTranslatedSpecifications(dataset.dataset);
-            console.log('dataset', translatedSpecifications)
-            // Return the dataset so we can use it immediately
-            return dataset.dataset;
+                console.log('getSpecTranslations response:', response); // Debug log
+
+                // Handle different response structures
+                let dataset;
+                if (response && response.dataset) {
+                    dataset = response.dataset;
+                } else if (response && Array.isArray(response)) {
+                    dataset = response;
+                } else if (response) {
+                    dataset = response;
+                } else {
+                    console.warn('No data received from getSpecTranslations');
+                    dataset = [];
+                }
+
+                // Set translated specifications - removed this since we don't need the state
+                // setTranslatedSpecifications(dataset);
+                console.log('Processed dataset:', dataset);
+
+                // Return the dataset so we can use it immediately
+                return dataset;
+            } catch (error) {
+                console.error('Error in tranlatedSpecification:', error);
+                return [];
+            }
         }
-        return null;
-    };
+        return [];
+    }, [productId, selectedLocale, getSpecTranslations]);
 
-    const fetchAndProcess = async () => {
+    const fetchAndProcess = useCallback(async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
         if (specifications) {
@@ -80,11 +100,11 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
             setTranSpecifications(transSpec);
         }
-    }
+    }, [specifications, selectedLocale, tranlatedSpecification]);
 
     useEffect(() => {
         fetchAndProcess();
-    }, [specifications, selectedLocale]);
+    }, [fetchAndProcess]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

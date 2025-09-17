@@ -1,3 +1,4 @@
+import ClientProvider from '@/app/components/Provider/ClientProvider';
 import { Inter } from 'next/font/google';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <ClientProvider>
+          {children}
+        </ClientProvider>
       </body>
     </html>
   )

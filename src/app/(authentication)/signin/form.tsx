@@ -2,6 +2,7 @@
 import getErrors from '@/app/components/Form/validation';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
+import { setAccessTokenCookie } from '@/lib/utils';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -68,6 +69,9 @@ export const LoginForm = () => {
           localStorage.setItem('token', loginData.token);
           localStorage.setItem('refresh_token', loginData.refresh_token);
           localStorage.setItem('email', loginData.email);
+
+          // Also set the token as a cookie for API routes
+          setAccessTokenCookie(loginData.token);
 
           router.push("/admin");
         } else {

@@ -48,12 +48,12 @@ interface ApiResponse {
 // Create the async thunk for uploading media
 export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
   "upload/files",
-  async (payload ) => {
+  async (payload) => {
     const { productId, files } = payload; // Fixed typo from prodductId to productId
 
     // Initialize formData as a FormData object
     const formData = new FormData();
- 
+
     formData.append("product_id", productId.toString()); // Convert to string
     formData.append("apiUrl", "/productimages");
 
@@ -63,10 +63,21 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
     });
 
     try {
+      // Get access token from localStorage for Authorization header
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+      // Prepare headers
+      const headers: HeadersInit = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       // Handle the API call
       const response = await fetch("/api/multipart", {
         method: "POST",
         body: formData, // FormData is used directly as body
+        headers: headers,
         // Note: Do not set Content-Type header, fetch will automatically set it to multipart/form-data
       });
 
@@ -97,7 +108,7 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
 );
 export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   "upload/removemedia",
-  async (payload ) => {
+  async (payload) => {
     const { productId } = payload;
 
     const newFormData = {
