@@ -119,13 +119,7 @@ const KeyTransForm = ({ speckeyData }: PageProps) => {
 
     const setTransKey = (transKey: string) => {
         setTranslated_key(transKey);
-        setState((prevState) => ({
-            ...prevState,
-            translations: prevState.translations ? {
-                ...prevState.translations,
-                translated_key: transKey
-            } : null
-        }));
+
     };
 
     return (

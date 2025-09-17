@@ -27,8 +27,6 @@ const Specification = () => {
         }
     };
 
-
-
     const saveSpecs = async () => {
 
         const specArrays = activeSpecifications

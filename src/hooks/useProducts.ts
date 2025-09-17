@@ -204,15 +204,39 @@ export const useProducts = () => {
     id: number
   ) => {
     try {
-      // Use the correct Go server endpoint for product translations
-      const response = await fetchApi(`/product-trans/${id}`, {
+      console.log(
+        "Creating/updating translation for product:",
+        id,
+        productData
+      );
+
+      // Use Go server API URL for product translations
+      const goApiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const url = `${goApiUrl}/products/${id}/translations`;
+
+      const response = await fetch(url, {
         method: "POST",
-        body: productData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          locale: productData.locale,
+          translated_name: productData.translated_name,
+          price: productData.price,
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       return {
-        success: true,
-        data: response,
+        success: data.success || true,
+        data: data.translation || data,
+        message: data.message || "Translation created/updated successfully",
       };
     } catch (error) {
       console.error("Error creating translation:", error);
@@ -224,18 +248,34 @@ export const useProducts = () => {
     }
   };
 
-  const getProductTranslations = async (productId: number) => {
+  const getProductTranslations = async (productId: number, locale?: string) => {
     try {
-      // This would need to be implemented on the Go server side
-      // For now, return empty array as translations might be included in product data
       console.log(`Getting translations for product ${productId}`);
 
-      // If the Go server has an endpoint like /products/{id}/translations
-      // const response = await fetchApi(`/products/${productId}/translations`);
+      // Use Go server API URL for product translations
+      const goApiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const url = locale
+        ? `${goApiUrl}/products/${productId}/translations?locale=${locale}`
+        : `${goApiUrl}/products/${productId}/translations`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
 
       return {
-        success: true,
-        data: [], // Empty for now until Go server endpoint is available
+        success: data.success || true,
+        data: data.data || [],
+        message: data.message || "Translations retrieved successfully",
       };
     } catch (error) {
       console.error("Error fetching translations:", error);

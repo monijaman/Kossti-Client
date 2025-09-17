@@ -16,8 +16,8 @@ interface ProductFormProps {
 
 const ProductForm = ({ product }: ProductFormProps) => {
     const [name, setName] = useState(product?.name || '');
-    const [category, setCategory] = useState(product?.category_id || '');
-    const [brand, setBrand] = useState(product?.brand_id || '');
+    const [category, setCategory] = useState(product?.category_id?.toString() || '');
+    const [brand, setBrand] = useState(product?.brand_id?.toString() || '');
     const [model, setModel] = useState(product?.model || '');
     const [price, setPrice] = useState(product?.price || 0);
     const [status, setStatus] = useState(product?.status || false);
@@ -27,13 +27,15 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
     // Define response types for API calls
     interface ProductCreateResponse {
-        message: string;
-        product: Product;
+        id?: number;        // Direct ID on the response
+        message?: string;
+        error?: string;
     }
 
     interface ProductUpdateResponse {
-        message: string;
-        product: Product;
+        id?: number;        // Direct ID on the response  
+        message?: string;
+        error?: string;
     }
 
     const { getCategory } = useCategory();
@@ -61,8 +63,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
     useEffect(() => {
         if (product) {
             setName(product.name || '');
-            setCategory(product.category_id || '');
-            setBrand(product.brand_id || '');
+            setCategory(product.category_id?.toString() || '');
+            setBrand(product.brand_id?.toString() || '');
             setModel(product.model || '');
             setPrice(product.price || 0);
             setStatus(product.status || false);
@@ -97,8 +99,10 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
                 if (response.success && response.data) {
                     setSubmitStatus(response.data.message || 'Product updated successfully');
+                } else {
+                    // Handle error case - use response.error for failed requests
+                    setSubmitStatus(response.error || response.data?.error || 'Failed to update product');
                 }
-
             } else {
                 // Create new product
                 response = await fetchApi(apiEndpoints.createProduct, {
@@ -107,7 +111,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                 }) as ApiResponse<ProductCreateResponse>;
 
                 if (response.success && response.data) {
-                    const productId = response.data.product?.id;
+                    const productId = response.data.id;
 
                     if (productId) {
                         // Optionally: Redirect after delay or handle the newly created product
@@ -118,11 +122,11 @@ const ProductForm = ({ product }: ProductFormProps) => {
                 }
             }
 
-            if (response.success && response.data) {
-                setSubmitStatus(response.data.message || 'Operation completed successfully');
-            } else {
-                setSubmitStatus('Error submitting the form');
-            }
+            // if (response.success && response.data) {
+            //     setSubmitStatus(response.data.message || 'Operation completed successfully');
+            // } else {
+            //     setSubmitStatus(response.error || 'An error occurred during the operation');
+            // }
         } catch (error) {
             console.error('Error submitting form', error);
             setSubmitStatus('Error submitting the form');
