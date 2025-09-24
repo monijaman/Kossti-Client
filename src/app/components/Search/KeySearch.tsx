@@ -3,7 +3,7 @@ import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
 import { SearchBoxProps, SpecificationKey } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -12,38 +12,16 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
     const { getSpecificationsKeys } = useSpecificationsKeys()
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
-    useEffect(() => {
-        if (debouncedSearchTerm) {
-            fetchdata();
-        } else {
-            setShowSuggestions(false)
-            setSuggestions([]); // Clear suggestions when input is empty
-        }
-    }, [debouncedSearchTerm]);
-
-
-
-
     // Handle search input change and update suggestions
-    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value;
-        setSearchTerm(searchTerm);
-
-    };
-
-    // Handle search input change and update suggestions
-    const fetchdata = async () => {
-
+    const fetchdata = useCallback(async () => {
 
         // Fetch product suggestions
         if (searchTerm.length > 0) {
             try {
                 const page = 1; // Default page
 
-                const paginate = false;
-
                 // Make the getProducts call to fetch suggestions
-                const response = await getSpecificationsKeys({ page, searchTerm, paginate });
+                const response = await getSpecificationsKeys({ page, searchTerm });
 
                 // Assuming that response.data contains products array
 
@@ -57,6 +35,22 @@ const KeySearch = ({ initialSearchTerm = '' }: SearchBoxProps) => {
         } else {
             setSuggestions([]); // Clear suggestions when input is empty
         }
+    }, [searchTerm, getSpecificationsKeys]);
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            fetchdata();
+        } else {
+            setShowSuggestions(false)
+            setSuggestions([]); // Clear suggestions when input is empty
+        }
+    }, [debouncedSearchTerm, fetchdata]);
+
+    // Handle search input change and update suggestions
+    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value;
+        setSearchTerm(searchTerm);
+
     };
 
 

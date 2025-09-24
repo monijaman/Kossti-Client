@@ -357,7 +357,81 @@ export const useSpecifications = () => {
     }
   };
 
-  // Submit form
+  // Submit translated values only (simplified version)
+  const submitSpecTranslationValues = async (
+    productId: number,
+    specifications: SpecKeyTranslation[]
+  ): Promise<ApiResponse> => {
+    console.log("=== SUBMITTING SPEC TRANSLATION VALUES ===");
+    console.log("Product ID:", productId);
+    console.log("Specifications:", JSON.stringify(specifications, null, 2));
+
+    if (!apiUrl) {
+      return {
+        success: false,
+        error: "API URL is not defined in environment variables",
+      };
+    }
+
+    try {
+      if (!specifications || specifications.length === 0) {
+        return {
+          success: false,
+          error: "No specifications to submit",
+        };
+      }
+
+      // Transform to simpler payload structure
+      const validSpecs = specifications
+        .filter((spec) => spec.id && spec.locale && spec.translated_value)
+        .map((spec) => ({
+          id: Number(spec.id),
+          locale: spec.locale,
+          translated_value: spec.translated_value,
+        }));
+
+      if (validSpecs.length === 0) {
+        return {
+          success: false,
+          error: "No valid specifications with translated values",
+        };
+      }
+
+      const payload = {
+        productId: Number(productId),
+        specifications: validSpecs,
+      };
+
+      console.log("Sending payload:", JSON.stringify(payload, null, 2));
+
+      const response = await fetchApi(
+        apiEndpoints.updateSpecTranslationValues,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: payload,
+        }
+      );
+
+      console.log("Success response:", response);
+
+      return {
+        success: true,
+        data: response,
+      };
+    } catch (error) {
+      console.error("Error submitting specification values:", error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
+    }
+  };
+
+  // Submit form (original version for backwards compatibility)
   const submitSpecKeyTranslation = async (
     productId: number,
     specifications: SpecKeyTranslation[]
@@ -401,7 +475,7 @@ export const useSpecifications = () => {
 
         // Check for required fields
         if (
-          !spec.specification_key_id ||
+          !spec.id || // Use spec.id instead of specification_key_id
           !spec.locale ||
           !spec.translated_value
         ) {
@@ -410,7 +484,7 @@ export const useSpecifications = () => {
         }
 
         const result = {
-          id: Number(spec.specification_key_id), // This maps to specification_id in Go
+          id: Number(spec.id), // Use the actual specification ID
           locale: spec.locale,
           translated_key: spec.translated_key || "",
           translated_value: spec.translated_value,
@@ -493,6 +567,7 @@ export const useSpecifications = () => {
     submitSpecifications,
     getSpecifications,
     submitSpecKeyTranslation,
+    submitSpecTranslationValues,
     getFormSpecifications,
     getSpecificationsByCategory,
     submitSpecificationsKeys,

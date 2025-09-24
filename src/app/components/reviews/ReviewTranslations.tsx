@@ -3,7 +3,6 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import 'react-quill/dist/quill.snow.css'; // Import styles
 import Select from 'react-select';
 type SubmitSpecResponse = {
     success: boolean;

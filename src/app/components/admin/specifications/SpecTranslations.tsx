@@ -3,14 +3,14 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import 'react-quill/dist/quill.snow.css'; // Import styles
 import Select from 'react-select';
 type SubmitSpecResponse = {
     success: boolean;
-    data: {
+    data?: {
         message: string;
         // other fields if any
     };
+    error?: string;
 };
 
 
@@ -39,7 +39,7 @@ interface PageProps {
 const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
     const [selectedLocale, setSelectedLocale] = useState('bn');
-    const { submitSpecKeyTranslation, getSpecTranslations } = useSpecifications();
+    const { submitSpecTranslationValues, getSpecTranslations } = useSpecifications();
     // Removed unused translatedSpecifications state
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
@@ -81,26 +81,30 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const fetchAndProcess = useCallback(async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
-        if (specifications) {
+        if (specifications && specKeys) {
             const transSpec = specifications.map((item) => {
                 const keyValue = fetchedSpecifications?.find((trans: transDataSet) => {
                     // Ensure that trans has the correct structure
-
                     return trans?.specification_key_id === +item.specification_key_id;
                 });
+
+                // Find the corresponding specKey to get the specification_key name
+                const specKey = specKeys.find(key => key.id === +item.specification_key_id);
 
                 return {
                     id: item.id ?? null,  // Ensure id is either a number or null
                     locale: selectedLocale,
-                    specification_key_id: +item.specification_key_id,  // Ensure id is either a number or null
-                    translated_key: keyValue?.translations?.translated_value ?? '', // Use the actual translated value
-                    translated_value: keyValue?.translations?.translated_value ?? '', // Provide a default value
+                    specification_key_id: +item.specification_key_id,
+                    // translated_key should be the translated name of the specification key itself
+                    translated_key: keyValue?.translations?.translated_key || specKey?.specification_key || '',
+                    // translated_value should be the translated value for this specification
+                    translated_value: keyValue?.translations?.translated_value || item.value || '',
                 };
             })
 
             setTranSpecifications(transSpec);
         }
-    }, [specifications, selectedLocale, tranlatedSpecification]);
+    }, [specifications, specKeys, selectedLocale, tranlatedSpecification]);
 
     useEffect(() => {
         fetchAndProcess();
@@ -110,16 +114,42 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        if (!productId) {
+            setFormStatus('Product ID is required');
+            return;
+        }
 
-        if (productId) {
+        // Validate that all translations have required fields
+        const invalidTranslations = tranSpecifications.filter(spec =>
+            !spec.specification_key_id ||
+            !spec.locale ||
+            (!spec.translated_key && !spec.translated_value)
+        );
 
-            const response = await submitSpecKeyTranslation(productId, tranSpecifications) as SubmitSpecResponse;
+        if (invalidTranslations.length > 0) {
+            console.error('Invalid translations found:', invalidTranslations);
+            setFormStatus('Please fill in all required fields');
+            return;
+        }
 
+        console.log('Submitting translations:', {
+            productId,
+            translations: tranSpecifications
+        });
+
+        try {
+            const response = await submitSpecTranslationValues(productId, tranSpecifications) as SubmitSpecResponse;
+
+            console.log('Translation response:', response);
 
             if (response.success) {
-
-                setFormStatus(response.data.message)
+                setFormStatus(response.data?.message || 'Translations updated successfully');
+            } else {
+                setFormStatus(`Error: ${response.error || 'Failed to update translations'}`);
             }
+        } catch (error) {
+            console.error('Translation submission error:', error);
+            setFormStatus('An unexpected error occurred while updating translations');
         }
     };
 
@@ -128,9 +158,11 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
         if (tranSpecifications) {
             const values = [...tranSpecifications];
             const { name, value } = event.target;
-            // Type guard to ensure name is a key of SpecificationInt
-            if (name === 'translated_key' || name === 'value') {
-                values[index]['translated_value'] = value; // Ensure key is valid
+            // Type guard to ensure name is a valid key
+            if (name === 'translated_key') {
+                values[index]['translated_key'] = value;
+            } else if (name === 'translated_value') {
+                values[index]['translated_value'] = value;
             }
             setTranSpecifications(values);
         }
@@ -165,8 +197,11 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
 
             {tranSpecifications && tranSpecifications.map((spec, index) => (
-                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Specification Key
+                        </label>
                         <Select
                             name="specification_id"
                             value={specKeys && specKeys
@@ -184,17 +219,20 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                             placeholder="Search and select a specification key"
                             isSearchable
                             required
-                            isDisabled={false} // Make the Select unchangeable
-
+                            isDisabled={true} // Make the Select unchangeable
                         />
-
                     </div>
+
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Translated Value ({selectedLocale.toUpperCase()})
+                        </label>
                         <input
                             type="text"
-                            name="value" // Ensure this matches the SpecificationInt key
-                            value={spec.translated_value}
+                            name="translated_value"
+                            value={spec.translated_value || ''}
                             onChange={(event) => handleInputChange(index, event)}
+                            placeholder="Enter translated value"
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required
                         />

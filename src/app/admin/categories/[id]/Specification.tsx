@@ -17,7 +17,7 @@ interface Specification {
 
 interface PageProps {
     params: Promise<{
-        id: number;
+        id: string;
     }>;
 }
 
@@ -30,7 +30,7 @@ const Specification = ({ params }: PageProps) => {
     const [brands, setBrands] = useState<Brand[]>([]);
     const [activeBrands, setActiveBrands] = useState<Brand[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id);
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(+category_id);
     const [formStatus, setFormStatus] = useState<string | null>(null);
 
     // Fetch categories

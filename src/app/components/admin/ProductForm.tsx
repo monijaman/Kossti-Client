@@ -25,6 +25,13 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Debug log for submitStatus changes
+    useEffect(() => {
+        if (submitStatus) {
+            console.log('Submit Status Changed:', submitStatus);
+        }
+    }, [submitStatus]);
+
     // Define response types for API calls
     interface ProductCreateResponse {
         id?: number;        // Direct ID on the response
@@ -89,6 +96,10 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
         try {
             setSubmitStatus('')
+            console.log('=== FORM SUBMISSION DEBUG ===');
+            console.log('Payload:', payload);
+            console.log('Is Update?', !!product?.id);
+
             let response: ApiResponse<ProductCreateResponse | ProductUpdateResponse>;
             if (product?.id) {
                 // Update existing product
@@ -97,8 +108,12 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     body: payload,
                 }) as ApiResponse<ProductUpdateResponse>;
 
+                console.log('Update Response:', response);
+
                 if (response.success && response.data) {
-                    setSubmitStatus(response.data.message || 'Product updated successfully');
+                    const successMessage = response.data.message || 'Product updated successfully';
+                    setSubmitStatus(successMessage);
+                    console.log('Update success message set:', successMessage);
                 } else {
                     // Handle error case - use response.error for failed requests
                     setSubmitStatus(response.error || response.data?.error || 'Failed to update product');
@@ -110,23 +125,27 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     body: payload,
                 }) as ApiResponse<ProductCreateResponse>;
 
+                console.log('Create Response:', response);
+
                 if (response.success && response.data) {
+                    // Backend returns the product directly, so response.data contains the product
                     const productId = response.data.id;
+                    const successMessage = response.data.message || 'Product created successfully';
+                    setSubmitStatus(successMessage);
+                    console.log('Success message set:', successMessage);
 
                     if (productId) {
-                        // Optionally: Redirect after delay or handle the newly created product
+                        // Show success message for 3 seconds before redirect
                         setTimeout(() => {
                             router.push(`/admin/products/${productId}`); // Redirect to the product's page
-                        }, 1000);
+                        }, 3000); // Increased to 3 seconds so user can see the message
                     }
+                } else {
+                    console.log('Create failed:', response);
+                    // Handle error case for creation
+                    setSubmitStatus(response.error || response.data?.error || 'Failed to create product');
                 }
             }
-
-            // if (response.success && response.data) {
-            //     setSubmitStatus(response.data.message || 'Operation completed successfully');
-            // } else {
-            //     setSubmitStatus(response.error || 'An error occurred during the operation');
-            // }
         } catch (error) {
             console.error('Error submitting form', error);
             setSubmitStatus('Error submitting the form');
@@ -159,6 +178,9 @@ const ProductForm = ({ product }: ProductFormProps) => {
     return (
 
         <>
+            {/* Debug: Log render state */}
+            {console.log('ProductForm render - submitStatus:', submitStatus, 'loading:', loading)}
+
             {product &&
                 <Modal isOpen={isModalOpen} onClose={closeModal}>
                     <DragNdrop onFilesSelected={setFiles} productId={product.id} width="auto" height="auto" />
@@ -305,16 +327,24 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         </button>
                     </div>
 
-                    {/* Submission Status */}
+                    {/* Submission Status - Always visible if there's a status */}
                     {submitStatus && (
                         <div
-                            className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
-                                ? 'text-green-700 bg-green-100'
-                                : 'text-red-700 bg-red-100'
+                            className={`p-4 mt-4 text-sm rounded-lg border ${submitStatus.toLowerCase().includes('successfully') || submitStatus.toLowerCase().includes('success')
+                                ? 'text-green-700 bg-green-100 border-green-300'
+                                : 'text-red-700 bg-red-100 border-red-300'
                                 }`}
                             role="alert"
                         >
+                            <strong>{submitStatus.toLowerCase().includes('successfully') || submitStatus.toLowerCase().includes('success') ? '✅ Success: ' : '❌ Error: '}</strong>
                             {submitStatus}
+                        </div>
+                    )}
+
+                    {/* Debug: Show submit status state */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="p-2 mt-2 text-xs bg-gray-100 rounded">
+                            Debug - submitStatus: &quot;{submitStatus}&quot; | loading: {loading.toString()}
                         </div>
                     )}
                 </form>

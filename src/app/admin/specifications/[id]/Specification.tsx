@@ -71,16 +71,17 @@ const Specification = ({ params }: PageProps) => {
         try {
             const response = await getSpecifications(id);
 
-            if (response.dataset.specifications.length > 0) {
+            if (response && response.dataset) {
+                if (response.dataset.specifications && response.dataset.specifications.length > 0) {
+                    setSpecifications(response.dataset.specifications);
+                } else if (response.dataset.formspecs) {
+                    setSpecifications(response.dataset.formspecs);
+                }
 
-                setSpecifications(response.dataset.specifications);
-
-            } else {
-                setSpecifications(response.dataset.formspecs);
-
+                if (response.dataset.name) {
+                    setProductName(response.dataset.name);
+                }
             }
-
-            setProductName(response.dataset.name)
 
             // setProduct();
         } catch (error) {
@@ -111,7 +112,7 @@ const Specification = ({ params }: PageProps) => {
                                                 value: key.id,
                                                 label: key.specification_key,
                                             }))
-                                            .find((option) => option.value === parseInt(spec.specification_key_id)) || null}
+                                            .find((option) => option.value === parseInt(String(spec.specification_key_id))) || null}
                                         onChange={(selectedOption) => handleSelectChange(index, selectedOption)}
                                         options={specKeys.map((key) => ({
                                             value: key.id,

@@ -5,9 +5,16 @@ import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'r
 import Select, { SingleValue } from 'react-select';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
+
+interface ApiResultData {
+    message?: string;
+    count?: number;
+    [key: string]: unknown;
+}
+
 interface PageProps {
     params: Promise<{
-        id: number;
+        id: string;
     }>;
 }
 
@@ -16,9 +23,17 @@ const Specification = ({ params }: PageProps) => {
     const { getSpecifications, getSpecificationsKeys, submitSpecificationsKeys } = useSpecifications();
 
     const [specifications, setSpecifications] = useState<SpecificationInt[]>([]);
-
     const [specKeys, setSpecKeys] = useState<SpecificationKey[]>([]);
     const [productName, setProductName] = useState<string>('');
+    const [submitStatus, setSubmitStatus] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    // Debug log for submitStatus changes
+    useEffect(() => {
+        if (submitStatus) {
+            console.log('Specifications Submit Status Changed:', submitStatus);
+        }
+    }, [submitStatus]);
 
 
     // Function to handle input change
@@ -47,22 +62,27 @@ const Specification = ({ params }: PageProps) => {
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoading(true);
+        setSubmitStatus(''); // Clear previous status
 
         try {
             // Call the submit function with the mapped data
-            const result = await submitSpecificationsKeys(id, specifications);
+            const result = await submitSpecificationsKeys(+id, specifications);
 
             if (result.success) {
                 console.log("Specifications saved successfully:", result.data);
+                setSubmitStatus((result.data as ApiResultData)?.message || 'Specifications saved successfully');
                 // Optionally refresh the specifications
                 fetchSpecifications();
             } else {
                 console.error("Failed to save specifications:", result.error);
-                alert(`Failed to save specifications: ${result.error}`);
+                setSubmitStatus(`Failed to save specifications: ${result.error}`);
             }
         } catch (error) {
             console.error("Error submitting specifications:", error);
-            alert("An error occurred while saving specifications");
+            setSubmitStatus("An error occurred while saving specifications");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -81,7 +101,7 @@ const Specification = ({ params }: PageProps) => {
     // fetch all specificatiosn for dropdown option
     const fetchSpecifications = useCallback(async () => {
         try {
-            const response = await getSpecifications(id);
+            const response = await getSpecifications(+id);
 
             // Check if response exists and has the expected structure
             if (response && response.dataset) {
@@ -163,16 +183,33 @@ const Specification = ({ params }: PageProps) => {
                             </button> */}
                             <button
                                 type="submit"
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                disabled={loading}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Submit
+                                {loading ? 'Saving...' : 'Submit'}
                             </button>
                         </div>
+
+                        {/* Success/Error Message Display */}
+                        {submitStatus && (
+                            <div
+                                className={`p-4 mt-4 text-sm rounded-lg border ${submitStatus.toLowerCase().includes('success') || submitStatus.toLowerCase().includes('saved')
+                                        ? 'text-green-700 bg-green-100 border-green-300'
+                                        : 'text-red-700 bg-red-100 border-red-300'
+                                    }`}
+                                role="alert"
+                            >
+                                <strong>
+                                    {submitStatus.toLowerCase().includes('success') || submitStatus.toLowerCase().includes('saved') ? '✅ Success: ' : '❌ Error: '}
+                                </strong>
+                                {submitStatus}
+                            </div>
+                        )}
                     </form>
                 </div>
             </div>
             <div className="w-1/2">
-                <SpecTranslations productId={id} specKeys={specKeys && specKeys} specifications={specifications && specifications} />
+                <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={specifications && specifications} />
             </div>
         </div>
     );

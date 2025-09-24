@@ -70,6 +70,7 @@ export const apiEndpoints = {
   deleteSpecification: (id: number | string) => `/specifications/${id}`,
   searchSpecifications: "/specificationsearch",
   createSpecTranslation: "/spec_translation",
+  updateSpecTranslationValues: "/spec_translation/values",
   getSpecTranslation: (id: number | string) => `/spec_translation/${id}`,
   getPublicSpecs: (productId: number) => `/get-public-spec/${productId}`,
   getSpecKeys: "/speckey",

@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 
 interface PageProps {
     params: Promise<{
-        id: number; // Type for the slug
+        id: string; // Type for the id
     }>;
 }
 
@@ -20,7 +20,7 @@ const Products = async ({ params }: PageProps) => {
 
     const fetchAProductData = async (): Promise<Product> => {
         const response = await fetchApi(
-            apiEndpoints.getAProductById(id),
+            apiEndpoints.getAProductById(+id),
             {
                 method: 'GET',
                 accessToken: (await cookies()).get("accessToken")?.value || "",

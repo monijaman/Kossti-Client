@@ -1,14 +1,10 @@
 "use client";
 import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
+import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
-import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import 'react-quill/dist/quill.snow.css'; // Import styles
-
-// Dynamically import React Quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 // Page props
 interface PageProps {
@@ -152,9 +148,9 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                     {/* Review Input */}
                     <div className="relative min-h-[400px]">
                         <label htmlFor="review" className="block text-sm font-medium  text-gray-700 mb-2">Review ({selectedTranslation.locale})</label>
-                        <ReactQuill
+                        <ReactQuillWrapper
                             value={selectedTranslation.review || ''}
-                            onChange={(value) => {
+                            onChange={(value: string) => {
                                 if (selectedTranslation) {
                                     setSelectedTranslation({ ...selectedTranslation, review: value });
                                 }

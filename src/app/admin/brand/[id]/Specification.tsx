@@ -12,7 +12,7 @@ type SubmitBrandResponse = {
     message: string;
 };
 
-export default function SpecificationPage({ params }: { params: Promise<{ id: number }> }) {
+export default function SpecificationPage({ params }: { params: Promise<{ id: string }> }) {
 
     const { id } = use(params);
     const category_id = Number(id);
