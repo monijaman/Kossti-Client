@@ -66,16 +66,18 @@ export const useReviews = () => {
         new Error("API URL is not defined in environment variables")
       );
     }
-
-    const fullUrl = `${apiUrl}/products/${id}/reviews?${queryString}`;
+    // eviews/1?locale=bn
+    const fullUrl = `${apiUrl}/reviews/${id}?locale=bn`;
 
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
 
+      // The API returns { product_id: <id>, reviews: [...] }
+      // Return the whole dataset as `data` so callers can access reviews
       return {
         success: true,
-        data: dataset.product,
+        data: dataset,
       };
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -115,31 +117,37 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Prepare the form data
-      const newFormData = {
-        product_id,
-        rating,
-        reviews,
-        additional_details, // Extract detail strings if needed
-        apiUrl: `reviews/${product_id}`,
-      };
+      // Ensure API base URL is available
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
 
-      // Make the POST request
-      const response = await fetch("/api/post", {
+      // Prepare request payload (we inline below)
+
+      // POST to the backend create-review endpoint: {BASEURL}/reviews/{product_id}
+      // If you want to update an existing review instead, use /product/{id}/review/{reviewid}
+      const fullUrl = `${apiUrl}/reviews/${product_id}`;
+
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify({
+          rating,
+          reviews,
+          // send additional_details as an actual JSON array/object (not a string)
+          additional_details: additional_details,
+        }),
       });
 
-      // Handle response
       if (!response.ok) {
-        throw new Error("Failed to submit review");
+        const text = await response.text();
+        throw new Error(`Failed to submit review: ${response.status} ${text}`);
       }
 
       const responseData = await response.json();
-      return responseData; // Return the response if needed
+      return responseData;
     } catch (error) {
       console.error("Error submitting review:", error);
     }
@@ -154,32 +162,40 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Prepare the form data
-      const newFormData = {
-        product_id, // Keep the id as per your backend requirement
-        rating,
-        review,
+      // Ensure API base URL is available
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      // Build the payload expected by the Go server
+      const payload = {
+        product_id,
         locale,
-        additional_details, // Send additional details as an array
-        apiUrl: "review/translation", // Assuming this is used on the backend for some routing logic
+        review,
+        rating,
+        additional_details,
       };
 
-      // Make the POST request
-      const response = await fetch("/api/post", {
+      // POST directly to the Go server translation endpoint
+      const fullUrl = `${apiUrl}/review/translation`;
+
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify(payload),
       });
 
-      // Handle response
       if (!response.ok) {
-        throw new Error("Failed to submit review");
+        const text = await response.text();
+        throw new Error(
+          `Failed to submit translation: ${response.status} ${text}`
+        );
       }
 
       const responseData = await response.json();
-      return responseData; // Return the response if needed
+      return responseData;
     } catch (error) {
       console.error("Error submitting review:", error);
       throw error;
@@ -266,9 +282,69 @@ export const useReviews = () => {
       return { success: false, data: [] };
     }
   };
+  // Update review helper (used by updateReview below)
+  async function updateReviewInternal(
+    apiUrlVal: string | undefined,
+    product_id: number | null,
+    review_id: number | null,
+    rating: number | null,
+    reviewsStr: string,
+    additional_details: AdditionalDetails[]
+  ) {
+    if (!apiUrlVal)
+      throw new Error("API URL is not defined in environment variables");
+    if (!product_id || !review_id)
+      throw new Error("product_id and review_id are required");
+
+    const fullUrl = `${apiUrlVal}/product/${product_id}/review/${review_id}`;
+
+    const response = await fetch(fullUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        rating,
+        reviews: reviewsStr,
+        // send additional_details as an actual JSON array/object (not a string)
+        additional_details: additional_details,
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to update review: ${response.status} ${text}`);
+    }
+
+    return await response.json();
+  }
+
+  // expose updateReview for hook users
+  const updateReview = async (
+    product_id: number | null = null,
+    review_id: number | null = null,
+    rating: number | null = null,
+    reviews: string = "",
+    additional_details: AdditionalDetails[] = []
+  ) => {
+    try {
+      return await updateReviewInternal(
+        apiUrl,
+        product_id,
+        review_id,
+        rating,
+        reviews,
+        additional_details
+      );
+    } catch (error) {
+      console.error("Error updating review:", error);
+      throw error;
+    }
+  };
 
   return {
     addReview,
+    updateReview,
     getReview,
     getReviews,
     getReviewByProductId,

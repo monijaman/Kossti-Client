@@ -4,7 +4,7 @@ import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Page props
 interface PageProps {
@@ -26,8 +26,14 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
+    // Transient success message for translation submit
+    const [transSuccessMessage, setTransSuccessMessage] = useState<string>('');
+    const transTimerRef = useRef<number | null>(null);
+    // Transient error message
+    const [transErrorMessage, setTransErrorMessage] = useState<string>('');
+    const transErrorTimerRef = useRef<number | null>(null);
 
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         const newTranslation: ReviewTranslation = {
             locale: selectedLocale,
             rating: 0,
@@ -35,17 +41,18 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             additional_details: []
         };
         setSelectedTranslation(newTranslation); // Set to null or leave unchanged
-    }
+    }, [selectedLocale]);
 
+    // Ensure we update transData when translations prop changes
     useEffect(() => {
         if (translations && translations.length > 0) {
             setTransData(translations);
         } else {
             resetForm();
         }
-    }, [translations]);
+    }, [translations, resetForm]);
 
-    const loadTranslation = async () => {
+    const loadTranslation = useCallback(async () => {
         setAdditionalDetails([]); // Reset additional details
 
         if (transData.length > 0) {
@@ -57,16 +64,16 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         } else {
             resetForm();
         }
-    }
+    }, [transData, selectedLocale, resetForm]);
 
     useEffect(() => {
         resetForm();
         loadTranslation();
-    }, [selectedLocale]);
+    }, [selectedLocale, loadTranslation, resetForm]);
 
     useEffect(() => {
         loadTranslation();
-    }, [transData]);
+    }, [transData, loadTranslation]);
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -86,7 +93,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             additionalDetails
         );
 
-        if (response.success) {
+        if (response && response.success) {
             const details = response.data.review;
             const updatedTransData = transData.map((dataset) => {
                 if (dataset.locale === selectedLocale) {
@@ -96,9 +103,58 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             });
 
             setTransData(updatedTransData);
-            setFormStatus(response.data.message || 'Review submitted successfully');
+            const msg = response.data.message || 'Review submitted successfully';
+            setFormStatus(msg);
+
+            // Show transient success message below the submit button
+            setTransSuccessMessage(msg);
+            if (transTimerRef.current) {
+                window.clearTimeout(transTimerRef.current);
+            }
+            transTimerRef.current = window.setTimeout(() => {
+                setTransSuccessMessage('');
+                transTimerRef.current = null;
+            }, 2500) as unknown as number;
+        } else {
+            // Handle error case
+            let err = 'Failed to submit translation';
+            try {
+                if (response && response.data && (response.data.error || response.data.message)) {
+                    err = String(response.data.error || response.data.message);
+                } else if (response && response.message) {
+                    err = String(response.message);
+                }
+            } catch {
+                /* ignore */
+            }
+
+            setFormStatus(err);
+
+            // Show transient error message
+            setTransErrorMessage(err);
+            if (transErrorTimerRef.current) {
+                window.clearTimeout(transErrorTimerRef.current);
+            }
+            transErrorTimerRef.current = window.setTimeout(() => {
+                setTransErrorMessage('');
+                transErrorTimerRef.current = null;
+            }, 2500) as unknown as number;
         }
     };
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (transTimerRef.current) {
+                window.clearTimeout(transTimerRef.current);
+                transTimerRef.current = null;
+            }
+            if (transErrorTimerRef.current) {
+                window.clearTimeout(transErrorTimerRef.current);
+                transErrorTimerRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -179,6 +235,14 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                             Submit Translation
                         </button>
                     </div>
+
+                    {/* Inline transient success / error messages for translation submit */}
+                    {transSuccessMessage && (
+                        <div className="mt-2 text-sm text-green-700 text-center">{transSuccessMessage}</div>
+                    )}
+                    {transErrorMessage && (
+                        <div className="mt-2 text-sm text-red-600 text-center">{transErrorMessage}</div>
+                    )}
                 </div>
             )}
 

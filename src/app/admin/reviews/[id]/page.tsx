@@ -6,7 +6,7 @@ import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { AdditionalDetails, Product, Review } from '@/lib/types';
-import React, { use, useCallback, useEffect, useState } from 'react';
+import React, { use, useCallback, useEffect, useRef, useState } from 'react';
 
 interface PageProps {
     params: Promise<{
@@ -19,10 +19,13 @@ const ReviewForm = ({ params }: PageProps) => {
     const [reviewData, setReviewData] = useState<Review>();
     const [reviews, setReviews] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
-    const { addReview, getReviewByProductId } = useReviews();
+    const { addReview, updateReview, getReviewByProductId } = useReviews();
     // const [productId, setProductId] = useState<number | null>(id); // To hold the fetched product ID
     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
+    // Parent-managed transient message for AdditionalDetails
+    const [detailsMessageVisible, setDetailsMessageVisible] = useState(false);
+    const detailsTimerRef = useRef<number | null>(null);
     const [formStatus, setFormStatus] = useState("");
     const [loading, setLoading] = useState(false);
     const [dataLoading, setDataLoading] = useState(true);
@@ -40,13 +43,41 @@ const ReviewForm = ({ params }: PageProps) => {
                 setDataLoading(true);
                 const response = await getReviewByProductId(+id); // Fetch product by ID
                 if (response?.success && response?.data) {
-                    setProducts(response.data); // Set the actual review content
-                    if (response?.data.reviews?.[0]) {
-                        const dataset = response?.data.reviews?.[0];
-                        setReviewData(dataset);
-                        setReviews(dataset.reviews)
-                        setRating(dataset.rating)
-                        setAdditionalDetails(dataset.additional_details ?? [])
+                    const data = response.data as Record<string, unknown>;
+                    // Normalize response shapes: some endpoints return { product_id, reviews: [...] }
+                    // while others return { review: {...}, translation: {...} }
+                    let dataset: Record<string, unknown> | null = null;
+
+                    const maybeReviews = data['reviews'];
+                    if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
+                        dataset = maybeReviews[0] as Record<string, unknown>;
+                    } else if (data['review']) {
+                        // Single-review shape: attach translation into translations[] if present
+                        dataset = data['review'] as Record<string, unknown>;
+                        const translationVal = data['translation'];
+                        if (translationVal && typeof translationVal === 'object') {
+                            const t = translationVal as Record<string, unknown>;
+                            dataset['translations'] = [
+                                {
+                                    id: t['id'],
+                                    product_review_id: t['product_review_id'],
+                                    locale: t['locale'],
+                                    rating: dataset['rating'] ?? 0,
+                                    review: t['translated_review'],
+                                    additional_details: t['additional_details'] ?? [],
+                                    created_at: t['created_at'],
+                                    updated_at: t['updated_at'],
+                                },
+                            ];
+                        }
+                    }
+
+                    if (dataset) {
+                        setProducts(response.data as Product);
+                        setReviewData(dataset as unknown as Review);
+                        setReviews((dataset['reviews'] as string) || (dataset['review'] as string) || "");
+                        setRating((dataset['rating'] as number) || 0);
+                        setAdditionalDetails((dataset['additional_details'] as unknown as AdditionalDetails[]) ?? []);
                     }
                 }
             } catch (error) {
@@ -59,6 +90,16 @@ const ReviewForm = ({ params }: PageProps) => {
         fetchProductData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]); // Only run when id changes
+
+    // Cleanup timer on unmount to avoid leaks
+    useEffect(() => {
+        return () => {
+            if (detailsTimerRef.current) {
+                window.clearTimeout(detailsTimerRef.current);
+                detailsTimerRef.current = null;
+            }
+        };
+    }, []);
 
     // Keep fetchProductData as a separate function for manual refresh
     const refreshProductData = useCallback(async () => {
@@ -121,14 +162,38 @@ const ReviewForm = ({ params }: PageProps) => {
         }
 
         try {
-            const result = await addReview(
-                +id,
-                rating,
-                reviews,
-                additionalDetails,
+            let result;
+            if (reviewData && reviewData.id) {
+                // Update existing review
+                result = await updateReview(
+                    +id,
+                    reviewData.id,
+                    rating,
+                    reviews,
+                    additionalDetails,
+                );
+            } else {
+                // Create new review
+                result = await addReview(
+                    +id,
+                    rating,
+                    reviews,
+                    additionalDetails,
+                );
+            }
+
+            // Robust success detection: server may return { message, review } or { success, data } shapes
+            const ok = !!(
+                result && (
+                    // direct shapes
+                    result.review || result.message ||
+                    // proxy shapes
+                    (result.success === true) ||
+                    (result.data && (result.data.review || result.data.message))
+                )
             );
 
-            if (result?.success) {
+            if (ok) {
                 setSuccessMessage('Review saved successfully!');
                 setFormStatus('Review submitted successfully!');
                 // Optionally refresh the data
@@ -140,7 +205,17 @@ const ReviewForm = ({ params }: PageProps) => {
                     setFormStatus('');
                 }, 3000);
             } else {
-                setErrorMessage('Failed to save review. Please try again.');
+                // Try to extract a better server error message if present
+                let errMsg = 'Failed to save review. Please try again.';
+                try {
+                    if (result && result.error) errMsg = String(result.error);
+                    else if (result && result.message) errMsg = String(result.message);
+                    else if (result && result.data && (result.data.error || result.data.message)) errMsg = String(result.data.error || result.data.message);
+                } catch {
+                    /* ignore */
+                }
+
+                setErrorMessage(errMsg);
                 setFormStatus('Error submitting review');
 
                 // Auto-hide error message after 5 seconds
@@ -164,6 +239,19 @@ const ReviewForm = ({ params }: PageProps) => {
         }
     };
 
+    // Handler passed to AdditionalDetails to allow parent to show a transient message
+    const handleAdditionalDetailsChange = (details: AdditionalDetails[]) => {
+        setAdditionalDetails(details);
+        setDetailsMessageVisible(true);
+        if (detailsTimerRef.current) {
+            window.clearTimeout(detailsTimerRef.current);
+        }
+        detailsTimerRef.current = window.setTimeout(() => {
+            setDetailsMessageVisible(false);
+            detailsTimerRef.current = null;
+        }, 2500) as unknown as number;
+    };
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => {
@@ -179,6 +267,19 @@ const ReviewForm = ({ params }: PageProps) => {
             <Modal isOpen={isModalOpen} onClose={closeModal}>
                 <DragNdrop onFilesSelected={setFiles} productId={+id} width="auto" height="auto" />
             </Modal>
+
+            {/* Floating toast notification (top-right) for success/error */}
+            {(successMessage || errorMessage) && (
+                <div className="fixed top-4 right-4 z-50">
+                    <div className={`max-w-sm w-full p-4 rounded shadow-lg flex items-start justify-between ${successMessage ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                        <div>
+                            <div className="font-bold">{successMessage ? 'Success!' : 'Error!'}</div>
+                            <div className="text-sm mt-1">{successMessage || errorMessage}</div>
+                        </div>
+                        <button onClick={() => { setSuccessMessage(''); setErrorMessage(''); }} className="ml-4 text-white font-bold">✕</button>
+                    </div>
+                </div>
+            )}
 
             {/* Loading indicator when fetching data */}
             {dataLoading ? (
@@ -256,6 +357,8 @@ const ReviewForm = ({ params }: PageProps) => {
                                         <AdditionalDetailsForm
                                             additionalDetails={additionalDetails}
                                             setAdditionalDetails={setAdditionalDetails}
+                                            showMessage={detailsMessageVisible}
+                                            onDetailsChange={handleAdditionalDetailsChange}
                                         />
 
                                         {/* Submit Button */}
