@@ -189,14 +189,17 @@ export interface BrandTranslation {
 
 export interface ProductPhotos {
   id: number;
-  name: string;
+  name?: string;
   product_id: number;
-  defaultphoto: number;
+  defaultphoto?: number;
   path: string;
-  status: string;
+  status?: string;
   media_type?: string;
   file_size?: number;
-  asset_url: string;
+  asset_url?: string; // Legacy field - kept for backwards compatibility
+  url: string; // New field - presigned URL from S3
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SpecificationInt {

@@ -257,7 +257,7 @@ const DragNdrop = ({
                         <tr key={index}>
                           <td>
                             <div className="preview-container">
-                              <Image src={file.asset_url} alt="" width={50} height={50} />
+                              <Image src={file.url || file.asset_url || ''} alt={file.name || 'Product image'} width={50} height={50} />
                             </div>
                           </td>
                           <td>{file.name}</td>

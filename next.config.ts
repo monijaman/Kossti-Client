@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "viper.monirspace.com",
       },
+      {
+        protocol: "https",
+        hostname: "kossti.s3.ap-southeast-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.*.amazonaws.com", // Allow all S3 buckets
+      },
     ],
   },
 };

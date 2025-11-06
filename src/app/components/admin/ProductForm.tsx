@@ -178,8 +178,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
     return (
 
         <>
-            {/* Debug: Log render state */}
-            {console.log('ProductForm render - submitStatus:', submitStatus, 'loading:', loading)}
+
 
             {product &&
                 <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -187,12 +186,12 @@ const ProductForm = ({ product }: ProductFormProps) => {
                 </Modal>
             }
             <div className="rounded px-8 pt-6 pb-8 mb-4">
-                <button
+                {product && <button
                     className="bg-blue-500 mb-8 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
                     onClick={openModal}
                 >
                     Add Photos
-                </button>
+                </button>}
 
                 <form onSubmit={handleSubmit} >
                     {/* Product Name */}
@@ -341,12 +340,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         </div>
                     )}
 
-                    {/* Debug: Show submit status state */}
-                    {process.env.NODE_ENV === 'development' && (
-                        <div className="p-2 mt-2 text-xs bg-gray-100 rounded">
-                            Debug - submitStatus: &quot;{submitStatus}&quot; | loading: {loading.toString()}
-                        </div>
-                    )}
+
                 </form>
             </div>
         </>

@@ -23,7 +23,7 @@ const ManageReviews = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [totalPage, setTotalPage] = useState(0);
 
-    // Fetch products data
+    // Fetch products data; re-run when paging, filters or debounced search term change
     useEffect(() => {
         const fetchProductData = async () => {
             // Build query parameters
@@ -65,7 +65,7 @@ const ManageReviews = () => {
         };
 
         fetchProductData();
-    }, []);
+    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);

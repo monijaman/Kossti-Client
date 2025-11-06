@@ -63,10 +63,10 @@ export const useBrands = () => {
         `${apiEndpoints.getBrands}?${queryParams.toString()}`
       );
 
-      // Return success with data
+      // Return success with parsed body (dataset.data contains parsed JSON)
       return {
         success: true,
-        data: dataset,
+        data: dataset.data,
       };
     } catch (error: unknown) {
       console.error("Error fetching category:", error);
@@ -139,7 +139,7 @@ export const useBrands = () => {
       // Send the request to the backend using fetchApi
       const response = await fetchApi(apiEndpoints.createCategoryBrands, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
       // Return the response

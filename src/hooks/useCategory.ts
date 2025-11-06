@@ -218,10 +218,10 @@ export const useCategory = () => {
         `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`
       );
 
-      // Return success with data
+      // Return success with parsed body (dataset.data contains parsed JSON)
       return {
         success: true,
-        data: dataset,
+        data: dataset.data,
       };
     } catch (error: unknown) {
       console.error("Error fetching category:", error);

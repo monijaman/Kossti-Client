@@ -65,7 +65,6 @@ export const RegisterForm = () => {
     setFormErrors(errors);
     if (Object.keys(errors).length === 0) {
 
-
       setSubmitted(true);
       register();
     }
@@ -88,7 +87,7 @@ export const RegisterForm = () => {
 
         const res = await fetchApi(apiEndpoints.register, {
           method: "POST",
-          body: JSON.stringify(requestBody),
+          body: requestBody,
         });
 
         // fetchApi returns parsed JSON response directly
