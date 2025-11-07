@@ -3,7 +3,7 @@
 import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
 import { Brand, Category } from '@/lib/types';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 interface CategoryBrand {
@@ -19,15 +19,17 @@ interface Specification {
 }
 
 interface PageProps {
-    params: {
-        id: string;
-    };
+    // categories can be provided from server-side page to avoid flicker
+    categoriesFromServer?: Category[];
+    // server-computed numeric id for the category
+    numericCategoryId?: number | null;
 }
 
-export default function CategoryBrandsClient({ params }: PageProps) {
-    const { id: category_id } = params;
-    const numericCategoryId = Number(category_id) || null;
-
+export default function CategoryBrandsClient({ categoriesFromServer, numericCategoryId: propNumericCategoryId }: PageProps) {
+    // prefer server-provided numeric id; fallback to null
+    const numericCategoryId = typeof propNumericCategoryId !== 'undefined' ? propNumericCategoryId : null;
+    // use console.debug so we can inspect values during hydration/client runtime
+    console.debug('[CategoryBrands] numericCategoryId:', numericCategoryId, 'propNumericCategoryId:', propNumericCategoryId);
     const { getCategories, getCategoryRelBrands } = useCategory();
     const { getAllBrands, submitBrands } = useBrands();
 
@@ -38,8 +40,27 @@ export default function CategoryBrandsClient({ params }: PageProps) {
     const [formStatus, setFormStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // Fetch categories
-    const fetchCategories = async () => {
+    // helper: normalize different API shapes into an array
+    const normalizeList = useCallback(<T,>(data: unknown): T[] => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data as T[];
+        if (typeof data === 'object') {
+            const obj = data as Record<string, unknown>;
+            if (Array.isArray(obj.categories)) return obj.categories as T[];
+            if (Array.isArray(obj.brands)) return obj.brands as T[];
+            if (Array.isArray(obj.data)) return obj.data as T[];
+            // nested data.categories
+            if (obj.data && typeof obj.data === 'object') {
+                const nested = obj.data as Record<string, unknown>;
+                if (Array.isArray(nested.categories)) return nested.categories as T[];
+                if (Array.isArray(nested.brands)) return nested.brands as T[];
+            }
+        }
+        return [];
+    }, []);
+
+    // Fetch categories (client-side fallback)
+    const fetchCategories = useCallback(async () => {
         try {
             const categoriesResponse = await getCategories({
                 perPage: undefined,
@@ -47,76 +68,85 @@ export default function CategoryBrandsClient({ params }: PageProps) {
                 paginate: false,
                 locale: undefined,
                 categoryId: '',
+                status: null,
             });
-            if (categoriesResponse.success) {
-                const categoryData = categoriesResponse.data?.data?.categories || categoriesResponse.data?.categories;
-                setCategories(Array.isArray(categoryData) ? categoryData : []);
+            if (categoriesResponse && categoriesResponse.success) {
+                const categoryData = normalizeList<Category>(categoriesResponse.data);
+                setCategories(categoryData);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
             setCategories([]);
         }
-    };
+    }, [normalizeList]);
 
     // Fetch brands
-    const fetchBrands = async () => {
+    const fetchBrands = useCallback(async () => {
         try {
             const response = await getAllBrands();
             const dataset = response?.data;
-            let arr: any[] = [];
-            if (Array.isArray(dataset)) arr = dataset;
-            else if (Array.isArray(dataset?.brands)) arr = dataset.brands;
-            else if (Array.isArray(dataset?.data)) arr = dataset.data;
-            setBrands(Array.isArray(arr) ? arr : []);
+            const arr = normalizeList<Brand>(dataset);
+            setBrands(arr);
         } catch (error) {
             console.error("Error fetching brands:", error);
             setBrands([]);
         }
-    };
+    }, [normalizeList]);
 
     // Fetch active brands for selected category
-    const fetchActiveBrands = async () => {
-        if (selectedCategory) {
-            try {
-                const response = await getCategoryRelBrands({ category_id: selectedCategory });
-                const dataset = response?.data;
-                let raw: any = null;
-                if (dataset == null) raw = null;
-                else if (Array.isArray(dataset)) raw = dataset;
-                else if (dataset.data) raw = dataset.data;
-                else raw = dataset;
+    const fetchActiveBrands = useCallback(async () => {
+        if (!selectedCategory) return;
+        try {
+            const response = await getCategoryRelBrands({ category_id: selectedCategory });
+            const dataset = response?.data;
 
-                let arr: any = [];
-                if (!raw) arr = [];
-                else if (Array.isArray(raw)) arr = raw;
-                else if (Array.isArray(raw.relations)) arr = raw.relations;
-                else if (Array.isArray(raw.data)) arr = raw.data;
-                else if (Array.isArray(raw.brands)) arr = raw.brands;
-                else {
-                    if (raw.id || raw.brand_id) arr = [raw];
-                    else arr = [];
-                }
-
-                const normalized = (Array.isArray(arr) ? arr : []).map((it: any) => ({
-                    id: it.id ?? it.ID ?? null,
-                    brand_id: it.brand_id ?? it.brandId ?? it.BrandID ?? it.BrandId ?? null,
-                    category_id: it.category_id ?? it.categoryId ?? it.CategoryID ?? it.CategoryId ?? selectedCategory,
-                    name: it.name ?? it.brand_name ?? it.BrandName ?? it.title ?? "",
-                }));
-
-                console.debug("fetched category relations (normalized):", normalized);
-                setActiveBrands(normalized);
-            } catch (error) {
-                console.error("Error fetching category brands:", error);
-                setActiveBrands([]);
+            // normalize possible shapes into an array of records
+            let arr: Record<string, unknown>[] = [];
+            if (!dataset) arr = [];
+            else if (Array.isArray(dataset)) arr = dataset as Record<string, unknown>[];
+            else if (typeof dataset === 'object') {
+                const obj = dataset as Record<string, unknown>;
+                if (Array.isArray(obj.relations)) arr = obj.relations as Record<string, unknown>[];
+                else if (Array.isArray(obj.data)) arr = obj.data as Record<string, unknown>[];
+                else if (Array.isArray(obj.brands)) arr = obj.brands as Record<string, unknown>[];
+                else arr = [obj];
             }
+
+            const normalized = arr.map((it) => ({
+                id: (it.id ?? it.ID) as number | null ?? null,
+                brand_id: (it.brand_id ?? it.brandId ?? it.BrandID ?? it.BrandId) as number | null ?? null,
+                category_id: (it.category_id ?? it.categoryId ?? it.CategoryID ?? it.CategoryId) as number | null ?? selectedCategory,
+                name: (it.name ?? it.brand_name ?? it.BrandName ?? it.title) as string ?? "",
+            }));
+
+            console.debug("fetched category relations (normalized):", normalized);
+            // dedupe relations by brand_id (keep first occurrence) to avoid duplicate selects
+            const seen = new Set<number | string>();
+            const deduped = normalized.filter((it, idx) => {
+                const key = it.brand_id ?? `__idx_${idx}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+            if (deduped.length !== normalized.length) {
+                console.debug('deduped category relations, before/after lengths:', normalized.length, deduped.length);
+            }
+            setActiveBrands(deduped);
+        } catch (error) {
+            console.error("Error fetching category brands:", error);
+            setActiveBrands([]);
         }
-    };
+    }, [selectedCategory]);
 
     useEffect(() => {
-        fetchCategories();
-        fetchBrands();
-    }, []);
+        // if server provided categories, use them and skip client fetch for categories
+        if (!Array.isArray(categoriesFromServer) || categoriesFromServer.length === 0) {
+            void fetchCategories();
+        } else {
+            setCategories(categoriesFromServer);
+        }
+        void fetchBrands();
+    }, [fetchBrands, fetchCategories]);
 
     useEffect(() => {
         if (!Array.isArray(brands) || brands.length === 0) return;
@@ -137,20 +167,20 @@ export default function CategoryBrandsClient({ params }: PageProps) {
 
         console.debug("filling activeBrands from global brands, before/after:", activeBrands, filled);
         setActiveBrands(filled);
-    }, [brands, activeBrands]);
+    }, [brands]);
 
     useEffect(() => {
-        fetchActiveBrands();
-    }, [selectedCategory]);
+        void fetchActiveBrands();
+    }, [fetchActiveBrands]);
 
     const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) setSelectedCategory(selectedOption.value);
+        if (selectedOption && selectedOption.value != null) setSelectedCategory(Number(selectedOption.value));
     };
 
     const handleBrandChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) {
+        if (selectedOption && selectedOption.value != null) {
             const updatedBrands = [...activeBrands];
-            updatedBrands[index].brand_id = selectedOption.value;
+            updatedBrands[index].brand_id = Number(selectedOption.value);
             updatedBrands[index].name = selectedOption.label;
             setActiveBrands(updatedBrands);
         }
@@ -186,22 +216,29 @@ export default function CategoryBrandsClient({ params }: PageProps) {
         setLoading(false);
     };
 
+    // compute category options and brand select options
+    const categoryOptions = Array.isArray(categories)
+        ? categories.map((cat) => ({ value: Number(cat.id), label: cat.name ?? "" }))
+        : [];
+
     const selectOptions = (() => {
-        const fromRelations = Array.isArray(activeBrands)
+        const fromRelations: { value: number; label: string }[] = Array.isArray(activeBrands)
             ? activeBrands.map((ab) => ({ value: Number(ab.brand_id) || 0, label: ab.name ?? "" }))
             : [];
-        const fromBrands = Array.isArray(brands)
+        const fromBrands: { value: number; label: string }[] = Array.isArray(brands)
             ? brands.map((b) => ({ value: Number(b.id) || 0, label: b.name ?? "" }))
             : [];
 
-        const map = new Map<number | null, { value: number | null; label: string }>();
+        const map = new Map<number, { value: number; label: string }>();
         fromRelations.forEach((o) => map.set(o.value, o));
         fromBrands.forEach((o) => { if (!map.has(o.value)) map.set(o.value, o); });
-        return Array.from(map.values()) as { value: number | null; label: string }[];
+        return Array.from(map.values()) as { value: number; label: string }[];
     })();
 
+
+
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8  bg-gray-100  ">
+        <div className="max-w-3xl mx-auto shadow-lg rounded-lg p-8 mt-8 bg-gray-100">
             <h1 className="text-2xl font-bold mb-6">Manage Related Brands for Category</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -210,13 +247,14 @@ export default function CategoryBrandsClient({ params }: PageProps) {
                     </label>
                     <Select
                         name="category"
-                        value={Array.isArray(categories) && categories.length > 0
-                            ? categories
-                                .map((cat) => ({ value: cat.id, label: cat.name }))
-                                .find((option) => option.value == selectedCategory) || null
-                            : null}
+                        // ensure we pass the actual option object from the options list
+                        value={
+                            categoryOptions.length > 0
+                                ? categoryOptions.find((option) => Number(option.value) === Number(selectedCategory)) ?? null
+                                : null
+                        }
                         onChange={handleCategoryChange}
-                        options={Array.isArray(categories) ? categories.map((cat) => ({ value: cat.id, label: cat.name })) : []}
+                        options={categoryOptions}
                         className="block w-full"
                         placeholder="Select a category"
                         isSearchable
@@ -224,9 +262,12 @@ export default function CategoryBrandsClient({ params }: PageProps) {
                     />
                 </div>
 
+                <label htmlFor="BrandItems" className="block text-sm font-medium text-gray-700 mb-2">
+                    Manage Brands for Selected Category
+                </label>
                 {Array.isArray(activeBrands) && activeBrands.length > 0 ? (
                     activeBrands.map((item, index) => (
-                        <div key={index} className="flex gap-4 items-center">
+                        <div id="BrandItems" key={index} className="flex gap-4 items-center">
                             <Select
                                 value={
                                     selectOptions.find((o) => o.value === Number(item.brand_id)) ?? null

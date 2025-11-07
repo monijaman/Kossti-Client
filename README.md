@@ -39,4 +39,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 admin@gmail.com
 admininfo: admin
-password: admin@\*123
+password: admin@*123
