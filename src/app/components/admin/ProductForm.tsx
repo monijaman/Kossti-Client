@@ -45,23 +45,41 @@ const ProductForm = ({ product }: ProductFormProps) => {
         error?: string;
     }
 
-    const { getCategory } = useCategory();
+    const { getCategory, getCategories } = useCategory();
     const { getBrands } = useBrands();
     const router = useRouter();
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
-    useEffect(() => {
-        // Fetch categories and brands on component mount
         const fetchCategoriesAndBrands = async () => {
-            const categories = await getCategory();
+            // Try the wide categories endpoint (supports per_page) to avoid default pagination
+            let categoriesResponse = await getCategory();
+            try {
+                const wide = await getCategories({ perPage: 1000, paginate: false, status: null });
+                // getCategories returns { success: boolean; data: unknown }
+                // The hook's getCategories currently returns the fetchApi response as `data`.
+                // Handle both shapes: direct array or nested `data` field.
+                if (wide && wide.data) {
+                    const maybeApiResp = wide.data as unknown;
+                    const inner = (maybeApiResp && ( (maybeApiResp as { data?: unknown }).data ?? maybeApiResp)) as unknown;
+                    if (Array.isArray(inner)) {
+                        categoriesResponse = { success: true, data: inner } as { success: boolean; data: unknown };
+                    }
+                }
+            } catch (err) {
+                // fallback to the basic getCategory
+                console.debug('getCategories wide fetch failed, falling back to getCategory', err);
+            }
+
             const brands = await getBrands();
 
-            setCategories(categories.data as Category[]);
+            setCategories(categoriesResponse.data as Category[]);
             setBrands(brands.data as Brand[]);
         };
 
+    useEffect(() => {
+        // Fetch categories and brands on component mount
         fetchCategoriesAndBrands();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Only run once on mount
@@ -167,6 +185,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
 
     useEffect(() => {
+
         console.log('Files selected:', files);
     }, [files]);
 
@@ -225,7 +244,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         >
                             <option value="" disabled>Select category</option>
                             {Array.isArray(categories) && categories.map((item) => (
-                                <option key={item.id} value={item.id}>
+                                <option selected={item.id === parseInt(category)} key={item.id} value={item.id.toString()}>
                                     {item.name}
                                 </option>
                             ))}
@@ -247,7 +266,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         >
                             <option value="" disabled>Select brand</option>
                             {Array.isArray(brands) && brands.map((item) => (
-                                <option key={item.id as number} value={item.id as number}>
+                                <option key={item.id as number} value={item.id?.toString() ?? ''}>
                                     {item.name}
                                 </option>
                             ))}

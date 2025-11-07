@@ -13,7 +13,9 @@ export const useCategory = () => {
     data: unknown;
   }> => {
     try {
-      const dataset = await fetchApi(apiEndpoints.getCategories);
+  // Request a larger page size to return more rows (backend defaults to 50 per page)
+  // If the backend enforces pagination, consider using getCategories/getWideCategories with pagination params.
+  const dataset = await fetchApi(`${apiEndpoints.getCategories}?limit=1000&offset=0`);
 
       // Type the response to handle Go server structure
       const responseData = dataset.data as {
