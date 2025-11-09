@@ -2,7 +2,7 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
-import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Select from 'react-select';
 type SubmitSpecResponse = {
     success: boolean;
@@ -44,7 +44,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
-    const tranlatedSpecification = useCallback(async () => {
+    const tranlatedSpecification = async () => {
         if (productId) {
             try {
                 const response = await getSpecTranslations(productId, selectedLocale);
@@ -76,11 +76,12 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
             }
         }
         return [];
-    }, [productId, selectedLocale, getSpecTranslations]);
+    }
 
-    const fetchAndProcess = useCallback(async () => {
+    const fetchAndProcess =  async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
+        console.log('Fetched Specifications:', fetchedSpecifications);
         if (specifications && specKeys) {
             const transSpec = specifications.map((item) => {
                 const keyValue = fetchedSpecifications?.find((trans: transDataSet) => {
@@ -104,11 +105,11 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
             setTranSpecifications(transSpec);
         }
-    }, [specifications, specKeys, selectedLocale, tranlatedSpecification]);
+    }
 
     useEffect(() => {
         fetchAndProcess();
-    }, [fetchAndProcess]);
+    }, [specifications, selectedLocale, specKeys]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -179,9 +180,9 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="font-bold mb-4">Tranaslattion</h2>
+            <h2 className="font-bold mb-0 mt-0">Tranaslattion</h2>
 
-            <div className="mb-4">
+            <div className="mb-0 mt-0 pt-0">
                 {LOCALES.map((translation) => (
                     <button
                         type='button'
@@ -199,9 +200,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
             {tranSpecifications && tranSpecifications.map((spec, index) => (
                 <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Specification Key
-                        </label>
+                        
                         <Select
                             name="specification_id"
                             value={specKeys && specKeys
@@ -224,9 +223,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Translated Value ({selectedLocale.toUpperCase()})
-                        </label>
+                       
                         <input
                             type="text"
                             name="translated_value"

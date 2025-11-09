@@ -95,14 +95,14 @@ const Specification = ({ params }: PageProps) => {
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
-    }, [getSpecificationsKeys]);
+    }, []);
 
 
     // fetch all specificatiosn for dropdown option
     const fetchSpecifications = useCallback(async () => {
         try {
             const response = await getSpecifications(+id);
-
+ 
             // Check if response exists and has the expected structure
             if (response && response.dataset) {
                 if (response.dataset.specifications && response.dataset.specifications.length > 0) {
@@ -122,12 +122,12 @@ const Specification = ({ params }: PageProps) => {
             console.error("Error fetching specifications:", error);
             setSpecifications([]);
         }
-    }, [id, getSpecifications]);
+    }, [id]);
 
     useEffect(() => {
         fetchSpecificationKeys();
         fetchSpecifications();
-    }, [fetchSpecificationKeys, fetchSpecifications]);
+    }, []);
 
     return (
 
@@ -135,7 +135,7 @@ const Specification = ({ params }: PageProps) => {
             <div className="w-1/2">
 
                 <div className="bg-white shadow-md rounded-lg p-8">
-                    <h1 className="text-2xl font-semibold mb-6">Add Specifications for {productName}</h1>
+                    <h1 className="text-2xl h-[60px] font-semibold mb-6">Add Specifications for {productName}</h1>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {specifications.map((spec, index) => (
                             <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -209,7 +209,7 @@ const Specification = ({ params }: PageProps) => {
                 </div>
             </div>
             <div className="w-1/2">
-                <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={specifications && specifications} />
+                <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={ specifications} />
             </div>
         </div>
     );

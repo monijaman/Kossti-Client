@@ -92,7 +92,7 @@ const Specification = () => {
     // Fetch the specification keys for select
     const fetchSpecificationKeys = async (searchTerm = "") => {
         try {
-            const response = await fetchApi(apiEndpoints.getSpecKeys);
+            const response = await fetchApi(`${apiEndpoints.getSpecKeys}?limit=1000`);
             const apiResponse = response as { success: boolean; data: { specification_keys: SpecificationKey[] } };
 
             console.log("Specification Keys Response:", apiResponse.data.specification_keys);
@@ -112,7 +112,7 @@ const Specification = () => {
     // Fetch categories
     const fetchCategories = async () => {
         try {
-            const response = await fetchApi(apiEndpoints.Categories);
+            const response = await fetchApi(`${apiEndpoints.Categories}?limit=1000&offset=0`);
             const apiResponse = response as { success: boolean; data: { categories: Category[], count: number, limit: number, offset: number } };
 
 

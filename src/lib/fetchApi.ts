@@ -57,6 +57,8 @@ export default async function fetchApi<T>(
           ? options.body
           : JSON.stringify(options.body),
     }),
+    // Include credentials so cookie-based auth works across dev ports (3000 <-> 8080)
+    credentials: "include",
     signal: controller.signal,
     cache: "no-store",
   };
