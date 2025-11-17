@@ -42,9 +42,9 @@ const ReviewForm = ({ params }: PageProps) => {
             try {
                 setDataLoading(true);
                 const response = await getReviewByProductId(+id, 'bn'); // Fetch product by ID
-                
+
                 if (response?.success && response?.data) {
-                  
+
                     const data = response.data as Record<string, unknown>;
                     // Normalize response shapes: some endpoints return { product_id, count, reviews: [...] }
                     // Each review item has: { review: {...}, translation: {...} }
@@ -57,7 +57,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                         // Build translations array from review data and translation
                         const translations: Array<Record<string, unknown>> = [];
-                        console.log('Base review added to translations:', firstReviewItem.translation );
+                        console.log('Base review added to translations:', firstReviewItem.translation);
 
                         // Add the base review as English translation
                         translations.push({
@@ -145,8 +145,6 @@ const ReviewForm = ({ params }: PageProps) => {
         try {
             setDataLoading(true);
             const response = await getReviewByProductId(+id);
-
-            console.log('Refreshing product data, fetched reviewData:', response);
 
             if (response?.success && response?.data) {
                 setProducts(response.data);
