@@ -6,7 +6,7 @@ import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { AdditionalDetails, Product, Review } from '@/lib/types';
-import React, { use, useCallback, useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 
 interface PageProps {
     params: Promise<{
@@ -41,16 +41,55 @@ const ReviewForm = ({ params }: PageProps) => {
         const fetchProductData = async () => {
             try {
                 setDataLoading(true);
-                const response = await getReviewByProductId(+id); // Fetch product by ID
+                const response = await getReviewByProductId(+id, 'bn'); // Fetch product by ID
+                
                 if (response?.success && response?.data) {
+                  
                     const data = response.data as Record<string, unknown>;
-                    // Normalize response shapes: some endpoints return { product_id, reviews: [...] }
-                    // while others return { review: {...}, translation: {...} }
+                    // Normalize response shapes: some endpoints return { product_id, count, reviews: [...] }
+                    // Each review item has: { review: {...}, translation: {...} }
                     let dataset: Record<string, unknown> | null = null;
 
                     const maybeReviews = data['reviews'];
                     if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
-                        dataset = maybeReviews[0] as Record<string, unknown>;
+                        const firstReviewItem = maybeReviews[0] as Record<string, unknown>;
+                        const reviewData = firstReviewItem['review'] as Record<string, unknown>;
+
+                        // Build translations array from review data and translation
+                        const translations: Array<Record<string, unknown>> = [];
+                        console.log('Base review added to translations:', firstReviewItem.translation );
+
+                        // Add the base review as English translation
+                        translations.push({
+                            id: reviewData['id'],
+                            product_review_id: reviewData['id'],
+                            locale: 'en',
+                            rating: reviewData['rating'] ?? 0,
+                            review: reviewData['reviews'] ?? reviewData['review'],
+                            additional_details: reviewData['additional_details'] ?? [],
+                            created_at: reviewData['created_at'],
+                            updated_at: reviewData['updated_at'],
+                        });
+
+
+                        // Add translation if present
+                        const translationVal = firstReviewItem['translation'];
+                        if (translationVal && typeof translationVal === 'object') {
+                            const t = translationVal as Record<string, unknown>;
+                            translations.push({
+                                id: t['id'],
+                                product_review_id: t['product_review_id'],
+                                locale: t['locale'],
+                                rating: t['rating'] ?? reviewData['rating'] ?? 0,
+                                review: t['translated_review'],
+                                additional_details: t['additional_details'] ?? [],
+                                created_at: t['created_at'],
+                                updated_at: t['updated_at'],
+                            });
+                        }
+
+                        dataset = reviewData;
+                        dataset['translations'] = translations;
                     } else if (data['review']) {
                         // Single-review shape: attach translation into translations[] if present
                         dataset = data['review'] as Record<string, unknown>;
@@ -102,18 +141,51 @@ const ReviewForm = ({ params }: PageProps) => {
     }, []);
 
     // Keep fetchProductData as a separate function for manual refresh
-    const refreshProductData = useCallback(async () => {
+    const refreshProductData = async () => {
         try {
             setDataLoading(true);
             const response = await getReviewByProductId(+id);
+
+            console.log('Refreshing product data, fetched reviewData:', response);
+
             if (response?.success && response?.data) {
                 setProducts(response.data);
                 if (response?.data.reviews?.[0]) {
-                    const dataset = response?.data.reviews?.[0];
-                    setReviewData(dataset);
-                    setReviews(dataset.reviews)
-                    setRating(dataset.rating)
-                    setAdditionalDetails(dataset.additional_details ?? [])
+                    const firstReviewItem = response?.data.reviews?.[0];
+                    const reviewData = firstReviewItem['review'];
+                    const translations: Array<Record<string, unknown>> = [];
+                    // Add base review as English
+                    translations.push({
+                        id: reviewData['id'],
+                        product_review_id: reviewData['id'],
+                        locale: 'en',
+                        rating: reviewData['rating'] ?? 0,
+                        review: reviewData['reviews'] ?? reviewData['review'],
+                        additional_details: reviewData['additional_details'] ?? [],
+                        created_at: reviewData['created_at'],
+                        updated_at: reviewData['updated_at'],
+                    });
+
+                    // Add translation if present
+                    if (firstReviewItem['translation']) {
+                        const t = firstReviewItem['translation'];
+                        translations.push({
+                            id: t['id'],
+                            product_review_id: t['product_review_id'],
+                            locale: t['locale'],
+                            rating: t['rating'] ?? reviewData['rating'] ?? 0,
+                            review: t['translated_review'],
+                            additional_details: t['additional_details'] ?? [],
+                            created_at: t['created_at'],
+                            updated_at: t['updated_at'],
+                        });
+                    }
+
+                    reviewData['translations'] = translations;
+                    setReviewData(reviewData);
+                    setReviews(reviewData.reviews)
+                    setRating(reviewData.rating)
+                    setAdditionalDetails(reviewData.additional_details ?? [])
                 }
             }
         } catch (error) {
@@ -121,8 +193,9 @@ const ReviewForm = ({ params }: PageProps) => {
         } finally {
             setDataLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]); // Only depend on id to prevent infinite re-fetching
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only depend on id to prevent infinite re-fetching
 
     useEffect(() => {
 
@@ -337,7 +410,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                             className="w-full p-2 mb-4 border rounded"
                                             min="1"
                                             max="5"
-                                            step="0.1"  // Allow decimal values, with steps of 0.1
+                                            step="0.05"  // Allow decimal values, with steps of 0.05
                                         />
 
                                         {/* Rich Text Editor for Reviews */}
@@ -348,7 +421,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 onChange={setReviews}
                                                 className="mb-4"
                                                 id="reviews"
-                                                style={{ backgroundColor: '#f9f9f9', height: '200px' }}
+                                                style={{ backgroundColor: '#f9f9f9', minHeight: '200px' }}
                                             />
                                             {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                                         </div>

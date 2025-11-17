@@ -4,11 +4,11 @@ import { apiEndpoints } from '@/lib/constants';
 import { Category } from '@/lib/types';
 
 interface PageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export default async function Page({ params }: PageProps) {
-    // server-side fetch categories to preselect the option and avoid client flicker
+    const resolvedParams = await params;
     let categoriesFromServer: Category[] = [];
    
     try {
@@ -31,7 +31,7 @@ export default async function Page({ params }: PageProps) {
         console.error('Server fetch categories failed:', err);
     }
 
-    const category_id = params?.id ?? undefined;
+    const category_id = resolvedParams?.id ?? undefined;
     const numericCategoryId = category_id ? Number(category_id) : null;
 
     return (

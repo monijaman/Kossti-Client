@@ -279,11 +279,11 @@ export const useSpecifications = () => {
           }
         }
 
-        // Check for empty values
-        if (!spec.value || spec.value.toString().trim() === "") {
-          console.warn(`Skipping spec ${index}: empty value`);
-          continue;
-        }
+        // Allow empty values - don't skip specs with empty values
+        // if (!spec.value || spec.value.toString().trim() === "") {
+        //   console.warn(`Skipping spec ${index}: empty value`);
+        //   continue;
+        // }
 
         const result: {
           id?: number;
@@ -293,7 +293,7 @@ export const useSpecifications = () => {
         } = {
           product_id: Number(productId), // Ensure it's a number
           specification_key_id: Number(specKeyId), // Ensure it's a number
-          value: spec.value.toString().trim(),
+          value: spec.value ? spec.value.toString().trim() : "", // Allow empty strings
         };
 
         // Only add ID if it exists and is not 0
