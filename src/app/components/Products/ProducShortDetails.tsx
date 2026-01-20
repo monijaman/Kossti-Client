@@ -11,22 +11,50 @@ const ProducShortDetails = ({ product, countryCode }: PopularProductsProps) => {
     <Link
       key={product.id}
       href={`${countryCode}/${product.category_slug}/${product.slug}`}
-      className="product-card flex items-center space-x-4 p-4 transition-all"
+      className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
     >
-      {/* Product Image */}
-      <Image
-        src={product.photo || '/placeholder-image.jpg'}
-        alt={product.name}
-        width={80}
-        height={80}
-        className="rounded-lg object-cover shadow-sm"
-      />
+      {/* Product Image Container */}
+      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-yellow-100 via-blue-50 to-purple-100 overflow-hidden">
+        {product.review && (
+          <div className="absolute top-4 left-4 z-10">
+            <span className="bg-black text-white text-xs font-semibold px-3 py-1 rounded-full">
+              Review
+            </span>
+          </div>
+        )}
+        <Image
+          src={product.photo || '/noimage.webp'}
+          alt={product.name}
+          fill
+          className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+        />
+      </div>
 
       {/* Product Details */}
-      <div className="flex flex-col space-y-2">
-        <h3 className="text-lg font-semibold text-gray-800 leading-tight">{product.name}</h3>
-        <p className="text-sm text-blue-600 font-medium">{product.brand?.name}</p>
-        <p className="text-xs text-gray-500 uppercase tracking-wide">{product.category?.name}</p>
+      <div className="p-5 space-y-3">
+        <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+          {product.name}
+        </h3>
+
+        <p className="text-sm text-gray-600 line-clamp-2">
+          {product.description || `${product.brand?.name} ${product.category?.name}`}
+        </p>
+
+        {/* Brand and Category Info */}
+        <div className="flex items-center gap-3 pt-2">
+          {product.brand?.name && (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
+                <span className="text-xs font-bold text-gray-700">
+                  {product.brand.name.substring(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-700">
+                {product.brand.name}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   );

@@ -12,7 +12,7 @@ export const useProducts = () => {
     priceRange?: string,
     searchTerm?: string,
     locale?: string,
-    sortby?: string
+    sortby?: string,
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -35,7 +35,7 @@ export const useProducts = () => {
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -75,7 +75,7 @@ export const useProducts = () => {
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -110,7 +110,7 @@ export const useProducts = () => {
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -154,7 +154,7 @@ export const useProducts = () => {
         // If the response status is not OK, throw an error
         const errorData = await response.json();
         throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
+          `Error creating product: ${errorData.message || response.statusText}`,
         );
       }
 
@@ -176,7 +176,7 @@ export const useProducts = () => {
 
   const updateProduct = async (
     id: number | string,
-    productData: Record<string, unknown>
+    productData: Record<string, unknown>,
   ) => {
     try {
       // Use the correct Go server endpoint for updating products
@@ -201,13 +201,13 @@ export const useProducts = () => {
 
   const Translation = async (
     productData: Record<string, unknown>,
-    id: number
+    id: number,
   ) => {
     try {
       console.log(
         "Creating/updating translation for product:",
         id,
-        productData
+        productData,
       );
 
       // Use Go server API URL for product translations
@@ -304,6 +304,23 @@ export const useProducts = () => {
     }
   };
 
+  const getVideosByProductId = async (productId: number) => {
+    const fullUrl = `${apiUrl}/product-videos/${productId}`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+
+      return {
+        success: true,
+        data: dataset.data || dataset.videos || [],
+      };
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      return { success: false, data: [] };
+    }
+  };
+
   const incrementViews = async (productId: number) => {
     try {
       const fullUrl = `${apiUrl}/products/${productId}/increment-views`; // Assuming this is the API route
@@ -322,7 +339,7 @@ export const useProducts = () => {
         // If the response status is not OK, throw an error
         const errorData = await response.json();
         throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
+          `Error creating product: ${errorData.message || response.statusText}`,
         );
       }
 
@@ -385,6 +402,7 @@ export const useProducts = () => {
     updateProduct,
     getProductTranslations,
     getPhotosByProductId,
+    getVideosByProductId,
     MakePhotoDefault,
     incrementViews,
   };

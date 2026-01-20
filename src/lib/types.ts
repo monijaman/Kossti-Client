@@ -35,6 +35,7 @@ export interface Product {
   name: string;
   description?: string;
   slug: string;
+  review: string;
   price: number;
   category_id?: number;
   brand_id?: number;

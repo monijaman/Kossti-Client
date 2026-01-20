@@ -3,34 +3,35 @@
 import InteractiveBrandFilter from '@/app/components/ui/Sidebar/InteractiveBrandFilter';
 import { useBrands } from '@/hooks/useBrands';
 import { Brand, SidebarParams } from '@/lib/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
     const { getCategoryRelBrands } = useBrands();
     const [brands, setBrands] = useState<Brand[]>([]);
-    const fetchbrands = useCallback(async () => {
-        // Fetch brand data server-side
-
-        if (activeCategory) {
-            const response = await getCategoryRelBrands({
-                category_id: undefined,
-                category_slug: activeCategory,
-                locale: countryCode,
-            });
-
-            if (response.success && response.data) {
-                const data = response.data as { data?: Brand[] } | Brand[];
-                const brandList = Array.isArray(data) ? data : (data.data || []);
-                setBrands(brandList);
-            } else {
-                setBrands([]);
-            }
-        }
-    }, [activeCategory, countryCode, getCategoryRelBrands]);
 
     useEffect(() => {
+        const fetchbrands = async () => {
+            // Fetch brand data server-side
+
+            if (activeCategory) {
+                const response = await getCategoryRelBrands({
+                    category_id: undefined,
+                    category_slug: activeCategory,
+                    locale: countryCode,
+                });
+
+                if (response.success && response.data) {
+                    const data = response.data as { data?: Brand[] } | Brand[];
+                    const brandList = Array.isArray(data) ? data : (data.data || []);
+                    setBrands(brandList);
+                } else {
+                    setBrands([]);
+                }
+            }
+        };
+
         fetchbrands();
-    }, [fetchbrands])
+    }, [activeCategory, countryCode])
 
     const categories = activeCategory || '';
     const searchterm = searchTerm || '';

@@ -1,10 +1,11 @@
-// import { useSpecifications } from '@/hooks/useSpecifications';
+"use client"
 import { apiEndpoints, DEFAULT_LOCALE } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { ApiResponse } from "@/lib/types";
-import { cookies } from 'next/headers';
+import { useEffect, useState } from "react";
+
 interface PopularProductsProps {
   productId: number;
+  countryCode?: string;
 }
 type SpecType = {
   specification_key_id: number;
@@ -15,52 +16,70 @@ type SpecType = {
 type SpecsResponse = {
   dataset: SpecType[];
 };
-const SpecDetails = async ({ productId }: PopularProductsProps) => {
-  // const { getPublicSpecs } = useSpecifications();
-  // const cookieStore = await cookies();
-  const countryCode = (await cookies()).get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
 
-  const fetchSpecifications = async (): Promise<ApiResponse<SpecsResponse>> => {
-    console.log('Fetching specifications for product ID:', apiEndpoints.getPublicSpecs(productId));
-    const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(productId), {
-      queryParams: { locale: countryCode }, // Pass the locale as a query parameter
-    });
+const SpecDetails = ({ productId, countryCode = DEFAULT_LOCALE }: PopularProductsProps) => {
+  const [dataset, setDataset] = useState<SpecType[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchSpecifications = async (): Promise<void> => {
+      try {
+        setLoading(true);
+        console.log('Fetching specifications for product ID:', apiEndpoints.getPublicSpecs(productId));
+        const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(productId), {
+          queryParams: { locale: countryCode },
+        });
 
-    return response;
-  };
+        if (response.success && response.data?.dataset) {
+          setDataset(response.data.dataset);
+        } else {
+          setDataset([]);
+        }
+      } catch (error) {
+        console.error('Error fetching specifications:', error);
+        setDataset([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Await the fetch to get the actual data
-  const specsResponse = await fetchSpecifications();
-  const dataset = specsResponse.success && specsResponse.data?.dataset
-    ? specsResponse.data.dataset
-    : [];
+    fetchSpecifications();
+  }, [productId, countryCode]);
 
-  console.log('F-------------------------------:', dataset);
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+        <div className="text-center py-8 text-gray-500">
+          <p>Loading specifications...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-
-      {dataset ? (
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Specification</th>
-              <th className="py-3 px-6 text-left">Value</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {dataset.map((spec) => (
-
-              <tr key={spec.specification_key_id} className="border-b border-gray-300 hover:bg-gray-100">
-                <td className="py-3 px-6">{spec.translated_key}</td>
-                <td className="py-3 px-6">{spec.translated_value}</td>
+    <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+      {dataset && dataset.length > 0 ? (
+        <table className="min-w-full divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200">
+            {dataset.map((spec, index) => (
+              <tr
+                key={spec.specification_key_id}
+                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}
+              >
+                <td className="py-4 px-6 text-sm font-semibold text-gray-700 w-1/3">
+                  {spec.translated_key}
+                </td>
+                <td className="py-4 px-6 text-sm text-gray-900">
+                  {spec.translated_value}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p>Error fetching specifications.</p>
+        <div className="text-center py-8 text-gray-500">
+          <p>No specifications available for this product.</p>
+        </div>
       )}
     </div>
   );

@@ -4,6 +4,15 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 const PUBLIC_FILE = /\.(.*)$/;
 
+// Function to check admin session
+function checkAdminSession(req: NextRequest): boolean {
+  const adminSession = req.cookies.get("admin_session")?.value;
+  console.log(
+    `[Middleware Check] Path: ${req.nextUrl.pathname}, admin_session: ${adminSession ? "FOUND" : "MISSING"}`,
+  );
+  return !!adminSession;
+}
+
 function internationalization(req: NextRequest, res: NextResponse) {
   // List of supported locales
 
@@ -67,7 +76,7 @@ function internationalization(req: NextRequest, res: NextResponse) {
 async function handleTokenAndRedirect(
   request: NextRequest,
   response: NextResponse,
-  refToken?: string
+  refToken?: string,
 ) {
   const token = request.cookies.get("accessToken")?.value;
 
@@ -124,6 +133,33 @@ export async function middleware(request: NextRequest) {
   // Only call handleTokenAndRedirect for specified routes
   const pathname = request.nextUrl.pathname;
 
+  // Protect admin routes - require session
+  /* 
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (!checkAdminSession(request)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      return NextResponse.redirect(url);
+    }
+  }
+  */
+
+  // Redirect /admin to /admin/dashboard (only if user is authenticated)
+  if (pathname === "/admin") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // If user is logged in and tries to access login page, redirect to dashboard
+  if (pathname === "/admin/login") {
+    if (checkAdminSession(request)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/dashboard";
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Skip internationalization for admin routes - keep them in English only
   if (
     pathname.startsWith("/admin") ||
@@ -176,7 +212,7 @@ export async function middleware(request: NextRequest) {
       // If the locale in the URL is different from the cookie, update the cookie
       const url = new URL(request.url);
       url.pathname = `/${firstPathSegment}${pathname.substring(
-        firstPathSegment.length + 1
+        firstPathSegment.length + 1,
       )}`;
 
       // Set the 'country-code' cookie with the new locale

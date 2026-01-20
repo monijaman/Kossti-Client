@@ -103,6 +103,8 @@ export const apiEndpoints = {
   // Review endpoints (existing)
   getPublicReviewsByProductId: (id: number | string, countryCode: string) =>
     `/public-reviews/${id}?locale=${countryCode}`,
+  productReviews: (id: number | string, countryCode: string) =>
+    `/product-reviews/${id}?locale=${countryCode}`,
   getReviews: `get`,
   submitBrands: (brandid: number) => `category-brands/${brandid}`,
   getAProductById: (id: number) => `/products/${id}`,

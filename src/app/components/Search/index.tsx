@@ -99,7 +99,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                 >
                                     {/* Image */}
                                     <Image
-                                        src={product.photo || '/placeholder-image.jpg'}
+                                        src={product.photo || '/noimage.webp'}
                                         alt={product.name}
                                         width={50}
                                         height={50}

@@ -1,16 +1,18 @@
-import CategoryBrandsClient from './CategoryBrandsClient';
-import fetchApi from '@/lib/fetchApi';
 import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
 import { Category } from '@/lib/types';
+import CategoryBrandsClient from './CategoryBrandsClient';
 
 interface PageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export default async function Page({ params }: PageProps) {
+    const resolvedParams = await params;
+
     // server-side fetch categories to preselect the option and avoid client flicker
     let categoriesFromServer: Category[] = [];
-   
+
     try {
         const res = await fetchApi(apiEndpoints.getWideCategories, {
             queryParams: { per_page: 100, paginate: 'false' },
@@ -31,7 +33,7 @@ export default async function Page({ params }: PageProps) {
         console.error('Server fetch categories failed:', err);
     }
 
-    const category_id = params?.id ?? undefined;
+    const category_id = resolvedParams?.id ?? undefined;
     const numericCategoryId = category_id ? Number(category_id) : null;
 
     return (

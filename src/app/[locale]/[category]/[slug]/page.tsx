@@ -1,21 +1,26 @@
 import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import ProductPhotosPage from '@/app/components/reviews/ProductPhotos';
-import ReviewDetails from '@/app/components/reviews/ReviewDetails';
+import ProductVideos from '@/app/components/reviews/ProductVideos';
 import SearchBox from '@/app/components/Search';
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
+import { cookies } from 'next/headers';
 
 interface PageProps {
   params: Promise<{
     category: string; // category parameter
     slug: string; // slug parameter
+    locale: string;
   }>;
   searchParams: Promise<SearchParams>; // or use a more specific type if needed
 }
 
 const Page = async ({ params, searchParams }: PageProps) => {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const cookieStore = await cookies();
+  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE;
   const resolvedSearchParams = await searchParams;
 
   const searchTerm = resolvedSearchParams.searchterm || '';
@@ -60,8 +65,8 @@ const Page = async ({ params, searchParams }: PageProps) => {
         {dataset.category && ` - ${dataset.category.name}`}
       </h3>
       <ProductPhotosPage productId={dataset.id} />
-      <ReviewDetails productId={dataset.id} />
-      <ProducDetails product={dataset} />
+      <ProductVideos productId={dataset.id} />
+      <ProducDetails product={dataset} countryCode={countryCode} />
     </MainLayout>
   );
 };

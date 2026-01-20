@@ -1,6 +1,7 @@
 // src/app/products/page.tsx
 import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
+import CategoryBrands from '@/app/components/Products/CategoryBrands';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
@@ -65,8 +66,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
         category: activeCategory,
         brand: activeBrands,
         priceRange: activePriceRange,
-        searchterm: searchTerm,
-        sortby: '', // Add sorting if needed
+        search: searchTerm,
+        sortby: 'popular',
       },
     });
     console.log('API Response:', response); // Debugging line to check the response structure
@@ -93,9 +94,10 @@ const Page = async ({ searchParams, params }: PageProps) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+      <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
 
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
-      <PopularProducts countryCode={countryCode} />
+      <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
       <Pagination
         currentPage={page}
         totalPages={totalPages}

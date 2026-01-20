@@ -1,0 +1,253 @@
+/* Review Content Styles */
+.reviewContent {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.reviewContent h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.reviewContent h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.reviewContent p {
+  margin-bottom: 1rem;
+  text-align: justify;
+}
+
+.reviewContent ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.reviewContent li {
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.reviewContent li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #3b82f6;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.reviewContent strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Review Container */
+.reviewCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.reviewCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+/* Review Header */
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+
+.reviewerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatarCircle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.reviewerName {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.reviewDate {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.ratingStars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.starFilled {
+  color: #f97316;
+}
+
+.starEmpty {
+  color: #d1d5db;
+}
+
+/* Price Badge */
+.priceBadge {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+.actionButton:hover {
+  background: #f3f4f6;
+}
+
+.helpfulButton:hover {
+  color: #3b82f6;
+}
+
+.unhelpfulButton:hover {
+  color: #dc2626;
+}
+
+.actionIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Additional Details Section */
+.additionalDetails {
+  background: #f9fafb;
+  border-left: 3px solid #3b82f6;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.additionalDetailsTitle {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+/* Pros and Cons Side-by-Side Layout */
+.reviewContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Make full-width elements span both columns */
+.reviewContent h2,
+.reviewContent h3:nth-of-type(1),
+.reviewContent h3:nth-of-type(2),
+.reviewContent h3:nth-of-type(3),
+.reviewContent h3:nth-of-type(4),
+.reviewContent ul:nth-of-type(1),
+.reviewContent ul:nth-of-type(2),
+.reviewContent ul:nth-of-type(3) {
+  grid-column: 1 / -1;
+}
+
+/* Price & Verdict spans full width */
+.reviewContent h3:last-of-type,
+.reviewContent p:last-of-type {
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .reviewContent {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .reviewContent h2 {
+    font-size: 1.25rem;
+  }
+
+  .reviewContent h3 {
+    font-size: 1rem;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .actionButton {
+    width: 100%;
+    justify-content: center;
+  }
+}

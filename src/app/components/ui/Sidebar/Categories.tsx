@@ -8,7 +8,17 @@ interface CategoriesProps {
 }
 
 const Categories = ({ categories, activeCategory, locale, clearCategoryText }: CategoriesProps) => {
-  const clearCategoryUrl = `/`;
+  const getCurrentQueryString = () => {
+    // Preserve other query parameters when selecting a category
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.delete('page'); // Reset to page 1 when changing category
+      return params.toString() ? `&${params.toString()}` : '';
+    }
+    return '';
+  };
+
+  const clearCategoryUrl = `/${locale}`;
   // console.log('Categories:', categories);
   return (
     <>

@@ -19,7 +19,7 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
       <h2 className="page-title text-2xl font-bold text-gray-800 mb-6">
         {translation.latest_review}</h2>
 
-      <div className="product-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {products.map((product, i) => (
           <ProducShortDetails key={product.id + i} product={product} countryCode={countryCode} />
         ))}

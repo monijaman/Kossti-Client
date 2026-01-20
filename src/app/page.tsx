@@ -1,6 +1,7 @@
 // src/app/products/page.tsx
 import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
+import CategoryBrands from '@/app/components/Products/CategoryBrands';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import { apiEndpoints, DEFAULT_LOCALE } from '@/lib/constants';
@@ -41,9 +42,10 @@ const Page = async ({ searchParams }: PageProps) => {
         limit: limit.toString(),
         category: activeCategory,
         brand: activeBrands,
-        pricerange: activePriceRange,
-        searchterm: searchTerm,
+        priceRange: activePriceRange,
+        search: searchTerm,
         locale: countryCode,
+        sortby: 'popular',
       },
     });
 
@@ -56,7 +58,7 @@ const Page = async ({ searchParams }: PageProps) => {
   };
 
   const dataset = await fetchProductData();
-  const totalPages = 0;//Math.ceil(dataset.totalProducts / limit);
+  const totalPages = Math.ceil(dataset.totalProducts / limit);
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -69,9 +71,10 @@ const Page = async ({ searchParams }: PageProps) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       {/* <SearchBox initialSearchTerm={searchTerm} /> */}
+      <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
 
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
-      <PopularProducts countryCode={countryCode} />
+      <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
       <Pagination
         currentPage={page}
         totalPages={totalPages}
