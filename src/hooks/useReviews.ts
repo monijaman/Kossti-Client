@@ -66,21 +66,23 @@ export const useReviews = () => {
         new Error("API URL is not defined in environment variables")
       );
     }
-    // eviews/1?locale=bn
-    const fullUrl = `${apiUrl}/reviews/${id}?locale=bn`;
+    
+    // Use the new /product-reviews endpoint to fetch reviews by product_id
+    // Append locale parameter if provided
+    const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ''}`;
 
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
-
-      // The API returns { product_id: <id>, reviews: [...] }
+ 
+      // The API returns { product_id: <id>, count: <n>, reviews: [...] }
       // Return the whole dataset as `data` so callers can access reviews
       return {
         success: true,
         data: dataset,
       };
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching reviews by product id:", error);
       return { success: false, data: [] };
     }
   };
@@ -156,7 +158,7 @@ export const useReviews = () => {
   // services/reviewService.ts
   const addReviewTranslation = async (
     product_id: number | null = null, // Changed to product_review_id
-    rating: number | null = null,
+    rating: string | null = null, // Changed to string to accept Bangla numerals
     review: string = "",
     locale: string = "",
     additional_details: AdditionalDetails[] = [] // Change here
@@ -167,14 +169,24 @@ export const useReviews = () => {
         throw new Error("API URL is not defined in environment variables");
       }
 
+      // Serialize additional_details as JSON
+      let serializedDetails: string | null = null;
+      if (additional_details && additional_details.length > 0) {
+        serializedDetails = JSON.stringify(additional_details);
+      }
+
       // Build the payload expected by the Go server
-      const payload = {
+      const payload: Record<string, string | number | null | object> = {
         product_id,
         locale,
         review,
-        rating,
-        additional_details,
+        rating: rating || "", // Send rating as string (Bangla numerals or ASCII)
       };
+
+      // Add additional_details only if it's not empty
+      if (serializedDetails) {
+        payload.additional_details = JSON.parse(serializedDetails);
+      }
 
       // POST directly to the Go server translation endpoint
       const fullUrl = `${apiUrl}/review/translation`;

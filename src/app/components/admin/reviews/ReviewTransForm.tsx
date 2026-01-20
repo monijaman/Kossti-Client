@@ -26,6 +26,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const [transData, setTransData] = useState<ReviewTranslation[]>([]);
+    const [ratingInput, setRatingInput] = useState<string>(''); // Store raw rating input as string
     // Transient success message for translation submit
     const [transSuccessMessage, setTransSuccessMessage] = useState<string>('');
     const transTimerRef = useRef<number | null>(null);
@@ -41,6 +42,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             additional_details: []
         };
         setSelectedTranslation(newTranslation); // Set to null or leave unchanged
+        setRatingInput(''); // Reset rating input
     }, [selectedLocale]);
 
     // Ensure we update transData when translations prop changes
@@ -57,8 +59,13 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
         if (transData.length > 0) {
             const translation = transData.find((trans) => trans.locale === selectedLocale);
-            if (translation) {
+             if (translation) {
                 setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
+                // Keep rating as-is (whether it's Bengali string "৪.१५" or English "4.15")
+                const ratingValue = translation.rating;
+                const ratingString = typeof ratingValue === 'string' ? ratingValue : (typeof ratingValue === 'number' ? String(ratingValue) : '');
+                console.log('Setting ratingInput to:', ratingString);
+                setRatingInput(ratingString);
                 setAdditionalDetails(translation.additional_details); // Set additional details
             }
         } else {
@@ -75,6 +82,23 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         loadTranslation();
     }, [transData, loadTranslation]);
 
+    // Convert Bengali/Devanagari numerals to English
+    const convertToEnglishNumber = (value: string): number => {
+        let englishText = value;
+        // Replace Bengali numerals (U+09E6-09EF with 0-9)
+        for (let i = 0; i < 10; i++) {
+            const bengaliChar = String.fromCharCode(0x09E6 + i);
+            englishText = englishText.replace(new RegExp(bengaliChar, 'g'), String(i));
+        }
+        // Replace Devanagari numerals (U+0966-096F with 0-9)
+        for (let i = 0; i < 10; i++) {
+            const devanagariChar = String.fromCharCode(0x0966 + i);
+            englishText = englishText.replace(new RegExp(devanagariChar, 'g'), String(i));
+        }
+        const numericText = englishText.replace(/[^\d.]/g, '');
+        return numericText ? parseFloat(numericText) : 0;
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,17 +108,17 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
         const product_id = productId;
 
-        // Prepare the data to be submitted
+        // Prepare the data to be submitted - send rating as string
         const response = await addReviewTranslation(
             product_id,
-            selectedTranslation.rating,
+            ratingInput, // Send the ratingInput string directly
             selectedTranslation.review,
             selectedLocale,
             additionalDetails
         );
 
         if (response && response.success) {
-            const details = response.data.review;
+            const details = response.data.translation || response.data.review;
             const updatedTransData = transData.map((dataset) => {
                 if (dataset.locale === selectedLocale) {
                     return { ...dataset, ...details };
@@ -103,6 +127,12 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             });
 
             setTransData(updatedTransData);
+            
+            // Update ratingInput to show the newly saved rating (preserve Bengali format)
+            if (details && details.rating) {
+                setRatingInput(String(details.rating));
+            }
+            
             const msg = response.data.message || 'Review submitted successfully';
             setFormStatus(msg);
 
@@ -181,29 +211,42 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 <div className="space-y-4">
                     {/* Rating Input */}
                     <div>
-                        <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                        <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-2">Rating (0 to 5)</label>
                         <input
-                            type="number"
+                            type="text"
                             id="rating"
-                            value={selectedTranslation.rating}
+                            value={ratingInput}
                             onChange={(e) => {
-                                if (selectedTranslation) {
+                                // Store the raw value as-is (can be Bengali, Devanagari, or English)
+                                setRatingInput(e.target.value);
+                            }}
+                            onBlur={(e) => {
+                                // On blur, validate but keep original format
+                                const inputValue = String(e.target.value);
+                                const numericRatingValue = convertToEnglishNumber(inputValue);
+                                if (numericRatingValue >= 0 && numericRatingValue <= 5) {
+                                    // Keep the original input format, don't convert back to English
                                     setSelectedTranslation({
                                         ...selectedTranslation,
-                                        rating: parseFloat(e.target.value) || 0
+                                        rating: numericRatingValue // Store numeric for internal state
+                                    });
+                                    // ratingInput stays as original (Bengali/Devanagari/English)
+                                } else {
+                                    setRatingInput(''); // Clear if invalid
+                                    setSelectedTranslation({
+                                        ...selectedTranslation,
+                                        rating: 0
                                     });
                                 }
                             }}
                             className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            min="1"
-                            max="5"
-                            step="0.1"
+                            placeholder="0 to 5 (English or Bengali numerals like ৪.१५)"
                         />
                     </div>
 
                     {/* Review Input */}
                     <div className="relative min-h-[400px]">
-                        <label htmlFor="review" className="block text-sm font-medium  text-gray-700 mb-2">Review ({selectedTranslation.locale})</label>
+                        <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-2">Review ({selectedTranslation.locale})</label>
                         <ReactQuillWrapper
                             value={selectedTranslation.review || ''}
                             onChange={(value: string) => {
@@ -216,7 +259,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                             }}
                             className="w-full mb-4 border border-gray-300 rounded-md"
                             id="review"
-                            style={{ height: "350px", backgroundColor: "#f9f9f9" }}
+                            style={{ backgroundColor: "#f9f9f9" }}
                         />
                     </div>
 

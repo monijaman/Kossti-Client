@@ -48,7 +48,6 @@ const Specification = ({ params }: PageProps) => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-
         // Call the submit function with the mapped data
         await submitSpecificationsKeys(id, specifications);
 
@@ -101,7 +100,7 @@ const Specification = ({ params }: PageProps) => {
 
                 <div className="bg-white shadow-md rounded-lg p-8">
                     <h1 className="text-2xl font-semibold mb-6">Add Specifications for {productName}</h1>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         {specifications.map((spec, index) => (
                             <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
@@ -118,11 +117,10 @@ const Specification = ({ params }: PageProps) => {
                                             value: key.id,
                                             label: key.specification_key,
                                         }))}
-
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
-                                        required
+                                        isClearable
                                     />
                                 </div>
                                 <div>
@@ -132,7 +130,6 @@ const Specification = ({ params }: PageProps) => {
                                         value={spec.value}
                                         onChange={(event) => handleInputChange(index, event)}
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        required
                                     />
                                 </div>
                             </div>

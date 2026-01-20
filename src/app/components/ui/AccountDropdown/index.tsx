@@ -34,20 +34,20 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
   const handleLogout = async () => {
     try {
-      console.log('logout accoutn drop')
-      const response = await fetch("/api/logout", {
+      console.log('logout account dropdown')
+      const response = await fetch("/api/admin/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        }
+        },
+        credentials: 'include',
       });
 
-      if (response) {
-
-        // Redirect the user after successful logout
-        router.refresh();
+      if (response.ok) {
+        // Redirect the user to login after successful logout
+        router.push('/admin/login');
       } else {
-        console.error('Failed to logout');
+        console.error('Failed to logout', response.status);
       }
     } catch (error) {
       console.error('Error logging out:', error);
@@ -92,7 +92,10 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
               </Link>
               <Link
                 href='#'
-                onClick={handleLogout}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}
                 className="block px-4 py-2 hover:bg-gray-100">
                 Logout
               </Link>
