@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     maxAge: 0,
     path: "/",
     secure: false,
+    sameSite: "lax",
   });
 
   // Clear access token
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     maxAge: 0,
     path: "/",
     secure: false,
+    sameSite: "lax",
   });
 
   // Clear refresh token
@@ -34,6 +36,7 @@ export async function POST(request: NextRequest) {
     maxAge: 0,
     path: "/",
     secure: false,
+    sameSite: "lax",
   });
 
   return response;

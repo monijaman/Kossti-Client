@@ -4,7 +4,8 @@ export async function GET(request: NextRequest) {
   try {
     const adminSession = request.cookies.get("admin_session")?.value;
 
-    if (adminSession) {
+    // Check if the session cookie exists and is not empty
+    if (adminSession && adminSession.trim() !== "") {
       return NextResponse.json({ message: "Authenticated" }, { status: 200 });
     }
 

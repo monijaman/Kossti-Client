@@ -35,6 +35,8 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const handleLogout = async () => {
     try {
       console.log('logout account dropdown')
+      setIsOpen(false); // Close dropdown immediately
+
       const response = await fetch("/api/admin/logout", {
         method: "POST",
         headers: {
@@ -44,8 +46,10 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
       });
 
       if (response.ok) {
-        // Redirect the user to login after successful logout
-        router.push('/admin/login');
+        console.log('Logout successful, redirecting...');
+        // Wait a moment for cookies to be cleared, then redirect
+        await new Promise(resolve => setTimeout(resolve, 300));
+        router.push('/');
       } else {
         console.error('Failed to logout', response.status);
       }
