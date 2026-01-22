@@ -14,8 +14,6 @@ function checkAdminSession(req: NextRequest): boolean {
 }
 
 function internationalization(req: NextRequest, res: NextResponse) {
-  // List of supported locales
-
   // Skip Next.js internal routes, API routes, and public files.
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
@@ -25,51 +23,22 @@ function internationalization(req: NextRequest, res: NextResponse) {
     return null; // No redirect if internal or public file
   }
 
-  // Extract the locale from cookies or headers
-  const cookieLocale = req.cookies.get("country-code")?.value;
-  const browserLocale = req.headers
-    .get("accept-language")
-    ?.split(",")[0]
-    ?.split("-")[0];
-
-  let detectedLocale: string;
-
-  // Determine the detected locale
-  if (cookieLocale && LOCALES.includes(cookieLocale)) {
-    detectedLocale = cookieLocale;
-  } else if (browserLocale && LOCALES.includes(browserLocale)) {
-    detectedLocale = browserLocale;
-  } else {
-    detectedLocale = DEFAULT_LOCALE;
-  }
-
-  // Update the cookie with the detected locale
-  res.cookies.set("country-code", detectedLocale, {
-    httpOnly: false,
-  });
-
-  // Check if the URL already has a valid locale prefix
+  // Extract the locale from the pathname
   const pathnameParts = req.nextUrl.pathname.split("/");
   const currentLocale = pathnameParts[1];
 
+  // If the path already has a valid locale, don't redirect
   if (LOCALES.includes(currentLocale)) {
-    // If the locale in the path matches the detected locale, do nothing
-    if (currentLocale === detectedLocale) {
-      return null; // No redirection needed
-    }
-
-    // If the locale in the path differs, update the cookie but avoid redirect
-    res.cookies.set("country-code", currentLocale, {
-      httpOnly: false,
-    });
-    return null; // No redirection needed
+    return null;
   }
 
-  // Redirect to the correct locale if no valid locale is present in the path
-  const redirectUrl = `/${detectedLocale}${
-    req.nextUrl.pathname === "/" ? "" : req.nextUrl.pathname
-  }`;
-  return redirectUrl; // Return the correct redirect URL
+  // Only redirect to default locale if it's the root path
+  if (req.nextUrl.pathname === "/") {
+    return `/${DEFAULT_LOCALE}`;
+  }
+
+  // For other paths without locale, prepend default locale
+  return `/${DEFAULT_LOCALE}${req.nextUrl.pathname}`;
 }
 
 // Function to handle token checking and redirection
@@ -168,95 +137,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Apply internationalization only to non-admin routes
-  if (!request.cookies.get("country-code")) {
-    const redirectUrl = internationalization(request, response);
-
-    if (redirectUrl) {
-      // response.cookies.set("country-code", redirectUrl, {
-      //   httpOnly: false,
-      // });
-
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
-    // return NextResponse.redirect(new URL(redirectUrl, request.url));
-  } else if (request.cookies.get("country-code")) {
-    // Get the current pathname
-    const pathname = request.nextUrl.pathname;
-
-    // Skip internationalization for admin routes - they should stay English only
-    if (
-      pathname.startsWith("/admin") ||
-      pathname.startsWith("/signin") ||
-      pathname.startsWith("/signup")
-    ) {
-      return response;
-    }
-
-    // Get the 'country-code' cookie value
-    const countryCodeCookie = request.cookies.get("country-code");
-    const countryCode = countryCodeCookie?.value;
-
-    // Check if the pathname already includes a valid locale
-    const firstPathSegment = pathname.split("/")[1]; // Extract the first segment
-    // If the first path segment is a valid locale and differs from the stored cookie value
-
-    // Check if the first path segment is a valid locale
-    if (firstPathSegment && LOCALES.includes(firstPathSegment)) {
-      // If the locale in the URL matches the cookie, do nothing and continue
-      if (firstPathSegment === countryCode) {
-        return response; // No redirect needed, continue with the response
-      }
-
-      // If the locale in the URL is different from the cookie, update the cookie
-      const url = new URL(request.url);
-      url.pathname = `/${firstPathSegment}${pathname.substring(
-        firstPathSegment.length + 1,
-      )}`;
-
-      // Set the 'country-code' cookie with the new locale
-      response.cookies.set("country-code", firstPathSegment, {
-        httpOnly: false, // Make the cookie accessible from JavaScript
-      });
-
-      // Redirect to the updated URL with the new locale
-    } else if (!firstPathSegment) {
-      // If the country code cookie is available, prepend it to the URL
-      if (countryCode && LOCALES.includes(countryCode)) {
-        const url = new URL(request.url);
-        url.pathname = `/${countryCode}${pathname}`; // Add the country-code as the first segment
-
-        // Set the 'country-code' cookie with the new locale
-        response.cookies.set("country-code", countryCode, {
-          httpOnly: false, // Make the cookie accessible from JavaScript
-        });
-
-        return NextResponse.redirect(url); // Redirect to the URL with the new locale
-      }
-
-      // If no valid cookie is set, default to a supported locale (e.g., "en")
-      const url = new URL(request.url);
-      url.pathname = `/${DEFAULT_LOCALE}${pathname}`; // Prepend the default locale
-
-      // Set the 'country-code' cookie with the default locale
-      response.cookies.set("country-code", DEFAULT_LOCALE, {
-        httpOnly: false,
-      });
-
-      return NextResponse.redirect(url); // Redirect to the default locale
-    }
-
-    // If no valid locale is found in the URL path, do nothing and continue
-    return response;
+  const redirectUrl = internationalization(request, response);
+  if (redirectUrl) {
+    return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
 
-  // else {
-  //   const redirectUrl = await handleIpAddress(request, response);
-  //   if (redirectUrl) {
-  //     return NextResponse.redirect(new URL(redirectUrl, request.url));
-  //   }
-  // }
-
-  // Continue to next response if no further handling is needed
   return response;
 }
 

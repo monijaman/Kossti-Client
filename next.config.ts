@@ -35,6 +35,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  // Reduce bundle size
+  modularizeImports: {
+    'react-icons': {
+      transform: 'react-icons/{{member}}',
+    },
+  },
 };
 
 export default nextConfig;
