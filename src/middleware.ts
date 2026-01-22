@@ -16,7 +16,7 @@ function checkAdminSession(req: NextRequest): boolean {
 function internationalization(req: NextRequest, res: NextResponse) {
   // List of supported locales
 
-  // Skip Next.js internal routes, API routes, and public files
+  // Skip Next.js internal routes, API routes, and public files.
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
     req.nextUrl.pathname.includes("/api/") ||
@@ -134,15 +134,13 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Protect admin routes - require session
-  /* 
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     if (!checkAdminSession(request)) {
       const url = request.nextUrl.clone();
-      url.pathname = '/admin/login';
+      url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
   }
-  */
 
   // Redirect /admin to /admin/dashboard (only if user is authenticated)
   if (pathname === "/admin") {

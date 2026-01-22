@@ -17,7 +17,7 @@ const AdminLayout = async ({ children }: AdminLayoutProps) => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
 
-  return <AdminLayoutClient accessToken={accessToken}>{children}</AdminLayoutClient>;
+  return <AdminLayoutClient accessToken={accessToken}> {children}</AdminLayoutClient>;
 };
 
 export default AdminLayout;

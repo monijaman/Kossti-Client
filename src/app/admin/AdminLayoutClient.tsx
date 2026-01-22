@@ -15,7 +15,7 @@ const AdminLayoutClient = ({ children, accessToken }: AdminLayoutClientProps) =>
     const pathname = usePathname();
     const isLoginPage = pathname.startsWith('/admin/login');
 
-    if (isLoginPage) {
+    if (!accessToken && isLoginPage) {
         return <>{children}</>;
     }
 
@@ -24,6 +24,7 @@ const AdminLayoutClient = ({ children, accessToken }: AdminLayoutClientProps) =>
             <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Admin Panel</h1>
                 <AccountDropdown isAuthenticated={!!accessToken} />
+
             </header>
 
             <Navigation />
