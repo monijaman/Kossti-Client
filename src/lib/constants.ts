@@ -4,7 +4,7 @@ export const DEFAULT_LOCALE = "en";
 export const apiEndpoints = {
   // Authentication endpoints
   register: "/api/register",
-  login: "/api/loginsss/test",
+  login: "/api/login",
   refreshToken: "/api/refresh-token",
   registration: "/api/registration",
   loginV1: "/api/login",
