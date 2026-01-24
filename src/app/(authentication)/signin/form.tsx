@@ -26,6 +26,7 @@ export const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const validationConfig = {
@@ -48,6 +49,8 @@ export const LoginForm = () => {
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
+      setIsLoading(true);
+      setError(null);
 
       const requestBody = {
         email: formData.email,
@@ -60,6 +63,7 @@ export const LoginForm = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: requestBody,
+          signal: 15000, // 15 second timeout for login
         });
 
         if (response.success) {
@@ -79,10 +83,18 @@ export const LoginForm = () => {
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
-          setError(error.message);
+          if (error.name === 'AbortError') {
+            setError("Request timed out. Please check your connection and try again.");
+          } else if (error.message.includes('fetch')) {
+            setError("Network error. Please check your internet connection.");
+          } else {
+            setError(`Login failed: ${error.message}`);
+          }
         } else {
-          setError("An unknown error occurred.");
+          setError("An unknown error occurred. Please try again.");
         }
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -132,9 +144,10 @@ export const LoginForm = () => {
       <div className="pt-4">
         <button
           type="submit"
-          className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          disabled={isLoading}
+          className="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Signin
+          {isLoading ? "Signing in..." : "Signin"}
         </button>
       </div>
     </form>
