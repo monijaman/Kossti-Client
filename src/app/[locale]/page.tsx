@@ -8,6 +8,9 @@ import SearchBox from '@/app/components/Search';
 import { apiEndpoints, DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
+
+// Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
+export const revalidate = 60;
 import { cookies } from 'next/headers';
 
 type ProductApiResponse = {
