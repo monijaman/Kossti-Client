@@ -113,6 +113,7 @@ const ListSpecifications = () => {
             <Pagination
                 currentPage={page}
                 totalPages={totalPages}
+                baseUrl="/admin/categories"
                 additionalParams={{
                     category: activeCategory,
                     brand: activeBrands,

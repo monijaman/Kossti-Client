@@ -4,12 +4,14 @@ import Link from 'next/link';
 
 interface ReviewData {
   id: number;
-  review: Review;
-  product: Product;
+  product_id: number;
+  rating: string;
+  reviews: string;
+  [key: string]: any;
 }
 
 interface PageProps {
-  reviews: ReviewData[]; // Using the structured ReviewData type
+  reviews: ReviewData[]; // Reviews array from backend
 }
 
 const Reviewetails = ({ reviews }: PageProps) => {
@@ -44,22 +46,22 @@ const Reviewetails = ({ reviews }: PageProps) => {
             <tr key={dataset.id} className="hover:bg-gray-100">
               <td className="py-3 px-4 border">{dataset.id}</td>
               <td className="py-3 px-4 border">
-                <Link href={`products/${dataset.product.id}`} className="text-blue-600 hover:text-blue-800">
-                  {dataset.product.name}
+                <Link href={`/admin/products/${dataset.product_id}`} className="text-blue-600 hover:text-blue-800">
+                  Product #{dataset.product_id}
                 </Link>
               </td>
               <td className="py-3 px-4 border">
-                {dataset.review.reviews.length > 300 ? (
+                {dataset.reviews && dataset.reviews.length > 300 ? (
                   <span
                     dangerouslySetInnerHTML={{
-                      __html: dataset.review.reviews.slice(0, 300) + '...',
+                      __html: dataset.reviews.slice(0, 300) + '...',
                     }}
                   />
                 ) : (
-                  <span dangerouslySetInnerHTML={{ __html: dataset.review.reviews }} />
+                  <span dangerouslySetInnerHTML={{ __html: dataset.reviews || 'No review' }} />
                 )}
               </td>
-              <td className="py-3 px-4 border">{dataset.review.rating}</td>
+              <td className="py-3 px-4 border">{dataset.rating}</td>
               <td className="py-3 px-4 border text-center">
                 <Link
                   href={`reviews/${dataset.id}`}

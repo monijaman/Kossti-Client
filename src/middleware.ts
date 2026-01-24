@@ -1,19 +1,19 @@
 import { DEFAULT_LOCALE, LOCALES } from "@/lib/constants";
-import { gettokenbyrefreshToken } from "@/lib/utils"; // Adjust the import path as needed
+ // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 const PUBLIC_FILE = /\.(.*)$/;
 
 // Function to check admin session
 function checkAdminSession(req: NextRequest): boolean {
-  const adminSession = req.cookies.get("admin_session")?.value;
+  const adminSession = req.cookies.get("accessToken")?.value;
   console.log(
     `[Middleware Check] Path: ${req.nextUrl.pathname}, admin_session: ${adminSession ? "FOUND" : "MISSING"}`,
   );
   return !!adminSession;
 }
 
-function internationalization(req: NextRequest, res: NextResponse) {
+function internationalization(req: NextRequest) {
   // Skip Next.js internal routes, API routes, and public files.
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
@@ -79,27 +79,33 @@ async function handleTokenAndRedirect(
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  const token = request.cookies.get("accessToken")?.value;
-  const refreshToken = request.cookies.get("refreshToken")?.value;
-  let refToken = undefined;
-  if (!token && refreshToken) {
+  const refToken = undefined;
+
+  // IMPORTANT: Disable automatic token refresh to ensure logout is permanent
+  // Users should only get new tokens by explicitly logging in
+  // This prevents the "access token comes back after logout" issue
+  // If you want to re-enable auto-refresh in the future, make sure to:
+  // 1. Call server-side logout first (which we do)
+  // 2. Verify refresh tokens are deleted on server (which we do)
+  // Then you can uncomment the code below
+
+  /*
+  const pathname = request.nextUrl.pathname;
+  if (!token && refreshToken && pathname !== "/" && pathname !== "/admin/login") {
     try {
       refToken = await gettokenbyrefreshToken(refreshToken);
-
       if (refToken) {
         response.cookies.set("accessToken", refToken, {
           httpOnly: true,
-          maxAge: 24 * 60 * 60, // 1 day
-          path: "/", // Ensure cookie is accessible site-wide
+          maxAge: 24 * 60 * 60,
+          path: "/",
         });
-        // Construct absolute URL for the redirect
       }
     } catch (error) {
       console.error("Error while fetching token using refreshToken:", error);
     }
   }
-
-  // Only call handleTokenAndRedirect for specified routes
+  */
   const pathname = request.nextUrl.pathname;
 
   // Protect admin routes - require session
@@ -137,7 +143,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Apply internationalization only to non-admin routes
-  const redirectUrl = internationalization(request, response);
+  const redirectUrl = internationalization(request);
   if (redirectUrl) {
     return NextResponse.redirect(new URL(redirectUrl, request.url));
   }

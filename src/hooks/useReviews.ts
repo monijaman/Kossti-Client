@@ -1,5 +1,6 @@
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import { AdditionalDetails } from "@/lib/types";
+import { useCallback } from "react";
 
 export const useReviews = () => {
   const getReview = async (
@@ -214,10 +215,11 @@ export const useReviews = () => {
     }
   };
 
-  const getReviews = async (
+  const getReviews = useCallback(async (
     page: number,
     limit: number,
-    searchTerm?: string
+    searchTerm?: string,
+    category?: number | null
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -226,6 +228,7 @@ export const useReviews = () => {
 
     // Add optional parameters only if they are defined
     if (searchTerm) params.searchterm = searchTerm;
+    if (category) params.category = category.toString();
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
@@ -260,7 +263,7 @@ export const useReviews = () => {
         };
       }
     }
-  };
+  }, []);
 
   const getPublicReviewsByProductId = async (id: number, locale?: string) => {
     const params: Record<string, string> = {};

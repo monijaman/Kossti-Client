@@ -3,18 +3,18 @@ export const DEFAULT_LOCALE = "en";
 
 export const apiEndpoints = {
   // Authentication endpoints
-  register: "/register",
-  login: "/login",
-  refreshToken: "/refresh-token",
-  registration: "/registration",
-  loginV1: "/login",
-  forgotPassword: "/forgot-password",
-  resetPassword: "/reset-password",
-  logout: "/logout",
-  checkToken: "/check-token",
-  searchUsers: "/search_users",
-  profile: "/profile",
-  checkRole: "/checkrole",
+  register: "/api/register",
+  login: "/api/login",
+  refreshToken: "/api/refresh-token",
+  registration: "/api/registration",
+  loginV1: "/api/login",
+  forgotPassword: "/api/forgot-password",
+  resetPassword: "/api/reset-password",
+  logout: "/api/v1/logout",
+  checkToken: "/api/check-token",
+  searchUsers: "/api/search_users",
+  profile: "/api/profile",
+  checkRole: "/api/checkrole",
 
   // User endpoints
   users: "/users",

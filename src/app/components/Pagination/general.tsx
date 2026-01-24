@@ -1,9 +1,16 @@
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
+  onPageChange?: (page: number) => void;
+  queryParams?: Record<string, string>;
 }
 
-const GeneralPagination = ({ currentPage, totalPages }: PaginationProps) => {
+const GeneralPagination = ({ currentPage, totalPages, onPageChange, queryParams }: PaginationProps) => {
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(queryParams || {} as Record<string, string>);
+    params.set('page', page.toString());
+    return `?${params.toString()}`;
+  };
 
 
 
@@ -59,7 +66,13 @@ const GeneralPagination = ({ currentPage, totalPages }: PaginationProps) => {
     <div className="mt-4 flex justify-center items-center space-x-2">
       {/* Previous Button */}
       <a
-        href={`?page=${currentPage - 1}`}
+        href={buildPageUrl(currentPage - 1)}
+        onClick={(e) => {
+          if (onPageChange && currentPage > 1) {
+            e.preventDefault();
+            onPageChange(currentPage - 1);
+          }
+        }}
         className={`px-3 py-1 rounded-full border ${currentPage === 1 ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 border-gray-300'}`}
         aria-disabled={currentPage === 1}
       >
@@ -73,7 +86,13 @@ const GeneralPagination = ({ currentPage, totalPages }: PaginationProps) => {
             <span className="px-3 py-1">...</span>
           ) : (
             <a
-              href={`?page=${page}`}
+              href={buildPageUrl(page as number)}
+              onClick={(e) => {
+                if (onPageChange) {
+                  e.preventDefault();
+                  onPageChange(page as number);
+                }
+              }}
               className={`px-3 py-1 rounded-full border ${currentPage === page ? 'bg-blue-600 text-white border-blue-600 font-bold' : 'bg-white text-blue-600 border-gray-300'}`}
             >
               {page}
@@ -84,7 +103,13 @@ const GeneralPagination = ({ currentPage, totalPages }: PaginationProps) => {
 
       {/* Next Button */}
       <a
-        href={`?page=${currentPage + 1}`}
+        href={buildPageUrl(currentPage + 1)}
+        onClick={(e) => {
+          if (onPageChange && currentPage < totalPages) {
+            e.preventDefault();
+            onPageChange(currentPage + 1);
+          }
+        }}
         className={`px-3 py-1 rounded-full border ${currentPage === totalPages ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 border-gray-300'}`}
         aria-disabled={currentPage === totalPages}
       >

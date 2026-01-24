@@ -35,8 +35,39 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const handleLogout = async () => {
     try {
       console.log('logout account dropdown')
-      setIsOpen(false); // Close dropdown immediately
+      setIsOpen(false);
 
+      // Clear localStorage first (before calling logout endpoints)
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('email');
+
+      // Step 1: Get the access token from cookies
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('accessToken='))
+        ?.split('=')[1];
+
+      // Step 2: Call server-side logout to invalidate refresh tokens
+      if (token) {
+        try {
+          const serverLogoutResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/logout`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+              },
+            }
+          );
+          console.log('Server-side logout:', serverLogoutResponse.status);
+        } catch (error) {
+          console.warn('Server logout failed (will continue with client logout):', error);
+        }
+      }
+
+      // Step 3: Call client-side logout to clear cookies and redirect
       const response = await fetch("/api/admin/logout", {
         method: "POST",
         headers: {
@@ -47,9 +78,6 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
       if (response.ok) {
         console.log('Logout successful, redirecting...');
-        // Wait a moment for cookies to be cleared, then redirect
-        await new Promise(resolve => setTimeout(resolve, 300));
-        router.push('/');
       } else {
         console.error('Failed to logout', response.status);
       }

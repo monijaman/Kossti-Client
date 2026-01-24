@@ -22,9 +22,9 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col mx-auto">
       <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
-        <Link href="/">
+          <Link href="/">
           <Image
-            src="/kossti.png"
+            src="/kossti.svg"
             alt="Kosti"
             style={{
               width: "auto",
