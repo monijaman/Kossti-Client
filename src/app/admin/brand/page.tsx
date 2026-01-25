@@ -39,6 +39,8 @@ const BrandPage = ({ searchParams }: PageProps) => {
     const limit = 10;
     const locale = resolvedSearchParams.locale || 'en';
 
+    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
     const fetchBrandsBase = useCallback(async (searchQuery: string = '') => {
         try {
             setLoading(true);
@@ -84,12 +86,14 @@ const BrandPage = ({ searchParams }: PageProps) => {
         <div className="container mx-auto p-6 p-6 bg-gray-100 min-h-screen shadow-md rounded-lg ">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Brands</h2>
 
-            <Link
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                href="/admin/brand/manage"
-            >
-                Add New Brand
-            </Link>
+            {userType !== 'reviewer' && (
+                <Link
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                    href="/admin/brand/manage"
+                >
+                    Add New Brand
+                </Link>
+            )}
 
             <div className="my-6 flex justify-between items-center">
                 <input

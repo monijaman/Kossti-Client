@@ -2,6 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import fetchApi from '@/lib/fetchApi';
+import { apiEndpoints } from '@/lib/constants';
+import { setAccessTokenCookie } from '@/lib/utils';
+
+interface LoginResponse {
+  token: string;
+  refresh_token: string;
+  email: string;
+  type: string;
+}
 
 const AdminLogin = () => {
     const router = useRouter();
@@ -40,105 +50,48 @@ const AdminLogin = () => {
         setError('');
         setLoading(true);
 
+        const requestBody = {
+            email: email,
+            password: password
+        };
+
         try {
-            // Try backend first, if not available use mock
-            const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-            let data;
-            let loginSuccess = false;
+            const response = await fetchApi(apiEndpoints.login, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: requestBody,
+                signal: 15000, // 15 second timeout for login
+            });
 
-            try {
-                const response = await fetch(`${backendUrl}/admin/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
+            if (response.success) {
+                setError(null);
+                // Store the tokens and user info
+                const loginData = response.data as LoginResponse;
+                localStorage.setItem('token', loginData.token);
+                localStorage.setItem('refresh_token', loginData.refresh_token);
+                localStorage.setItem('email', loginData.email);
+                localStorage.setItem('userType', loginData.type);
 
-                if (response.ok) {
-                    data = await response.json();
-                    loginSuccess = true;
-                } else {
-                    // Backend failed, try mock login
-                    console.log('Backend login failed, using mock credentials');
-                    if (email === 'admin@example.com' && password === 'admin123') {
-                        data = {
-                            token: 'mock_token_' + Date.now(),
-                            refresh_token: 'mock_refresh_' + Date.now(),
-                            email: email
-                        };
-                        loginSuccess = true;
-                    } else {
-                        throw new Error('Invalid credentials');
-                    }
-                }
-            } catch {
-                // Backend not available, use mock login
-                console.log('Backend not available, using mock login');
-                if (email === 'admin@example.com' && password === 'admin123') {
-                    data = {
-                        token: 'mock_token_' + Date.now(),
-                        refresh_token: 'mock_refresh_' + Date.now(),
-                        email: email
-                    };
-                    loginSuccess = true;
-                } else {
-                    setError('Invalid email or password. Demo: admin@example.com / admin123');
-                    setLoading(false);
-                    return;
-                }
-            }
+                // Also set the token as a cookie for API routes
+                setAccessTokenCookie(loginData.token);
 
-            if (!loginSuccess) {
-                setError(data.message || 'Login failed');
-                setLoading(false);
-                return;
-            }
-
-            // Store tokens from response
-            if (data.token) {
-                // First, clear any existing session cookies
-                await fetch('/api/admin/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                });
-
-                // Wait a moment for logout to complete
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                // Create a session via our API endpoint
-                const sessionResponse = await fetch('/api/admin/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include', // Ensure cookies are handled
-                    body: JSON.stringify({
-                        token: data.token,
-                        refresh_token: data.refresh_token,
-                        email: data.email,
-                    }),
-                });
-
-                if (!sessionResponse.ok) {
-                    setError('Failed to create session');
-                    setLoading(false);
-                    return;
-                }
-
-                // Wait a moment for cookies to be set, then redirect
-                setTimeout(() => {
-                    router.push('/admin/dashboard');
-                }, 500);
+                router.push("/admin/dashboard");
             } else {
-                setError('No token received from server');
-                setLoading(false);
+                setError(response.error || "Login failed.");
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                if (error.name === 'AbortError') {
+                    setError("Request timed out. Please check your connection and try again.");
+                } else if (error.message.includes('fetch')) {
+                    setError("Network error. Please check your internet connection.");
+                } else {
+                    setError(`Login failed: ${error.message}`);
+                }
+            } else {
+                setError("An unknown error occurred. Please try again.");
+            }
+        } finally {
             setLoading(false);
         }
     };

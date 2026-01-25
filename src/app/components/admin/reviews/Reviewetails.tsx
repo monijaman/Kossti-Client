@@ -18,6 +18,8 @@ const Reviewetails = ({ reviews }: PageProps) => {
   // Ensure reviews is an array
   const reviewList = Array.isArray(reviews) ? reviews : [];
 
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
   if (reviewList.length === 0) {
     return (
       <div className="overflow-x-auto bg-gray-50 p-6 rounded-lg shadow-md">
@@ -75,12 +77,14 @@ const Reviewetails = ({ reviews }: PageProps) => {
                 >
                   Edit
                 </Link>
-                <Link
-                  href={`reviews/${dataset.id}`}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
-                >
-                  Delete
-                </Link>
+                {userType !== 'reviewer' && (
+                  <Link
+                    href={`reviews/${dataset.id}`}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
+                  >
+                    Delete
+                  </Link>
+                )}
               </td>
             </tr>
           ))}

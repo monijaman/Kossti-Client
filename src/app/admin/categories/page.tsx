@@ -66,6 +66,8 @@ const ListSpecifications = () => {
         }
     }, [searchTerm, page, locale, getCategories]);
 
+    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
     useEffect(() => {
         if (debouncedSearchTerm) fetchCategories();
     }, [debouncedSearchTerm]);
@@ -82,12 +84,14 @@ const ListSpecifications = () => {
         <div className="container mx-auto p-6 bg-white shadow-md rounded-lg p-6 bg-gray-100 min-h-screen">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Categories</h2>
 
-            <Link
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                href="/admin/categories/manage"
-            >
-                Add New Key
-            </Link>
+            {userType !== 'reviewer' && (
+                <Link
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                    href="/admin/categories/manage"
+                >
+                    Add New Key
+                </Link>
+            )}
 
             <div className="my-6 flex justify-between items-center bg-white">
                 <Input

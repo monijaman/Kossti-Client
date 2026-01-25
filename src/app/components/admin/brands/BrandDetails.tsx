@@ -13,6 +13,8 @@ const BrandDetails = ({ brands }: PageProps) => {
 
   const [brandList, setBrandList] = useState<Brand[]>(Array.isArray(brands) ? brands : []);
 
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
   if (brandList.length === 0) {
     return (
       <div className="overflow-x-auto bg-white shadow-md rounded-lg p-6">
@@ -61,16 +63,16 @@ const BrandDetails = ({ brands }: PageProps) => {
                 </span>
               </td>
               <td className="py-2 px-4">
-                <Link
-                  className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
-                  href={`/admin/brand/manage/${brand.id}`}
-                >
-                  Edit
-                </Link>
+                {userType !== 'reviewer' && (
+                  <Link
+                    className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
+                    href={`/admin/brand/manage/${brand.id}`}
+                  >
+                    Edit
+                  </Link>
+                )}
 
-
-
-                {brand.id !== null && (
+                {brand.id !== null && userType !== 'reviewer' && (
                   <button
                     className={`${brand.status ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
                     onClick={() => brandStatusUpdate(brand.id!, brand.status ? 0 : 1)}

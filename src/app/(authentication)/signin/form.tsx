@@ -17,6 +17,7 @@ interface LoginResponse {
   token: string;
   refresh_token: string;
   email: string;
+  type: string;
 }
 interface FormErrors {
   [key: string]: string[]; // Allow arrays of strings for each error field
@@ -73,6 +74,7 @@ export const LoginForm = () => {
           localStorage.setItem('token', loginData.token);
           localStorage.setItem('refresh_token', loginData.refresh_token);
           localStorage.setItem('email', loginData.email);
+          localStorage.setItem('userType', loginData.type);
 
           // Also set the token as a cookie for API routes
           setAccessTokenCookie(loginData.token);

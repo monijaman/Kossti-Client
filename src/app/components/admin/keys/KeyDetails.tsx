@@ -15,6 +15,8 @@ const ProductDetails = ({ keys, onRefresh }: ProductDetailsProps) => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const { deleteSpecificationKey } = useSpecificationsKeys();
 
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
   const deleteKey = async (id: number) => {
     if (!confirm('Are you sure you want to delete this specification key?')) {
       return;
@@ -79,16 +81,18 @@ const ProductDetails = ({ keys, onRefresh }: ProductDetailsProps) => {
                   >
                     Edit
                   </Link>
-                  <button
-                    onClick={() => key.id !== null && deleteKey(key.id)}
-                    disabled={deletingId === key.id}
-                    className={`text-white text-sm px-3 py-1 rounded ${deletingId === key.id
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-red-500 hover:bg-red-600'
-                      }`}
-                  >
-                    {deletingId === key.id ? 'Deleting...' : 'Delete'}
-                  </button>
+                  {userType !== 'reviewer' && (
+                    <button
+                      onClick={() => key.id !== null && deleteKey(key.id)}
+                      disabled={deletingId === key.id}
+                      className={`text-white text-sm px-3 py-1 rounded ${deletingId === key.id
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-red-500 hover:bg-red-600'
+                        }`}
+                    >
+                      {deletingId === key.id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
 
                 </td>
               </tr>

@@ -23,6 +23,8 @@ export default function KeysListPage() {
 
     const page = parseInt(searchParamsFromHook.get('page') || '1', 10);
 
+    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
     const fetchKeys = async () => {
         setLoading(true);
         const response = await getSpecificationsKeys({ perPage, searchTerm: debouncedSearchTerm, page });
@@ -57,7 +59,9 @@ export default function KeysListPage() {
     return (
         <div>
             <h2 className="text-2xl font-bold mb-4"> Specification Keys</h2>
-            <Link className='bg-blue-500 text-white p-4 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
+            {userType !== 'reviewer' && (
+                <Link className='bg-blue-500 text-white p-4 py-1 rounded mr-2 my-2' href="/admin/keys/manage">Add New Key</Link>
+            )}
 
             <div className='my-4'>
                 <Input

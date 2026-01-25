@@ -11,6 +11,8 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
   // Ensure products is an array
   const productList = Array.isArray(products) ? products : [];
 
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
   const deleteProduct = (id: number) => {
     console.log(`Delete product with ID: ${id}`);
   };
@@ -79,12 +81,14 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
                   >
                     Specs
                   </Link>
-                  <button
-                    className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
-                    onClick={() => deleteProduct(product.id)}
-                  >
-                    Delete
-                  </button>
+                  {userType !== 'reviewer' && (
+                    <button
+                      className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
+                      onClick={() => deleteProduct(product.id)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

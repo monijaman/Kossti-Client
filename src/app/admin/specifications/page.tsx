@@ -20,6 +20,8 @@ const Specification = () => {
     const productName = '';
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // To store the selected category
 
+    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
     // Function to handle category selection
     const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
         if (selectedOption) {
@@ -225,13 +227,15 @@ const Specification = () => {
                                     />
                                 </div>
                                 <div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setActiveSpecifications(activeSpecifications.filter((_, i) => i !== index))}
-                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    >
-                                        Remove
-                                    </button>
+                                    {userType !== 'reviewer' && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveSpecifications(activeSpecifications.filter((_, i) => i !== index))}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -239,19 +243,23 @@ const Specification = () => {
                         {selectedCategory &&
 
                             <div className="flex justify-between">
-                                <button
-                                    type="button"
-                                    onClick={addMoreSpecifications}
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    Add New Specification
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                >
-                                    Submit
-                                </button>
+                                {userType !== 'reviewer' && (
+                                    <button
+                                        type="button"
+                                        onClick={addMoreSpecifications}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    >
+                                        Add New Specification
+                                    </button>
+                                )}
+                                {userType !== 'reviewer' && (
+                                    <button
+                                        type="submit"
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    >
+                                        Submit
+                                    </button>
+                                )}
                             </div>
 
                         }

@@ -2,6 +2,7 @@ import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import ProductPhotosPage from '@/app/components/reviews/ProductPhotos';
 import ProductVideos from '@/app/components/reviews/ProductVideos';
+import SimilarProducts from '@/app/components/Products/SimilarProducts';
 import SearchBox from '@/app/components/Search';
 import { DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
@@ -44,6 +45,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const dataset = await fetchProductData() as Product | null;
 
+  console.log('datasetdatasetdataset', dataset);
   if (!dataset) {
     return (
       <MainLayout>
@@ -61,12 +63,13 @@ const Page = async ({ params, searchParams }: PageProps) => {
       <SearchBox initialSearchTerm={searchTerm} />
       <h3 className="font-semibold py-4">
         {dataset.name}
-        {dataset.brand && ` - ${dataset.brand}`}
+        {dataset.brand && ` - ${dataset.brand_slug}`}
         {dataset.category && ` - ${dataset.category.name}`}
       </h3>
       <ProductPhotosPage productId={dataset.id} />
       <ProductVideos productId={dataset.id} />
       <ProducDetails product={dataset} countryCode={countryCode} />
+      <SimilarProducts countryCode={countryCode} slug={slug} />
     </MainLayout>
   );
 };

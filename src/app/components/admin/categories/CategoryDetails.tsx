@@ -14,6 +14,8 @@ const CategoryDetails = ({ categories }: PageProps) => {
 
   const { categoryStatUpdate } = useCategory();
 
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
   const statusUpdate = async (category_id: number, status: number) => {
     const response = await categoryStatUpdate({ category_id, status });
     if (response?.success) {
@@ -63,21 +65,25 @@ const CategoryDetails = ({ categories }: PageProps) => {
                 >
                   Brands
                 </Link>
-                <Link
-                  className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
-                  href={`/admin/categories/manage/${category.id}`}
-                >
-                  Edit
-                </Link>
-                <button
-                  className={`${category.status ? 'bg-green-500' : 'bg-red-500'
-                    } text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
-                  onClick={() =>
-                    statusUpdate(category.id, category.status ? 0 : 1)
-                  }
-                >
-                  {category.status ? 'Deactivate' : 'Activate'}
-                </button>
+                {userType !== 'reviewer' && (
+                  <Link
+                    className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
+                    href={`/admin/categories/manage/${category.id}`}
+                  >
+                    Edit
+                  </Link>
+                )}
+                {userType !== 'reviewer' && (
+                  <button
+                    className={`${category.status ? 'bg-green-500' : 'bg-red-500'
+                      } text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
+                    onClick={() =>
+                      statusUpdate(category.id, category.status ? 0 : 1)
+                    }
+                  >
+                    {category.status ? 'Deactivate' : 'Activate'}
+                  </button>
+                )}
 
               </td>
             </tr>

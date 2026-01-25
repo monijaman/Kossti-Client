@@ -1,7 +1,7 @@
 'use client'; // This directive makes this component a client component
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
   isAuthenticated: boolean; // Define the type for the prop
@@ -9,10 +9,13 @@ type AccountDropdownProps = {
 
 const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
   // const isAuthenticated = useAuth();
+
+  const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
 
   // Close dropdown when clicking outside
@@ -38,9 +41,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
       setIsOpen(false);
 
       // Clear localStorage first (before calling logout endpoints)
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('email');
+      localStorage.clear();
 
       // Step 1: Get the access token from cookies
       const token = document.cookie
@@ -78,8 +79,12 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
       if (response.ok) {
         console.log('Logout successful, redirecting...');
+        const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/signin';
+        router.push(loginPath);
       } else {
         console.error('Failed to logout', response.status);
+        const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/signin';
+        router.push(loginPath);
       }
     } catch (error) {
       console.error('Error logging out:', error);
@@ -131,18 +136,20 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
                 className="block px-4 py-2 hover:bg-gray-100">
                 Logout
               </Link>
-              <>
-                <hr className="my-1" />
-                <Link
-                  href="/admin"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                >
-                  Admin Dashboard
-                </Link>
-                <Link href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
-                  Manage Users
-                </Link>
-              </>
+              {userType !== 'guest' && (
+                <>
+                  <hr className="my-1" />
+                  <Link
+                    href="/admin"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Admin Dashboard
+                  </Link>
+                  <Link href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
+                    Manage Users
+                  </Link>
+                </>
+              )}
             </>
           )}
         </div>
