@@ -100,6 +100,11 @@ export const apiEndpoints = {
   // Health check
   health: "/health",
 
+  // Comments endpoints
+  createComment: () => `/comments`,
+  getCommentsByProductId: (id: number | string) => `/comments/product/${id}`,
+  createCommentTranslation: () => `/comment-translations`,
+
   // Review endpoints (existing)
   getPublicReviewsByProductId: (id: number | string, countryCode: string) =>
     `/public-reviews/${id}?locale=${countryCode}`,

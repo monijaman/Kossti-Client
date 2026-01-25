@@ -224,7 +224,7 @@ ${englishText}`;
 export function convertTobengaliNumerals(
   englishNumber: number | string
 ): string {
-  const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 
   const numberStr = String(englishNumber);
   return numberStr
@@ -234,4 +234,165 @@ export function convertTobengaliNumerals(
       return isNaN(num) ? digit : bengaliNumerals[num];
     })
     .join("");
+}
+
+export interface AIComment {
+  username: string;
+  location: string;
+  comment: string;
+  sourceUrl: string;
+  commentBn?: string; // Bengali translation
+}
+
+
+//#region Product Comments Generation and Translation
+/**
+ * Generate realistic product comments using OpenAI
+ * Returns 10-20 comments with usernames, locations, and source URLs
+ */
+export async function generateProductComments(
+  productName: string
+): Promise<AIComment[]> {
+  const client = getOpenAIClient();
+
+  const prompt = `Generate 25 to 40 realistic product comments/reviews for: "${productName}"
+
+Each comment should include:
+1. A realistic username (first name or nickname)
+2. A location (city, country)
+3. A genuine-sounding comment (1-3 sentences, max 150 chars)
+4. A source URL (can be from Amazon, YouTube, Reddit, product forum, or review site)
+
+The comments should be:
+- Varied in sentiment (positive, neutral, some critical)
+- Realistic and authentic sounding
+- About different aspects of the product
+- Include specific details (not generic praise)
+
+Return ONLY a valid JSON array with this structure:
+[
+  {
+    "username": "John",
+    "location": "New York, USA",
+    "comment": "Great quality, arrived fast. Exactly what I needed.",
+    "sourceUrl": "https://www.amazon.com/..."
+  }
+]
+
+IMPORTANT: Return ONLY valid JSON array, nothing else.`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 3000,
+      temperature: 0.8,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a data generator that creates realistic product comments. Return ONLY valid JSON, no markdown, no explanations.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const comments: AIComment[] = JSON.parse(content);
+
+    if (!Array.isArray(comments) || comments.length === 0) {
+      throw new Error("Invalid comments format");
+    }
+
+    return comments;
+  } catch (error) {
+    console.error("Error generating comments:", error);
+    throw error;
+  }
+}
+
+/**
+ * Translate product comments to Bengali
+ * Takes an array of English comments and returns them with Bengali translations
+ */
+export async function translateCommentsTobengali(
+  comments: AIComment[]
+): Promise<AIComment[]> {
+  const client = getOpenAIClient();
+
+  const commentTexts = comments.map((c) => c.comment).join("\n---\n");
+
+  const prompt = `Translate these English product comments to Bengali. Keep the translation natural and authentic.
+
+English comments:
+${commentTexts}
+
+Return ONLY a valid JSON array where each object has the translated Bengali comment text.
+Format: ["Bengali comment 1", "Bengali comment 2", ...]
+
+IMPORTANT: Return ONLY valid JSON array of strings, nothing else.`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 3000,
+      temperature: 0.7,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a translator. Translate product comments to Bengali. Return ONLY valid JSON array of strings.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const bengaliTranslations: string[] = JSON.parse(content);
+
+    if (!Array.isArray(bengaliTranslations) || bengaliTranslations.length === 0) {
+      throw new Error("Invalid translations format");
+    }
+
+    // Attach Bengali translations to comments
+    const translatedComments = comments.map((comment, index) => ({
+      ...comment,
+      commentBn: bengaliTranslations[index] || comment.comment,
+    }));
+
+    return translatedComments;
+  } catch (error) {
+    console.error("Error translating comments to Bengali:", error);
+    // Return comments without Bengali translation if translation fails
+    return comments;
+  }
 }

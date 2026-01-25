@@ -24,6 +24,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [priority, setPriority] = useState(product?.priority || 1);
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
+    const [commentStatus, setCommentStatus] = useState('');
 
     // Debug log for submitStatus changes
     useEffect(() => {
@@ -97,6 +99,69 @@ const ProductForm = ({ product }: ProductFormProps) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id]); // Only depend on product ID to avoid loops
+
+    // Handle pulling comments from OpenAI
+    const handlePullComments = async () => {
+        if (!product?.id) {
+            setCommentStatus('Error: Product not found');
+            return;
+        }
+
+        setCommentLoading(true);
+        setCommentStatus('');
+
+        try {
+            console.log('[DEBUG] Starting comment pull process...');
+            
+            // Call API to generate comments
+            const response = await fetch('/api/openai/generate-comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productName: name }),
+            });
+
+            const data = await response.json();
+            console.log('[DEBUG] Generated comments:', data);
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate comments');
+            }
+
+            // Now save the comments to the database
+            const comments = data.comments;
+            console.log('[DEBUG] Sending to bulk-create:', { productId: product.id, commentCount: comments.length });
+
+            // Save comments via API endpoint
+            const saveResponse = await fetch('/api/comments/bulk-create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: product.id,
+                    comments: comments,
+                }),
+            });
+
+            const saveData = await saveResponse.json();
+            console.log('[DEBUG] Bulk-create response:', saveData);
+
+            if (!saveResponse.ok) {
+                throw new Error(saveData.error || 'Failed to save comments');
+            }
+
+            setCommentStatus(`✅ Successfully added ${comments.length} comments!`);
+        } catch (error) {
+            console.error('Error pulling comments:', error);
+            setCommentStatus(
+                `❌ Error: ${error instanceof Error ? error.message : 'Failed to pull comments'}`
+            );
+        } finally {
+            setCommentLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -335,7 +400,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
+                        {console.log('DEBUG: product?.id =', product?.id)}
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
@@ -343,7 +409,32 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         >
                             {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
                         </button>
+
+                        {/* Pull Comments Button - Only show if product exists */}
+                        {product?.id && (
+                            <button
+                                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button"
+                                onClick={handlePullComments}
+                                disabled={commentLoading}
+                            >
+                                {commentLoading ? 'Pulling Comments...' : 'Pull Comments'}
+                            </button>
+                        )}
                     </div>
+
+                    {/* Comment Status Message */}
+                    {commentStatus && (
+                        <div
+                            className={`p-4 mt-4 text-sm rounded-lg border ${commentStatus.toLowerCase().includes('successfully') || commentStatus.toLowerCase().includes('success')
+                                ? 'text-green-700 bg-green-100 border-green-300'
+                                : 'text-red-700 bg-red-100 border-red-300'
+                                }`}
+                            role="alert"
+                        >
+                            {commentStatus}
+                        </div>
+                    )}
 
                     {/* Submission Status - Always visible if there's a status */}
                     {submitStatus && (
