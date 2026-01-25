@@ -36,18 +36,28 @@ export async function POST(request: NextRequest) {
     const commentsNeedingTranslation = comments.filter((c) => !c.commentBn);
     if (commentsNeedingTranslation.length > 0) {
       try {
+        console.log(`[DEBUG] Translating ${commentsNeedingTranslation.length} comments to Bengali`);
         const translatedComments =
           await translateCommentsTobengali(commentsNeedingTranslation);
+        console.log(`[DEBUG] Translated comments:`, translatedComments);
+        
+        // Create a map of original English text to Bengali translation
+        const translationMap = new Map<string, string>();
+        translatedComments.forEach((comment) => {
+          if (comment.commentBn) {
+            translationMap.set(comment.comment, comment.commentBn);
+          }
+        });
+        
         // Update comments with Bengali translations
         comments = comments.map((comment) => {
-          const translated = translatedComments.find(
-            (t) => t.comment === comment.comment
-          );
+          const bengaliText = translationMap.get(comment.comment);
           return {
             ...comment,
-            commentBn: translated?.commentBn || comment.comment,
+            commentBn: bengaliText || comment.comment,
           };
         });
+        console.log(`[DEBUG] Comments after translation mapping:`, comments);
       } catch (error) {
         console.error("Failed to translate comments, continuing without Bengali translations:", error);
       }
@@ -85,9 +95,9 @@ export async function POST(request: NextRequest) {
           console.log(`[DEBUG] Comment saved with ID: ${commentId}`);
 
           // Save Bengali translation
-          if (commentId && comment.commentBn && comment.commentBn !== comment.comment) {
+          if (commentId && comment.commentBn) {
             try {
-              console.log(`[DEBUG] Saving Bengali translation for comment ${commentId}`);
+              console.log(`[DEBUG] Saving Bengali translation for comment ${commentId}: ${comment.commentBn.substring(0, 30)}...`);
               const translationResponse = await fetchApi("/comment-translations", {
                 method: "POST",
                 accessToken,
