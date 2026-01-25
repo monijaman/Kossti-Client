@@ -1,5 +1,5 @@
 'use client';
-import { Product, Review } from '@/lib/types'; // Assuming you have a Product type
+ // Assuming you have a Product type
 import Link from 'next/link';
 
 interface ReviewData {
@@ -7,7 +7,7 @@ interface ReviewData {
   product_id: number;
   rating: string;
   reviews: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface PageProps {
@@ -66,20 +66,20 @@ const Reviewetails = ({ reviews }: PageProps) => {
               <td className="py-3 px-4 border">{dataset.rating}</td>
               <td className="py-3 px-4 border text-center">
                 <Link
-                  href={`reviews/${dataset.id}`}
+                  href={`reviews/${dataset.product_id}`}
                   className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600 transition duration-200"
                 >
                   View
                 </Link>
                 <Link
-                  href={`reviews/${dataset.id}`}
+                  href={`reviews/${dataset.product_id}`}
                   className="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600 transition duration-200"
                 >
                   Edit
                 </Link>
                 {userType !== 'reviewer' && (
                   <Link
-                    href={`reviews/${dataset.id}`}
+                    href={`reviews/${dataset.product_id}`}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
                   >
                     Delete

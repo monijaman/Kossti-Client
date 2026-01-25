@@ -15,6 +15,9 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
   // const isAuthenticated = useAuth();
 
+  // Check both server-side prop and client-side localStorage
+  const isUserAuthenticated = isAuthenticated || (typeof window !== 'undefined' && !!localStorage.getItem('token'));
+
   const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
 
@@ -104,7 +107,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
           className="absolute right-0 mt-2 w-48 bg-white text-gray-900 shadow-lg rounded-md"
           style={{ top: '100%', zIndex: 10 }}
         >
-          {!isAuthenticated ? (
+          {!isUserAuthenticated ? (
             <>
               <Link
                 href="/signin"
@@ -136,7 +139,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
                 className="block px-4 py-2 hover:bg-gray-100">
                 Logout
               </Link>
-              {userType !== 'guest' && (
+              {isUserAuthenticated && userType !== 'guest' && (
                 <>
                   <hr className="my-1" />
                   <Link

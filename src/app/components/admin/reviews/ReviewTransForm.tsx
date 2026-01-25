@@ -4,6 +4,7 @@ import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
+import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Page props
@@ -33,6 +34,9 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     // Transient error message
     const [transErrorMessage, setTransErrorMessage] = useState<string>('');
     const transErrorTimerRef = useRef<number | null>(null);
+    // AI Review states
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState<string>('');
 
     const resetForm = useCallback(() => {
         const newTranslation: ReviewTranslation = {
@@ -97,6 +101,66 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         }
         const numericText = englishText.replace(/[^\d.]/g, '');
         return numericText ? parseFloat(numericText) : 0;
+    };
+
+    // Generate AI Review
+    const handleGenerateAIReview = async () => {
+        setAiLoading(true);
+        setAiError('');
+        
+        try {
+            if (!productName) {
+                throw new Error('Product name is required');
+            }
+
+            console.log('🚀 Starting AI review generation for:', productName);
+
+            // Generate review using OpenAI
+            const aiReviewContent = await generateAIReview({
+                productName,
+                locale: 'en', // For now, always generate in English
+            });
+
+            console.log('✅ AI review generated successfully');
+
+            if (!aiReviewContent) {
+                throw new Error('No content received from AI');
+            }
+
+            // Extract rating from the AI-generated content
+            const extractedRating = extractRatingFromReview(aiReviewContent);
+            console.log('📊 Extracted rating:', extractedRating);
+
+            // Update form fields with AI review
+            setSelectedTranslation({
+                ...selectedTranslation,
+                review: aiReviewContent,
+                rating: extractedRating,
+            });
+
+            // Update rating input
+            setRatingInput(String(extractedRating));
+
+            // Show success message
+            setTransSuccessMessage('✅ AI review generated successfully');
+
+            setTimeout(() => {
+                setTransSuccessMessage('');
+            }, 3000);
+        } catch (error) {
+            console.error('❌ Error generating AI review:', error);
+            const errorMessage =
+                error instanceof Error ? error.message : 'Failed to generate AI review';
+            setAiError(
+                `Failed to generate AI review: ${errorMessage}`
+            );
+
+            setTimeout(() => {
+                setAiError('');
+            }, 50000);
+        } finally {
+            setAiLoading(false);
+        }
     };
 
     // Handle form submission
@@ -269,8 +333,43 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                         setAdditionalDetails={setAdditionalDetails}
                     />
 
-                    {/* Submit Button */}
-                    <div className="flex justify-center">
+                    {/* AI Error Message */}
+                    {aiError && (
+                        <div className="p-3 mt-4 mb-4 text-sm rounded-lg bg-red-100 text-red-700 border border-red-300">
+                            {aiError}
+                        </div>
+                    )}
+
+                    {/* AI Review Button - Only for English */}
+                    {selectedLocale === 'en' && (
+                        <div className="flex justify-center gap-4 flex-wrap mb-4">
+                            <button
+                                type="button"
+                                onClick={handleGenerateAIReview}
+                                disabled={aiLoading || !productName}
+                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
+                                    aiLoading
+                                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                                        : 'bg-purple-500 hover:bg-purple-600 text-white'
+                                }`}
+                            >
+                                {aiLoading ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Generating...
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <span>✨</span>
+                                        AI Review  
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Button Group - Submit */}
+                    <div className="flex justify-center gap-4 flex-wrap">
                         <button
                             type="submit"
                             className="bg-blue-500 text-white py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out hover:bg-blue-600"
@@ -281,17 +380,17 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
                     {/* Inline transient success / error messages for translation submit */}
                     {transSuccessMessage && (
-                        <div className="mt-2 text-sm text-green-700 text-center">{transSuccessMessage}</div>
+                        <div className="mt-4 text-sm text-green-700 text-center">{transSuccessMessage}</div>
                     )}
                     {transErrorMessage && (
-                        <div className="mt-2 text-sm text-red-600 text-center">{transErrorMessage}</div>
+                        <div className="mt-4 text-sm text-red-600 text-center">{transErrorMessage}</div>
                     )}
                 </div>
             )}
 
             {/* Status Message */}
             {formStatus && (
-                <div className="p-4 mb-4 text-sm rounded-lg bg-green-100 text-green-700" role="alert">
+                <div className="p-4 mt-4 mb-4 text-sm rounded-lg bg-green-100 text-green-700" role="alert">
                     {formStatus}
                 </div>
             )}

@@ -104,8 +104,8 @@ export const useProducts = () => {
     // Build the query string (if params are provided)
     const queryString = new URLSearchParams(params).toString();
     const fullUrl = queryString
-      ? `${apiUrl}/product/${id}?${queryString}&type=public`
-      : `${apiUrl}/product/${id}?type=public`;
+      ? `${apiUrl}/products/${id}?${queryString}&type=public`
+      : `${apiUrl}/products/${id}?type=public`;
 
     // Ensure API URL is defined
     if (!apiUrl) {

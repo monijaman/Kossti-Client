@@ -5,6 +5,8 @@ import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
+import { useProducts } from '@/hooks/useProducts';
+import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
 import { AdditionalDetails, Product, Review } from '@/lib/types';
 import React, { use, useEffect, useRef, useState } from 'react';
 
@@ -20,6 +22,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [reviews, setReviews] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
     const { addReview, updateReview, getReviewByProductId } = useReviews();
+    const { getAProductById } = useProducts();
     // const [productId, setProductId] = useState<number | null>(id); // To hold the fetched product ID
     const [reviewsError, setReviewsError] = useState<string>(''); // Validation error state for reviews
     const [additionalDetails, setAdditionalDetails] = useState<AdditionalDetails[]>([]);
@@ -34,99 +37,111 @@ const ReviewForm = ({ params }: PageProps) => {
     const [products, setProducts] = useState<Product>();
     const productName = ""
     const [files, setFiles] = useState<File[]>([]);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState<string>('');
 
-    useEffect(() => {
-        if (!id) return;
+    const fetchProductData = async () => {
 
-        const fetchProductData = async () => {
-            try {
-                setDataLoading(true);
-                const response = await getReviewByProductId(+id, 'bn'); // Fetch product by ID
+        const productResponse = await getAProductById(+id);
+        if (productResponse?.success && productResponse?.data) {
+            setProducts(productResponse.data as Product);
+        }
+    }
 
-                if (response?.success && response?.data) {
+    const fetchReviewData = async () => {
+        try {
+            setDataLoading(true);
 
-                    const data = response.data as Record<string, unknown>;
-                    // Normalize response shapes: some endpoints return { product_id, count, reviews: [...] }
-                    // Each review item has: { review: {...}, translation: {...} }
-                    let dataset: Record<string, unknown> | null = null;
+            // Fetch product details
 
-                    const maybeReviews = data['reviews'];
-                    if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
-                        const firstReviewItem = maybeReviews[0] as Record<string, unknown>;
-                        const reviewData = firstReviewItem['review'] as Record<string, unknown>;
+            const response = await getReviewByProductId(+id, 'bn'); // Fetch review by product ID
 
-                        // Build translations array from review data and translation
-                        const translations: Array<Record<string, unknown>> = [];
-                        console.log('Base review added to translations:', firstReviewItem.translation);
+            if (response?.success && response?.data) {
 
-                        // Add the base review as English translation
+                const data = response.data as Record<string, unknown>;
+                // Normalize response shapes: some endpoints return { product_id, count, reviews: [...] }
+                // Each review item has: { review: {...}, translation: {...} }
+                let dataset: Record<string, unknown> | null = null;
+
+                const maybeReviews = data['reviews'];
+                if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
+                    const firstReviewItem = maybeReviews[0] as Record<string, unknown>;
+                    const reviewData = firstReviewItem['review'] as Record<string, unknown>;
+
+                    // Build translations array from review data and translation
+                    const translations: Array<Record<string, unknown>> = [];
+                    console.log('Base review added to translations:', firstReviewItem.translation);
+
+                    // Add the base review as English translation
+                    translations.push({
+                        id: reviewData['id'],
+                        product_review_id: reviewData['id'],
+                        locale: 'en',
+                        rating: reviewData['rating'] ?? 0,
+                        review: reviewData['reviews'] ?? reviewData['review'],
+                        additional_details: reviewData['additional_details'] ?? [],
+                        created_at: reviewData['created_at'],
+                        updated_at: reviewData['updated_at'],
+                    });
+
+
+                    // Add translation if present
+                    const translationVal = firstReviewItem['translation'];
+                    if (translationVal && typeof translationVal === 'object') {
+                        const t = translationVal as Record<string, unknown>;
                         translations.push({
-                            id: reviewData['id'],
-                            product_review_id: reviewData['id'],
-                            locale: 'en',
-                            rating: reviewData['rating'] ?? 0,
-                            review: reviewData['reviews'] ?? reviewData['review'],
-                            additional_details: reviewData['additional_details'] ?? [],
-                            created_at: reviewData['created_at'],
-                            updated_at: reviewData['updated_at'],
+                            id: t['id'],
+                            product_review_id: t['product_review_id'],
+                            locale: t['locale'],
+                            rating: t['rating'] ?? reviewData['rating'] ?? 0,
+                            review: t['translated_review'],
+                            additional_details: t['additional_details'] ?? [],
+                            created_at: t['created_at'],
+                            updated_at: t['updated_at'],
                         });
+                    }
 
-
-                        // Add translation if present
-                        const translationVal = firstReviewItem['translation'];
-                        if (translationVal && typeof translationVal === 'object') {
-                            const t = translationVal as Record<string, unknown>;
-                            translations.push({
+                    dataset = reviewData;
+                    dataset['translations'] = translations;
+                } else if (data['review']) {
+                    // Single-review shape: attach translation into translations[] if present
+                    dataset = data['review'] as Record<string, unknown>;
+                    const translationVal = data['translation'];
+                    if (translationVal && typeof translationVal === 'object') {
+                        const t = translationVal as Record<string, unknown>;
+                        dataset['translations'] = [
+                            {
                                 id: t['id'],
                                 product_review_id: t['product_review_id'],
                                 locale: t['locale'],
-                                rating: t['rating'] ?? reviewData['rating'] ?? 0,
+                                rating: dataset['rating'] ?? 0,
                                 review: t['translated_review'],
                                 additional_details: t['additional_details'] ?? [],
                                 created_at: t['created_at'],
                                 updated_at: t['updated_at'],
-                            });
-                        }
-
-                        dataset = reviewData;
-                        dataset['translations'] = translations;
-                    } else if (data['review']) {
-                        // Single-review shape: attach translation into translations[] if present
-                        dataset = data['review'] as Record<string, unknown>;
-                        const translationVal = data['translation'];
-                        if (translationVal && typeof translationVal === 'object') {
-                            const t = translationVal as Record<string, unknown>;
-                            dataset['translations'] = [
-                                {
-                                    id: t['id'],
-                                    product_review_id: t['product_review_id'],
-                                    locale: t['locale'],
-                                    rating: dataset['rating'] ?? 0,
-                                    review: t['translated_review'],
-                                    additional_details: t['additional_details'] ?? [],
-                                    created_at: t['created_at'],
-                                    updated_at: t['updated_at'],
-                                },
-                            ];
-                        }
-                    }
-
-                    if (dataset) {
-                        setProducts(response.data as Product);
-                        setReviewData(dataset as unknown as Review);
-                        setReviews((dataset['reviews'] as string) || (dataset['review'] as string) || "");
-                        setRating((dataset['rating'] as number) || 0);
-                        setAdditionalDetails((dataset['additional_details'] as unknown as AdditionalDetails[]) ?? []);
+                            },
+                        ];
                     }
                 }
-            } catch (error) {
-                console.error('Error fetching product:', error);
-            } finally {
-                setDataLoading(false);
-            }
-        };
 
-        fetchProductData();
+                if (dataset) {
+                    setReviewData(dataset as unknown as Review);
+                    setReviews((dataset['reviews'] as string) || (dataset['review'] as string) || "");
+                    setRating((dataset['rating'] as number) || 0);
+                    setAdditionalDetails((dataset['additional_details'] as unknown as AdditionalDetails[]) ?? []);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching product:', error);
+        } finally {
+            setDataLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!id) return;
+        fetchProductData()
+        fetchReviewData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]); // Only run when id changes
 
@@ -144,10 +159,11 @@ const ReviewForm = ({ params }: PageProps) => {
     const refreshProductData = async () => {
         try {
             setDataLoading(true);
+
+
             const response = await getReviewByProductId(+id);
 
             if (response?.success && response?.data) {
-                setProducts(response.data);
                 if (response?.data.reviews?.[0]) {
                     const firstReviewItem = response?.data.reviews?.[0];
                     const reviewData = firstReviewItem['review'];
@@ -208,7 +224,58 @@ const ReviewForm = ({ params }: PageProps) => {
     }
         , [files]);
 
+    // Generate AI Review
+    const handleGenerateAIReview = async () => {
+        setAiLoading(true);
+        setAiError('');
 
+        try {
+
+            if (!products?.name) {
+                throw new Error('Product name is required');
+            }
+
+            // Generate review using OpenAI with product details
+            const aiReviewContent = await generateAIReview({
+                productName: products.name,
+                productCategory: products.category_slug || '',
+                locale: 'en',
+            });
+
+
+            if (!aiReviewContent) {
+                throw new Error('No content received from AI');
+            }
+
+            // Extract rating from the AI-generated content
+            const extractedRating = extractRatingFromReview(aiReviewContent);
+            console.log('📊 Extracted rating:', extractedRating);
+
+            // Update form fields with AI review
+            setReviews(aiReviewContent);
+            setRating(extractedRating);
+
+            // Show success message
+            setSuccessMessage('✅ AI review generated successfully');
+
+            setTimeout(() => {
+                setSuccessMessage('');
+            }, 30000);
+        } catch (error) {
+            console.error('❌ Error generating AI review:', error);
+            const errorMessage =
+                error instanceof Error ? error.message : 'Failed to generate AI review';
+            setAiError(
+                `Failed to generate AI review: ${errorMessage}`
+            );
+
+            setTimeout(() => {
+                setAiError('');
+            }, 5000);
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     const handleReviewSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -431,6 +498,39 @@ const ReviewForm = ({ params }: PageProps) => {
                                             showMessage={detailsMessageVisible}
                                             onDetailsChange={handleAdditionalDetailsChange}
                                         />
+
+                                        {/* AI Error Message */}
+                                        {aiError && (
+                                            <div className="p-3 mt-4 mb-4 text-sm rounded-lg bg-red-100 text-red-700 border border-red-300">
+                                                {aiError}
+                                            </div>
+                                        )}
+
+                                        {/* AI Review Button */}
+                                        <div className='my-4'>
+
+                                            <button
+                                                type="button"
+                                                onClick={handleGenerateAIReview}
+                                                disabled={aiLoading || !products?.name}
+                                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${aiLoading
+                                                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                                                    : 'bg-purple-500 hover:bg-purple-600 text-white'
+                                                    }`}
+                                            >
+                                                {aiLoading ? (
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="animate-spin">⏳</span>
+                                                        Generating...
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-2">
+                                                        <span>✨</span>
+                                                        AI Review 
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </div>
 
                                         {/* Submit Button */}
                                         <div className='my-4'>
