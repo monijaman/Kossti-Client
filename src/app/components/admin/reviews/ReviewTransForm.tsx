@@ -4,7 +4,7 @@ import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
-import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
+import { generateAIReview, extractRatingFromReview, translateToBengali, convertTobengaliNumerals } from '@/lib/openai-service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Page props
@@ -37,6 +37,9 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     // AI Review states
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string>('');
+    // Translation states
+    const [translationLoading, setTranslationLoading] = useState(false);
+    const [translationError, setTranslationError] = useState<string>('');
 
     const resetForm = useCallback(() => {
         const newTranslation: ReviewTranslation = {
@@ -160,6 +163,64 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             }, 50000);
         } finally {
             setAiLoading(false);
+        }
+    };
+
+    // Translate Review to Bengali
+    const handleTranslateReview = async () => {
+        setTranslationLoading(true);
+        setTranslationError('');
+
+        try {
+            // Get English translation from transData
+            const englishTranslation = transData.find((trans) => trans.locale === 'en');
+            
+            if (!englishTranslation || !englishTranslation.review) {
+                throw new Error('English translation not found. Please add the English review first.');
+            }
+
+            console.log('🌍 Starting review translation from English to Bengali...');
+
+            // Translate the English review to Bengali
+            const bengaliReview = await translateToBengali(englishTranslation.review);
+
+            console.log('✅ Review translated to Bengali successfully');
+
+            if (!bengaliReview) {
+                throw new Error('No content received from translation');
+            }
+
+            // Update form fields with translated review
+            setSelectedTranslation({
+                ...selectedTranslation,
+                review: bengaliReview,
+            });
+
+            // Convert English rating to Bengali numerals if available
+            if (englishTranslation.rating) {
+                const bengaliRating = convertTobengaliNumerals(String(englishTranslation.rating));
+                setRatingInput(bengaliRating);
+            }
+
+            // Show success message
+            setTransSuccessMessage('✅ Review translated to Bengali successfully');
+
+            setTimeout(() => {
+                setTransSuccessMessage('');
+            }, 3000);
+        } catch (error) {
+            console.error('❌ Error translating review:', error);
+            const errorMessage =
+                error instanceof Error ? error.message : 'Failed to translate review';
+            setTranslationError(
+                `Failed to translate review: ${errorMessage}`
+            );
+
+            setTimeout(() => {
+                setTranslationError('');
+            }, 5000);
+        } finally {
+            setTranslationLoading(false);
         }
     };
 
@@ -340,6 +401,13 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                         </div>
                     )}
 
+                    {/* Translation Error Message */}
+                    {translationError && (
+                        <div className="p-3 mt-4 mb-4 text-sm rounded-lg bg-red-100 text-red-700 border border-red-300">
+                            {translationError}
+                        </div>
+                    )}
+
                     {/* AI Review Button - Only for English */}
                     {selectedLocale === 'en' && (
                         <div className="flex justify-center gap-4 flex-wrap mb-4">
@@ -362,6 +430,34 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                     <span className="flex items-center gap-2">
                                         <span>✨</span>
                                         AI Review  
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Translate to Bengali Button - Only for Bengali */}
+                    {selectedLocale === 'bn' && (
+                        <div className="flex justify-center gap-4 flex-wrap mb-4">
+                            <button
+                                type="button"
+                                onClick={handleTranslateReview}
+                                disabled={translationLoading || !transData.find((trans) => trans.locale === 'en')?.review}
+                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
+                                    translationLoading
+                                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                                        : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                                }`}
+                            >
+                                {translationLoading ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="animate-spin">⏳</span>
+                                        Translating...
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <span>🌍</span>
+                                        Translate English to Bengali  
                                     </span>
                                 )}
                             </button>

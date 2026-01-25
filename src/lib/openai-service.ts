@@ -74,12 +74,11 @@ Rules:
 - Make it like human-written reviews
 - Need to be at least 800 words long`;
 
-const userPrompt = productName
-  ? `Create a comprehensive review for: ${productName} ${
-      productCategory ? ` (Category: ${productCategory})` : ''
-    }`
-  : '';
-
+  const userPrompt = productName
+    ? `Create a comprehensive review for: ${productName} ${
+        productCategory ? ` (Category: ${productCategory})` : ""
+      }`
+    : "";
 
   try {
     const client = getOpenAIClient();
@@ -159,4 +158,80 @@ export function extractRatingFromReview(reviewContent: string): number {
     return Math.min(Math.max(rating, 1), 5);
   }
   return 4.0; // Default rating if none found
+}
+
+/**
+ * Translate English text to Bengali using OpenAI
+ */
+export async function translateToBengali(englishText: string): Promise<string> {
+  if (!englishText.trim()) {
+    throw new Error("No text to translate");
+  }
+
+  const systemPrompt = `
+You are an expert translator specializing in translating product reviews
+from English to Bengali.
+
+Rules:
+- Translate headings like "Rating", "Pros", "Cons" into Bengali.
+- Convert English numerals into Bengali numerals where appropriate.
+- Maintain meaning, tone, and clarity.
+- Preserve line breaks and structure.
+- If HTML is present, keep all tags unchanged and translate only text nodes.
+- Output ONLY the translated content, no explanations.
+`;
+
+  const userPrompt = `Translate the following English review to Bengali. Keep all HTML tags intact and only translate the text content:
+
+${englishText}`;
+
+  try {
+    const client = getOpenAIClient();
+
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 4000,
+      temperature: 0.7,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+    });
+
+    if (response.choices[0].message.content) {
+      let content = response.choices[0].message.content;
+      // Remove markdown code blocks if present
+      content = content.replace(/```html\n?/g, "").replace(/```\n?/g, "");
+      return content;
+    }
+
+    throw new Error("Unexpected response format from OpenAI");
+  } catch (error) {
+    console.error("Error translating to Bengali:", error);
+    throw error;
+  }
+}
+
+/**
+ * Convert English numerals to Bengali numerals
+ */
+export function convertTobengaliNumerals(
+  englishNumber: number | string
+): string {
+  const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+
+  const numberStr = String(englishNumber);
+  return numberStr
+    .split("")
+    .map((digit) => {
+      const num = parseInt(digit);
+      return isNaN(num) ? digit : bengaliNumerals[num];
+    })
+    .join("");
 }
