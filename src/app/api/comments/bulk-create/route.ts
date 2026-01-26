@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import fetchApi from "@/lib/fetchApi";
-import { apiEndpoints } from "@/lib/constants";
 import { cookies } from "next/headers";
 import { translateCommentsTobengali } from "@/lib/openai-service";
 
@@ -72,9 +71,9 @@ export async function POST(request: NextRequest) {
 
     for (const comment of comments) {
       try {
-        // Save the main comment
-        console.log(`[DEBUG] Saving comment: ${comment.username} - ${comment.comment.substring(0, 30)}...`);
-        const response = await fetchApi(apiEndpoints.createComment(), {
+        // Save the main comment (create or update)
+        console.log(`[DEBUG] Saving/updating comment: ${comment.username} - ${comment.comment.substring(0, 30)}...`);
+        const response = await fetchApi("/comments/upsert", {
           method: "POST",
           accessToken,
           body: {

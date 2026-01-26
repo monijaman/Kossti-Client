@@ -26,6 +26,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [loading, setLoading] = useState(false);
     const [commentLoading, setCommentLoading] = useState(false);
     const [commentStatus, setCommentStatus] = useState('');
+    const [translateLoading, setTranslateLoading] = useState(false);
+    const [translateStatus, setTranslateStatus] = useState('');
 
     // Debug log for submitStatus changes
     useEffect(() => {
@@ -160,6 +162,46 @@ const ProductForm = ({ product }: ProductFormProps) => {
             );
         } finally {
             setCommentLoading(false);
+        }
+    };
+
+    // Handle translating existing comments
+    const handleTranslateComments = async () => {
+        if (!product?.id) {
+            setTranslateStatus('Error: Product not found');
+            return;
+        }
+
+        setTranslateLoading(true);
+        setTranslateStatus('');
+
+        try {
+            console.log('[DEBUG] Starting comment translation process...');
+
+            // Call API to translate comments and save to comment_translations
+            const response = await fetch('/api/comments/bulk-translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: product.id }),
+            });
+
+            const data = await response.json();
+            console.log('[DEBUG] Bulk translate response:', data);
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to translate comments');
+            }
+
+            setTranslateStatus(`✅ Successfully translated and saved ${data.translatedCount || 0} comments to comment_translations!`);
+        } catch (error) {
+            console.error('Error translating comments:', error);
+            setTranslateStatus(
+                `❌ Error: ${error instanceof Error ? error.message : 'Failed to translate comments'}`
+            );
+        } finally {
+            setTranslateLoading(false);
         }
     };
 
@@ -421,6 +463,18 @@ const ProductForm = ({ product }: ProductFormProps) => {
                                 {commentLoading ? 'Pulling Comments...' : 'Pull Comments'}
                             </button>
                         )}
+
+                        {/* Translate Comments Button - Only show if product exists */}
+                        {product?.id && (
+                            <button
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button"
+                                onClick={handleTranslateComments}
+                                disabled={translateLoading}
+                            >
+                                {translateLoading ? 'Translating...' : 'Translate Comments'}
+                            </button>
+                        )}
                     </div>
 
                     {/* Comment Status Message */}
@@ -433,6 +487,19 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             role="alert"
                         >
                             {commentStatus}
+                        </div>
+                    )}
+
+                    {/* Translate Status Message */}
+                    {translateStatus && (
+                        <div
+                            className={`p-4 mt-4 text-sm rounded-lg border ${translateStatus.toLowerCase().includes('successfully') || translateStatus.toLowerCase().includes('success')
+                                ? 'text-green-700 bg-green-100 border-green-300'
+                                : 'text-red-700 bg-red-100 border-red-300'
+                                }`}
+                            role="alert"
+                        >
+                            {translateStatus}
                         </div>
                     )}
 
