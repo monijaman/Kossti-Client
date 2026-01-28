@@ -63,8 +63,8 @@ const BrandDetails = ({ brands }: PageProps) => {
       console.log('API Response:', response);
       
       if (response.success && response.data) {
-        // The API returns { data: [...], success: true }, so we need response.data.data
-        const products = Array.isArray(response.data.data) ? response.data.data : [];
+        // response.data is already the array of MarketProduct[]
+        const products = Array.isArray(response.data) ? response.data : [];
         console.log('Setting products:', products);
         setMarketProducts(products);
       } else {

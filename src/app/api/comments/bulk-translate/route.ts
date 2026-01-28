@@ -86,7 +86,16 @@ export async function POST(request: NextRequest) {
 
     try {
       console.log(`[DEBUG] Translating ${commentsList.length} comments to Bengali`);
-      const translatedComments = await translateCommentsTobengali(commentsList);
+      
+      // Map comments to AIComment format with required fields
+      const commentsForTranslation = commentsList.map(comment => ({
+        username: comment.username || 'Anonymous',
+        location: comment.location || '',
+        comment: comment.comment,
+        sourceUrl: comment.sourceUrl || '',
+      }));
+      
+      const translatedComments = await translateCommentsTobengali(commentsForTranslation);
       console.log(`[DEBUG] Translated comments:`, translatedComments);
 
       // Create a map of original English text to Bengali translation
