@@ -4,6 +4,7 @@ import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { generateProductSpecifications } from "@/lib/openai-service";
+import Modal from '@/app/components/Modal/client';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 
@@ -29,6 +30,8 @@ const Specification = ({ params }: PageProps) => {
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false);
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+    const [aiPrompt, setAiPrompt] = useState<string>('');
 
     // Debug log for submitStatus changes
     useEffect(() => {
@@ -63,13 +66,20 @@ const Specification = ({ params }: PageProps) => {
 
     // Function to generate AI specifications
     const handleAISpecifications = async () => {
+        setIsAIModalOpen(true);
+    };
+
+    // Function to generate AI specifications with custom prompt
+    const generateAIWithPrompt = async () => {
         if (!productName || specKeys.length === 0) {
             setSubmitStatus('Product name or specification keys not available');
+            setIsAIModalOpen(false);
             return;
         }
 
         setAiLoading(true);
         setSubmitStatus('');
+        setIsAIModalOpen(false);
 
         try {
             // Get only the specification keys that are currently selected in the form
@@ -85,7 +95,12 @@ const Specification = ({ params }: PageProps) => {
                 return;
             }
 
-            const aiSpecs = await generateProductSpecifications(productName, selectedSpecKeys);
+            // Add custom prompt to the generation if provided
+            const enhancedProductName = aiPrompt 
+                ? `${productName}. Additional context: ${aiPrompt}`
+                : productName;
+
+            const aiSpecs = await generateProductSpecifications(enhancedProductName, selectedSpecKeys);
 
             // Update specifications with AI-generated values
             const updatedSpecs = specifications.map(spec => {
@@ -261,6 +276,45 @@ const Specification = ({ params }: PageProps) => {
             <div className="w-1/2">
                 <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={ specifications} />
             </div>
+
+            {/* AI Prompt Modal */}
+            <Modal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)}>
+                <div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">🤖 Generate Specifications with AI</h3>
+                    
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Additional Context (Optional)
+                        </label>
+                        <textarea
+                            value={aiPrompt}
+                            onChange={(e) => setAiPrompt(e.target.value)}
+                            placeholder="Enter any additional context or requirements for the AI to consider when generating specifications. For example: 'High-end gaming laptop', 'Budget friendly device', 'For professional photography', etc."
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            rows={6}
+                        />
+                        <p className="mt-2 text-sm text-gray-500">
+                            This helps the AI generate more relevant and tailored specifications for your product.
+                        </p>
+                    </div>
+
+                    <div className="flex gap-4 justify-end">
+                        <button
+                            onClick={() => setIsAIModalOpen(false)}
+                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={generateAIWithPrompt}
+                            disabled={aiLoading}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {aiLoading ? 'Generating...' : 'Generate Specifications'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

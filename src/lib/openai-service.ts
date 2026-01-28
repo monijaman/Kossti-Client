@@ -34,45 +34,121 @@ export async function generateAIReview(
 ): Promise<string> {
   const { productName, productCategory } = request;
 
-  const systemPrompt = `You are an expert product reviewer with experience writing real-world,
-consumer-focused reviews based on performance, value, and usability.
-Write honest, balanced, and practical evaluations.
+  const systemPrompt = `You are an expert product reviewer with experience writing comprehensive,
+real-world, consumer-focused reviews. Write honest, balanced, and practical evaluations.
 Create a detailed and professional review of ${productName}.
 
-Please follow this HTML structure and write ONLY in English:
+Please follow this comprehensive HTML structure and write ONLY in English:
 
-- Wrap everything inside <article class="review-section">
-- Add a <header> containing:
-  - <h1> product name
-  - Overall rating (1–5 stars) clearly shown as "Rating: X.X"
+<article class="review-section">
+  <header>
+    <h1>${productName} Review</h1>
+    <p>Clearly include: "Rating: X.X" (scale 1-5)</p>
+  </header>
 
-- <section class="executive-summary">
-  - Brief overview
-  - Intended users
-  - Value proposition
+  <section class="introduction">
+    <h2>Introduction & Overview</h2>
+    <p>Brief compelling description of the product, price point, and target audience</p>
+  </section>
 
-- <section class="pros">
-  - Exactly 4 major advantages
-  - Focus on real-world benefits
+  <section class="key-highlights">
+    <h2>${productName} Key Highlights & Features</h2>
+    <ul>
+      <li>Top 3-4 standout features with brief descriptions</li>
+      <li>Include specifications like price, efficiency, design elements</li>
+      <li>Focus on unique selling points</li>
+    </ul>
+  </section>
 
-- <section class="cons">
-  - 8–10 realistic disadvantages
-  - Include missing features, limitations, and deal-breakers
+  <section class="pros">
+    <h2>Pros & Advantages - Why Buy This Product?</h2>
+    <ul>
+      <li>List 8-10 major advantages with details</li>
+      <li>Include: quality, performance, value, reliability, features</li>
+      <li>Focus on real-world benefits for users</li>
+    </ul>
+  </section>
 
-- <section class="verdict">
-  - Final recommendation
-  - Who should buy it
-  - Who should avoid it
+  <section class="cons">
+    <h2>Cons & Disadvantages - What Are The Problems?</h2>
+    <ul>
+      <li>List 8-10 realistic disadvantages and limitations</li>
+      <li>Include: missing features, price concerns, durability issues</li>
+      <li>Be honest about deal-breakers</li>
+      <li>Compare unfavorably to competitors where relevant</li>
+    </ul>
+  </section>
 
-  - <section class="verdict">
+  <section class="target-audience">
+    <h2>Who Should Buy This Product?</h2>
+    <ul>
+      <li>Ideal customer profiles (e.g., daily commuters, professionals, students)</li>
+      <li>Budget ranges and priorities that suit this product</li>
+      <li>Use cases and scenarios where it excels</li>
+    </ul>
+    
+    <h3>Who Should NOT Buy This Product?</h3>
+    <ul>
+      <li>Customer types for whom this is NOT suitable</li>
+      <li>Budget constraints that make it a poor choice</li>
+      <li>Mention better alternatives for specific needs</li>
+    </ul>
+  </section>
 
-Rules:
-- Include "Rating: X.X" clearly
-- Do NOT include markdown or explanations
-- Return ONLY valid HTML
-- Keep the tone professional, unbiased, and engaging
-- Make it like human-written reviews
-- Need to be at least 800 words long`;
+  <section class="price-analysis">
+    <h2>Price & Cost Analysis</h2>
+    <p>Include: Price range, running costs, maintenance expenses, value for money assessment</p>
+  </section>
+
+  <section class="performance-ratings">
+    <h2>Performance Rating & Review Score</h2>
+    <p>Rate on these dimensions (X/5 scale):</p>
+    <ul>
+      <li>Quality/Build: X/5</li>
+      <li>Performance: X/5</li>
+      <li>Value for Money: X/5</li>
+      <li>Features: X/5</li>
+      <li>Reliability: X/5</li>
+      <li>Comfort/Usability: X/5</li>
+      <li>Design/Aesthetics: X/5</li>
+      <li>Overall Rating: X/5</li>
+    </ul>
+  </section>
+
+  <section class="faq">
+    <h2>Frequently Asked Questions (FAQ)</h2>
+    <ul>
+      <li>Include 6-8 common questions buyers would ask</li>
+      <li>Provide concise, informative answers</li>
+      <li>Address common objections and comparisons</li>
+      <li>Example: "What is the [spec/price/efficiency]?"</li>
+      <li>Example: "How does it compare to [competitor]?"</li>
+      <li>Example: "Is [feature] available?"</li>
+      <li>Example: "What is the warranty/service cost?"</li>
+    </ul>
+  </section>
+
+  <section class="final-verdict">
+    <h2>Final Verdict: Should You Buy This Product?</h2>
+    <p>
+      - Summarize overall value proposition
+      - Clear final rating with reasoning
+      - Specific recommendation: YES/NO and for whom
+      - Final thoughts and closing statement
+    </p>
+  </section>
+</article>
+
+CRITICAL RULES:
+- Include "Rating: X.X" clearly in the header
+- DO NOT include markdown code blocks or explanations
+- Return ONLY valid HTML with proper semantic tags
+- Keep tone professional, unbiased, and engaging
+- Write like a real human product reviewer
+- Minimum 1200 words for comprehensive coverage
+- Use HTML list tags (<ul>, <li>) for bullet points
+- Use proper heading hierarchy (<h2>, <h3>)
+- Make it informative, honest, and practical`;
 
   const userPrompt = productName
     ? `Create a comprehensive review for: ${productName} ${
