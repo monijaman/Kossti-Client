@@ -9,7 +9,7 @@ import '../globals.scss';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Viper Front',
+  title: 'Kossti - Review Platform',
   description: 'By Monir',
 };
 
