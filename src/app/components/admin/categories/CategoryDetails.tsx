@@ -44,28 +44,6 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
     }
   };
 
-  // Sort categories based on current sort settings
-  const sortedCategories = [...categoryList].sort((a, b) => {
-    if (currentSortBy === 'name') {
-      const aName = a.name || '';
-      const bName = b.name || '';
-      if (currentSortOrder === 'asc') {
-        return aName.localeCompare(bName);
-      } else {
-        return bName.localeCompare(aName);
-      }
-    } else if (currentSortBy === 'status') {
-      const aStatus = a.status ? 1 : 0;
-      const bStatus = b.status ? 1 : 0;
-      if (currentSortOrder === 'asc') {
-        return aStatus - bStatus;
-      } else {
-        return bStatus - aStatus;
-      }
-    }
-    return 0;
-  });
-
   useEffect(() => {
     setCategoryList(Array.isArray(categories) ? categories : []);
   }, [categories]);
@@ -102,7 +80,7 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
           </tr>
         </thead>
         <tbody>
-          {sortedCategories?.map((category) => (
+          {categoryList?.map((category) => (
             <tr key={category.id} className="border-b hover:bg-gray-100">
               <td className="py-2 px-4 text-sm">{category.id}</td>
               <td className="py-2 px-4 text-sm">{category.name}</td>

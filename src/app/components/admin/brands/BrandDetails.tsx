@@ -49,12 +49,24 @@ const BrandDetails = ({ brands }: PageProps) => {
     setLoadingMarket(true);
     try {
       const response = await fetchApi<MarketProduct[]>(apiEndpoints.getMarketProducts);
+      console.log('API Response:', response);
+      console.log('Response data:', response.data);
+      console.log('Is data an array?', Array.isArray(response.data));
+      
       if (response.success && response.data) {
-        setMarketProducts(response.data);
+        // Ensure response.data is an array
+        const products = Array.isArray(response.data) ? response.data : [];
+        console.log('Setting products:', products);
+        setMarketProducts(products);
         setShowMarketProducts(true);
+      } else {
+        alert(`Failed to fetch market products: ${response.error || 'Unknown error'}`);
+        setMarketProducts([]); // Reset to empty array on error
       }
     } catch (error) {
       console.error('Error fetching market products:', error);
+      alert('Error fetching market products. Please check if the server is running.');
+      setMarketProducts([]); // Reset to empty array on error
     } finally {
       setLoadingMarket(false);
     }
@@ -62,23 +74,25 @@ const BrandDetails = ({ brands }: PageProps) => {
 
   const importProduct = async (product: MarketProduct) => {
     try {
+      const productData = {
+        name: product.name,
+        description: product.description,
+        price: product.price || 99.99,
+        category_id: product.category_id || 1,
+        brand_id: 1, // Default brand, could be made dynamic
+        status: true,
+      };
+
       const response = await fetchApi(apiEndpoints.createProduct, {
         method: 'POST',
-        body: {
-          name: product.name,
-          description: product.description,
-          // Add other necessary fields, assuming defaults or from product
-          price: product.price || 0,
-          category_id: product.category_id || 1, // Default category
-          brand_id: 1, // Perhaps the current brand? But since it's in brand page, maybe not.
-          status: true,
-        },
+        body: productData,
       });
+
       if (response.success) {
-        alert('Product imported successfully');
-        // Optionally remove from market products or refresh
+        alert('Product imported successfully!');
+        // Optionally refresh the market products or remove the imported one
       } else {
-        alert('Failed to import product');
+        alert(`Failed to import product: ${response.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error importing product:', error);
@@ -143,7 +157,7 @@ const BrandDetails = ({ brands }: PageProps) => {
         </tbody>
       </table>
 
-      {showMarketProducts && (
+      {showMarketProducts && Array.isArray(marketProducts) && marketProducts.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">New Products Available in Market</h3>
           <table className="min-w-full bg-white border-collapse border border-gray-300">
@@ -156,23 +170,39 @@ const BrandDetails = ({ brands }: PageProps) => {
               </tr>
             </thead>
             <tbody>
-              {marketProducts.map((product, index) => (
-                <tr key={index} className="border-b hover:bg-gray-100">
-                  <td className="py-2 px-4 text-sm">{product.name}</td>
-                  <td className="py-2 px-4 text-sm">{product.description}</td>
-                  <td className="py-2 px-4 text-sm">{product.type}</td>
-                  <td className="py-2 px-4">
-                    <button
-                      className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-                      onClick={() => importProduct(product)}
-                    >
-                      Import this Product
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {(() => {
+                console.log('Rendering marketProducts:', marketProducts);
+                console.log('Is marketProducts an array?', Array.isArray(marketProducts));
+                return Array.isArray(marketProducts) && marketProducts.map((product, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-100">
+                    <td className="py-2 px-4 text-sm">{product.name}</td>
+                    <td className="py-2 px-4 text-sm">{product.description}</td>
+                    <td className="py-2 px-4 text-sm">{product.type}</td>
+                    <td className="py-2 px-4">
+                      <button
+                        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                        onClick={() => importProduct(product)}
+                      >
+                        Import this Product
+                      </button>
+                    </td>
+                  </tr>
+                ));
+              })()}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {showMarketProducts && loadingMarket && (
+        <div className="mt-8 text-center">
+          <p className="text-lg text-gray-500">Loading market products...</p>
+        </div>
+      )}
+
+      {showMarketProducts && !loadingMarket && Array.isArray(marketProducts) && marketProducts.length === 0 && (
+        <div className="mt-8 text-center">
+          <p className="text-lg text-gray-500">No market products available.</p>
         </div>
       )}
     </div>
