@@ -23,6 +23,7 @@ export interface AIReviewRequest {
   productName: string;
   productCategory?: string;
   locale: "en" | "bn";
+  customPrompt?: string;
 }
 
 /**
@@ -32,7 +33,7 @@ export interface AIReviewRequest {
 export async function generateAIReview(
   request: AIReviewRequest
 ): Promise<string> {
-  const { productName, productCategory } = request;
+  const { productName, productCategory, customPrompt } = request;
 
   const systemPrompt = `You are an expert product reviewer with experience writing comprehensive,
 real-world, consumer-focused reviews. Write honest, balanced, and practical evaluations.
@@ -150,11 +151,9 @@ CRITICAL RULES:
 - Use proper heading hierarchy (<h2>, <h3>)
 - Make it informative, honest, and practical`;
 
-  const userPrompt = productName
-    ? `Create a comprehensive review for: ${productName} ${
-        productCategory ? ` (Category: ${productCategory})` : ""
-      }`
-    : "";
+  const userPrompt = customPrompt
+    ? `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ''}\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
+    : `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}`;
 
   try {
     const client = getOpenAIClient();

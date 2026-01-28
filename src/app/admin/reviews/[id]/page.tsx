@@ -245,15 +245,11 @@ const ReviewForm = ({ params }: PageProps) => {
             }
 
             // Generate review using OpenAI with product details and custom prompt
-            const enhancedProductName = aiReviewPrompt 
-                ? `${products.name}. Additional context: ${aiReviewPrompt}`
-                : products.name;
-
-            // Generate review using OpenAI with product details
             const aiReviewContent = await generateAIReview({
-                productName: enhancedProductName,
+                productName: products.name,
                 productCategory: products.category_slug || '',
                 locale: 'en',
+                customPrompt: aiReviewPrompt || undefined,
             });
 
 
