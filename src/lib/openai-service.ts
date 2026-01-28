@@ -117,34 +117,6 @@ Rules:
 }
 
 /**
- * Format AI review as HTML article following the template structure
- */
-export function formatReviewAsHTML(
-  reviewContent: string,
-  productName: string,
-  locale: string
-): string {
-  const lang = locale === "bn" ? "bn" : "en";
-
-  // Wrap the content in article tags with proper structure
-  const htmlTemplate = `<!DOCTYPE html>
-<html lang="${lang}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${productName} Review</title>
-</head>
-<body>
-    <article class="ai-review review-section">
-        ${reviewContent}
-    </article>
-</body>
-</html>`;
-
-  return htmlTemplate;
-}
-
-/**
  * Extract rating from AI-generated review content
  */
 export function extractRatingFromReview(reviewContent: string): number {
@@ -261,7 +233,7 @@ Each comment should include:
 1. A realistic username (first name or nickname)
 2. A location (city, country)
 3. A genuine-sounding comment (1-3 sentences, max 150 chars)
-4. A source URL (can be from Amazon, YouTube, Reddit, product forum, or review site)
+4. A source URL from one of these platforms: https://www.amazon.com, https://www.reddit.com, https://www.facebook.com, https://www.trustpilot.com, https://www.youtube.com, https://www.productreview.com.au
 
 The comments should be:
 - Varied in sentiment (positive, neutral, some critical)
@@ -275,7 +247,19 @@ Return ONLY a valid JSON array with this structure:
     "username": "John",
     "location": "New York, USA",
     "comment": "Great quality, arrived fast. Exactly what I needed.",
-    "sourceUrl": "https://www.amazon.com/..."
+    "sourceUrl": "https://www.amazon.com"
+  },
+  {
+    "username": "Sarah",
+    "location": "London, UK",
+    "comment": "Good product but shipping took longer than expected.",
+    "sourceUrl": "https://www.reddit.com"
+  },
+  {
+    "username": "Mike",
+    "location": "Toronto, Canada",
+    "comment": "Love it! Recommended to all my friends.",
+    "sourceUrl": "https://www.facebook.com"
   }
 ]
 
@@ -290,7 +274,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
         {
           role: "system",
           content:
-            "You are a data generator that creates realistic product comments. Return ONLY valid JSON, no markdown, no explanations.",
+            "You are a data generator that creates realistic product comments. Use only the base URLs provided (amazon.com, reddit.com, facebook.com, trustpilot.com, youtube.com, productreview.com.au). Return ONLY valid JSON, no markdown, no explanations.",
         },
         {
           role: "user",
@@ -312,16 +296,194 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
       .trim();
 
     // Parse JSON response
-    const comments: AIComment[] = JSON.parse(content);
+    let comments: AIComment[] = JSON.parse(content);
 
     if (!Array.isArray(comments) || comments.length === 0) {
       throw new Error("Invalid comments format");
     }
 
+    // Post-process: Validate URLs - keep only valid ones, empty out invalid ones
+    comments = comments.map((comment) => {
+      // Check if URL is valid (starts with http/https)
+      if (comment.sourceUrl && !comment.sourceUrl.startsWith("http")) {
+        // Invalid URL, set to empty
+        comment.sourceUrl = "";
+      }
+      return comment;
+    });
+
     return comments;
   } catch (error) {
     console.error("Error generating comments:", error);
     throw error;
+  }
+}
+
+/**
+ * Generate product specifications using OpenAI
+ * Returns an object mapping specification keys to values
+ */
+export async function generateProductSpecifications(
+  productName: string,
+  specKeys: string[]
+): Promise<Record<string, string>> {
+  if (!productName || !specKeys.length) {
+    throw new Error("Product name and specification keys are required");
+  }
+
+  const client = getOpenAIClient();
+
+  const prompt = `Generate realistic specifications for the product: "${productName}"
+
+Based on these specification categories: ${specKeys.join(", ")}
+
+For each category, provide a realistic value that would be typical for this type of product. Be specific and accurate.
+
+Return ONLY a valid JSON object with specification keys as properties and their values as strings:
+{
+  "Display Size": "6.5 inches",
+  "Battery Capacity": "5000 mAh",
+  "Processor": "Qualcomm Snapdragon 8 Gen 2",
+  "RAM": "8GB",
+  "Storage": "128GB",
+  "Camera": "64MP main + 12MP ultra-wide",
+  "Operating System": "Android 13",
+  "Weight": "180 grams"
+}
+
+IMPORTANT: 
+- Return ONLY valid JSON object
+- Use the exact specification key names provided
+- Provide realistic values for the product type
+- Values should be strings`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 2000,
+      temperature: 0.6,
+      messages: [
+        {
+          role: "system",
+          content: "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const specs: Record<string, string> = JSON.parse(content);
+
+    if (typeof specs !== "object" || specs === null) {
+      throw new Error("Invalid specifications format");
+    }
+
+    return specs;
+  } catch (error) {
+    console.error("Error generating specifications:", error);
+    throw error;
+  }
+}
+
+/**
+ * Translate specification values to Bengali
+ * Takes an array of specification objects and returns them with Bengali translations
+ */
+export async function translateSpecificationsToBengali(
+  specifications: Array<{ key: string; value: string }>
+): Promise<Array<{ key: string; value: string; translatedKey?: string; translatedValue?: string }>> {
+  if (!specifications.length) {
+    throw new Error("No specifications to translate");
+  }
+
+  const client = getOpenAIClient();
+
+  // Create a formatted list of specifications to translate
+  const specsText = specifications
+    .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
+    .join('\n');
+
+  const prompt = `Translate these product specifications from English to Bengali. Keep the format and structure intact.
+
+English specifications:
+${specsText}
+
+Return ONLY a valid JSON array where each object has the translated key and value.
+Format: [{"translatedKey": "translated key name", "translatedValue": "translated value"}, ...]
+
+IMPORTANT: 
+- Return ONLY valid JSON array
+- Translate both the specification key names and their values
+- Maintain technical accuracy for specs like dimensions, capacity, etc.
+- Keep the same number of items as input`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 2000,
+      temperature: 0.3,
+      messages: [
+        {
+          role: "system",
+          content: "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const translations: Array<{ translatedKey: string; translatedValue: string }> = JSON.parse(content);
+
+    if (!Array.isArray(translations) || translations.length !== specifications.length) {
+      throw new Error("Invalid translations format or length mismatch");
+    }
+
+    // Attach translations to original specifications
+    const translatedSpecs = specifications.map((spec, index) => ({
+      ...spec,
+      translatedKey: translations[index]?.translatedKey || spec.key,
+      translatedValue: translations[index]?.translatedValue || spec.value,
+    }));
+
+    return translatedSpecs;
+  } catch (error) {
+    console.error("Error translating specifications to Bengali:", error);
+    // Return original specs with empty translations if translation fails
+    return specifications.map(spec => ({
+      ...spec,
+      translatedKey: spec.key,
+      translatedValue: spec.value,
+    }));
   }
 }
 

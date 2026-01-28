@@ -6,9 +6,15 @@ import { useEffect, useState } from 'react';
 
 interface PageProps {
   categories: Category[];
+  onSort?: (sortBy: SortField, sortOrder: SortOrder) => void;
+  currentSortBy?: SortField;
+  currentSortOrder?: SortOrder;
 }
 
-const CategoryDetails = ({ categories }: PageProps) => {
+type SortField = 'name' | 'status';
+type SortOrder = 'asc' | 'desc';
+
+const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSortOrder = 'asc' }: PageProps) => {
   // Always initialize with an array
   const [categoryList, setCategoryList] = useState<Category[]>(Array.isArray(categories) ? categories : []);
 
@@ -30,6 +36,36 @@ const CategoryDetails = ({ categories }: PageProps) => {
     }
   };
 
+  // Sorting handler
+  const handleSort = (field: SortField) => {
+    const newSortOrder = currentSortBy === field && currentSortOrder === 'asc' ? 'desc' : 'asc';
+    if (onSort) {
+      onSort(field, newSortOrder);
+    }
+  };
+
+  // Sort categories based on current sort settings
+  const sortedCategories = [...categoryList].sort((a, b) => {
+    if (currentSortBy === 'name') {
+      const aName = a.name || '';
+      const bName = b.name || '';
+      if (currentSortOrder === 'asc') {
+        return aName.localeCompare(bName);
+      } else {
+        return bName.localeCompare(aName);
+      }
+    } else if (currentSortBy === 'status') {
+      const aStatus = a.status ? 1 : 0;
+      const bStatus = b.status ? 1 : 0;
+      if (currentSortOrder === 'asc') {
+        return aStatus - bStatus;
+      } else {
+        return bStatus - aStatus;
+      }
+    }
+    return 0;
+  });
+
   useEffect(() => {
     setCategoryList(Array.isArray(categories) ? categories : []);
   }, [categories]);
@@ -40,13 +76,33 @@ const CategoryDetails = ({ categories }: PageProps) => {
         <thead>
           <tr className="text-left border-b">
             <th className="py-3 px-4 text-lg font-medium text-gray-700">ID</th>
-            <th className="py-3 px-4 text-lg font-medium text-gray-700">Name</th>
-            <th className="py-3 px-4 text-lg font-medium text-gray-700">Status</th>
+            <th
+              className="py-3 px-4 text-lg font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none"
+              onClick={() => handleSort('name')}
+            >
+              Name
+              {currentSortBy === 'name' && (
+                <span className="ml-2">
+                  {currentSortOrder === 'asc' ? '↑' : '↓'}
+                </span>
+              )}
+            </th>
+            <th
+              className="py-3 px-4 text-lg font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none"
+              onClick={() => handleSort('status')}
+            >
+              Status
+              {currentSortBy === 'status' && (
+                <span className="ml-2">
+                  {currentSortOrder === 'asc' ? '↑' : '↓'}
+                </span>
+              )}
+            </th>
             <th className="py-3 px-4 text-lg font-medium text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {categoryList?.map((category) => (
+          {sortedCategories?.map((category) => (
             <tr key={category.id} className="border-b hover:bg-gray-100">
               <td className="py-2 px-4 text-sm">{category.id}</td>
               <td className="py-2 px-4 text-sm">{category.name}</td>

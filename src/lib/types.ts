@@ -276,3 +276,13 @@ export interface VideoItem {
   title: string;
   youtubeUrl?: string; // Optional property to resolve the issue
 }
+
+export interface MarketProduct {
+  name: string;
+  description: string;
+  type: string;
+  // Add other fields as necessary for import
+  price?: number;
+  category_id?: number;
+  brand_id?: number;
+}

@@ -2,8 +2,9 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
+import { translateSpecificationsToBengali } from '@/lib/openai-service';
 type SubmitSpecResponse = {
     success: boolean;
     data?: {
@@ -43,6 +44,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     // Removed unused translatedSpecifications state
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
+    const [translationLoading, setTranslationLoading] = useState(false);
 
     const tranlatedSpecification = async () => {
         if (productId) {
@@ -78,7 +80,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
         return [];
     }
 
-    const fetchAndProcess =  async () => {
+    const fetchAndProcess = useCallback(async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
         console.log('Fetched Specifications:', fetchedSpecifications);
@@ -105,11 +107,11 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
             setTranSpecifications(transSpec);
         }
-    }
+    }, [specifications, specKeys, selectedLocale]);
 
     useEffect(() => {
         fetchAndProcess();
-    }, [specifications, selectedLocale, specKeys]);
+    }, [fetchAndProcess]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -166,6 +168,57 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                 values[index]['translated_value'] = value;
             }
             setTranSpecifications(values);
+        }
+    };
+
+    // Function to handle AI translation to Bangla
+    const handleTranslateToBangla = async () => {
+        if (!specifications || !specKeys) {
+            setFormStatus('No specifications available to translate');
+            return;
+        }
+
+        setTranslationLoading(true);
+        setFormStatus('');
+
+        try {
+            // Prepare specifications for translation
+            const specsToTranslate = specifications.map(spec => {
+                const keyObj = specKeys.find(key => key.id === spec.specification_key_id);
+                return {
+                    key: keyObj?.specification_key || 'Unknown',
+                    value: spec.value || ''
+                };
+            }).filter(spec => spec.value.trim() !== ''); // Only translate specs with values
+
+            if (specsToTranslate.length === 0) {
+                setFormStatus('No specification values to translate');
+                return;
+            }
+
+            // Translate using AI
+            const translatedSpecs = await translateSpecificationsToBengali(specsToTranslate);
+
+            // Update the tranSpecifications state with translated values
+            const updatedTranSpecs = tranSpecifications.map((tranSpec, index) => {
+                const translated = translatedSpecs[index];
+                if (translated) {
+                    return {
+                        ...tranSpec,
+                        translated_key: translated.translatedKey || tranSpec.translated_key,
+                        translated_value: translated.translatedValue || tranSpec.translated_value
+                    };
+                }
+                return tranSpec;
+            });
+
+            setTranSpecifications(updatedTranSpecs);
+            setFormStatus('Specifications translated to Bangla successfully');
+        } catch (error) {
+            console.error('Error translating to Bangla:', error);
+            setFormStatus('Failed to translate specifications to Bangla');
+        } finally {
+            setTranslationLoading(false);
         }
     };
 
@@ -237,7 +290,16 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
             ))}
 
             <div className="flex justify-between">
-
+                {selectedLocale === 'bn' && (
+                    <button
+                        type="button"
+                        onClick={handleTranslateToBangla}
+                        disabled={translationLoading}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed mr-4"
+                    >
+                        {translationLoading ? 'Translating...' : '🌐 Translate to Bangla'}
+                    </button>
+                )}
                 <button
                     type="submit"
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"

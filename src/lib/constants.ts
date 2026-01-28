@@ -28,6 +28,7 @@ export const apiEndpoints = {
   createProduct: "/products",
   getProductById: (id: number | string) => `/products/${id}`,
   updateProduct: (id: number | string) => `/products/${id}`,
+  getMarketProducts: "/market-products",
   getProductBySlug: (slug: string) => `/products-by-slug/${slug}`,
   getPopularProducts: "/popular-products",
   incrementProductViews: (id: number | string) =>

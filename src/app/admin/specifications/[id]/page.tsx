@@ -3,6 +3,7 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
+import { generateProductSpecifications } from "@/lib/openai-service";
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 
@@ -27,6 +28,7 @@ const Specification = ({ params }: PageProps) => {
     const [productName, setProductName] = useState<string>('');
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
 
     // Debug log for submitStatus changes
     useEffect(() => {
@@ -58,6 +60,54 @@ const Specification = ({ params }: PageProps) => {
     };
 
     // Function to handle adding more specifications
+
+    // Function to generate AI specifications
+    const handleAISpecifications = async () => {
+        if (!productName || specKeys.length === 0) {
+            setSubmitStatus('Product name or specification keys not available');
+            return;
+        }
+
+        setAiLoading(true);
+        setSubmitStatus('');
+
+        try {
+            // Get only the specification keys that are currently selected in the form
+            const selectedSpecKeys = specifications
+                .map(spec => {
+                    const keyObj = specKeys.find(key => key.id === spec.specification_key_id);
+                    return keyObj ? keyObj.specification_key : null;
+                })
+                .filter(key => key !== null) as string[];
+
+            if (selectedSpecKeys.length === 0) {
+                setSubmitStatus('No specification keys selected in the form');
+                return;
+            }
+
+            const aiSpecs = await generateProductSpecifications(productName, selectedSpecKeys);
+
+            // Update specifications with AI-generated values
+            const updatedSpecs = specifications.map(spec => {
+                const keyObj = specKeys.find(key => key.id === spec.specification_key_id);
+                if (keyObj && aiSpecs[keyObj.specification_key]) {
+                    return {
+                        ...spec,
+                        value: aiSpecs[keyObj.specification_key]
+                    };
+                }
+                return spec;
+            });
+
+            setSpecifications(updatedSpecs);
+            setSubmitStatus('AI specifications generated successfully');
+        } catch (error) {
+            console.error('Error generating AI specifications:', error);
+            setSubmitStatus('Failed to generate AI specifications');
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -95,7 +145,7 @@ const Specification = ({ params }: PageProps) => {
         } catch (error) {
             console.error("Error fetching specifications:", error);
         }
-    }, []);
+    }, [getSpecificationsKeys]);
 
 
     // fetch all specificatiosn for dropdown option
@@ -122,12 +172,12 @@ const Specification = ({ params }: PageProps) => {
             console.error("Error fetching specifications:", error);
             setSpecifications([]);
         }
-    }, [id]);
+    }, [id, getSpecifications]);
 
     useEffect(() => {
         fetchSpecificationKeys();
         fetchSpecifications();
-    }, []);
+    }, [fetchSpecificationKeys, fetchSpecifications]);
 
     return (
 
@@ -173,13 +223,14 @@ const Specification = ({ params }: PageProps) => {
                         ))}
 
                         <div className="flex justify-between">
-                            {/* <button
+                            <button
                                 type="button"
-                                onClick={addMoreSpecifications}
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                onClick={handleAISpecifications}
+                                disabled={aiLoading || loading}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Add More
-                            </button> */}
+                                {aiLoading ? 'Generating...' : '🤖 AI Specifications'}
+                            </button>
                             <button
                                 type="submit"
                                 disabled={loading}
