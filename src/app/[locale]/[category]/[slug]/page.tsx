@@ -1,14 +1,40 @@
 import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import ProductPhotosPage from '@/app/components/reviews/ProductPhotos';
-import ProductVideos from '@/app/components/reviews/ProductVideos';
-import SimilarProducts from '@/app/components/Products/SimilarProducts';
 import SearchBox from '@/app/components/Search';
 import { DEFAULT_LOCALE, SITE_URL, SITE_NAME, OG_IMAGE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { Metadata } from 'next';
+import { Suspense, lazy } from 'react';
+
+// Lazy load non-critical components for better performance while keeping SEO-critical content server-rendered
+const ProductVideos = lazy(() => import('@/app/components/reviews/ProductVideos'));
+const SimilarProducts = lazy(() => import('@/app/components/Products/SimilarProducts'));
+
+// Skeleton loaders for lazy components
+const ProductVideosSkeleton = () => (
+  <div className="mb-8">
+    <h2 className="text-2xl font-bold mb-4">Product Videos</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[1, 2].map(i => (
+        <div key={i} className="h-64 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
+      ))}
+    </div>
+  </div>
+);
+
+const SimilarProductsSkeleton = () => (
+  <div className="mb-8">
+    <h2 className="text-2xl font-bold mb-4">Similar Products</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[1, 2, 3, 4, 5, 6].map(i => (
+        <div key={i} className="h-64 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
+      ))}
+    </div>
+  </div>
+);
 
 interface PageProps {
   params: Promise<{
@@ -171,10 +197,19 @@ const Page = async ({ params, searchParams }: PageProps) => {
         {dataset.brand && ` - ${dataset.brand_slug}`}
         {dataset.category && ` - ${dataset.category.name}`}
       </h3>
+      
+      {/* SEO-Critical Components - Keep Synchronous */}
       <ProductPhotosPage productId={dataset.id} />
-      <ProductVideos productId={dataset.id} />
       <ProducDetails product={dataset} countryCode={countryCode} />
-      <SimilarProducts countryCode={countryCode} slug={slug} />
+      
+      {/* Non-Critical Components - Lazy Load */}
+      <Suspense fallback={<ProductVideosSkeleton />}>
+        <ProductVideos productId={dataset.id} />
+      </Suspense>
+      
+      <Suspense fallback={<SimilarProductsSkeleton />}>
+        <SimilarProducts countryCode={countryCode} slug={slug} />
+      </Suspense>
     </MainLayout>
   );
 };

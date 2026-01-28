@@ -1,18 +1,35 @@
 // src/app/products/page.tsx
 import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
-import CategoryBrands from '@/app/components/Products/CategoryBrands';
-import PopularProducts from '@/app/components/Products/PopularProducts';
-import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
+import ProductReview from '@/app/components/Products/ProductReview';
 import { apiEndpoints, DEFAULT_LOCALE, SITE_URL, SITE_NAME, OG_IMAGE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { Metadata } from 'next';
+import { Suspense, lazy } from 'react';
 
-// Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
-export const revalidate = 60;
+// Enable Incremental Static Regeneration (ISR) - revalidate every 3600 seconds (1 hour)
+export const revalidate = 3600;
 import { cookies } from 'next/headers';
+
+// Lazy load ONLY non-critical components for better performance
+// ProductReview stays server-rendered for SEO (shows actual products)
+const CategoryBrands = lazy(() => import('@/app/components/Products/CategoryBrands'));
+const PopularProducts = lazy(() => import('@/app/components/Products/PopularProducts'));
+
+// Loading skeletons for suspended components
+const CategoryBrandsSkeleton = () => (
+  <div className="mb-6 h-24 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
+);
+
+const PopularProductsSkeleton = () => (
+  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {[1, 2, 3, 4, 5, 6].map(i => (
+      <div key={i} className="h-64 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
+    ))}
+  </div>
+);
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
@@ -179,10 +196,20 @@ const Page = async ({ searchParams, params }: PageProps) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-      <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
+      
+      {/* Lazy load CategoryBrands (non-critical UI enhancement) */}
+      <Suspense fallback={<CategoryBrandsSkeleton />}>
+        <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
+      </Suspense>
 
+      {/* ProductReview - KEEP SYNCHRONOUS for SEO (critical indexable content) */}
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
-      <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
+
+      {/* Lazy load PopularProducts (secondary content for engagement) */}
+      <Suspense fallback={<PopularProductsSkeleton />}>
+        <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
+      </Suspense>
+
       <Pagination
         currentPage={page}
         totalPages={totalPages}
