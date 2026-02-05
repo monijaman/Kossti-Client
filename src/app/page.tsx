@@ -83,5 +83,5 @@ const Page = async ({ searchParams }: PageProps) => {
   );
 };
 
-// Note: - `getServerSideProps` is not available in the `app/` directory, so we fetch the data directly here
+// Note: `getServerSideProps` is not available in the `app/` directory, so we fetch the data directly here
 export default Page;
