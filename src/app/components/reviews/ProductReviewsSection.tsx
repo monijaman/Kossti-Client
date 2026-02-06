@@ -167,7 +167,7 @@ const ProductReviewsSection = ({ productId, countryCode = 'en' }: ProductReviews
                                 {/* Reviewer Info */}
                                 <div>
                                     <p className={styles.reviewerName}>Reviewer</p>
-                                    <p className={styles.reviewDate}>
+                                    <p className={styles.reviewDate} suppressHydrationWarning>
                                         {review.created_at
                                             ? new Date(review.created_at).toLocaleDateString('en-US', {
                                                 year: 'numeric',

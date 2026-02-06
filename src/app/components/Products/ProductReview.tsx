@@ -21,7 +21,12 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {products.map((product, i) => (
-          <ProducShortDetails key={product.id + i} product={product} countryCode={countryCode} />
+          <ProducShortDetails
+            key={product.id + i}
+            product={product}
+            countryCode={countryCode}
+            priority={i < 4} // Prioritize first 4 images (above the fold)
+          />
         ))}
       </div>
     </>

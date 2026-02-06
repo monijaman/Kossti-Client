@@ -20,9 +20,9 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
   const accessToken = cookieStore.get('accessToken')?.value; // Default to 'en' if not found
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   return (
-    <div className="min-h-screen flex flex-col mx-auto">
+    <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
       <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
-          <Link href="/">
+        <Link href="/" suppressHydrationWarning>
           <Image
             src="/kossti.svg"
             alt="Kosti"
@@ -41,9 +41,8 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
           <LanguageSwitcher />
         </div>
       </header>
+
       <Breadcrumbs />
-
-
       <div className="flex flex-grow">
         <Sidebar {...sidebarProps} />
 

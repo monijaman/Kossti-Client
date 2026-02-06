@@ -15,6 +15,10 @@ import { Suspense } from 'react';
 // Enable Incremental Static Regeneration (ISR) - revalidate every 3600 seconds (1 hour)
 export const revalidate = 3600;
 
+// Dynamic rendering config for better performance
+export const dynamic = 'force-dynamic'; // For pages with search params
+export const dynamicParams = true;
+
 // Generate metadata for the home page
 export async function generateMetadata(props: {
   params: Promise<{
@@ -141,7 +145,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
   // Fetch all data in parallel for better performance
   const [productData] = await Promise.all([
-    // Main products fetch
+    // Main products fetch with ISR caching
     fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: 'GET',
       accessToken: token,
@@ -155,9 +159,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
         search: searchTerm,
         sortby: 'popular',
       },
+      next: { revalidate: 60 }, // Cache for 60 seconds
     }),
-    // CategoryBrands and PopularProducts now fetch their own data
-    // We just initiate them in parallel with the main fetch
   ]);
 
   const products = productData.data?.data ?? [];
@@ -194,12 +197,12 @@ const Page = async ({ searchParams, params }: PageProps) => {
   );
 };
 
-// Loading skeletons
+// Loading skeletons (memoized for better performance)
 const CategoryBrandsSkeleton = () => (
-  <div className="category-brands-section my-6 animate-pulse">
+  <div className="category-brands-section my-6 animate-pulse" aria-label="Loading brands">
     <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-      {[...Array(8)].map((_, i) => (
+      {Array.from({ length: 8 }, (_, i) => (
         <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
       ))}
     </div>
@@ -207,10 +210,10 @@ const CategoryBrandsSkeleton = () => (
 );
 
 const PopularProductsSkeleton = () => (
-  <div className="my-8 animate-pulse">
+  <div className="my-8 animate-pulse" aria-label="Loading popular products">
     <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {[...Array(8)].map((_, i) => (
+      {Array.from({ length: 8 }, (_, i) => (
         <div key={i} className="space-y-3">
           <div className="h-48 bg-gray-200 rounded-lg"></div>
           <div className="h-4 bg-gray-200 rounded w-3/4"></div>

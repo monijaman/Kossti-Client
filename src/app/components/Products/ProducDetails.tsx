@@ -64,13 +64,13 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
           </div>
           <div>
             <span className="text-gray-600">Added on:</span>
-            <span className="ml-2 text-gray-700">
+            <span className="ml-2 text-gray-700" suppressHydrationWarning>
               {product.created_at ? new Date(product.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
             </span>
           </div>
           <div>
             <span className="text-gray-600">Last updated:</span>
-            <span className="ml-2 text-gray-700">
+            <span className="ml-2 text-gray-700" suppressHydrationWarning>
               {product.updated_at ? new Date(product.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
             </span>
           </div>
@@ -87,7 +87,7 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
             </div>
             <div className="min-w-0">
               <div className="text-xs text-gray-600">Released</div>
-              <div className="text-xs font-semibold text-gray-900 truncate">
+              <div className="text-xs font-semibold text-gray-900 truncate" suppressHydrationWarning>
                 {product.created_at ? `Exp. ${new Date(product.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : 'Soon'}
               </div>
             </div>

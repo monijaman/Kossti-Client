@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-     "start": "next start -p $PORT",
+    "start": "next start -p $PORT",
     "lint": "next lint",
     "clean": "if exist .next rmdir /S /Q .next",
-    "fresh-dev": "npm run clean && npm run dev"
+    "fresh-dev": "npm run clean && npm run dev",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",

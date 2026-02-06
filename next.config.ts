@@ -34,16 +34,43 @@ const nextConfig: NextConfig = {
         hostname: "*.s3.*.amazonaws.com", // Allow all S3 buckets
       },
     ],
+    formats: ["image/avif", "image/webp"], // Use modern formats
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Optimize for common devices
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Icon sizes
+    minimumCacheTTL: 60, // Cache images for 60 seconds minimum
   },
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
+
+  // Add security and performance headers
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+        ],
+      },
+    ];
+  },
+
   // Reduce bundle size
   modularizeImports: {
-    'react-icons': {
-      transform: 'react-icons/{{member}}',
+    "react-icons": {
+      transform: "react-icons/{{member}}",
     },
   },
+
+  // Output standalone for optimal deployment
+  output: "standalone",
 };
 
 export default nextConfig;

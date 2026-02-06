@@ -4,9 +4,10 @@ import Link from 'next/link';
 interface PopularProductsProps {
   product: Product;
   countryCode: string;
+  priority?: boolean; // For LCP optimization
 }
 
-const ProducShortDetails = ({ product, countryCode }: PopularProductsProps) => {
+const ProducShortDetails = ({ product, countryCode, priority = false }: PopularProductsProps) => {
   return (
     <Link
       key={product.id}
@@ -26,6 +27,9 @@ const ProducShortDetails = ({ product, countryCode }: PopularProductsProps) => {
           src={product.photo || '/noimage.webp'}
           alt={product.name}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          loading={priority ? "eager" : "lazy"}
+          priority={priority}
           className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
         />
       </div>

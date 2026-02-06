@@ -28,7 +28,7 @@ const DetailedReviewsList = ({ reviews, productId }: DetailedReviewsListProps) =
                                 ))}
                                 <span className="ml-2 font-bold text-gray-900">{review.rating}/5</span>
                             </div>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-500" suppressHydrationWarning>
                                 {new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                             </span>
                         </div>
