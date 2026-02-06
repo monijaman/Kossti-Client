@@ -1,35 +1,19 @@
 // src/app/products/page.tsx
 import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
-import SearchBox from '@/app/components/Search';
+import CategoryBrands from '@/app/components/Products/CategoryBrands';
+import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
-import { apiEndpoints, DEFAULT_LOCALE, SITE_URL, SITE_NAME, OG_IMAGE_URL } from '@/lib/constants';
+import SearchBox from '@/app/components/Search';
+import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { Metadata } from 'next';
-import { Suspense, lazy } from 'react';
+import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 
 // Enable Incremental Static Regeneration (ISR) - revalidate every 3600 seconds (1 hour)
 export const revalidate = 3600;
-import { cookies } from 'next/headers';
-
-// Lazy load ONLY non-critical components for better performance
-// ProductReview stays server-rendered for SEO (shows actual products)
-const CategoryBrands = lazy(() => import('@/app/components/Products/CategoryBrands'));
-const PopularProducts = lazy(() => import('@/app/components/Products/PopularProducts'));
-
-// Loading skeletons for suspended components
-const CategoryBrandsSkeleton = () => (
-  <div className="mb-6 h-24 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
-);
-
-const PopularProductsSkeleton = () => (
-  <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {[1, 2, 3, 4, 5, 6].map(i => (
-      <div key={i} className="h-64 bg-gradient-to-r from-gray-200 to-gray-100 animate-pulse rounded-lg"></div>
-    ))}
-  </div>
-);
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
@@ -50,29 +34,29 @@ export async function generateMetadata(props: {
       : 'বাংলাদেশে মোটরসাইকেল, ফোন, ইলেকট্রনিক্স এবং আরও অনেক পণ্যের সৎ এবং বিস্তারিত রিভিউ এবং তুলনা পড়ুন। বিশেষজ্ঞ রেটিং এবং ব্যবহারকারীর প্রতিক্রিয়া সহ সেরা পণ্য খুঁজে নিন।',
     keywords: isEn
       ? [
-          'product reviews',
-          'product comparison',
-          'best products',
-          'motorcycle reviews',
-          'phone reviews',
-          'electronics reviews',
-          'Bangladesh products',
-          'product ratings',
-          'customer reviews',
-          'product guide',
-        ]
+        'product reviews',
+        'product comparison',
+        'best products',
+        'motorcycle reviews',
+        'phone reviews',
+        'electronics reviews',
+        'Bangladesh products',
+        'product ratings',
+        'customer reviews',
+        'product guide',
+      ]
       : [
-          'পণ্য রিভিউ',
-          'পণ্য তুলনা',
-          'সেরা পণ্য',
-          'মোটরসাইকেল রিভিউ',
-          'ফোন রিভিউ',
-          'ইলেকট্রনিক্স রিভিউ',
-          'বাংলাদেশের পণ্য',
-          'পণ্য রেটিং',
-          'গ্রাহক রিভিউ',
-          'পণ্য গাইড',
-        ],
+        'পণ্য রিভিউ',
+        'পণ্য তুলনা',
+        'সেরা পণ্য',
+        'মোটরসাইকেল রিভিউ',
+        'ফোন রিভিউ',
+        'ইলেকট্রনিক্স রিভিউ',
+        'বাংলাদেশের পণ্য',
+        'পণ্য রেটিং',
+        'গ্রাহক রিভিউ',
+        'পণ্য গাইড',
+      ],
     openGraph: {
       title: isEn
         ? `${SITE_NAME} - Best Product Reviews & Comparisons`
@@ -142,7 +126,6 @@ interface PageProps {
 
 // Server Component
 const Page = async ({ searchParams, params }: PageProps) => {
-  // const { getProducts } = useProducts();
   const resolvedSearchParams = await searchParams;
   const { locale } = await params;
 
@@ -153,12 +136,13 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activePriceRange = resolvedSearchParams.price || '';
   const searchTerm = resolvedSearchParams.searchterm || '';
   const cookieStore = await cookies();
-  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE; // Use locale as fallback
+  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
 
-  const fetchProductData = async (): Promise<{ products: Product[]; totalProducts: number }> => {
-
-    const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+  // Fetch all data in parallel for better performance
+  const [productData] = await Promise.all([
+    // Main products fetch
+    fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: 'GET',
       accessToken: token,
       queryParams: {
@@ -171,19 +155,14 @@ const Page = async ({ searchParams, params }: PageProps) => {
         search: searchTerm,
         sortby: 'popular',
       },
-    });
-    console.log('API Response:', response); // Debugging line to check the response structure
-    // Handle Laravel-compatible response format
-    return {
-      products: response.data?.data ?? [], // Laravel format uses 'data' field
-      totalProducts: response.data?.meta?.total ?? 0, // Laravel format uses 'meta.total'
-    };
+    }),
+    // CategoryBrands and PopularProducts now fetch their own data
+    // We just initiate them in parallel with the main fetch
+  ]);
 
-
-  };
-
-  const dataset = await fetchProductData();
-  const totalPages = Math.ceil(dataset.totalProducts / limit);
+  const products = productData.data?.data ?? [];
+  const totalProducts = productData.data?.meta?.total ?? 0;
+  const totalPages = Math.ceil(totalProducts / limit);
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -196,16 +175,13 @@ const Page = async ({ searchParams, params }: PageProps) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-      
-      {/* Lazy load CategoryBrands (non-critical UI enhancement) */}
+
       <Suspense fallback={<CategoryBrandsSkeleton />}>
         <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
       </Suspense>
 
-      {/* ProductReview - KEEP SYNCHRONOUS for SEO (critical indexable content) */}
-      <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
+      <ProductReview products={products} countryCode={countryCode} />
 
-      {/* Lazy load PopularProducts (secondary content for engagement) */}
       <Suspense fallback={<PopularProductsSkeleton />}>
         <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
       </Suspense>
@@ -218,5 +194,31 @@ const Page = async ({ searchParams, params }: PageProps) => {
   );
 };
 
-// Note: `getServerSideProps` is not available in the `app/` directory, so we fetch the data directly here
+// Loading skeletons
+const CategoryBrandsSkeleton = () => (
+  <div className="category-brands-section my-6 animate-pulse">
+    <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
+      ))}
+    </div>
+  </div>
+);
+
+const PopularProductsSkeleton = () => (
+  <div className="my-8 animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="space-y-3">
+          <div className="h-48 bg-gray-200 rounded-lg"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export default Page;

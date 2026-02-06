@@ -9,13 +9,19 @@ interface FetchOptions {
   signal?: number;
   accessToken?: string; // Optional Bearer token
   countryCode?: string; // Optional country code
+  next?: NextFetchRequestConfig; // Next.js caching options
 }
+
+type NextFetchRequestConfig = {
+  revalidate?: number | false;
+  tags?: string[];
+};
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
 
 export default async function fetchApi<T>(
   path: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<ApiResponse<T>> {
   if (!baseUrl) throw new Error("API URL is not defined in env variables");
 
@@ -23,7 +29,7 @@ export default async function fetchApi<T>(
     ? new URLSearchParams(
         Object.entries(options.queryParams)
           .filter(([, v]) => v !== undefined && v !== null)
-          .map(([k, v]) => [k, String(v)])
+          .map(([k, v]) => [k, String(v)]),
       ).toString()
     : "";
 
@@ -60,7 +66,8 @@ export default async function fetchApi<T>(
     // Include credentials so cookie-based auth works across dev ports (3000 <-> 8080)
     credentials: "include",
     signal: controller.signal,
-    cache: "no-store",
+    // Use Next.js caching if provided, otherwise default to no-store
+    ...(options.next ? { next: options.next } : { cache: "no-store" }),
   };
 
   try {
