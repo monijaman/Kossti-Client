@@ -5,9 +5,9 @@ import { useBrands } from '@/hooks/useBrands';
 import { Brand, SidebarParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
-const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
+const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode, initialBrands }: SidebarParams) => {
     const { getCategoryRelBrands } = useBrands();
-    const [brands, setBrands] = useState<Brand[]>([]);
+    const [brands, setBrands] = useState<Brand[]>(initialBrands || []);
 
     useEffect(() => {
         const fetchbrands = async () => {

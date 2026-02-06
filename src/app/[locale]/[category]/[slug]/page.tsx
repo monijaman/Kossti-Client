@@ -170,6 +170,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
           'Accept': 'application/json',
         },
       });
+      console.log('slugslugslug', slug);
       return response.success ? response.data : null;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -179,6 +180,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const dataset = await fetchProductData() as Product | null;
 
+  console.log('datasetdatasetdataset', dataset);
   if (!dataset) {
     return (
       <MainLayout>

@@ -1,5 +1,5 @@
 import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
-import { Brand, SidebarParams } from '@/lib/types';
+import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import Categories from './Categories';
 
@@ -8,11 +8,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarParams) => {
   const countryCode = (await cookies()).get('country-code')?.value ?? 'en';
-  const apiBaseUrl = API_BASE_URL;
 
 
   async function fetchCategories(countryCode: string) {
-    if (!apiBaseUrl) {
+    if (!API_BASE_URL) {
       return [];
     }
 
@@ -27,13 +26,13 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
         page: ''
       });
 
-      const fullUrl = `${apiBaseUrl}/wide-categories?${queryParams.toString()}`;
+      const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
       const response = await fetch(fullUrl, { next: { revalidate: 300 } }); // Cache categories for 5 minutes
 
       if (!response.ok) {
         // Try with /api prefix as fallback
         console.log('Trying /wide-categories...');
-        const altResponse = await fetch(`${apiBaseUrl}/wide-categories`);
+        const altResponse = await fetch(`${API_BASE_URL}/wide-categories`);
         if (altResponse.ok) {
           const data = await altResponse.json();
           return data.categories || [];
@@ -49,33 +48,8 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
     }
   }
 
-  async function fetchBrandsByCategory(categorySlug?: string) {
-    if (!apiBaseUrl || !categorySlug) {
-      return [] as Brand[];
-    }
-
-    try {
-      const response = await fetch(
-        `${apiBaseUrl}/category-brands?category_slug=${categorySlug}`,
-        { next: { revalidate: 300 } }
-      );
-
-      if (!response.ok) {
-        return [] as Brand[];
-      }
-
-      const data = (await response.json()) as { brands?: Brand[] };
-      return data.brands || [];
-    } catch {
-      return [] as Brand[];
-    }
-  }
-
-  // Fetch categories and brands data in parallel
-  const [categories, brands] = await Promise.all([
-    fetchCategories(countryCode),
-    fetchBrandsByCategory(activeCategory),
-  ]);
+  // Fetch categories data
+  const categories = await fetchCategories(countryCode);
 
 
   return (
@@ -91,7 +65,6 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
         activeCategory={activeCategory}
         searchTerm={searchTerm}
         countryCode={countryCode}
-        initialBrands={brands}
       />
     </aside>
   );

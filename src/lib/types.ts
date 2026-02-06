@@ -82,6 +82,7 @@ export interface SidebarParams {
   activePriceRange?: string; // Change from string[] to string
   searchTerm?: string;
   countryCode?: string;
+  initialBrands?: Brand[];
 }
 
 export interface ProductApiResponse {
