@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, LOCALES } from "@/lib/constants";
+import { LOCALES } from "@/lib/constants";
 import { gettokenbyrefreshToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -11,6 +11,34 @@ function checkAdminSession(req: NextRequest): boolean {
     `[Middleware Check] Path: ${req.nextUrl.pathname}, admin_session: ${adminSession ? "FOUND" : "MISSING"}`,
   );
   return !!adminSession;
+}
+
+function getPreferredLocale(req: NextRequest): string {
+  // First check if user has a locale preference cookie
+  const localePreference = req.cookies.get("locale-preference")?.value;
+  if (localePreference && LOCALES.includes(localePreference)) {
+    return localePreference;
+  }
+
+  // Check if user's country is Bangladesh based on various indicators
+  const country =
+    req.geo?.country ||
+    req.headers.get("cf-ipcountry") ||
+    req.headers.get("x-vercel-ip-country") ||
+    "";
+  const acceptLanguage = req.headers.get("accept-language") || "";
+
+  // If user is from Bangladesh, default to Bangla
+  if (
+    country?.toLowerCase() === "bd" ||
+    country?.toLowerCase() === "bangladesh" ||
+    acceptLanguage.includes("bn")
+  ) {
+    return "bn";
+  }
+
+  // Otherwise default to English
+  return "en";
 }
 
 function internationalization(req: NextRequest, res: NextResponse) {
@@ -32,13 +60,16 @@ function internationalization(req: NextRequest, res: NextResponse) {
     return null;
   }
 
-  // Only redirect to default locale if it's the root path
+  // Get preferred locale based on user location
+  const preferredLocale = getPreferredLocale(req);
+
+  // Only redirect to preferred locale if it's the root path
   if (req.nextUrl.pathname === "/") {
-    return `/${DEFAULT_LOCALE}`;
+    return `/${preferredLocale}`;
   }
 
-  // For other paths without locale, prepend default locale
-  return `/${DEFAULT_LOCALE}${req.nextUrl.pathname}`;
+  // For other paths without locale, prepend preferred locale
+  return `/${preferredLocale}${req.nextUrl.pathname}`;
 }
 
 // Function to handle token checking and redirection
