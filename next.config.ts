@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"], // Use modern formats
     deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Optimize for common devices
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Icon sizes
-    minimumCacheTTL: 60, // Cache images for 60 seconds minimum
+    minimumCacheTTL: 86400, // Cache images for 24 hours (product images rarely change)
   },
   // Performance optimizations
   compress: true,

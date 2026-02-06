@@ -11,7 +11,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
   return (
     <Link
       key={product.id}
-      href={`${countryCode}/${product.category_slug}/${product.slug}`}
+      href={`/${countryCode}/${product.category_slug}/${product.slug}`}
       className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
     >
       {/* Product Image Container */}

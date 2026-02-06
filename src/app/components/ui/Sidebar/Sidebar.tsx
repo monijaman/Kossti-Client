@@ -27,7 +27,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
       });
 
       const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
-      const response = await fetch(fullUrl);
+      const response = await fetch(fullUrl, { next: { revalidate: 300 } }); // Cache categories for 5 minutes
 
       if (!response.ok) {
         // Try with /api prefix as fallback

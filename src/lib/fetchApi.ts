@@ -66,8 +66,12 @@ export default async function fetchApi<T>(
     // Include credentials so cookie-based auth works across dev ports (3000 <-> 8080)
     credentials: "include",
     signal: controller.signal,
-    // Use Next.js caching if provided, otherwise default to no-store
-    ...(options.next ? { next: options.next } : { cache: "no-store" }),
+    // Use Next.js caching if provided, otherwise default to 60s revalidation for GET requests
+    ...(options.next
+      ? { next: options.next }
+      : method === "GET"
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store" }),
   };
 
   try {

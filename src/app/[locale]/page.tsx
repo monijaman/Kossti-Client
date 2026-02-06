@@ -12,12 +12,9 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
-// Enable Incremental Static Regeneration (ISR) - revalidate every 3600 seconds (1 hour)
-export const revalidate = 3600;
-
-// Dynamic rendering config for better performance
-export const dynamic = 'force-dynamic'; // For pages with search params
-export const dynamicParams = true;
+// Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
+// Note: Do NOT use `dynamic = 'force-dynamic'` here - it overrides revalidate and disables ALL caching
+export const revalidate = 60;
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
