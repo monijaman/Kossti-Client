@@ -25,8 +25,17 @@ function getPreferredLocale(req: NextRequest): string {
     req.geo?.country ||
     req.headers.get("cf-ipcountry") ||
     req.headers.get("x-vercel-ip-country") ||
+    req.headers.get("x-forwarded-for") ||
     "";
   const acceptLanguage = req.headers.get("accept-language") || "";
+
+  // Log for debugging (remove in production)
+  console.log("Country detection:", {
+    country,
+    acceptLanguage,
+    geo: req.geo,
+    cfCountry: req.headers.get("cf-ipcountry"),
+  });
 
   // If user is from Bangladesh, default to Bangla
   if (
@@ -37,8 +46,8 @@ function getPreferredLocale(req: NextRequest): string {
     return "bn";
   }
 
-  // Otherwise default to English
-  return "en";
+  // Default to Bangla if we can't detect location (assuming most users are from Bangladesh)
+  return "bn";
 }
 
 function internationalization(req: NextRequest, res: NextResponse) {
