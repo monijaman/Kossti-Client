@@ -1,6 +1,11 @@
 export const LOCALES = ["en", "bn"];
 export const DEFAULT_LOCALE = "en";
 
+// Site Configuration
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com';
+export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Kossti';
+export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
+
 export const apiEndpoints = {
   // Authentication endpoints
   register: "/api/register",
@@ -28,6 +33,7 @@ export const apiEndpoints = {
   createProduct: "/products",
   getProductById: (id: number | string) => `/products/${id}`,
   updateProduct: (id: number | string) => `/products/${id}`,
+  getMarketProducts: "/market-products",
   getProductBySlug: (slug: string) => `/products-by-slug/${slug}`,
   getPopularProducts: "/popular-products",
   incrementProductViews: (id: number | string) =>

@@ -64,7 +64,7 @@ const AdminLogin = () => {
             });
 
             if (response.success) {
-                setError(null);
+                setError('');
                 // Store the tokens and user info
                 const loginData = response.data as LoginResponse;
                 localStorage.setItem('token', loginData.token);

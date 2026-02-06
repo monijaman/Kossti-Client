@@ -1,5 +1,5 @@
 "use client"
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 /**
  * PaginationProps interface defines the configuration options for the Pagination component
@@ -67,6 +67,7 @@ const Pagination = ({
   additionalParams = {},
 }: PaginationProps) => {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   // Ensure currentPage and totalPages are always numbers and at least 1
   // This prevents errors from invalid props and provides sensible defaults
@@ -109,7 +110,7 @@ const Pagination = ({
 
     // Build the final URL using baseUrl or current pathname
     const queryString = params.toString();
-    const base = baseUrl || (typeof window !== 'undefined' ? window.location.pathname : '/');
+    const base = baseUrl || pathname;
     return `${base}${queryString ? `?${queryString}` : ''}`;
   };
 

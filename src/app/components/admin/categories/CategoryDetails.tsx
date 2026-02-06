@@ -6,9 +6,15 @@ import { useEffect, useState } from 'react';
 
 interface PageProps {
   categories: Category[];
+  onSort?: (sortBy: SortField, sortOrder: SortOrder) => void;
+  currentSortBy?: SortField;
+  currentSortOrder?: SortOrder;
 }
 
-const CategoryDetails = ({ categories }: PageProps) => {
+type SortField = 'name' | 'status';
+type SortOrder = 'asc' | 'desc';
+
+const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSortOrder = 'asc' }: PageProps) => {
   // Always initialize with an array
   const [categoryList, setCategoryList] = useState<Category[]>(Array.isArray(categories) ? categories : []);
 
@@ -30,6 +36,14 @@ const CategoryDetails = ({ categories }: PageProps) => {
     }
   };
 
+  // Sorting handler
+  const handleSort = (field: SortField) => {
+    const newSortOrder = currentSortBy === field && currentSortOrder === 'asc' ? 'desc' : 'asc';
+    if (onSort) {
+      onSort(field, newSortOrder);
+    }
+  };
+
   useEffect(() => {
     setCategoryList(Array.isArray(categories) ? categories : []);
   }, [categories]);
@@ -40,8 +54,28 @@ const CategoryDetails = ({ categories }: PageProps) => {
         <thead>
           <tr className="text-left border-b">
             <th className="py-3 px-4 text-lg font-medium text-gray-700">ID</th>
-            <th className="py-3 px-4 text-lg font-medium text-gray-700">Name</th>
-            <th className="py-3 px-4 text-lg font-medium text-gray-700">Status</th>
+            <th
+              className="py-3 px-4 text-lg font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none"
+              onClick={() => handleSort('name')}
+            >
+              Name
+              {currentSortBy === 'name' && (
+                <span className="ml-2">
+                  {currentSortOrder === 'asc' ? '↑' : '↓'}
+                </span>
+              )}
+            </th>
+            <th
+              className="py-3 px-4 text-lg font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none"
+              onClick={() => handleSort('status')}
+            >
+              Status
+              {currentSortBy === 'status' && (
+                <span className="ml-2">
+                  {currentSortOrder === 'asc' ? '↑' : '↓'}
+                </span>
+              )}
+            </th>
             <th className="py-3 px-4 text-lg font-medium text-gray-700">Actions</th>
           </tr>
         </thead>

@@ -7,7 +7,7 @@ import { useCategory } from '@/hooks/useCategory';
 import { categoryInt } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 // API returns { data: { categories: categoryInt[], total: number } }
@@ -24,6 +24,7 @@ const ListSpecifications = () => {
     const [categories, setCategories] = useState<categoryInt[]>([]);
     const [loading, setLoading] = useState(true);
     const { getCategories } = useCategory();
+    const router = useRouter();
 
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
@@ -35,6 +36,8 @@ const ListSpecifications = () => {
     const activeBrands = searchParams.get('brand') ?? '';
     const locale = searchParams.get('locale') ?? 'en';
     const status = searchParams.get('status') ?? null;
+    const sortBy = searchParams.get('sortBy') ?? 'name';
+    const sortOrder = searchParams.get('sortOrder') ?? 'asc';
     // Fetch categories with current search, page, and locale
     const fetchCategories = useCallback(async () => {
 
@@ -47,6 +50,8 @@ const ListSpecifications = () => {
                 categoryId: '',      // Category ID (optional, can be empty)
                 page: page,           // current page (optional)
                 status: status,       // Status filter (optional)
+                sortBy: sortBy,       // Sort field (optional)
+                sortOrder: sortOrder, // Sort order (optional)
             });
 
 
@@ -64,24 +69,32 @@ const ListSpecifications = () => {
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
-    }, [searchTerm, page, locale, getCategories]);
+    }, [searchTerm, page, locale, getCategories, sortBy, sortOrder, status]);
 
     const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
     useEffect(() => {
         if (debouncedSearchTerm) fetchCategories();
-    }, [debouncedSearchTerm]);
+    }, [debouncedSearchTerm, fetchCategories]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
+    const handleSort = (sortBy: string, sortOrder: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('sortBy', sortBy);
+        params.set('sortOrder', sortOrder);
+        params.set('page', '1'); // Reset to first page when sorting
+        router.push(`/admin/categories?${params.toString()}`);
+    };
+
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     return (
-        <div className="container mx-auto p-6 bg-white shadow-md rounded-lg p-6 bg-gray-100 min-h-screen">
+        <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Categories</h2>
 
             {userType !== 'reviewer' && (
@@ -110,6 +123,9 @@ const ListSpecifications = () => {
             {!loading && (
                 <CategoryDetails
                     categories={categories}
+                    onSort={handleSort}
+                    currentSortBy={sortBy as 'name' | 'status'}
+                    currentSortOrder={sortOrder as 'asc' | 'desc'}
                 />
             )}
 
@@ -123,6 +139,8 @@ const ListSpecifications = () => {
                     brand: activeBrands,
                     locale: locale,
                     search: searchTerm,
+                    sortBy: sortBy,
+                    sortOrder: sortOrder,
                 }}
             />
         </div>

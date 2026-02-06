@@ -42,6 +42,8 @@ export const useCategory = () => {
     categoryId = "",
     status = null,
     page = null,
+    sortBy = "",
+    sortOrder = "",
   }: {
     perPage?: number | string;
     search?: string;
@@ -50,6 +52,8 @@ export const useCategory = () => {
     categoryId?: number | string;
     status: string | null;
     page?: number | null;
+    sortBy?: string;
+    sortOrder?: string;
   }): Promise<{ success: boolean; data: unknown }> => {
     // Construct query parameters dynamically
     const queryParams = new URLSearchParams({
@@ -68,6 +72,14 @@ export const useCategory = () => {
     // Only append page if it's not null
     if (page !== null) {
       queryParams.append("page", page.toString());
+    }
+
+    // Only append sort parameters if they're not empty
+    if (sortBy) {
+      queryParams.append("sort_by", sortBy);
+    }
+    if (sortOrder) {
+      queryParams.append("sort_order", sortOrder);
     }
 
     try {

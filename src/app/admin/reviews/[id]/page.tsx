@@ -39,6 +39,8 @@ const ReviewForm = ({ params }: PageProps) => {
     const [files, setFiles] = useState<File[]>([]);
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string>('');
+    const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
+    const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
 
     const fetchProductData = async () => {
 
@@ -224,10 +226,17 @@ const ReviewForm = ({ params }: PageProps) => {
     }
         , [files]);
 
-    // Generate AI Review
+    // Generate AI Review - Open Modal
     const handleGenerateAIReview = async () => {
+        setIsAIReviewModalOpen(true);
+        setAiReviewPrompt('');
+    };
+
+    // Generate AI Review with Custom Prompt
+    const generateAIReviewWithPrompt = async () => {
         setAiLoading(true);
         setAiError('');
+        setIsAIReviewModalOpen(false);
 
         try {
 
@@ -235,11 +244,12 @@ const ReviewForm = ({ params }: PageProps) => {
                 throw new Error('Product name is required');
             }
 
-            // Generate review using OpenAI with product details
+            // Generate review using OpenAI with product details and custom prompt
             const aiReviewContent = await generateAIReview({
                 productName: products.name,
                 productCategory: products.category_slug || '',
                 locale: 'en',
+                customPrompt: aiReviewPrompt || undefined,
             });
 
 
@@ -585,6 +595,58 @@ const ReviewForm = ({ params }: PageProps) => {
                     </div>
                 </div>
             )}
+
+            {/* AI Review Prompt Modal */}
+            <Modal
+                isOpen={isAIReviewModalOpen}
+                onClose={() => setIsAIReviewModalOpen(false)}
+            >
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
+                    
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
+                        <p className="font-medium mb-2">📋 Review will include:</p>
+                        <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li>Key Features & Highlights</li>
+                            <li>Pros & Advantages (8-10 points)</li>
+                            <li>Cons & Disadvantages (8-10 points)</li>
+                            <li>Who Should Buy / Who Should NOT Buy</li>
+                            <li>Price & Cost Analysis</li>
+                            <li>Performance Ratings (8 dimensions)</li>
+                            <li>FAQ with 6-8 Common Questions</li>
+                            <li>Final Verdict & Recommendation</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Custom Prompt (Optional)
+                        </label>
+                        <textarea
+                            value={aiReviewPrompt}
+                            onChange={(e) => setAiReviewPrompt(e.target.value)}
+                            placeholder="Enter additional context or specific instructions (e.g., 'Focus on fuel efficiency and durability' or 'Compare with competitor X' or 'Emphasize features for budget-conscious buyers')..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            rows={4}
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <button
+                            onClick={() => setIsAIReviewModalOpen(false)}
+                            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={generateAIReviewWithPrompt}
+                            disabled={aiLoading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {aiLoading ? 'Generating...' : 'Generate Review'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 };

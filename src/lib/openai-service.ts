@@ -23,6 +23,7 @@ export interface AIReviewRequest {
   productName: string;
   productCategory?: string;
   locale: "en" | "bn";
+  customPrompt?: string;
 }
 
 /**
@@ -32,53 +33,127 @@ export interface AIReviewRequest {
 export async function generateAIReview(
   request: AIReviewRequest
 ): Promise<string> {
-  const { productName, productCategory } = request;
+  const { productName, productCategory, customPrompt } = request;
 
-  const systemPrompt = `You are an expert product reviewer with experience writing real-world,
-consumer-focused reviews based on performance, value, and usability.
-Write honest, balanced, and practical evaluations.
+  const systemPrompt = `You are an expert product reviewer with experience writing comprehensive,
+real-world, consumer-focused reviews. Write honest, balanced, and practical evaluations.
 Create a detailed and professional review of ${productName}.
 
-Please follow this HTML structure and write ONLY in English:
+Please follow this comprehensive HTML structure and write ONLY in English:
 
-- Wrap everything inside <article class="review-section">
-- Add a <header> containing:
-  - <h1> product name
-  - Overall rating (1–5 stars) clearly shown as "Rating: X.X"
+<article class="review-section">
+  <header>
+    <h1>${productName} Review</h1>
+    <p>Clearly include: "Rating: X.X" (scale 1-5)</p>
+  </header>
 
-- <section class="executive-summary">
-  - Brief overview
-  - Intended users
-  - Value proposition
+  <section class="introduction">
+    <h2>Introduction & Overview</h2>
+    <p>Brief compelling description of the product, price point, and target audience</p>
+  </section>
 
-- <section class="pros">
-  - Exactly 4 major advantages
-  - Focus on real-world benefits
+  <section class="key-highlights">
+    <h2>${productName} Key Highlights & Features</h2>
+    <ul>
+      <li>Top 3-4 standout features with brief descriptions</li>
+      <li>Include specifications like price, efficiency, design elements</li>
+      <li>Focus on unique selling points</li>
+    </ul>
+  </section>
 
-- <section class="cons">
-  - 8–10 realistic disadvantages
-  - Include missing features, limitations, and deal-breakers
+  <section class="pros">
+    <h2>Pros & Advantages - Why Buy This Product?</h2>
+    <ul>
+      <li>List 8-10 major advantages with details</li>
+      <li>Include: quality, performance, value, reliability, features</li>
+      <li>Focus on real-world benefits for users</li>
+    </ul>
+  </section>
 
-- <section class="verdict">
-  - Final recommendation
-  - Who should buy it
-  - Who should avoid it
+  <section class="cons">
+    <h2>Cons & Disadvantages - What Are The Problems?</h2>
+    <ul>
+      <li>List 8-10 realistic disadvantages and limitations</li>
+      <li>Include: missing features, price concerns, durability issues</li>
+      <li>Be honest about deal-breakers</li>
+      <li>Compare unfavorably to competitors where relevant</li>
+    </ul>
+  </section>
 
-  - <section class="verdict">
+  <section class="target-audience">
+    <h2>Who Should Buy This Product?</h2>
+    <ul>
+      <li>Ideal customer profiles (e.g., daily commuters, professionals, students)</li>
+      <li>Budget ranges and priorities that suit this product</li>
+      <li>Use cases and scenarios where it excels</li>
+    </ul>
+    
+    <h3>Who Should NOT Buy This Product?</h3>
+    <ul>
+      <li>Customer types for whom this is NOT suitable</li>
+      <li>Budget constraints that make it a poor choice</li>
+      <li>Mention better alternatives for specific needs</li>
+    </ul>
+  </section>
 
-Rules:
-- Include "Rating: X.X" clearly
-- Do NOT include markdown or explanations
-- Return ONLY valid HTML
-- Keep the tone professional, unbiased, and engaging
-- Make it like human-written reviews
-- Need to be at least 800 words long`;
+  <section class="price-analysis">
+    <h2>Price & Cost Analysis</h2>
+    <p>Include: Price range, running costs, maintenance expenses, value for money assessment</p>
+  </section>
 
-  const userPrompt = productName
-    ? `Create a comprehensive review for: ${productName} ${
-        productCategory ? ` (Category: ${productCategory})` : ""
-      }`
-    : "";
+  <section class="performance-ratings">
+    <h2>Performance Rating & Review Score</h2>
+    <p>Rate on these dimensions (X/5 scale):</p>
+    <ul>
+      <li>Quality/Build: X/5</li>
+      <li>Performance: X/5</li>
+      <li>Value for Money: X/5</li>
+      <li>Features: X/5</li>
+      <li>Reliability: X/5</li>
+      <li>Comfort/Usability: X/5</li>
+      <li>Design/Aesthetics: X/5</li>
+      <li>Overall Rating: X/5</li>
+    </ul>
+  </section>
+
+  <section class="faq">
+    <h2>Frequently Asked Questions (FAQ)</h2>
+    <ul>
+      <li>Include 6-8 common questions buyers would ask</li>
+      <li>Provide concise, informative answers</li>
+      <li>Address common objections and comparisons</li>
+      <li>Example: "What is the [spec/price/efficiency]?"</li>
+      <li>Example: "How does it compare to [competitor]?"</li>
+      <li>Example: "Is [feature] available?"</li>
+      <li>Example: "What is the warranty/service cost?"</li>
+    </ul>
+  </section>
+
+  <section class="final-verdict">
+    <h2>Final Verdict: Should You Buy This Product?</h2>
+    <p>
+      - Summarize overall value proposition
+      - Clear final rating with reasoning
+      - Specific recommendation: YES/NO and for whom
+      - Final thoughts and closing statement
+    </p>
+  </section>
+</article>
+
+CRITICAL RULES:
+- Include "Rating: X.X" clearly in the header
+- DO NOT include markdown code blocks or explanations
+- Return ONLY valid HTML with proper semantic tags
+- Keep tone professional, unbiased, and engaging
+- Write like a real human product reviewer
+- Minimum 1200 words for comprehensive coverage
+- Use HTML list tags (<ul>, <li>) for bullet points
+- Use proper heading hierarchy (<h2>, <h3>)
+- Make it informative, honest, and practical`;
+
+  const userPrompt = customPrompt
+    ? `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ''}\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
+    : `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}`;
 
   try {
     const client = getOpenAIClient();
@@ -114,34 +189,6 @@ Rules:
     console.error("Error generating AI review:", error);
     throw error;
   }
-}
-
-/**
- * Format AI review as HTML article following the template structure
- */
-export function formatReviewAsHTML(
-  reviewContent: string,
-  productName: string,
-  locale: string
-): string {
-  const lang = locale === "bn" ? "bn" : "en";
-
-  // Wrap the content in article tags with proper structure
-  const htmlTemplate = `<!DOCTYPE html>
-<html lang="${lang}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${productName} Review</title>
-</head>
-<body>
-    <article class="ai-review review-section">
-        ${reviewContent}
-    </article>
-</body>
-</html>`;
-
-  return htmlTemplate;
 }
 
 /**
@@ -261,7 +308,7 @@ Each comment should include:
 1. A realistic username (first name or nickname)
 2. A location (city, country)
 3. A genuine-sounding comment (1-3 sentences, max 150 chars)
-4. A source URL (can be from Amazon, YouTube, Reddit, product forum, or review site)
+4. A source URL from one of these platforms: https://www.amazon.com, https://www.reddit.com, https://www.facebook.com, https://www.trustpilot.com, https://www.youtube.com, https://www.productreview.com.au
 
 The comments should be:
 - Varied in sentiment (positive, neutral, some critical)
@@ -275,7 +322,19 @@ Return ONLY a valid JSON array with this structure:
     "username": "John",
     "location": "New York, USA",
     "comment": "Great quality, arrived fast. Exactly what I needed.",
-    "sourceUrl": "https://www.amazon.com/..."
+    "sourceUrl": "https://www.amazon.com"
+  },
+  {
+    "username": "Sarah",
+    "location": "London, UK",
+    "comment": "Good product but shipping took longer than expected.",
+    "sourceUrl": "https://www.reddit.com"
+  },
+  {
+    "username": "Mike",
+    "location": "Toronto, Canada",
+    "comment": "Love it! Recommended to all my friends.",
+    "sourceUrl": "https://www.facebook.com"
   }
 ]
 
@@ -290,7 +349,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
         {
           role: "system",
           content:
-            "You are a data generator that creates realistic product comments. Return ONLY valid JSON, no markdown, no explanations.",
+            "You are a data generator that creates realistic product comments. Use only the base URLs provided (amazon.com, reddit.com, facebook.com, trustpilot.com, youtube.com, productreview.com.au). Return ONLY valid JSON, no markdown, no explanations.",
         },
         {
           role: "user",
@@ -312,16 +371,194 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
       .trim();
 
     // Parse JSON response
-    const comments: AIComment[] = JSON.parse(content);
+    let comments: AIComment[] = JSON.parse(content);
 
     if (!Array.isArray(comments) || comments.length === 0) {
       throw new Error("Invalid comments format");
     }
 
+    // Post-process: Validate URLs - keep only valid ones, empty out invalid ones
+    comments = comments.map((comment) => {
+      // Check if URL is valid (starts with http/https)
+      if (comment.sourceUrl && !comment.sourceUrl.startsWith("http")) {
+        // Invalid URL, set to empty
+        comment.sourceUrl = "";
+      }
+      return comment;
+    });
+
     return comments;
   } catch (error) {
     console.error("Error generating comments:", error);
     throw error;
+  }
+}
+
+/**
+ * Generate product specifications using OpenAI
+ * Returns an object mapping specification keys to values
+ */
+export async function generateProductSpecifications(
+  productName: string,
+  specKeys: string[]
+): Promise<Record<string, string>> {
+  if (!productName || !specKeys.length) {
+    throw new Error("Product name and specification keys are required");
+  }
+
+  const client = getOpenAIClient();
+
+  const prompt = `Generate realistic specifications for the product: "${productName}"
+
+Based on these specification categories: ${specKeys.join(", ")}
+
+For each category, provide a realistic value that would be typical for this type of product. Be specific and accurate.
+
+Return ONLY a valid JSON object with specification keys as properties and their values as strings:
+{
+  "Display Size": "6.5 inches",
+  "Battery Capacity": "5000 mAh",
+  "Processor": "Qualcomm Snapdragon 8 Gen 2",
+  "RAM": "8GB",
+  "Storage": "128GB",
+  "Camera": "64MP main + 12MP ultra-wide",
+  "Operating System": "Android 13",
+  "Weight": "180 grams"
+}
+
+IMPORTANT: 
+- Return ONLY valid JSON object
+- Use the exact specification key names provided
+- Provide realistic values for the product type
+- Values should be strings`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 2000,
+      temperature: 0.6,
+      messages: [
+        {
+          role: "system",
+          content: "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const specs: Record<string, string> = JSON.parse(content);
+
+    if (typeof specs !== "object" || specs === null) {
+      throw new Error("Invalid specifications format");
+    }
+
+    return specs;
+  } catch (error) {
+    console.error("Error generating specifications:", error);
+    throw error;
+  }
+}
+
+/**
+ * Translate specification values to Bengali
+ * Takes an array of specification objects and returns them with Bengali translations
+ */
+export async function translateSpecificationsToBengali(
+  specifications: Array<{ key: string; value: string }>
+): Promise<Array<{ key: string; value: string; translatedKey?: string; translatedValue?: string }>> {
+  if (!specifications.length) {
+    throw new Error("No specifications to translate");
+  }
+
+  const client = getOpenAIClient();
+
+  // Create a formatted list of specifications to translate
+  const specsText = specifications
+    .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
+    .join('\n');
+
+  const prompt = `Translate these product specifications from English to Bengali. Keep the format and structure intact.
+
+English specifications:
+${specsText}
+
+Return ONLY a valid JSON array where each object has the translated key and value.
+Format: [{"translatedKey": "translated key name", "translatedValue": "translated value"}, ...]
+
+IMPORTANT: 
+- Return ONLY valid JSON array
+- Translate both the specification key names and their values
+- Maintain technical accuracy for specs like dimensions, capacity, etc.
+- Keep the same number of items as input`;
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 2000,
+      temperature: 0.3,
+      messages: [
+        {
+          role: "system",
+          content: "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    let content = response.choices[0].message.content.trim();
+
+    // Remove markdown code blocks if present
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // Parse JSON response
+    const translations: Array<{ translatedKey: string; translatedValue: string }> = JSON.parse(content);
+
+    if (!Array.isArray(translations) || translations.length !== specifications.length) {
+      throw new Error("Invalid translations format or length mismatch");
+    }
+
+    // Attach translations to original specifications
+    const translatedSpecs = specifications.map((spec, index) => ({
+      ...spec,
+      translatedKey: translations[index]?.translatedKey || spec.key,
+      translatedValue: translations[index]?.translatedValue || spec.value,
+    }));
+
+    return translatedSpecs;
+  } catch (error) {
+    console.error("Error translating specifications to Bengali:", error);
+    // Return original specs with empty translations if translation fails
+    return specifications.map(spec => ({
+      ...spec,
+      translatedKey: spec.key,
+      translatedValue: spec.value,
+    }));
   }
 }
 
