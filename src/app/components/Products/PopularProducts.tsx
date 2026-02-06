@@ -1,8 +1,7 @@
-"use client"
 import { useTranslation } from "@/hooks/useLocale";
-import { useProducts } from "@/hooks/useProducts";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 import { Product } from "@/lib/types";
-import { useEffect, useState } from "react";
 import ProducShortDetails from "./ProducShortDetails";
 
 interface pageProps {
@@ -11,30 +10,36 @@ interface pageProps {
   currentPage?: number;
 }
 
-const PopularProducts = ({ countryCode, activeCategory = '', currentPage = 1 }: pageProps) => {
+type ProductApiResponse = {
+  data: Product[];
+  meta: {
+    total: number;
+  };
+};
+
+// Server Component - fetches data on the server
+const PopularProducts = async ({ countryCode, activeCategory = '', currentPage = 1 }: pageProps) => {
   const translation = useTranslation(countryCode);
-  const { getProducts } = useProducts();
-  const [dataset, setDataSet] = useState<Product[]>();
   const limit = 16;
 
-  // Retrieve the 'country-code' cookie directly in a server component
-  const fetchProductData = async () => {
+  // Fetch data on the server
+  const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+    method: 'GET',
+    queryParams: {
+      locale: countryCode,
+      page: currentPage.toString(),
+      limit: limit.toString(),
+      category: activeCategory,
+      brand: '',
+      priceRange: '',
+      search: '',
+      sortby: 'popular',
+    },
+    next: { revalidate: 60 }, // Cache for 60 seconds
+  });
 
-    const response = await getProducts(currentPage, limit, activeCategory, '', '', '', countryCode, 'popular');
+  const dataset = response.data?.data ?? [];
 
-    if (response.success && response.data && typeof response.data === 'object' && 'products' in response.data) {
-      const dataset = response.data.products;
-      setDataSet(dataset);
-      console.log('activeCategory', activeCategory)
-    } else {
-      setDataSet([]);
-    }
-  };
-
-
-  useEffect(() => {
-    fetchProductData();
-  }, [countryCode, activeCategory, currentPage])
   return (
     <>
       <h2 className="page-title text-2xl font-bold text-gray-800 mb-6 mt-8">
@@ -47,7 +52,7 @@ const PopularProducts = ({ countryCode, activeCategory = '', currentPage = 1 }: 
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {dataset && dataset.map((product) => (
+        {dataset.map((product) => (
           <ProducShortDetails key={product.id} product={product} countryCode={countryCode} />
         ))}
       </div>

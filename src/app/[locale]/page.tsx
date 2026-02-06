@@ -8,10 +8,11 @@ import SearchBox from '@/app/components/Search';
 import { apiEndpoints, DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
+import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 
 // Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
 export const revalidate = 60;
-import { cookies } from 'next/headers';
 
 type ProductApiResponse = {
   data: Product[];
@@ -43,7 +44,6 @@ interface PageProps {
 
 // Server Component
 const Page = async ({ searchParams, params }: PageProps) => {
-  // const { getProducts } = useProducts();
   const resolvedSearchParams = await searchParams;
   const { locale } = await params;
 
@@ -54,12 +54,13 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activePriceRange = resolvedSearchParams.price || '';
   const searchTerm = resolvedSearchParams.searchterm || '';
   const cookieStore = await cookies();
-  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE; // Use locale as fallback
+  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
 
-  const fetchProductData = async (): Promise<{ products: Product[]; totalProducts: number }> => {
-
-    const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+  // Fetch all data in parallel for better performance
+  const [productData] = await Promise.all([
+    // Main products fetch
+    fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: 'GET',
       accessToken: token,
       queryParams: {
@@ -72,19 +73,14 @@ const Page = async ({ searchParams, params }: PageProps) => {
         search: searchTerm,
         sortby: 'popular',
       },
-    });
-    console.log('API Response:', response); // Debugging line to check the response structure
-    // Handle Laravel-compatible response format
-    return {
-      products: response.data?.data ?? [], // Laravel format uses 'data' field
-      totalProducts: response.data?.meta?.total ?? 0, // Laravel format uses 'meta.total'
-    };
+    }),
+    // CategoryBrands and PopularProducts now fetch their own data
+    // We just initiate them in parallel with the main fetch
+  ]);
 
-
-  };
-
-  const dataset = await fetchProductData();
-  const totalPages = Math.ceil(dataset.totalProducts / limit);
+  const products = productData.data?.data ?? [];
+  const totalProducts = productData.data?.meta?.total ?? 0;
+  const totalPages = Math.ceil(totalProducts / limit);
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -97,10 +93,17 @@ const Page = async ({ searchParams, params }: PageProps) => {
   return (
     <MainLayout sidebarProps={sidebarProps}>
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-      <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
 
-      <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
-      <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
+      <Suspense fallback={<CategoryBrandsSkeleton />}>
+        <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
+      </Suspense>
+
+      <ProductReview products={products} countryCode={countryCode} />
+
+      <Suspense fallback={<PopularProductsSkeleton />}>
+        <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
+      </Suspense>
+
       <Pagination
         currentPage={page}
         totalPages={totalPages}
@@ -108,6 +111,33 @@ const Page = async ({ searchParams, params }: PageProps) => {
     </MainLayout>
   );
 };
+
+// Loading skeletons for better UX
+const CategoryBrandsSkeleton = () => (
+  <div className="category-brands-section my-6 animate-pulse">
+    <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
+      ))}
+    </div>
+  </div>
+);
+
+const PopularProductsSkeleton = () => (
+  <div className="my-8 animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="space-y-3">
+          <div className="h-48 bg-gray-200 rounded-lg"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 // Note: `getServerSideProps` is not available in the `app/` directory, so we fetch the data directly here
 export default Page;
