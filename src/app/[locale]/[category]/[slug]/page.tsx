@@ -2,11 +2,11 @@ import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import ProductPhotosPage from '@/app/components/reviews/ProductPhotos';
 import SearchBox from '@/app/components/Search';
-import { DEFAULT_LOCALE, SITE_URL, SITE_NAME, OG_IMAGE_URL } from '@/lib/constants';
+import { DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
-import { cookies } from 'next/headers';
 import { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { Suspense, lazy } from 'react';
 
 // Lazy load non-critical components for better performance while keeping SEO-critical content server-rendered
@@ -78,7 +78,7 @@ export async function generateMetadata(props: {
     const brandName = typeof product.brand === 'object' ? product.brand.name : product.brand_slug || 'Brand';
     const categoryName = typeof product.category === 'object' ? product.category.name : 'Product';
     const image = product.photo || OG_IMAGE_URL;
-    
+
     // Build SEO-friendly description
     const seoDescription = isEn
       ? `${productName} by ${brandName} - ${categoryName}. Read detailed review, specifications, price, pros & cons on ${SITE_NAME} Bangladesh.`
@@ -86,29 +86,29 @@ export async function generateMetadata(props: {
 
     const keywordsArray: string[] = isEn
       ? [
-          productName,
-          brandName,
-          categoryName,
-          `${productName} review`,
-          `${productName} specifications`,
-          `${productName} price`,
-          `${brandName} ${categoryName}`,
-          `best ${categoryName}`,
-          'Bangladesh',
-          'GoCrit',
-        ]
+        productName,
+        brandName,
+        categoryName,
+        `${productName} review`,
+        `${productName} specifications`,
+        `${productName} price`,
+        `${brandName} ${categoryName}`,
+        `best ${categoryName}`,
+        'Bangladesh',
+        'GoCrit',
+      ]
       : [
-          productName,
-          brandName,
-          categoryName,
-          `${productName} রিভিউ`,
-          `${productName} স্পেসিফিকেশন`,
-          `${productName} দাম`,
-          `${brandName} ${categoryName}`,
-          `সেরা ${categoryName}`,
-          'বাংলাদেশ',
-          'গোক্রিট',
-        ];
+        productName,
+        brandName,
+        categoryName,
+        `${productName} রিভিউ`,
+        `${productName} স্পেসিফিকেশন`,
+        `${productName} দাম`,
+        `${brandName} ${categoryName}`,
+        `সেরা ${categoryName}`,
+        'বাংলাদেশ',
+        'গোক্রিট',
+      ];
 
     return {
       title: `${productName} - ${brandName} ${categoryName} Review | ${SITE_NAME}`,
@@ -138,6 +138,10 @@ export async function generateMetadata(props: {
       },
       alternates: {
         canonical: `${SITE_URL}/${locale}/${product.category_slug || 'products'}/${slug}`,
+        languages: {
+          'en': `${SITE_URL}/en/${product.category_slug || 'products'}/${slug}`,
+          'bn': `${SITE_URL}/bn/${product.category_slug || 'products'}/${slug}`,
+        },
       },
     };
   } catch (error) {
@@ -166,7 +170,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
           'Accept': 'application/json',
         },
       });
-      console.log('slugslugslug', slug);
       return response.success ? response.data : null;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -176,7 +179,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const dataset = await fetchProductData() as Product | null;
 
-  console.log('datasetdatasetdataset', dataset);
   if (!dataset) {
     return (
       <MainLayout>
@@ -191,22 +193,49 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   return (
     <MainLayout>
-      <SearchBox initialSearchTerm={searchTerm} />
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: dataset.name,
+            image: dataset.photo || OG_IMAGE_URL,
+            description: dataset.description || `${dataset.name} review and specifications`,
+            brand: {
+              '@type': 'Brand',
+              name: typeof dataset.brand === 'object' ? dataset.brand.name : dataset.brand_slug || 'Brand',
+            },
+            category: typeof dataset.category === 'object' ? dataset.category.name : 'Product',
+            ...(dataset.price && {
+              offers: {
+                '@type': 'Offer',
+                price: dataset.price,
+                priceCurrency: 'BDT',
+                availability: 'https://schema.org/InStock',
+              },
+            }),
+          }),
+        }}
+      />
+
+      <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
       <h3 className="font-semibold py-4">
         {dataset.name}
         {dataset.brand && ` - ${dataset.brand_slug}`}
         {dataset.category && ` - ${dataset.category.name}`}
       </h3>
-      
+
       {/* SEO-Critical Components - Keep Synchronous */}
       <ProductPhotosPage productId={dataset.id} />
       <ProducDetails product={dataset} countryCode={countryCode} />
-      
+
       {/* Non-Critical Components - Lazy Load */}
       <Suspense fallback={<ProductVideosSkeleton />}>
         <ProductVideos productId={dataset.id} />
       </Suspense>
-      
+
       <Suspense fallback={<SimilarProductsSkeleton />}>
         <SimilarProducts countryCode={countryCode} slug={slug} />
       </Suspense>

@@ -1,15 +1,21 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
 
-// ...existing code...
-
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'KOSTI - Your trusted marketplace',
-  description: 'Find the best products at KOSTI marketplace',
+export const metadata: Metadata = {
+  title: 'Kossti - Honest Product Reviews & Comparisons',
+  description: 'Read honest, unbiased product reviews and expert comparisons. Find the best products with detailed analysis, ratings, and user feedback.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com'),
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#1f2937', // gray-800
 }
 
 export default function RootLayout({
@@ -18,12 +24,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ClientProvider>
-          {children}
-        </ClientProvider>
-      </body>
-    </html>
+    <ClientProvider>
+      {children}
+    </ClientProvider>
   )
 }

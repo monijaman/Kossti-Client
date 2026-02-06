@@ -1,4 +1,5 @@
 import { categoryInt } from '@/lib/types';
+import Link from 'next/link';
 
 interface CategoriesProps {
   categories: categoryInt[];
@@ -8,18 +9,8 @@ interface CategoriesProps {
 }
 
 const Categories = ({ categories, activeCategory, locale, clearCategoryText }: CategoriesProps) => {
-  const getCurrentQueryString = () => {
-    // Preserve other query parameters when selecting a category
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      params.delete('page'); // Reset to page 1 when changing category
-      return params.toString() ? `&${params.toString()}` : '';
-    }
-    return '';
-  };
-
   const clearCategoryUrl = `/${locale}`;
-  // console.log('Categories:', categories);
+
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">Categories</h2>
@@ -28,23 +19,23 @@ const Categories = ({ categories, activeCategory, locale, clearCategoryText }: C
           {categories &&
             categories.map((categoryItem: categoryInt, index: number) => {
               return (
-                <a
-                  key={categoryItem.id || index} // Fallback to index if category.id is undefined
+                <Link
+                  key={categoryItem.id || index}
                   href={`/${locale}?category=${categoryItem.slug}`}
                   className={`block px-4 py-2 rounded-md cursor-pointer hover:bg-gray-200 transition duration-300 ${activeCategory === categoryItem.slug ? 'bg-gray-300 text-gray-800' : 'bg-white text-gray-700'}`}
                 >
                   {categoryItem.name}
-                </a>
+                </Link>
               );
             })}
         </div>
       </div>
-      <a
+      <Link
         href={clearCategoryUrl}
         className="text-blue-500 hover:underline mb-4 block"
       >
         {clearCategoryText}
-      </a>
+      </Link>
     </>
   );
 };

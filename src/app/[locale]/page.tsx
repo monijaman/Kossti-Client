@@ -91,6 +91,10 @@ export async function generateMetadata(props: {
     robots: 'index, follow',
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
+      languages: {
+        'en': `${SITE_URL}/en`,
+        'bn': `${SITE_URL}/bn`,
+      },
     },
   };
 }
@@ -174,6 +178,32 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
   return (
     <MainLayout sidebarProps={sidebarProps}>
+      {/* JSON-LD for website */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: SITE_NAME,
+            url: SITE_URL,
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: `${SITE_URL}/${countryCode}?searchterm={search_term_string}`,
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
+
+      {/* H1 for SEO */}
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        {countryCode === 'en'
+          ? 'Product Reviews & Comparisons in Bangladesh'
+          : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
+        }
+      </h1>
+
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
 
       <Suspense fallback={<CategoryBrandsSkeleton />}>
