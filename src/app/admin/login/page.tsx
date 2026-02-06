@@ -1,16 +1,16 @@
 "use client";
 
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
+import { setAccessTokenCookie } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import fetchApi from '@/lib/fetchApi';
-import { apiEndpoints } from '@/lib/constants';
-import { setAccessTokenCookie } from '@/lib/utils';
 
 interface LoginResponse {
-  token: string;
-  refresh_token: string;
-  email: string;
-  type: string;
+    token: string;
+    refresh_token: string;
+    email: string;
+    type: string;
 }
 
 const AdminLogin = () => {
@@ -35,8 +35,10 @@ const AdminLogin = () => {
                     router.push('/admin/dashboard');
                     return;
                 }
-            } catch {
-                console.log('Auth check - user not logged in');
+                // 401 is expected when not authenticated - not an error
+            } catch (error) {
+                // Only log actual network errors, not auth failures
+                console.log('Network error during auth check:', error);
             } finally {
                 setIsCheckingAuth(false);
             }
@@ -67,15 +69,41 @@ const AdminLogin = () => {
                 setError('');
                 // Store the tokens and user info
                 const loginData = response.data as LoginResponse;
-                localStorage.setItem('token', loginData.token);
-                localStorage.setItem('refresh_token', loginData.refresh_token);
-                localStorage.setItem('email', loginData.email);
-                localStorage.setItem('userType', loginData.type);
 
-                // Also set the token as a cookie for API routes
-                setAccessTokenCookie(loginData.token);
+                // Now call the admin login endpoint to set proper cookies
+                const adminLoginResponse = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: loginData.token,
+                        refresh_token: loginData.refresh_token,
+                        email: loginData.email
+                    }),
+                    credentials: 'include'
+                });
 
-                router.push("/admin/dashboard");
+                console.log('Admin login response status:', adminLoginResponse.status);
+                console.log('Admin login response headers:', adminLoginResponse.headers);
+
+                if (adminLoginResponse.ok) {
+                    console.log('Admin login successful, redirecting to dashboard');
+                    // Store in localStorage as backup
+                    localStorage.setItem('token', loginData.token);
+                    localStorage.setItem('refresh_token', loginData.refresh_token);
+                    localStorage.setItem('email', loginData.email);
+                    localStorage.setItem('userType', loginData.type);
+
+                    // Also set the token as a cookie for API routes
+                    setAccessTokenCookie(loginData.token);
+
+                    // Small delay to ensure cookies are set before redirect
+                    setTimeout(() => {
+                        router.push("/admin/dashboard");
+                    }, 100);
+                } else {
+                    console.error('Admin login failed:', await adminLoginResponse.text());
+                    setError("Failed to set admin session");
+                }
             } else {
                 setError(response.error || "Login failed.");
             }

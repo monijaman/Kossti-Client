@@ -24,8 +24,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClientProvider>
-      {children}
-    </ClientProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <ClientProvider>
+          {children}
+        </ClientProvider>
+      </body>
+    </html>
   )
 }

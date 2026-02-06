@@ -10,8 +10,58 @@ import '../globals.scss';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Kossti - Review Platform',
-  description: 'By Monir',
+  title: 'Kossti - Honest Product Reviews & Comparisons | Best Tech Reviews',
+  description: 'Get honest, unbiased reviews of mobiles, electronics, and tech products. Compare prices, features, and specifications to make informed buying decisions. Trusted reviews in English and Bengali.',
+  keywords: 'product reviews, mobile reviews, tech reviews, electronics, comparison, buying guide, honest reviews, bangladesh, bengali reviews',
+  authors: [{ name: 'Kossti Team' }],
+  creator: 'Kossti',
+  publisher: 'Kossti',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en-US': '/en',
+      'bn-BD': '/bn',
+    },
+  },
+  openGraph: {
+    title: 'Kossti - Honest Product Reviews & Comparisons',
+    description: 'Get honest, unbiased reviews of mobiles, electronics, and tech products. Compare prices, features, and specifications.',
+    url: 'https://kossti.com',
+    siteName: 'Kossti',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Kossti - Product Reviews Platform',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kossti - Honest Product Reviews & Comparisons',
+    description: 'Get honest, unbiased reviews of mobiles, electronics, and tech products.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 interface RootLayoutProps {

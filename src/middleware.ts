@@ -7,10 +7,17 @@ const PUBLIC_FILE = /\.(.*)$/;
 // Function to check admin session
 function checkAdminSession(req: NextRequest): boolean {
   const adminSession = req.cookies.get("admin_session")?.value;
+  const accessToken = req.cookies.get("accessToken")?.value;
+
   console.log(
-    `[Middleware Check] Path: ${req.nextUrl.pathname}, admin_session: ${adminSession ? "FOUND" : "MISSING"}`,
+    `[Middleware Check] Path: ${req.nextUrl.pathname}`,
+    `admin_session: ${adminSession ? "FOUND" : "MISSING"}`,
+    `accessToken: ${accessToken ? "FOUND" : "MISSING"}`,
+    `User-Agent: ${req.headers.get("user-agent")?.substring(0, 50)}...`,
   );
-  return !!adminSession;
+
+  // Require both admin session and access token for admin routes
+  return !!(adminSession && accessToken);
 }
 
 function getPreferredLocale(req: NextRequest): string {

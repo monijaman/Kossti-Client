@@ -1,7 +1,7 @@
 'use client'; // This directive makes this component a client component
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
   isAuthenticated: boolean; // Define the type for the prop
@@ -12,11 +12,28 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [localAuthState, setLocalAuthState] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
-  // const isAuthenticated = useAuth();
 
-  // Check both server-side prop and client-side localStorage
-  const isUserAuthenticated = isAuthenticated || (typeof window !== 'undefined' && !!localStorage.getItem('token'));
+  // Check authentication state on component mount and update
+  useEffect(() => {
+    const checkAuthState = () => {
+      const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token');
+      setLocalAuthState(hasToken);
+    };
+
+    checkAuthState();
+
+    // Listen for storage changes (when localStorage is cleared)
+    window.addEventListener('storage', checkAuthState);
+
+    return () => {
+      window.removeEventListener('storage', checkAuthState);
+    };
+  }, []);
+
+  // Combine server-side prop and client-side state
+  const isUserAuthenticated = isAuthenticated || localAuthState;
 
   const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
@@ -45,6 +62,8 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
 
       // Clear localStorage first (before calling logout endpoints)
       localStorage.clear();
+      // Immediately update local auth state
+      setLocalAuthState(false);
 
       // Step 1: Get the access token from cookies
       const token = document.cookie
@@ -110,7 +129,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
           {!isUserAuthenticated ? (
             <>
               <Link
-                href="/signin"
+                href="/admin/login"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors"
               >
 

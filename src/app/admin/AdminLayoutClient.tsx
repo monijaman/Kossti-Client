@@ -15,10 +15,12 @@ const AdminLayoutClient = ({ children, accessToken }: AdminLayoutClientProps) =>
     const pathname = usePathname();
     const isLoginPage = pathname.startsWith('/admin/login');
 
-    if (!accessToken && isLoginPage) {
+    // Always show clean layout for login page, regardless of accessToken
+    if (isLoginPage) {
         return <>{children}</>;
     }
 
+    // For all other admin pages, show full layout
     return (
         <div className="min-h-screen flex flex-col">
             <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
