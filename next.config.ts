@@ -62,6 +62,23 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Redirect www to non-www
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.kossti.com",
+          },
+        ],
+        destination: "https://kossti.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   // Reduce bundle size
   modularizeImports: {
     "react-icons": {
