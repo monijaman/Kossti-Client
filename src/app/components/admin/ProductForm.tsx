@@ -56,31 +56,31 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
-        const fetchCategoriesAndBrands = async () => {
-            // Try the wide categories endpoint (supports per_page) to avoid default pagination
-            let categoriesResponse = await getCategory();
-            try {
-                const wide = await getCategories({ perPage: 1000, paginate: false, status: null });
-                // getCategories returns { success: boolean; data: unknown }
-                // The hook's getCategories currently returns the fetchApi response as `data`.
-                // Handle both shapes: direct array or nested `data` field.
-                if (wide && wide.data) {
-                    const maybeApiResp = wide.data as unknown;
-                    const inner = (maybeApiResp && ( (maybeApiResp as { data?: unknown }).data ?? maybeApiResp)) as unknown;
-                    if (Array.isArray(inner)) {
-                        categoriesResponse = { success: true, data: inner } as { success: boolean; data: unknown };
-                    }
+    const fetchCategoriesAndBrands = async () => {
+        // Try the wide categories endpoint (supports per_page) to avoid default pagination
+        let categoriesResponse = await getCategory();
+        try {
+            const wide = await getCategories({ perPage: 1000, paginate: false, status: null });
+            // getCategories returns { success: boolean; data: unknown }
+            // The hook's getCategories currently returns the fetchApi response as `data`.
+            // Handle both shapes: direct array or nested `data` field.
+            if (wide && wide.data) {
+                const maybeApiResp = wide.data as unknown;
+                const inner = (maybeApiResp && ((maybeApiResp as { data?: unknown }).data ?? maybeApiResp)) as unknown;
+                if (Array.isArray(inner)) {
+                    categoriesResponse = { success: true, data: inner } as { success: boolean; data: unknown };
                 }
-            } catch (err) {
-                // fallback to the basic getCategory
-                console.debug('getCategories wide fetch failed, falling back to getCategory', err);
             }
+        } catch (err) {
+            // fallback to the basic getCategory
+            console.debug('getCategories wide fetch failed, falling back to getCategory', err);
+        }
 
-            const brands = await getBrands();
+        const brands = await getBrands();
 
-            setCategories(categoriesResponse.data as Category[]);
-            setBrands(brands.data as Brand[]);
-        };
+        setCategories(categoriesResponse.data as Category[]);
+        setBrands(brands.data as Brand[]);
+    };
 
     useEffect(() => {
         // Fetch categories and brands on component mount
@@ -114,7 +114,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
         try {
             console.log('[DEBUG] Starting comment pull process...');
-            
+
             // Call API to generate comments
             const response = await fetch('/api/openai/generate-comments', {
                 method: 'POST',
@@ -444,8 +444,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex items-center justify-between gap-2">
-                        
+                    <div className="flex mb-4 items-center justify-between gap-2">
+
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
@@ -454,6 +454,37 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
                         </button>
 
+
+
+
+                    </div>
+                    <hr />
+
+                    <div className="flex items-center my-6 justify-between gap-2">
+                        {/* Review Button - Only show if product exists */}
+                        {product?.id && (
+                            <button
+                                className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button"
+                                onClick={() => router.push(`/admin/reviews/${product.id}`)}
+                            >
+                                Review
+                            </button>
+                        )}
+
+                        {/* Edit Specs Button - Only show if product exists */}
+                        {product?.id && (
+                            <button
+                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button"
+                                onClick={() => router.push(`/admin/specifications/${product.id}`)}
+                            >
+                                EditSpecs
+                            </button>
+                        )}
+                    </div>
+                        <hr />
+                    <div className="flex mt-6 items-center justify-between gap-2">
                         {/* Pull Comments Button - Only show if product exists */}
                         {product?.id && (
                             <button

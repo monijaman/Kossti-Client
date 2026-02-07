@@ -8,6 +8,7 @@ import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
 import { AdditionalDetails, Product, Review } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useRef, useState } from 'react';
 
 interface PageProps {
@@ -18,6 +19,7 @@ interface PageProps {
 
 const ReviewForm = ({ params }: PageProps) => {
     const { id } = use(params);
+    const router = useRouter();
     const [reviewData, setReviewData] = useState<Review>();
     const [reviews, setReviews] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
@@ -465,6 +467,38 @@ const ReviewForm = ({ params }: PageProps) => {
                                     Add Photos
                                 </button>
                                 <p className="text-sm text-gray-500 mt-2">Upload images to accompany the review</p>
+
+                                {/* Display Uploaded Images */}
+                                {files && files.length > 0 && (
+                                    <div className="mt-4">
+                                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Uploaded Images ({files.length})</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {files.map((file, index) => (
+                                                <div key={index} className="relative rounded-lg overflow-hidden border border-gray-200">
+                                                    {file.type.startsWith('image/') ? (
+                                                        <div className="relative">
+                                                            <img
+                                                                src={URL.createObjectURL(file)}
+                                                                alt={file.name}
+                                                                className="w-full h-40 object-cover"
+                                                            />
+                                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+                                                                <p className="text-white text-xs truncate">{file.name}</p>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-full h-40 bg-gray-100 flex items-center justify-center">
+                                                            <div className="text-center">
+                                                                <p className="text-gray-600 text-sm font-medium">📄</p>
+                                                                <p className="text-gray-600 text-xs mt-1 truncate">{file.name}</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Review Form */}
@@ -543,7 +577,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                         </div>
 
                                         {/* Submit Button */}
-                                        <div className='my-4'>
+                                        <div className='my-4 flex gap-3'>
                                             <button
                                                 type="submit"
                                                 disabled={loading}
@@ -553,6 +587,26 @@ const ReviewForm = ({ params }: PageProps) => {
                                                     }`}
                                             >
                                                 {loading ? 'Saving...' : 'Submit Review'}
+                                            </button>
+                                          
+                                        </div>
+
+<hr />
+                                         <div className='my-4 flex gap-3'>
+                                            
+                                            <button
+                                                type="button"
+                                                onClick={() => router.push(`/admin/specifications/${id}`)}
+                                                className="py-2 px-4 rounded transition-colors bg-indigo-500 hover:bg-indigo-700 text-white"
+                                            >
+                                                EditSpecs
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => router.push(`/admin/products/${id}`)}
+                                                className="py-2 px-4 rounded transition-colors bg-blue-600 hover:bg-blue-800 text-white"
+                                            >
+                                                Product
                                             </button>
                                         </div>
                                     </form>

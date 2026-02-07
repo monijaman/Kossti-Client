@@ -2,6 +2,7 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Select, { SingleValue } from 'react-select';
 import { generateProductSpecifications } from "@/lib/openai-service";
 import Modal from '@/app/components/Modal/client';
@@ -22,6 +23,7 @@ interface PageProps {
 
 const Specification = ({ params }: PageProps) => {
     const { id } = use(params);
+    const router = useRouter();
     const { getSpecifications, getSpecificationsKeys, submitSpecificationsKeys } = useSpecifications();
 
     const [specifications, setSpecifications] = useState<SpecificationInt[]>([]);
@@ -252,6 +254,24 @@ const Specification = ({ params }: PageProps) => {
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? 'Saving...' : 'Submit'}
+                            </button>
+                            
+                        </div>
+<hr />
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/admin/reviews/${id}`)}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                            >
+                                Review
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/admin/products/${id}`)}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Product
                             </button>
                         </div>
 

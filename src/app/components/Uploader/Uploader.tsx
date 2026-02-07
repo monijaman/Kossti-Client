@@ -159,15 +159,7 @@ const DragNdrop = ({
         >
           <div className="file-types">
             <div className="file-types__item">
-              <Image
-                src={`/icons/image.svg`} // Ensure backticks are
-                alt="Image"
-                title={"image"}
-                sizes="100vw"
-                width={44}
-                height={44}
-                priority // Optional: Set priority for loading
-              />
+              <div className="text-4xl">🖼️</div>
               <div>
                 <h5>Add Image file</h5>
                 <h6> All .gif, .png, .jpg</h6>
@@ -178,16 +170,7 @@ const DragNdrop = ({
           <>
             <div className="upload-box">
               <div className="upload-info">
-                <Image
-                  className="content-card__image"
-                  src={`/icons/upload.svg`} // Ensure backticks are
-                  alt="Tick Icon"
-                  title={""}
-                  sizes="100vw"
-                  width={44}
-                  height={44}
-                  priority // Optional: Set priority for loading
-                />
+                <div className="text-4xl">📁</div>
 
                 <div>
                   <p>
@@ -290,20 +273,7 @@ const DragNdrop = ({
 
             {files.length > 0 && (
               <div className="success-file">
-                <Image
-                  className="total-files"
-                  src={`/icons/circle.svg`} // Ensure backticks are
-                  alt="Tick Icon"
-                  title={""}
-                  sizes="100vw"
-                  style={{
-                    width: "23px",
-                    height: "23px",
-                  }}
-                  width={24}
-                  height={24}
-                  priority // Optional: Set priority for loading
-                />
+                <div className="text-xl">✅</div>
 
                 <p>{files.length} file(s) selected</p>
               </div>

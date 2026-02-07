@@ -23,27 +23,30 @@ const RenderPreview = ({ file, fileurl }: propTypes) => {
   }
 
   if (extension === "zip" || extension === "html") {
-    imgThumb = "/icons/html.svg";
+    imgThumb = "📦"; // Zip/HTML file icon
   } else if (extension === "mp4") {
-    imgThumb = "/icons/video.svg";
+    imgThumb = "🎥"; // Video file icon
   }
 
 
   return (
     <div key={filename} className="preview-item">
-      {/* {imgThumb} */}
-      <Image
-        src={imgThumb}
-        alt={filename} // Ensure backticks are
-        title={""}
-        style={{
-          width: "35px",
-          height: "auto",
-        }}
-        width={24}
-        height={24}
-        priority // Optional: Set priority for loading
-      />
+      {imgThumb && (imgThumb.startsWith("http") || imgThumb.startsWith("/")) ? (
+        <Image
+          src={imgThumb}
+          alt={filename}
+          title={""}
+          style={{
+            width: "35px",
+            height: "auto",
+          }}
+          width={24}
+          height={24}
+          priority
+        />
+      ) : (
+        <div style={{ fontSize: "35px", lineHeight: "35px" }}>{imgThumb}</div>
+      )}
     </div>
   );
 };
