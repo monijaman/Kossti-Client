@@ -33,9 +33,14 @@ function checkAdminSession(req: RequestWithGeo): boolean {
 }
 
 function getPreferredLocale(req: RequestWithGeo): string {
-  // First check if user has a locale preference cookie
-  const localePreference = req.cookies.get("locale-preference")?.value;
+  // First check if user has a locale preference cookie (check multiple possible names)
+  const localePreference =
+    req.cookies.get("locale-preference")?.value ||
+    req.cookies.get("country-code")?.value ||
+    req.cookies.get("locale")?.value;
+
   if (localePreference && LOCALES.includes(localePreference)) {
+    console.log("Found locale preference in cookies:", localePreference);
     return localePreference;
   }
 

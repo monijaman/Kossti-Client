@@ -17,6 +17,23 @@ export default function ClientProvider({ children }: ClientProviderProps) {
         // if (token) {
         //     setAccessTokenCookie(token);
         // }
+
+        // Sync locale preference from localStorage to cookie for middleware
+        const locale = localStorage.getItem('locale');
+        if (locale) {
+            // Check if cookie already exists
+            const cookieExists = document.cookie
+                .split('; ')
+                .some(row => row.startsWith('locale-preference='));
+
+            if (!cookieExists) {
+                console.log('Syncing locale from localStorage to cookie:', locale);
+                document.cookie = `locale-preference=${locale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+
+                // Refresh the page to let middleware handle the locale routing
+                window.location.reload();
+            }
+        }
     }, []);
 
     return <Provider store={store}>{children}</Provider>;

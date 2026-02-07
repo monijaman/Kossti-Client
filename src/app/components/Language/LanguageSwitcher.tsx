@@ -24,7 +24,7 @@ const LanguageSwitcher = () => {
                 // Set locale in localStorage, update state, and set cookie
                 localStorage.setItem('locale', activeLocale);
                 setLocale(activeLocale);
-                document.cookie = `country-code=${activeLocale}; path=/`; // Set cookie with path for the entire site
+                document.cookie = `locale-preference=${activeLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`; // Set cookie with path for the entire site
 
 
                 // Use a slight delay to allow the server to read the cookie
@@ -45,8 +45,8 @@ const LanguageSwitcher = () => {
         localStorage.setItem('locale', newLocale)
         setLocale(newLocale);
 
-        // Update the cookie
-        document.cookie = `country-code=${newLocale}; path=/`;
+        // Update the cookie (use the same name that middleware expects)
+        document.cookie = `locale-preference=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
 
         // Use window.location to manage the URL dynamically
         const currentUrl = window.location.pathname;

@@ -1,7 +1,8 @@
 // Utility functions for locale management
 
 export const setLocalePreference = (locale: string) => {
-  // Set cookie to remember user's locale preference
+  // Set both localStorage and cookie to keep them in sync
+  localStorage.setItem("locale", locale);
   document.cookie = `locale-preference=${locale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
 
   // Redirect to the new locale
@@ -16,6 +17,14 @@ export const setLocalePreference = (locale: string) => {
   // Add the new locale
   const newPath = `/${locale}${pathParts.join("/")}`;
   window.location.href = newPath;
+};
+
+export const syncLocalePreference = () => {
+  // Sync localStorage to cookie manually
+  const locale = localStorage.getItem("locale");
+  if (locale) {
+    document.cookie = `locale-preference=${locale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+  }
 };
 
 export const getLocaleFromPath = (pathname: string): string => {
