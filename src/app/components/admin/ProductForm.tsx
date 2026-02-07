@@ -21,7 +21,11 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [model, setModel] = useState(product?.model || '');
     const [price, setPrice] = useState(product?.price || 0);
     const [status, setStatus] = useState(product?.status || false);
-    const [priority, setPriority] = useState(product?.priority || 1);
+    const [priority, setPriority] = useState<number>(() => {
+        const p = product?.priority;
+        console.log('[ProductForm] Initial priority from product:', p);
+        return (p && p > 0) ? p : 1;
+    });
     const [submitStatus, setSubmitStatus] = useState('');
     const [loading, setLoading] = useState(false);
     const [commentLoading, setCommentLoading] = useState(false);
@@ -91,13 +95,14 @@ const ProductForm = ({ product }: ProductFormProps) => {
     // Update form state when product changes (on initial load)
     useEffect(() => {
         if (product) {
+            console.log('[ProductForm] Setting initial form values. Priority:', product.priority);
             setName(product.name || '');
             setCategory(product.category_id?.toString() || '');
             setBrand(product.brand_id?.toString() || '');
             setModel(product.model || '');
             setPrice(product.price || 0);
             setStatus(product.status || false);
-            setPriority(product.priority || 1);
+            setPriority(product.priority && product.priority > 0 ? product.priority : 1);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id]); // Only depend on product ID to avoid loops
@@ -217,6 +222,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
             status: !!status, // Convert to boolean (true/false)
             priority: Number(priority), // Priority field now exists in Go server's Product entity
         };
+
+        console.log('[ProductForm] Submit payload:', payload, 'Current priority state:', priority);
 
 
         try {
@@ -434,7 +441,11 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="priority"
                             value={priority?.toString() || '1'}
-                            onChange={(e) => setPriority(Number(e.target.value))}
+                            onChange={(e) => {
+                                const newPriority = Number(e.target.value);
+                                console.log('[ProductForm] Priority changed:', newPriority, 'from event value:', e.target.value);
+                                setPriority(newPriority);
+                            }}
                             required
                         >
                             <option value="1">Low</option>

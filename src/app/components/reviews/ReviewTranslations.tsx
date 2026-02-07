@@ -2,7 +2,7 @@
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
 type SubmitSpecResponse = {
     success: boolean;
@@ -36,13 +36,14 @@ interface PageProps {
 
 const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const { submitSpecKeyTranslation, getSpecTranslations } = useSpecifications();
     const [translatedSpecifications, setTranslatedSpecifications] = useState<transDataSet[]>([]);
 
     const [tranSpecifications, setTranSpecifications] = useState<SpecKeyTranslation[]>([]);
 
-    const tranlatedSpecification = async () => {
+    const tranlatedSpecification = useCallback(async () => {
         if (productId) {
             const dataset = await getSpecTranslations(productId, selectedLocale);
 
@@ -53,9 +54,9 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
             return dataset.dataset;
         }
         return null;
-    };
+    }, [productId, selectedLocale, getSpecTranslations, translatedSpecifications]);
 
-    const fetchAndProcess = async () => {
+    const fetchAndProcess = useCallback(async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
         if (specifications) {
@@ -77,25 +78,36 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
             setTranSpecifications(transSpec);
         }
-    }
+    }, [tranlatedSpecification, specifications, selectedLocale]);
 
     useEffect(() => {
         fetchAndProcess();
-    }, [specifications, selectedLocale]);
+    }, [fetchAndProcess]);
 
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setSubmitLoading(true);
+        setFormStatus("");
+        console.log('[ReviewTranslations] Submit started');
 
+        try {
+            if (productId) {
+                const response = await submitSpecKeyTranslation(productId, tranSpecifications) as SubmitSpecResponse;
 
-        if (productId) {
-
-            const response = await submitSpecKeyTranslation(productId, tranSpecifications) as SubmitSpecResponse;
-
-            if (response.success) {
-
-                setFormStatus(response.data.message)
+                if (response.success) {
+                    setFormStatus(response.data.message)
+                    console.log('[ReviewTranslations] Submit successful:', response.data.message);
+                } else {
+                    setFormStatus('Failed to submit translations');
+                }
             }
+        } catch (error) {
+            console.error('[ReviewTranslations] Submit error:', error);
+            setFormStatus('Error submitting translations');
+        } finally {
+            setSubmitLoading(false);
+            console.log('[ReviewTranslations] Submit finished');
         }
     };
 
@@ -116,7 +128,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="font-bold mb-4">Tranaslattion</h2>
+            <h2 className="font-bold mb-4">Tranaslation</h2>
 
             <div className="mb-4">
                 {LOCALES.map((translation) => (
@@ -175,9 +187,21 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
                 <button
                     type="submit"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    disabled={submitLoading}
+                    className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-all duration-200 ease-in-out ${
+                        submitLoading
+                            ? 'bg-gray-400 cursor-wait opacity-75'
+                            : 'bg-green-600 hover:bg-green-700'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                    Submit
+                    {submitLoading ? (
+                        <>
+                            <span className="animate-spin inline-block mr-2">⏳</span>
+                            Submitting...
+                        </>
+                    ) : (
+                        'Submit'
+                    )}
                 </button>
             </div>
 

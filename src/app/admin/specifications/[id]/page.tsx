@@ -42,6 +42,11 @@ const Specification = ({ params }: PageProps) => {
         }
     }, [submitStatus]);
 
+    // Debug log for loading state changes
+    useEffect(() => {
+        console.log('[SpecForm] Loading state changed:', loading);
+    }, [loading]);
+
 
     // Function to handle input change
     const handleInputChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
@@ -129,12 +134,15 @@ const Specification = ({ params }: PageProps) => {
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        console.log('[SpecForm] Submit clicked. Setting loading to true');
         setLoading(true);
         setSubmitStatus(''); // Clear previous status
 
         try {
+            console.log('[SpecForm] Calling submitSpecificationsKeys with id:', +id);
             // Call the submit function with the mapped data
             const result = await submitSpecificationsKeys(+id, specifications);
+            console.log('[SpecForm] Submit result:', result);
 
             if (result.success) {
                 console.log("Specifications saved successfully:", result.data);
@@ -149,6 +157,7 @@ const Specification = ({ params }: PageProps) => {
             console.error("Error submitting specifications:", error);
             setSubmitStatus("An error occurred while saving specifications");
         } finally {
+            console.log('[SpecForm] Submit finished. Setting loading to false');
             setLoading(false);
         }
     };
@@ -251,9 +260,20 @@ const Specification = ({ params }: PageProps) => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-all ${
+                                    loading
+                                        ? 'bg-gray-500 cursor-wait opacity-75'
+                                        : 'bg-green-600 hover:bg-green-700'
+                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
-                                {loading ? 'Saving...' : 'Submit'}
+                                {loading ? (
+                                    <>
+                                        <span className="animate-spin mr-2">⏳</span>
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    'Submit'
+                                )}
                             </button>
                             
                         </div>

@@ -125,23 +125,41 @@ export const useReviews = () => {
         throw new Error("API URL is not defined in environment variables");
       }
 
-      // Prepare request payload (we inline below)
+      // Validate rating is a number
+      const numRating = rating ? Number(rating) : null;
+      if (numRating === null || isNaN(numRating)) {
+        throw new Error("Rating must be a valid number");
+      }
+
+      // Ensure additional_details is an array and filter out empty entries
+      const cleanedDetails = Array.isArray(additional_details) 
+        ? additional_details.filter(detail => {
+            const youtubeUrl = (detail as any).youtubeUrl?.trim();
+            const sourceUrl = (detail as any).sourceUrl?.trim();
+            return youtubeUrl || sourceUrl;
+          })
+        : [];
 
       // POST to the backend create-review endpoint: {BASEURL}/reviews/{product_id}
       // If you want to update an existing review instead, use /product/{id}/review/{reviewid}
       const fullUrl = `${apiUrl}/reviews/${product_id}`;
+
+      const payload: Record<string, any> = {
+        rating: numRating,
+        reviews,
+      };
+
+      // Only include additional_details if there are non-empty items
+      if (cleanedDetails.length > 0) {
+        payload.additional_details = cleanedDetails;
+      }
 
       const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          rating,
-          reviews,
-          // send additional_details as an actual JSON array/object (not a string)
-          additional_details: additional_details,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -311,19 +329,39 @@ export const useReviews = () => {
     if (!product_id || !review_id)
       throw new Error("product_id and review_id are required");
 
+    // Validate rating is a number
+    const numRating = rating ? Number(rating) : null;
+    if (numRating === null || isNaN(numRating)) {
+      throw new Error("Rating must be a valid number");
+    }
+
+    // Ensure additional_details is an array and filter out empty entries
+    const cleanedDetails = Array.isArray(additional_details) 
+      ? additional_details.filter(detail => {
+          const youtubeUrl = (detail as any).youtubeUrl?.trim();
+          const sourceUrl = (detail as any).sourceUrl?.trim();
+          return youtubeUrl || sourceUrl;
+        })
+      : [];
+
     const fullUrl = `${apiUrlVal}/product/${product_id}/review/${review_id}`;
+
+    const payload: Record<string, any> = {
+      rating: numRating,
+      reviews: reviewsStr,
+    };
+
+    // Only include additional_details if there are non-empty items
+    if (cleanedDetails.length > 0) {
+      payload.additional_details = cleanedDetails;
+    }
 
     const response = await fetch(fullUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        rating,
-        reviews: reviewsStr,
-        // send additional_details as an actual JSON array/object (not a string)
-        additional_details: additional_details,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

@@ -37,8 +37,9 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     // AI Review states
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string>('');
-    // Translation states
-    const [translationLoading, setTranslationLoading] = useState(false);
+    // Translation states - SEPARATE loading states
+    const [translateReviewLoading, setTranslateReviewLoading] = useState(false);
+    const [submitTranslationLoading, setSubmitTranslationLoading] = useState(false);
     const [translationError, setTranslationError] = useState<string>('');
 
     const resetForm = useCallback(() => {
@@ -168,7 +169,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
     // Translate Review to Bengali
     const handleTranslateReview = async () => {
-        setTranslationLoading(true);
+        setTranslateReviewLoading(true);
         setTranslationError('');
 
         try {
@@ -220,80 +221,93 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 setTranslationError('');
             }, 5000);
         } finally {
-            setTranslationLoading(false);
+            setTranslateReviewLoading(false);
         }
     };
 
-    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormStatus("");
+        setSubmitTranslationLoading(true);
+        console.log('[ReviewTransForm] Translation submit started');
 
-        if (!selectedTranslation) return;
+        if (!selectedTranslation) {
+            setSubmitTranslationLoading(false);
+            return;
+        }
 
         const product_id = productId;
 
-        // Prepare the data to be submitted - send rating as string
-        const response = await addReviewTranslation(
-            product_id,
-            ratingInput, // Send the ratingInput string directly
-            selectedTranslation.review,
-            selectedLocale,
-            additionalDetails
-        );
+        try {
+            // Prepare the data to be submitted - send rating as string
+            const response = await addReviewTranslation(
+                product_id,
+                ratingInput, // Send the ratingInput string directly
+                selectedTranslation.review,
+                selectedLocale,
+                additionalDetails
+            );
 
-        if (response && response.success) {
-            const details = response.data.translation || response.data.review;
-            const updatedTransData = transData.map((dataset) => {
-                if (dataset.locale === selectedLocale) {
-                    return { ...dataset, ...details };
+            if (response && response.success) {
+                const details = response.data.translation || response.data.review;
+                const updatedTransData = transData.map((dataset) => {
+                    if (dataset.locale === selectedLocale) {
+                        return { ...dataset, ...details };
+                    }
+                    return dataset;
+                });
+
+                setTransData(updatedTransData);
+                
+                // Update ratingInput to show the newly saved rating (preserve Bengali format)
+                if (details && details.rating) {
+                    setRatingInput(String(details.rating));
                 }
-                return dataset;
-            });
+                
+                const msg = response.data.message || 'Review submitted successfully';
+                setFormStatus(msg);
 
-            setTransData(updatedTransData);
-            
-            // Update ratingInput to show the newly saved rating (preserve Bengali format)
-            if (details && details.rating) {
-                setRatingInput(String(details.rating));
-            }
-            
-            const msg = response.data.message || 'Review submitted successfully';
-            setFormStatus(msg);
-
-            // Show transient success message below the submit button
-            setTransSuccessMessage(msg);
-            if (transTimerRef.current) {
-                window.clearTimeout(transTimerRef.current);
-            }
-            transTimerRef.current = window.setTimeout(() => {
-                setTransSuccessMessage('');
-                transTimerRef.current = null;
-            }, 2500) as unknown as number;
-        } else {
-            // Handle error case
-            let err = 'Failed to submit translation';
-            try {
-                if (response && response.data && (response.data.error || response.data.message)) {
-                    err = String(response.data.error || response.data.message);
-                } else if (response && response.message) {
-                    err = String(response.message);
+                // Show transient success message below the submit button
+                setTransSuccessMessage(msg);
+                if (transTimerRef.current) {
+                    window.clearTimeout(transTimerRef.current);
                 }
-            } catch {
-                /* ignore */
-            }
+                transTimerRef.current = window.setTimeout(() => {
+                    setTransSuccessMessage('');
+                    transTimerRef.current = null;
+                }, 2500) as unknown as number;
+            } else {
+                // Handle error case
+                let err = 'Failed to submit translation';
+                try {
+                    if (response && response.data && (response.data.error || response.data.message)) {
+                        err = String(response.data.error || response.data.message);
+                    } else if (response && response.message) {
+                        err = String(response.message);
+                    }
+                } catch {
+                    /* ignore */
+                }
 
-            setFormStatus(err);
+                setFormStatus(err);
 
-            // Show transient error message
-            setTransErrorMessage(err);
-            if (transErrorTimerRef.current) {
-                window.clearTimeout(transErrorTimerRef.current);
+                // Show transient error message
+                setTransErrorMessage(err);
+                if (transErrorTimerRef.current) {
+                    window.clearTimeout(transErrorTimerRef.current);
+                }
+                transErrorTimerRef.current = window.setTimeout(() => {
+                    setTransErrorMessage('');
+                    transErrorTimerRef.current = null;
+                }, 2500) as unknown as number;
             }
-            transErrorTimerRef.current = window.setTimeout(() => {
-                setTransErrorMessage('');
-                transErrorTimerRef.current = null;
-            }, 2500) as unknown as number;
+        } catch (error) {
+            console.error('Translation submission error:', error);
+            setFormStatus('An error occurred while submitting translation');
+            setTransErrorMessage('An error occurred while submitting translation');
+        } finally {
+            console.log('[ReviewTransForm] Translation submit finished');
+            setSubmitTranslationLoading(false);
         }
     };
 
@@ -442,14 +456,14 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                             <button
                                 type="button"
                                 onClick={handleTranslateReview}
-                                disabled={translationLoading || !transData.find((trans) => trans.locale === 'en')?.review}
+                                disabled={translateReviewLoading || !transData.find((trans) => trans.locale === 'en')?.review}
                                 className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
-                                    translationLoading
+                                    translateReviewLoading
                                         ? 'bg-gray-400 cursor-not-allowed text-white'
                                         : 'bg-indigo-500 hover:bg-indigo-600 text-white'
                                 }`}
                             >
-                                {translationLoading ? (
+                                {translateReviewLoading ? (
                                     <span className="flex items-center gap-2">
                                         <span className="animate-spin">⏳</span>
                                         Translating...
@@ -468,9 +482,21 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                     <div className="flex justify-center gap-4 flex-wrap">
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out hover:bg-blue-600"
+                            disabled={submitTranslationLoading}
+                            className={`text-white py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
+                                submitTranslationLoading
+                                    ? 'bg-gray-500 cursor-wait opacity-75'
+                                    : 'bg-blue-500 hover:bg-blue-600'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                            Submit Translation
+                            {submitTranslationLoading ? (
+                                <>
+                                    <span className="animate-spin inline-block mr-2">⏳</span>
+                                    Submitting...
+                                </>
+                            ) : (
+                                'Submit Translation'
+                            )}
                         </button>
                     </div>
 

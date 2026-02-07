@@ -304,6 +304,14 @@ const ReviewForm = ({ params }: PageProps) => {
             return; // Stop form submission
         }
 
+        // Validate rating
+        const numRating = Number(rating);
+        if (isNaN(numRating) || numRating < 1 || numRating > 5) {
+            setErrorMessage('Rating must be a number between 1 and 5');
+            setLoading(false);
+            return;
+        }
+
         if (!id) {
             console.error('No product ID found');
             setErrorMessage('Product ID not found');
@@ -318,7 +326,7 @@ const ReviewForm = ({ params }: PageProps) => {
                 result = await updateReview(
                     +id,
                     reviewData.id,
-                    rating,
+                    numRating,
                     reviews,
                     additionalDetails,
                 );
@@ -326,7 +334,7 @@ const ReviewForm = ({ params }: PageProps) => {
                 // Create new review
                 result = await addReview(
                     +id,
-                    rating,
+                    numRating,
                     reviews,
                     additionalDetails,
                 );
@@ -542,7 +550,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                             showMessage={detailsMessageVisible}
                                             onDetailsChange={handleAdditionalDetailsChange}
                                         />
-
+                                        <hr className='mt-6' />
                                         {/* AI Error Message */}
                                         {aiError && (
                                             <div className="p-3 mt-4 mb-4 text-sm rounded-lg bg-red-100 text-red-700 border border-red-300">
@@ -551,7 +559,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                         )}
 
                                         {/* AI Review Button */}
-                                        <div className='my-4'>
+                                        <div className='my-4 mt-6'>
 
                                             <button
                                                 type="button"
@@ -562,6 +570,8 @@ const ReviewForm = ({ params }: PageProps) => {
                                                     : 'bg-purple-500 hover:bg-purple-600 text-white'
                                                     }`}
                                             >
+
+
                                                 {aiLoading ? (
                                                     <span className="flex items-center gap-2">
                                                         <span className="animate-spin">⏳</span>
@@ -570,12 +580,12 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         <span>✨</span>
-                                                        AI Review 
+                                                        AI Review
                                                     </span>
                                                 )}
                                             </button>
                                         </div>
-
+                                        <hr />
                                         {/* Submit Button */}
                                         <div className='my-4 flex gap-3'>
                                             <button
@@ -588,12 +598,12 @@ const ReviewForm = ({ params }: PageProps) => {
                                             >
                                                 {loading ? 'Saving...' : 'Submit Review'}
                                             </button>
-                                          
+
                                         </div>
 
-<hr />
-                                         <div className='my-4 flex gap-3'>
-                                            
+                                        <hr />
+                                        <div className='my-4 flex gap-3'>
+
                                             <button
                                                 type="button"
                                                 onClick={() => router.push(`/admin/specifications/${id}`)}
@@ -657,7 +667,7 @@ const ReviewForm = ({ params }: PageProps) => {
             >
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
-                    
+
                     <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
                         <p className="font-medium mb-2">📋 Review will include:</p>
                         <ul className="list-disc list-inside space-y-1 text-xs">
