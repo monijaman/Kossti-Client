@@ -430,15 +430,17 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="priority">
                             Priority
                         </label>
-                        <input
+                        <select
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="priority"
-                            type="number"
-                            placeholder="Enter priority"
-                            value={priority}
-                            onChange={(e) => setPriority(Number(e.target.value) || 1)}
+                            value={priority?.toString() || '1'}
+                            onChange={(e) => setPriority(Number(e.target.value))}
                             required
-                        />
+                        >
+                            <option value="1">Low</option>
+                            <option value="2">Medium</option>
+                            <option value="3">High</option>
+                        </select>
                     </div>
 
                     {/* Submit Button */}

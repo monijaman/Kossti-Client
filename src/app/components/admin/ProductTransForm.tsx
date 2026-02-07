@@ -207,16 +207,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
             return;
         }
 
-        if (!name?.trim()) {
-            setSubmitStatus('Error: Translated product name is required');
-            return;
-        }
-
-        if (!price || price <= 0) {
-            setSubmitStatus('Error: Valid price is required');
-            return;
-        }
-
         const payload = {
             locale: selectedTranslation, // Go server expects lowercase
             translated_name: name?.trim() || '', // Go server expects snake_case, trim whitespace safely
@@ -293,7 +283,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                         Translated Product Name ({selectedTranslation.toUpperCase()})
-                        <span className="text-red-500 ml-1">*</span>
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
@@ -302,7 +291,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                         placeholder={`Enter product name in ${selectedTranslation.toUpperCase()}`}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        required
                     />
                     <p className="text-gray-600 text-xs mt-1">
                         Enter the product name as it should appear in {selectedTranslation.toUpperCase()}
@@ -312,7 +300,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
                         Translated Price ({selectedTranslation.toUpperCase()})
-                        <span className="text-red-500 ml-1">*</span>
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
@@ -323,7 +310,6 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                         placeholder={`Enter price in ${selectedTranslation.toUpperCase()} currency`}
                         value={price || ''}
                         onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                        required
                     />
                     <p className="text-gray-600 text-xs mt-1">
                         Enter the price in the local currency for {selectedTranslation.toUpperCase()} market
@@ -334,7 +320,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     <button
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
                         type="submit"
-                        disabled={!name?.trim() || !price || price <= 0 || !selectedTranslation}
+                        disabled={!selectedTranslation}
                     >
                         {translations?.find(t => {
                             const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
