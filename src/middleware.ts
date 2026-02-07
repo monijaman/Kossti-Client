@@ -2,10 +2,22 @@ import { LOCALES } from "@/lib/constants";
 import { gettokenbyrefreshToken } from "@/lib/utils"; // Adjust the import path as needed
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
+// Extend NextRequest to include geo property
+interface RequestWithGeo extends NextRequest {
+  geo?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    latitude?: string;
+    longitude?: string;
+  };
+}
+
 const PUBLIC_FILE = /\.(.*)$/;
 
 // Function to check admin session
-function checkAdminSession(req: NextRequest): boolean {
+function checkAdminSession(req: RequestWithGeo): boolean {
   const adminSession = req.cookies.get("admin_session")?.value;
   const accessToken = req.cookies.get("accessToken")?.value;
 
@@ -20,7 +32,7 @@ function checkAdminSession(req: NextRequest): boolean {
   return !!(adminSession && accessToken);
 }
 
-function getPreferredLocale(req: NextRequest): string {
+function getPreferredLocale(req: RequestWithGeo): string {
   // First check if user has a locale preference cookie
   const localePreference = req.cookies.get("locale-preference")?.value;
   if (localePreference && LOCALES.includes(localePreference)) {
@@ -57,7 +69,7 @@ function getPreferredLocale(req: NextRequest): string {
   return "bn";
 }
 
-function internationalization(req: NextRequest, res: NextResponse) {
+function internationalization(req: RequestWithGeo, res: NextResponse) {
   // Skip Next.js internal routes, API routes, and public files.
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
@@ -90,7 +102,7 @@ function internationalization(req: NextRequest, res: NextResponse) {
 
 // Function to handle token checking and redirection
 async function handleTokenAndRedirect(
-  request: NextRequest,
+  request: RequestWithGeo,
   response: NextResponse,
   refToken?: string,
 ) {
@@ -123,7 +135,7 @@ async function handleTokenAndRedirect(
 }
 
 // Main middleware function
-export async function middleware(request: NextRequest) {
+export async function middleware(request: RequestWithGeo) {
   // Handle www to non-www redirect
   const hostname = request.headers.get("host");
   if (hostname?.startsWith("www.")) {
