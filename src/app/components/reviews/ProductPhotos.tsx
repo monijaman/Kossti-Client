@@ -14,6 +14,7 @@ const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
     // Fetch specifications based on product ID and country code
     const fetchPhotos = async () => {
         const response = await getPhotosByProductId(productId);
+        console.log('[ProductPhotos] Response:', response);
         setPhotos(response.data);
 
     };
@@ -23,7 +24,8 @@ const ProductPhotosPage = ({ productId }: PopularProductsProps) => {
 
     useEffect(() => {
         fetchPhotos();
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [productId])
 
 
     return (

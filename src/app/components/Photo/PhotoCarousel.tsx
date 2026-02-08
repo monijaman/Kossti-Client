@@ -38,7 +38,7 @@ const PhotoCarousel = ({ photos }: PhotoCarouselProps) => {
             {/* Display the current photo */}
             {photos.length > 0 && (
                 <Image
-                    src={photos[currentIndex]?.asset_url ?? ''}
+                    src={photos[currentIndex]?.url ?? photos[currentIndex]?.asset_url ?? ''}
                     alt={`Photo ${currentIndex + 1}`}
                     style={{
                         width: "auto",

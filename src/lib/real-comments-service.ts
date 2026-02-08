@@ -11,6 +11,27 @@ import { AIComment } from "./openai-service";
 // NEXT_PUBLIC_FACEBOOK_ACCESS_TOKEN
 // NEXT_PUBLIC_AMAZON_API_KEY
 
+interface RedditComment {
+  author: string;
+  body: string;
+  subreddit: string;
+}
+
+interface RedditChild {
+  data: RedditComment;
+}
+
+interface FacebookPost {
+  message: string;
+  from: { name: string };
+}
+
+interface AmazonReview {
+  verified_purchase: boolean;
+  reviewer: string;
+  body: string;
+}
+
 /**
  * Fetch real comments from Reddit
  */
@@ -62,7 +83,7 @@ export async function fetchRedditComments(productName: string): Promise<AICommen
     const comments: AIComment[] = [];
 
     if (data.data && data.data.children) {
-      data.data.children.forEach((item: any) => {
+      data.data.children.forEach((item: RedditChild) => {
         const comment = item.data;
         if (comment.body && comment.body.length > 10) {
           comments.push({
@@ -110,7 +131,7 @@ export async function fetchFacebookComments(productName: string): Promise<AIComm
     const comments: AIComment[] = [];
 
     if (data.data) {
-      data.data.forEach((post: any) => {
+      data.data.forEach((post: FacebookPost) => {
         if (post.message && post.message.length > 10) {
           comments.push({
             username: post.from?.name || "Anonymous",
@@ -165,7 +186,7 @@ export async function fetchAmazonComments(productName: string): Promise<AICommen
         if (reviewResponse.ok) {
           const reviewData = await reviewResponse.json();
           if (reviewData.reviews) {
-            reviewData.reviews.forEach((review: any) => {
+            reviewData.reviews.forEach((review: AmazonReview) => {
               comments.push({
                 username: review.verified_purchase ? `${review.reviewer}*` : review.reviewer,
                 location: "", // Amazon reviews don't always have location

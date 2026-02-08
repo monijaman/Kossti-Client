@@ -50,8 +50,9 @@ export async function POST(request: NextRequest) {
     
     // Handle nested data structure
     if (comments && typeof comments === 'object' && !Array.isArray(comments)) {
-      if (Array.isArray((comments as any).data)) {
-        comments = (comments as any).data;
+      const commentObj = comments as Record<string, unknown>;
+      if (Array.isArray(commentObj.data)) {
+        comments = commentObj.data;
       }
     }
 
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       id: number;
       comment: string;
       username: string;
-      [key: string]: any;
+      [key: string]: unknown;
     }>;
 
     console.log(`[DEBUG] Found ${commentsList.length} comments for product ${productId}`);

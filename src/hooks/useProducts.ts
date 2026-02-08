@@ -359,7 +359,7 @@ export const useProducts = () => {
     }
   };
 
-  const MakePhotoDefault = async (photoId: number | string) => {
+  const MakePhotoDefault = async (photoId: number | string, productId?: number) => {
     try {
       const payload = {
         apiUrl: `default-image/${photoId}`,
@@ -378,16 +378,27 @@ export const useProducts = () => {
 
       // Parse the response body as JSON
       const dataset = await response.json();
+      console.log("[MakePhotoDefault] Response:", dataset);
 
-      // Return success along with the data
+      // After setting the default, fetch the updated photos list
+      if (productId) {
+        const photosResponse = await getPhotosByProductId(productId);
+        return {
+          success: true,
+          data: photosResponse.data || [],
+        };
+      }
+
+      // If no productId provided, return empty data (caller should refetch)
       return {
         success: true,
-        data: dataset.data.images,
+        data: [],
+        message: dataset.message || "Image set as default",
       };
     } catch (error) {
       // Type the error to access the message property
       const err = error as Error;
-      console.error("Error updating product:", err.message);
+      console.error("Error setting photo as default:", err.message);
 
       return { success: false, data: [], error: err.message };
     }

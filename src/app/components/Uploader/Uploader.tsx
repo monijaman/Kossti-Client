@@ -28,7 +28,7 @@ const DragNdrop = ({
   height,
 }: DragNdropProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif"];
+  const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif", ".webp", ".svg"];
   const dispatch = useAppDispatch();
   const selectedFilesRef = useRef<File[]>([]);
 
@@ -123,8 +123,17 @@ const DragNdrop = ({
   };
 
   const makePhotoDefault = async (selectedValue: number) => {
-    const response = await MakePhotoDefault(selectedValue);
-    setPhotos(response.data);
+    const response = await MakePhotoDefault(selectedValue, productId);
+    if (response.success) {
+      setPhotos(response.data);
+      // Update selectedValue to reflect the newly set default image
+      const defaultFile = response.data.find((file: ProductPhotos) => file.defaultphoto === 1);
+      if (defaultFile) {
+        setSelectedValue(defaultFile.id);
+      }
+    } else {
+      console.error("Failed to set photo as default:", response.error);
+    }
   }
 
   // if file is selected

@@ -105,7 +105,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
             setPriority(product.priority && product.priority > 0 ? product.priority : 1);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [product?.id]); // Only depend on product ID to avoid loops
+    }, [product?.id, product?.priority]); // Watch both ID and priority for updates
 
     // Handle pulling comments from OpenAI
     const handlePullComments = async () => {
