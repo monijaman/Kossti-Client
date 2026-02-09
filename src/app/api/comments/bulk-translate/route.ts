@@ -90,11 +90,16 @@ export async function POST(request: NextRequest) {
       
       // Map comments to AIComment format with required fields
       const commentsForTranslation = commentsList.map(comment => ({
-        username: comment.username || 'Anonymous',
-        location: comment.location || '',
-        comment: comment.comment,
-        sourceUrl: comment.sourceUrl || '',
-      }));
+        username: String(comment.username || 'Anonymous'),
+        location: String(comment.location || ''),
+        comment: String(comment.comment),
+        sourceUrl: String(comment.sourceUrl || ''),
+      })) as Array<{
+        username: string;
+        location: string;
+        comment: string;
+        sourceUrl: string;
+      }>;
       
       const translatedComments = await translateCommentsTobengali(commentsForTranslation);
       console.log(`[DEBUG] Translated comments:`, translatedComments);

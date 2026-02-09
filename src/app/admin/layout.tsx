@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 import AdminLayoutClient from './AdminLayoutClient';
 
 export const metadata: Metadata = {
-  title: 'Viper Front',
+  title: 'Kossti: Review Analysis ',
   description: 'By Monir dev',
 };
 
