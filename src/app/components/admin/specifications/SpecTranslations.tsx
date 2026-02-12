@@ -100,8 +100,10 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     specification_key_id: +item.specification_key_id,
                     // translated_key should be the translated name of the specification key itself
                     translated_key: keyValue?.translations?.translated_key || specKey?.specification_key || '',
-                    // translated_value should be the translated value for this specification
-                    translated_value: keyValue?.translations?.translated_value || item.value || '',
+                    // translated_value should be the translated value for this specification (empty if none)
+                    translated_value: keyValue?.translations?.translated_value || '',
+                    // Keep the original English value as a read-only source hint
+                    source_value: item.value || '',
                 };
             })
 
@@ -182,34 +184,57 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
         setFormStatus('');
 
         try {
-            // Prepare specifications for translation
-            const specsToTranslate = specifications.map(spec => {
-                const keyObj = specKeys.find(key => key.id === spec.specification_key_id);
-                return {
-                    key: keyObj?.specification_key || 'Unknown',
-                    value: spec.value || ''
-                };
-            }).filter(spec => spec.value.trim() !== ''); // Only translate specs with values
+            // Prepare specifications for translation, keeping their original indices and key IDs
+            const specsWithIndex = specifications
+                .map((spec, idx) => {
+                    const keyObj = specKeys.find(key => key.id === spec.specification_key_id);
+                    return {
+                        index: idx,
+                        specification_key_id: spec.specification_key_id,
+                        key: keyObj?.specification_key || 'Unknown',
+                        value: spec.value || ''
+                    };
+                })
+                .filter((s) => s.value && s.value.trim() !== ''); // Only translate specs with values
 
-            if (specsToTranslate.length === 0) {
+            console.log('specsWithIndex:', specsWithIndex);
+
+            if (specsWithIndex.length === 0) {
                 setFormStatus('No specification values to translate');
                 return;
             }
 
-            // Translate using AI
+            // Translate using AI (preserves order of specsWithIndex)
+            const specsToTranslate = specsWithIndex.map(s => ({ key: s.key, value: s.value }));
+            console.log('specsToTranslate:', specsToTranslate);
+            
             const translatedSpecs = await translateSpecificationsToBengali(specsToTranslate);
+            console.log('translatedSpecs:', translatedSpecs);
 
-            // Update the tranSpecifications state with translated values
-            const updatedTranSpecs = tranSpecifications.map((tranSpec, index) => {
-                const translated = translatedSpecs[index];
-                if (translated) {
-                    return {
-                        ...tranSpec,
-                        translated_key: translated.translatedKey || tranSpec.translated_key,
-                        translated_value: translated.translatedValue || tranSpec.translated_value
-                    };
+            // Map translated results back by matching specification_key_id
+            const updatedTranSpecs = [...tranSpecifications];
+            translatedSpecs.forEach((translated, i) => {
+                const original = specsWithIndex[i];
+                if (!original) {
+                    console.error(`No original spec found for translated index ${i}`);
+                    return;
                 }
-                return tranSpec;
+                
+                // Find the corresponding item in tranSpecifications by specification_key_id
+                const targetIdx = updatedTranSpecs.findIndex(spec => spec.specification_key_id === original.specification_key_id);
+                
+                console.log(`Mapping translated[${i}] (key: ${translated.key}, value: ${translated.translatedValue}) to specification_key_id ${original.specification_key_id}, found at index ${targetIdx}`);
+                
+                if (targetIdx !== -1) {
+                    updatedTranSpecs[targetIdx] = {
+                        ...updatedTranSpecs[targetIdx],
+                        translated_key: translated.translatedKey || updatedTranSpecs[targetIdx].translated_key,
+                        translated_value: translated.translatedValue || updatedTranSpecs[targetIdx].translated_value,
+                    };
+                    console.log(`Updated tranSpecifications[${targetIdx}]:`, updatedTranSpecs[targetIdx]);
+                } else {
+                    console.error(`No tranSpecification found with specification_key_id ${original.specification_key_id}`);
+                }
             });
 
             setTranSpecifications(updatedTranSpecs);
@@ -277,14 +302,19 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
                     <div>
                        
-                        <input
-                            type="text"
-                            name="translated_value"
-                            value={spec.translated_value || ''}
-                            onChange={(event) => handleInputChange(index, event)}
-                            placeholder="Enter translated value"
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
+                        <div>
+                            <input
+                                type="text"
+                                name="translated_value"
+                                value={spec.translated_value || ''}
+                                onChange={(event) => handleInputChange(index, event)}
+                                placeholder={spec.source_value || 'Enter translated value'}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
+                            {spec.source_value && !spec.translated_value && (
+                                <div className="mt-1 text-xs text-gray-400">English: {spec.source_value}</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             ))}

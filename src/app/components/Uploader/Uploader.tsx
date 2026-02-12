@@ -28,7 +28,7 @@ const DragNdrop = ({
   height,
 }: DragNdropProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const approvedFileTypes = [".zip", ".mp4", ".jpg", ".png", ".gif", ".webp", ".svg"];
+  const approvedFileTypes = [".zip", ".mp4", ".jpg",  ".jpeg",".png", ".gif", ".webp", ".svg"];
   const dispatch = useAppDispatch();
   const selectedFilesRef = useRef<File[]>([]);
 

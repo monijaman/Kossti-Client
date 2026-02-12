@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 interface AdditionalDetail {
     youtubeUrl?: string; // Optional YouTube URL
     sourceUrl?: string;  // Optional Source Link
+    phone?: string;      // Optional Phone Number
 }
 
 interface FormProps {
@@ -19,7 +20,7 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
 
     // Note: message/timer logic is handled by the parent. If a parent handler is provided
     // we call it on user edits so the parent can decide whether to show a transient message.
-    const handleDetailsChange = (index: number, field: 'youtubeUrl' | 'sourceUrl', value: string) => {
+    const handleDetailsChange = (index: number, field: 'youtubeUrl' | 'sourceUrl' | 'phone', value: string) => {
         const updatedDetails = [...additionalDetails];
         updatedDetails[index] = { ...updatedDetails[index], [field]: value }; // Update the specific field
         if (typeof onDetailsChange === 'function') {
@@ -45,10 +46,10 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
         return Array.isArray(additionalDetails) ? additionalDetails : [];
     };
 
-    // Reusable function to add new details (YouTube URL or Source Link)
-    const addNewField = (field: 'youtubeUrl' | 'sourceUrl') => {
+    // Reusable function to add new details (YouTube URL or Source Link or Phone)
+    const addNewField = (field: 'youtubeUrl' | 'sourceUrl' | 'phone') => {
         const currentDetails = handleURL();
-        const newDetail = field === 'youtubeUrl' ? { youtubeUrl: '' } : { sourceUrl: '' };
+        const newDetail = field === 'youtubeUrl' ? { youtubeUrl: '' } : field === 'sourceUrl' ? { sourceUrl: '' } : { phone: '' };
         const updatedDetails = [...currentDetails, newDetail];
         if (typeof onDetailsChange === 'function') {
             onDetailsChange(updatedDetails);
@@ -61,6 +62,8 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
     const handleAddYouTube = () => addNewField('youtubeUrl');
     // Add a new Source Link field
     const handleAddSource = () => addNewField('sourceUrl');
+    // Add a new Phone field
+    const handleAddPhone = () => addNewField('phone');
 
 
     useEffect(() => {
@@ -85,12 +88,17 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
             const hasYoutubeB = 'youtubeUrl' in b.detail;
             const hasSourceA = 'sourceUrl' in a.detail;
             const hasSourceB = 'sourceUrl' in b.detail;
+            const hasPhoneA = 'phone' in a.detail;
+            const hasPhoneB = 'phone' in a.detail;
 
             if (hasYoutubeA && !hasYoutubeB) return -1;
             if (!hasYoutubeA && hasYoutubeB) return 1;
 
             if (hasSourceA && !hasSourceB) return 1;
             if (!hasSourceA && hasSourceB) return -1;
+
+            if (hasPhoneA && !hasPhoneB) return 1;
+            if (!hasPhoneA && hasPhoneB) return -1;
 
             return 0;
         });
@@ -104,21 +112,26 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
 
             {sortDetails(additionalDetails).map(({ detail, index }) => {
                 const isYouTube = 'youtubeUrl' in detail;
-                const value = isYouTube ? (detail.youtubeUrl ?? '') : (detail.sourceUrl ?? '');
+                const isSource = 'sourceUrl' in detail;
+                const isPhone = 'phone' in detail;
+                const value = isYouTube ? (detail.youtubeUrl ?? '') : isSource ? (detail.sourceUrl ?? '') : (detail.phone ?? '');
+                const fieldType = isYouTube ? 'youtubeUrl' : isSource ? 'sourceUrl' : 'phone';
+                const label = isYouTube ? `YouTube URL ${index + 1}` : isSource ? `Source Link ${index + 1}` : `Customer Care Phone ${index + 1}`;
+                const placeholder = isYouTube ? "Enter a YouTube URL" : isSource ? "Enter a Source URL" : "Enter Customer Care Phone Number";
 
                 return (
-                    <div key={`${isYouTube ? 'youtube' : 'source'}_${index}`} className="mb-4">
+                    <div key={`${fieldType}_${index}`} className="mb-4">
                         <label htmlFor={`details_${index}`} className="block mb-2">
-                            {isYouTube ? `YouTube URL ${index + 1}` : `Source Link ${index + 1}`}
+                            {label}
                         </label>
                         <input
-                            type="url"
+                            type={isPhone ? "tel" : "url"}
                             id={`details_${index}`}
                             value={value}
-                            onChange={(e) => handleDetailsChange(index, isYouTube ? 'youtubeUrl' : 'sourceUrl', e.target.value)}
-                            placeholder={isYouTube ? "Enter a YouTube URL" : "Enter a Source URL"}
+                            onChange={(e) => handleDetailsChange(index, fieldType, e.target.value)}
+                            placeholder={placeholder}
                             className="w-full p-2 mb-2 border rounded"
-                            required
+                            required={!isPhone}
                         />
                         <button
                             type="button"
@@ -132,7 +145,7 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
             })}
 
 
-            {/* Buttons to add YouTube URL or Source Link */}
+            {/* Buttons to add YouTube URL or Source Link or Phone */}
             <div className="flex gap-4">
                 <button
                     type="button"
@@ -147,6 +160,13 @@ const AdditionalDetailsForm = ({ additionalDetails = [], setAdditionalDetails, s
                     className="bg-green-500 text-white py-2 px-4 rounded"
                 >
                     Add Source Link
+                </button>
+                <button
+                    type="button"
+                    onClick={handleAddPhone}
+                    className="bg-purple-500 text-white py-2 px-4 rounded"
+                >
+                    Add Customer Care Phone
                 </button>
             </div>
 

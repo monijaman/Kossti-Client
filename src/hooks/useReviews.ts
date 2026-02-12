@@ -136,7 +136,8 @@ export const useReviews = () => {
         ? additional_details.filter(detail => {
             const youtubeUrl = (detail as any).youtubeUrl?.trim();
             const sourceUrl = (detail as any).sourceUrl?.trim();
-            return youtubeUrl || sourceUrl;
+            const phone = (detail as any).phone?.trim();
+            return youtubeUrl || sourceUrl || phone;
           })
         : [];
 
@@ -340,7 +341,8 @@ export const useReviews = () => {
       ? additional_details.filter(detail => {
           const youtubeUrl = (detail as any).youtubeUrl?.trim();
           const sourceUrl = (detail as any).sourceUrl?.trim();
-          return youtubeUrl || sourceUrl;
+          const phone = (detail as any).phone?.trim();
+          return youtubeUrl || sourceUrl || phone;
         })
       : [];
 

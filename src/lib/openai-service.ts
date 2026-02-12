@@ -62,7 +62,7 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="pros">
-    <h2>Pros & Advantages - Why Buy This Product?</h2>
+    <h2>Pros & Advantages   ?</h2>
     <ul>
       <li>List 8-10 major advantages with details</li>
       <li>Include: quality, performance, value, reliability, features</li>
@@ -71,7 +71,7 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="cons">
-    <h2>Cons & Disadvantages - What Are The Problems?</h2>
+    <h2>Cons & Disadvantages - What Are The Problems of ${productName}?</h2>
     <ul>
       <li>List 8-10 realistic disadvantages and limitations</li>
       <li>Include: missing features, price concerns, durability issues</li>
@@ -81,14 +81,14 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="target-audience">
-    <h2>Who Should Buy This Product?</h2>
+    <h2>Who is this  for?</h2>
     <ul>
       <li>Ideal customer profiles (e.g., daily commuters, professionals, students)</li>
       <li>Budget ranges and priorities that suit this product</li>
       <li>Use cases and scenarios where it excels</li>
     </ul>
     
-    <h3>Who Should NOT Buy This Product?</h3>
+    <h3>Who is this  not for?</h3>
     <ul>
       <li>Customer types for whom this is NOT suitable</li>
       <li>Budget constraints that make it a poor choice</li>
@@ -104,16 +104,10 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   <section class="performance-ratings">
     <h2>Performance Rating & Review Score</h2>
     <p>Rate on these dimensions (X/5 scale):</p>
-    <ul>
-      <li>Quality/Build: X/5</li>
-      <li>Performance: X/5</li>
-      <li>Value for Money: X/5</li>
-      <li>Features: X/5</li>
-      <li>Reliability: X/5</li>
-      <li>Comfort/Usability: X/5</li>
-      <li>Design/Aesthetics: X/5</li>
-      <li>Overall Rating: X/5</li>
-    </ul>
+  <ul>
+   Fill it up with relevant performance dimensions based on product type, e.g.:
+</ul>
+
   </section>
 
   <section class="faq">
@@ -149,6 +143,7 @@ CRITICAL RULES:
 - Minimum 1200 words for comprehensive coverage
 - Use HTML list tags (<ul>, <li>) for bullet points
 - Use proper heading hierarchy (<h2>, <h3>)
+- Performance Rating & Review Score. adjust it based on product type
 - Make it informative, honest, and practical`;
 
   const userPrompt = customPrompt
@@ -412,7 +407,7 @@ export async function generateProductSpecifications(
 
 Based on these specification categories: ${specKeys.join(", ")}
 
-For each category, provide a realistic value that would be typical for this type of product. Be specific and accurate.
+For each category, provide a real value that would be typical for this type of product. Be specific and accurate.
 
 Return ONLY a valid JSON object with specification keys as properties and their values as strings:
 {
@@ -427,9 +422,10 @@ Return ONLY a valid JSON object with specification keys as properties and their 
 }
 
 IMPORTANT: 
-- Return ONLY valid JSON object
+- Return ONLY valid, verified data only. 
+- get verified data only. keep empty if anything not found
 - Use the exact specification key names provided
-- Provide realistic values for the product type
+- Values should be realistic and specific, not generic
 - Values should be strings`;
 
   try {

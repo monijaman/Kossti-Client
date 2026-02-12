@@ -164,6 +164,7 @@ export interface ReviewTranslation {
 export interface AdditionalDetails {
   youtubeUrl?: string;
   sourceUrl?: string;
+  phone?: string;
 }
 
 export interface Category {
@@ -221,6 +222,7 @@ export interface SpecKeyTranslation {
   translated_key: string;
   TranslatedKey?: string;
   translated_value?: string;
+  source_value?: string;
 }
 
 export interface SpecificationKey {

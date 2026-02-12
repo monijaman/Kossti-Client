@@ -7,7 +7,7 @@ import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
 import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
-import { AdditionalDetails, Product, Review } from '@/lib/types';
+import { AdditionalDetails, Product, Review, ReviewTranslation } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useRef, useState } from 'react';
 
@@ -43,6 +43,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [aiError, setAiError] = useState<string>('');
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
+    const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
 
@@ -56,28 +57,37 @@ const ReviewForm = ({ params }: PageProps) => {
         try {
             setDataLoading(true);
 
-            // Fetch product details
+            // Fetch base review data (English)
+            const baseResponse = await getReviewByProductId(+id);
+            // Fetch translated data (Bangla) for translations
+            const transResponse = await getReviewByProductId(+id, 'bn');
 
-            const response = await getReviewByProductId(+id, 'bn'); // Fetch review by product ID
+            // Process base response for main form
+            if (baseResponse?.success && baseResponse?.data) {
+                const baseData = baseResponse.data as Record<string, unknown>;
+                const baseReviews = baseData['reviews'];
+                if (baseReviews && Array.isArray(baseReviews) && baseReviews.length > 0) {
+                    const baseReviewItem = baseReviews[0] as Record<string, unknown>;
+                    const baseReviewData = baseReviewItem['review'] as Record<string, unknown>;
+                    setReviewData(baseReviewData as unknown as Review);
+                    setReviews((baseReviewData['reviews'] as string) || (baseReviewData['review'] as string) || "");
+                    setRating((baseReviewData['rating'] as number) || 0);
+                    setAdditionalDetails((baseReviewData['additional_details'] as unknown as AdditionalDetails[]) ?? []);
+                }
+            }
 
-            if (response?.success && response?.data) {
-
-                const data = response.data as Record<string, unknown>;
-                // Normalize response shapes: some endpoints return { product_id, count, reviews: [...] }
-                // Each review item has: { review: {...}, translation: {...} }
-                let dataset: Record<string, unknown> | null = null;
+            // Process trans response for translations
+            if (transResponse?.success && transResponse?.data) {
+                const data = transResponse.data as Record<string, unknown>;
+                const translationsArray: Array<Record<string, unknown>> = [];
 
                 const maybeReviews = data['reviews'];
                 if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
                     const firstReviewItem = maybeReviews[0] as Record<string, unknown>;
                     const reviewData = firstReviewItem['review'] as Record<string, unknown>;
 
-                    // Build translations array from review data and translation
-                    const translations: Array<Record<string, unknown>> = [];
-                    console.log('Base review added to translations:', firstReviewItem.translation);
-
                     // Add the base review as English translation
-                    translations.push({
+                    translationsArray.push({
                         id: reviewData['id'],
                         product_review_id: reviewData['id'],
                         locale: 'en',
@@ -88,12 +98,11 @@ const ReviewForm = ({ params }: PageProps) => {
                         updated_at: reviewData['updated_at'],
                     });
 
-
                     // Add translation if present
                     const translationVal = firstReviewItem['translation'];
                     if (translationVal && typeof translationVal === 'object') {
                         const t = translationVal as Record<string, unknown>;
-                        translations.push({
+                        translationsArray.push({
                             id: t['id'],
                             product_review_id: t['product_review_id'],
                             locale: t['locale'],
@@ -104,43 +113,16 @@ const ReviewForm = ({ params }: PageProps) => {
                             updated_at: t['updated_at'],
                         });
                     }
-
-                    dataset = reviewData;
-                    dataset['translations'] = translations;
-                } else if (data['review']) {
-                    // Single-review shape: attach translation into translations[] if present
-                    dataset = data['review'] as Record<string, unknown>;
-                    const translationVal = data['translation'];
-                    if (translationVal && typeof translationVal === 'object') {
-                        const t = translationVal as Record<string, unknown>;
-                        dataset['translations'] = [
-                            {
-                                id: t['id'],
-                                product_review_id: t['product_review_id'],
-                                locale: t['locale'],
-                                rating: dataset['rating'] ?? 0,
-                                review: t['translated_review'],
-                                additional_details: t['additional_details'] ?? [],
-                                created_at: t['created_at'],
-                                updated_at: t['updated_at'],
-                            },
-                        ];
-                    }
                 }
 
-                if (dataset) {
-                    setReviewData(dataset as unknown as Review);
-                    setReviews((dataset['reviews'] as string) || (dataset['review'] as string) || "");
-                    setRating((dataset['rating'] as number) || 0);
-                    setAdditionalDetails((dataset['additional_details'] as unknown as AdditionalDetails[]) ?? []);
-                }
+                setTranslations(translationsArray as ReviewTranslation[]);
             }
         } catch (error) {
-            console.error('Error fetching product:', error);
+            console.error('Error fetching review:', error);
         } finally {
             setDataLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         if (!id) return;
@@ -653,7 +635,7 @@ const ReviewForm = ({ params }: PageProps) => {
                         {/* Translation Form */}
                         {reviewData &&
                             <div className="w-1/2">
-                                <ReviewTransForm productId={+id} productName={productName} translations={reviewData.translations} />
+                                <ReviewTransForm productId={+id} productName={productName} translations={translations.length ? translations : (reviewData.translations || [])} />
                             </div>
                         }
                     </div>
