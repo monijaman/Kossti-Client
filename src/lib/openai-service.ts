@@ -81,14 +81,14 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="target-audience">
-    <h2>Who is this  for?</h2>
+    <h2>Who is this Bank for?</h2>
     <ul>
       <li>Ideal customer profiles (e.g., daily commuters, professionals, students)</li>
       <li>Budget ranges and priorities that suit this product</li>
       <li>Use cases and scenarios where it excels</li>
     </ul>
     
-    <h3>Who is this  not for?</h3>
+    <h2>Who is this Bank not for?</h2>
     <ul>
       <li>Customer types for whom this is NOT suitable</li>
       <li>Budget constraints that make it a poor choice</li>
