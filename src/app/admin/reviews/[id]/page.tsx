@@ -115,7 +115,7 @@ const ReviewForm = ({ params }: PageProps) => {
                     }
                 }
 
-                setTranslations(translationsArray as ReviewTranslation[]);
+                setTranslations(translationsArray as unknown as ReviewTranslation[]);
             }
         } catch (error) {
             console.error('Error fetching review:', error);
