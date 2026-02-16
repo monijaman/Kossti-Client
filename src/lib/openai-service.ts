@@ -9,7 +9,7 @@ const getOpenAIClient = () => {
 
   if (!apiKey) {
     throw new Error(
-      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file"
+      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file",
     );
   }
 
@@ -31,13 +31,18 @@ export interface AIReviewRequest {
  * Returns HTML formatted review following the template structure
  */
 export async function generateAIReview(
-  request: AIReviewRequest
+  request: AIReviewRequest,
 ): Promise<string> {
   const { productName, productCategory, customPrompt } = request;
 
-  const systemPrompt = `You are an expert product reviewer with experience writing comprehensive,
-real-world, consumer-focused reviews. Write honest, balanced, and practical evaluations.
-Create a detailed and professional review of ${productName}.
+  const systemPrompt = `You are a professional product reviewer with expertise, credibility, and wit.
+Your approach combines thorough analysis with smart, sophisticated humor. You write for readers who value
+both accuracy and engaging prose. Be insightful, include clever observations where appropriate, but 
+maintain the professionalism of a trusted expert. Write a comprehensive review of ${productName} that's
+informative, well-reasoned, and occasionally humorous—but never at the expense of credibility.
+
+Use intelligent humor: well-placed wit, clever observations about product quirks, and sophisticated
+comparisons. Think "seasoned expert with personality" not "comedy show."
 
 Please follow this comprehensive HTML structure and write ONLY in English:
 
@@ -49,7 +54,7 @@ Please follow this comprehensive HTML structure and write ONLY in English:
 
   <section class="introduction">
     <h2>Introduction & Overview</h2>
-    <p>Brief compelling description of the product, price point, and target audience</p>
+    <p>Professional description of the product, price point, target market, and key positioning. Include relevant context and first impressions with subtle wit where appropriate</p>
   </section>
 
   <section class="key-highlights">
@@ -62,99 +67,136 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="pros">
-    <h2>Pros & Advantages   ?</h2>
+    <h2>Strengths & Key Advantages</h2>
     <ul>
-      <li>List 8-10 major advantages with details</li>
-      <li>Include: quality, performance, value, reliability, features</li>
-      <li>Focus on real-world benefits for users</li>
+      <li>List 8-10 major advantages with clear explanations and real-world applications</li>
+      <li>Explain why these benefits matter to the target user</li>
+      <li>Include performance metrics and quality assessments with intelligent observation</li>
+      <li>Compare favorably to competitors where relevant and well-documented</li>
     </ul>
   </section>
 
   <section class="cons">
-    <h2>Cons & Disadvantages - What Are The Problems of ${productName}?</h2>
+    <h2>Limitations & Drawbacks</h2>
     <ul>
-      <li>List 8-10 realistic disadvantages and limitations</li>
-      <li>Include: missing features, price concerns, durability issues</li>
-      <li>Be honest about deal-breakers</li>
-      <li>Compare unfavorably to competitors where relevant</li>
+      <li>List 8-10 realistic disadvantages and honest assessment of limitations</li>
+      <li>Explain why these matter and who would be affected by them</li>
+      <li>Note design choices that don't work for everyone with professional perspective</li>
+      <li>Fairly compare unfavorably to competitors where the data supports it</li>
+      <li>Be honest and direct without exaggeration</li>
     </ul>
   </section>
 
   <section class="target-audience">
-    <h2>Who is this Bank for?</h2>
+    <h2>Ideal Customer Profile & Use Cases</h2>
     <ul>
-      <li>Ideal customer profiles (e.g., daily commuters, professionals, students)</li>
-      <li>Budget ranges and priorities that suit this product</li>
-      <li>Use cases and scenarios where it excels</li>
+      <li>Specific user types and professional roles for whom this product excels</li>
+      <li>Budget ranges and purchasing priorities that align well with this product</li>
+      <li>Real-world scenarios and use cases where the product delivers value</li>
     </ul>
     
-    <h2>Who is this Bank not for?</h2>
+    <h2>Not Recommended For</h2>
     <ul>
-      <li>Customer types for whom this is NOT suitable</li>
-      <li>Budget constraints that make it a poor choice</li>
-      <li>Mention better alternatives for specific needs</li>
+      <li>User types and professional roles for whom alternatives are better suited</li>
+      <li>Budget constraints or priorities that make better options available</li>
+      <li>Mention specific alternatives that better serve these needs</li>
     </ul>
   </section>
 
   <section class="price-analysis">
-    <h2>Price & Cost Analysis</h2>
-    <p>Include: Price range, running costs, maintenance expenses, value for money assessment</p>
+    <h2>Value Assessment & Pricing Analysis</h2>
+    <p>Objective analysis of: Price positioning, Total cost of ownership, Maintenance and support costs, ROI/value for money assessment, Competitive pricing comparison</p>
   </section>
 
   <section class="performance-ratings">
-    <h2>Performance Rating & Review Score</h2>
-    <p>Rate on these dimensions (X/5 scale):</p>
+    <h2>Detailed Performance Ratings</h2>
+    <p>Professional assessment across these dimensions (X/5 scale):</p>
   <ul>
-   Fill it up with relevant performance dimensions based on product type, e.g.:
+   Adjust performance dimensions based on product category (e.g., for electronics: build quality, performance, battery life, design, value; for services: reliability, customer support, feature completeness, pricing, user experience)
 </ul>
 
   </section>
 
   <section class="faq">
-    <h2>Frequently Asked Questions (FAQ)</h2>
-    <ul>
-      <li>Include 6-8 common questions buyers would ask</li>
-      <li>Provide concise, informative answers</li>
-      <li>Address common objections and comparisons</li>
-      <li>Example: "What is the [spec/price/efficiency]?"</li>
-      <li>Example: "How does it compare to [competitor]?"</li>
-      <li>Example: "Is [feature] available?"</li>
-      <li>Example: "What is the warranty/service cost?"</li>
-    </ul>
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-items">
+      <!-- Generate 6-8 product-category-specific questions and answers -->
+      <!-- For Electronics (phones, laptops, etc.): Performance, compatibility, warranty, battery life, updates -->
+      <!-- For Appliances: Energy efficiency, maintenance, noise levels, warranty, installation -->
+      <!-- For Software/Services: Compatibility, pricing models, support, learning curve, integration -->
+      <!-- For Tools/Equipment: Durability, maintenance, warranty, alternatives, learning curve -->
+      <!-- For Home/Fashion: Material quality, sizing, return policy, durability, sustainability -->
+      <!-- Ensure each Q&A is specific and addresses real buyer concerns for this product type -->
+      <div class="faq-item">
+        <h3>[First specific question for this product category]</h3>
+        <p>[Detailed answer with specific information relevant to this product type]</p>
+      </div>
+      <div class="faq-item">
+        <h3>[Second specific question for this product category]</h3>
+        <p>[Detailed answer with specific information relevant to this product type]</p>
+      </div>
+      <div class="faq-item">
+        <h3>[Third specific question for this product category]</h3>
+        <p>[Detailed answer with specific information relevant to this product type]</p>
+      </div>
+    </div>
   </section>
 
   <section class="final-verdict">
-    <h2>Final Verdict: Should You Buy This Product?</h2>
+    <h2>Final Verdict & Recommendation</h2>
     <p>
-      - Summarize overall value proposition
-      - Clear final rating with reasoning
-      - Specific recommendation: YES/NO and for whom
-      - Final thoughts and closing statement
+      - Synthesize key findings into a clear, professional recommendation
+      - State the final rating with detailed justification
+      - Clear guidance: Recommended/Not Recommended, and for what specific use cases
+      - Specify the buyer profiles and priorities it best serves
+      - Note viable alternatives for other needs and budgets
+      - Closing professional assessment
     </p>
   </section>
 </article>
 
 CRITICAL RULES:
-- Include "Rating: X.X" clearly in the header
+- Include "Rating: X.X" clearly in the header with brief rating justification
 - DO NOT include markdown code blocks or explanations
 - Return ONLY valid HTML with proper semantic tags
-- Keep tone professional, unbiased, and engaging
-- Write like a real human product reviewer
-- Minimum 1200 words for comprehensive coverage
-- Use HTML list tags (<ul>, <li>) for bullet points
+- Maintain professional, credible tone with intelligent wit and humor where appropriate
+- Write as a respected industry expert who understands the product deeply
+- Minimum 1200 words for comprehensive analysis
+- Use HTML list tags (<ul>, <li>) for structured content
 - Use proper heading hierarchy (<h2>, <h3>)
-- Performance Rating & Review Score. adjust it based on product type
-- Make it informative, honest, and practical`;
+- Balance expertise with personality: informative, insightful, and occasionally clever
+- Humor should enhance readability, never undermine credibility
+- ALL section headlines MUST be customized for the product category - do NOT use generic titles:
+  * For Electronics: Use "Performance & Speed", "Build Quality & Durability", "Software & Updates", "Design & Ergonomics"
+  * For Appliances: Use "Energy Efficiency", "Noise & Vibration", "Durability & Reliability", "Ease of Use"
+  * For Software/Services: Use "Functionality & Features", "User Experience & Interface", "Integration Capabilities", "Support & Documentation"
+  * For Fashion/Home: Use "Material Quality & Craftsmanship", "Design & Aesthetics", "Fit & Sizing", "Durability & Longevity"
+  * For Banks/Financial: Use "Security & Trust", "Account Features & Flexibility", "Fees & Charges", "Customer Support"
+  * For Investments: Use "Risk-Return Profile", "Fee Structure & Costs", "Liquidity & Accessibility", "Market Performance"
+  * For Vehicles: Use "Performance & Power", "Fuel Economy", "Interior Quality", "Safety & Reliability"
+  * For Tools/Equipment: Use "Build Quality & Materials", "Durability & Longevity", "Ease of Use", "Versatility"
+- FAQ section MUST have 6-8 questions specific to the product category:
+  * For Electronics/Gadgets: Performance benchmarks, battery life, software updates, compatibility, warranty
+  * For Appliances: Energy costs, noise level, maintenance needs, installation, capacity
+  * For Software/Services: Pricing tiers, free trial, integrations, learning curve, support
+  * For Tools/Equipment: Durability, maintenance schedule, warranty, storage, safety features
+  * For Fashion/Home: Sizing/fit, material quality, sustainability, care instructions, return policy
+  * For Vehicles: Fuel efficiency, maintenance costs, warranty, insurance impact, resale value
+  * For Banks/Financial Services: Interest rates, fees, security, account requirements, FDIC/insurance coverage, minimum balance, transaction limits
+  * For Monetary/Investment Products: Returns, risk level, fees, liquidity, tax implications, minimum investment, diversification, market volatility
+- Generate Q&A pairs that directly address common buyer concerns for the specific product type
+- Replace generic section names with category-specific terminology in Pros, Cons, and Performance Ratings sections
+`;
 
   const userPrompt = customPrompt
-    ? `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ''}\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
+    ? `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
     : `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}`;
 
   try {
     const client = getOpenAIClient();
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 4000,
       temperature: 0.7,
       messages: [
@@ -192,7 +234,7 @@ CRITICAL RULES:
 export function extractRatingFromReview(reviewContent: string): number {
   // Match patterns like "Rating: 4.5" or "रेटिंग: 4.5" or similar
   const ratingMatch = reviewContent.match(
-    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i
+    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i,
   );
   if (ratingMatch && ratingMatch[1]) {
     const rating = parseFloat(ratingMatch[1]);
@@ -231,7 +273,7 @@ ${englishText}`;
     const client = getOpenAIClient();
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 4000,
       temperature: 0.7,
       messages: [
@@ -264,9 +306,9 @@ ${englishText}`;
  * Convert English numerals to Bengali numerals
  */
 export function convertTobengaliNumerals(
-  englishNumber: number | string
+  englishNumber: number | string,
 ): string {
-const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 
   const numberStr = String(englishNumber);
   return numberStr
@@ -286,14 +328,13 @@ export interface AIComment {
   commentBn?: string; // Bengali translation
 }
 
-
 //#region Product Comments Generation and Translation
 /**
  * Generate realistic product comments using OpenAI
  * Returns 10-20 comments with usernames, locations, and source URLs
  */
 export async function generateProductComments(
-  productName: string
+  productName: string,
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 
@@ -337,7 +378,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
 
   try {
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 3000,
       temperature: 0.8,
       messages: [
@@ -395,7 +436,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
  */
 export async function generateProductSpecifications(
   productName: string,
-  specKeys: string[]
+  specKeys: string[],
 ): Promise<Record<string, string>> {
   if (!productName || !specKeys.length) {
     throw new Error("Product name and specification keys are required");
@@ -430,13 +471,14 @@ IMPORTANT:
 
   try {
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 2000,
       temperature: 0.6,
       messages: [
         {
           role: "system",
-          content: "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
+          content:
+            "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
         },
         {
           role: "user",
@@ -476,8 +518,15 @@ IMPORTANT:
  * Takes an array of specification objects and returns them with Bengali translations
  */
 export async function translateSpecificationsToBengali(
-  specifications: Array<{ key: string; value: string }>
-): Promise<Array<{ key: string; value: string; translatedKey?: string; translatedValue?: string }>> {
+  specifications: Array<{ key: string; value: string }>,
+): Promise<
+  Array<{
+    key: string;
+    value: string;
+    translatedKey?: string;
+    translatedValue?: string;
+  }>
+> {
   if (!specifications.length) {
     throw new Error("No specifications to translate");
   }
@@ -487,7 +536,7 @@ export async function translateSpecificationsToBengali(
   // Create a formatted list of specifications to translate
   const specsText = specifications
     .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
-    .join('\n');
+    .join("\n");
 
   const prompt = `Translate these product specifications from English to Bengali. Keep the format and structure intact.
 
@@ -505,13 +554,14 @@ IMPORTANT:
 
   try {
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 2000,
       temperature: 0.3,
       messages: [
         {
           role: "system",
-          content: "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
+          content:
+            "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
         },
         {
           role: "user",
@@ -533,9 +583,15 @@ IMPORTANT:
       .trim();
 
     // Parse JSON response
-    const translations: Array<{ translatedKey: string; translatedValue: string }> = JSON.parse(content);
+    const translations: Array<{
+      translatedKey: string;
+      translatedValue: string;
+    }> = JSON.parse(content);
 
-    if (!Array.isArray(translations) || translations.length !== specifications.length) {
+    if (
+      !Array.isArray(translations) ||
+      translations.length !== specifications.length
+    ) {
       throw new Error("Invalid translations format or length mismatch");
     }
 
@@ -550,7 +606,7 @@ IMPORTANT:
   } catch (error) {
     console.error("Error translating specifications to Bengali:", error);
     // Return original specs with empty translations if translation fails
-    return specifications.map(spec => ({
+    return specifications.map((spec) => ({
       ...spec,
       translatedKey: spec.key,
       translatedValue: spec.value,
@@ -563,7 +619,7 @@ IMPORTANT:
  * Takes an array of English comments and returns them with Bengali translations
  */
 export async function translateCommentsTobengali(
-  comments: AIComment[]
+  comments: AIComment[],
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 
@@ -581,7 +637,7 @@ IMPORTANT: Return ONLY valid JSON array of strings, nothing else.`;
 
   try {
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       max_tokens: 3000,
       temperature: 0.7,
       messages: [
@@ -612,7 +668,10 @@ IMPORTANT: Return ONLY valid JSON array of strings, nothing else.`;
     // Parse JSON response
     const bengaliTranslations: string[] = JSON.parse(content);
 
-    if (!Array.isArray(bengaliTranslations) || bengaliTranslations.length === 0) {
+    if (
+      !Array.isArray(bengaliTranslations) ||
+      bengaliTranslations.length === 0
+    ) {
       throw new Error("Invalid translations format");
     }
 

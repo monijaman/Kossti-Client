@@ -3,8 +3,8 @@ import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { LOCALES } from '@/lib/constants';
+import { convertTobengaliNumerals, extractRatingFromReview, generateAIReview, translateToBengali } from '@/lib/openai-service';
 import { AdditionalDetails, ReviewTranslation } from '@/lib/types';
-import { generateAIReview, extractRatingFromReview, translateToBengali, convertTobengaliNumerals } from '@/lib/openai-service';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Page props
@@ -67,7 +67,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
         if (transData.length > 0) {
             const translation = transData.find((trans) => trans.locale === selectedLocale);
-             if (translation) {
+            if (translation) {
                 setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
                 // Keep rating as-is (whether it's Bengali string "৪.१५" or English "4.15")
                 const ratingValue = translation.rating;
@@ -111,7 +111,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     const handleGenerateAIReview = async () => {
         setAiLoading(true);
         setAiError('');
-        
+
         try {
             if (!productName) {
                 throw new Error('Product name is required');
@@ -175,7 +175,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         try {
             // Get English translation from transData
             const englishTranslation = transData.find((trans) => trans.locale === 'en');
-            
+
             if (!englishTranslation || !englishTranslation.review) {
                 throw new Error('English translation not found. Please add the English review first.');
             }
@@ -191,36 +191,57 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 throw new Error('No content received from translation');
             }
 
-            // Update form fields with translated review
-            setSelectedTranslation({
-                ...selectedTranslation,
-                review: bengaliReview,
+            // Ensure Bengali translation entry exists in transData
+            let bengaliEntry = transData.find((trans) => trans.locale === 'bn');
+            if (!bengaliEntry) {
+                // Create a new Bengali entry if it doesn't exist
+                bengaliEntry = {
+                    locale: 'bn',
+                    rating: englishTranslation.rating || 0,
+                    review: '',
+                    additional_details: []
+                };
+                transData.push(bengaliEntry);
+            }
+
+            // Update transData with the Bengali translation
+            const updatedTransData = transData.map((trans) => {
+                if (trans.locale === 'bn') {
+                    return {
+                        ...trans,
+                        review: bengaliReview,
+                        rating: englishTranslation.rating || trans.rating, // Use English rating if available
+                    };
+                }
+                return trans;
             });
+
+            setTransData(updatedTransData);
 
             // Convert English rating to Bengali numerals if available
             if (englishTranslation.rating) {
                 const bengaliRating = convertTobengaliNumerals(String(englishTranslation.rating));
-                setRatingInput(bengaliRating);
+
+                // Only update UI if currently viewing Bengali
+                if (selectedLocale === 'bn') {
+                    setRatingInput(bengaliRating);
+                }
             }
 
-            // Show success message
-            setTransSuccessMessage('✅ Review translated to Bengali successfully');
+            // Update selectedTranslation if currently viewing Bengali
+            if (selectedLocale === 'bn') {
+                setSelectedTranslation({
+                    locale: 'bn',
+                    rating: englishTranslation.rating || 0,
+                    review: bengaliReview,
+                    additional_details: englishTranslation.additional_details || []
+                });
+            }
 
-            setTimeout(() => {
-                setTransSuccessMessage('');
-            }, 3000);
+            setTranslateReviewLoading(false);
         } catch (error) {
-            console.error('❌ Error translating review:', error);
-            const errorMessage =
-                error instanceof Error ? error.message : 'Failed to translate review';
-            setTranslationError(
-                `Failed to translate review: ${errorMessage}`
-            );
-
-            setTimeout(() => {
-                setTranslationError('');
-            }, 5000);
-        } finally {
+            console.error('Translation error:', error);
+            setTranslationError(error instanceof Error ? error.message : 'Translation failed');
             setTranslateReviewLoading(false);
         }
     };
@@ -258,12 +279,15 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 });
 
                 setTransData(updatedTransData);
-                
+
                 // Update ratingInput to show the newly saved rating (preserve Bengali format)
                 if (details && details.rating) {
                     setRatingInput(String(details.rating));
                 }
-                
+
+                // Force reload the translation to ensure fresh data from server
+                setSelectedTranslation(details);
+
                 const msg = response.data.message || 'Review submitted successfully';
                 setFormStatus(msg);
 
@@ -337,8 +361,8 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                         type="button"
                         onClick={() => setSelectedLocale(translation)}
                         className={`px-4 py-2 mx-2 rounded-full text-sm font-semibold 
-                            ${selectedLocale === translation ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
-                            transition duration-200 ease-in-out hover:bg-blue-400`}
+                ${selectedLocale === translation ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}
+                transition duration-200 ease-in-out hover:bg-blue-400`}
                     >
                         {translation.toUpperCase()}
                     </button>
@@ -429,11 +453,10 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                 type="button"
                                 onClick={handleGenerateAIReview}
                                 disabled={aiLoading || !productName}
-                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
-                                    aiLoading
-                                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                                        : 'bg-purple-500 hover:bg-purple-600 text-white'
-                                }`}
+                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${aiLoading
+                                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                                    : 'bg-purple-500 hover:bg-purple-600 text-white'
+                                    }`}
                             >
                                 {aiLoading ? (
                                     <span className="flex items-center gap-2">
@@ -443,7 +466,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         <span>✨</span>
-                                        AI Review  
+                                        AI Review
                                     </span>
                                 )}
                             </button>
@@ -457,11 +480,10 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                 type="button"
                                 onClick={handleTranslateReview}
                                 disabled={translateReviewLoading || !transData.find((trans) => trans.locale === 'en')?.review}
-                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
-                                    translateReviewLoading
-                                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                                        : 'bg-indigo-500 hover:bg-indigo-600 text-white'
-                                }`}
+                                className={`py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${translateReviewLoading
+                                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                                    : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                                    }`}
                             >
                                 {translateReviewLoading ? (
                                     <span className="flex items-center gap-2">
@@ -471,7 +493,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         <span>🌍</span>
-                                        Translate English to Bengali  
+                                        Translate English to Bengali
                                     </span>
                                 )}
                             </button>
@@ -483,11 +505,10 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                         <button
                             type="submit"
                             disabled={submitTranslationLoading}
-                            className={`text-white py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${
-                                submitTranslationLoading
-                                    ? 'bg-gray-500 cursor-wait opacity-75'
-                                    : 'bg-blue-500 hover:bg-blue-600'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`text-white py-2 px-6 rounded-full shadow-lg transition-all duration-200 ease-in-out ${submitTranslationLoading
+                                ? 'bg-gray-500 cursor-wait opacity-75'
+                                : 'bg-blue-500 hover:bg-blue-600'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             {submitTranslationLoading ? (
                                 <>
