@@ -4,7 +4,6 @@ import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import Select from 'react-select';
-import { translateSpecificationsToBengali } from '@/lib/openai-service';
 type SubmitSpecResponse = {
     success: boolean;
     data?: {
@@ -204,27 +203,43 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                 return;
             }
 
-            // Translate using AI (preserves order of specsWithIndex)
+            // Call server-side API route for translation (avoids browser CORS & keeps API key safe)
             const specsToTranslate = specsWithIndex.map(s => ({ key: s.key, value: s.value }));
             console.log('specsToTranslate:', specsToTranslate);
-            
-            const translatedSpecs = await translateSpecificationsToBengali(specsToTranslate);
+
+            const response = await fetch('/api/translate/specs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ specifications: specsToTranslate }),
+            });
+
+            const data = await response.json();
+            console.log('Translation API response:', data);
+
+            if (!response.ok || !data.success) {
+                const errorMsg = data.error || `Translation failed (HTTP ${response.status})`;
+                console.error('Translation API error:', errorMsg);
+                setFormStatus(`❌ ${errorMsg}`);
+                return;
+            }
+
+            const translatedSpecs = data.translations;
             console.log('translatedSpecs:', translatedSpecs);
 
             // Map translated results back by matching specification_key_id
             const updatedTranSpecs = [...tranSpecifications];
-            translatedSpecs.forEach((translated, i) => {
+            translatedSpecs.forEach((translated: { key: string; value: string; translatedKey?: string; translatedValue?: string }, i: number) => {
                 const original = specsWithIndex[i];
                 if (!original) {
                     console.error(`No original spec found for translated index ${i}`);
                     return;
                 }
-                
+
                 // Find the corresponding item in tranSpecifications by specification_key_id
                 const targetIdx = updatedTranSpecs.findIndex(spec => spec.specification_key_id === original.specification_key_id);
-                
+
                 console.log(`Mapping translated[${i}] (key: ${translated.key}, value: ${translated.translatedValue}) to specification_key_id ${original.specification_key_id}, found at index ${targetIdx}`);
-                
+
                 if (targetIdx !== -1) {
                     updatedTranSpecs[targetIdx] = {
                         ...updatedTranSpecs[targetIdx],
@@ -238,10 +253,10 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
             });
 
             setTranSpecifications(updatedTranSpecs);
-            setFormStatus('Specifications translated to Bangla successfully');
+            setFormStatus('✅ Specifications translated to Bangla successfully');
         } catch (error) {
             console.error('Error translating to Bangla:', error);
-            setFormStatus('Failed to translate specifications to Bangla');
+            setFormStatus(`❌ Failed to translate: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setTranslationLoading(false);
         }
@@ -278,7 +293,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
             {tranSpecifications && tranSpecifications.map((spec, index) => (
                 <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                     <div>
-                        
+
                         <Select
                             name="specification_id"
                             value={specKeys && specKeys
@@ -301,7 +316,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     </div>
 
                     <div>
-                       
+
                         <div>
                             <input
                                 type="text"

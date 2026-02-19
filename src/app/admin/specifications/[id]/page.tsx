@@ -1,11 +1,11 @@
 "use client";
-import { useSpecifications } from "@/hooks/useSpecifications";
-import { SpecificationInt, SpecificationKey } from '@/lib/types';
-import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Select, { SingleValue } from 'react-select';
-import { generateProductSpecifications } from "@/lib/openai-service";
 import Modal from '@/app/components/Modal/client';
+import { useSpecifications } from "@/hooks/useSpecifications";
+import { generateProductSpecifications } from "@/lib/openai-service";
+import { SpecificationInt, SpecificationKey } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
+import Select, { SingleValue } from 'react-select';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 
@@ -103,7 +103,7 @@ const Specification = ({ params }: PageProps) => {
             }
 
             // Add custom prompt to the generation if provided
-            const enhancedProductName = aiPrompt 
+            const enhancedProductName = aiPrompt
                 ? `${productName}. Additional context: ${aiPrompt}`
                 : productName;
 
@@ -140,8 +140,18 @@ const Specification = ({ params }: PageProps) => {
 
         try {
             console.log('[SpecForm] Calling submitSpecificationsKeys with id:', +id);
-            // Call the submit function with the mapped data
-            const result = await submitSpecificationsKeys(+id, specifications);
+            // Prepare and filter specifications before sending in one bulk call
+            const specsToSave = specifications
+                .map(s => ({
+                    id: s.id ?? undefined,
+                    specification_key_id: typeof s.specification_key_id === 'string' ? parseInt(s.specification_key_id as string, 10) : s.specification_key_id,
+                    value: s.value != null ? String(s.value).trim() : ''
+                }))
+                .filter(s => s.specification_key_id && Number(s.specification_key_id) > 0);
+
+            console.log('[SpecForm] Specifications to save:', specsToSave);
+
+            const result = await submitSpecificationsKeys(+id, specsToSave as any);
             console.log('[SpecForm] Submit result:', result);
 
             if (result.success) {
@@ -178,7 +188,7 @@ const Specification = ({ params }: PageProps) => {
     const fetchSpecifications = useCallback(async () => {
         try {
             const response = await getSpecifications(+id);
- 
+
             // Check if response exists and has the expected structure
             if (response && response.dataset) {
                 if (response.dataset.specifications && response.dataset.specifications.length > 0) {
@@ -260,11 +270,10 @@ const Specification = ({ params }: PageProps) => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-all ${
-                                    loading
+                                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-all ${loading
                                         ? 'bg-gray-500 cursor-wait opacity-75'
                                         : 'bg-green-600 hover:bg-green-700'
-                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 {loading ? (
                                     <>
@@ -275,9 +284,9 @@ const Specification = ({ params }: PageProps) => {
                                     'Submit'
                                 )}
                             </button>
-                            
+
                         </div>
-<hr />
+                        <hr />
                         <div className="flex gap-3">
                             <button
                                 type="button"
@@ -299,8 +308,8 @@ const Specification = ({ params }: PageProps) => {
                         {submitStatus && (
                             <div
                                 className={`p-4 mt-4 text-sm rounded-lg border ${submitStatus.toLowerCase().includes('success') || submitStatus.toLowerCase().includes('saved')
-                                        ? 'text-green-700 bg-green-100 border-green-300'
-                                        : 'text-red-700 bg-red-100 border-red-300'
+                                    ? 'text-green-700 bg-green-100 border-green-300'
+                                    : 'text-red-700 bg-red-100 border-red-300'
                                     }`}
                                 role="alert"
                             >
@@ -314,14 +323,14 @@ const Specification = ({ params }: PageProps) => {
                 </div>
             </div>
             <div className="w-1/2">
-                <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={ specifications} />
+                <SpecTranslations productId={+id} specKeys={specKeys && specKeys} specifications={specifications} />
             </div>
 
             {/* AI Prompt Modal */}
             <Modal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)}>
                 <div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">🤖 Generate Specifications with AI</h3>
-                    
+
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Additional Context (Optional)

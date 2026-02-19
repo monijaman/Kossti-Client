@@ -2,10 +2,10 @@ import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 
 import {
-  ApiResponse,
-  SpecificationInt,
-  SpecificationKey,
-  SpecKeyTranslation,
+    ApiResponse,
+    SpecificationInt,
+    SpecificationKey,
+    SpecKeyTranslation,
 } from "@/lib/types";
 import { useCallback } from "react";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -21,7 +21,7 @@ export const useSpecifications = () => {
 
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -46,7 +46,7 @@ export const useSpecifications = () => {
 
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -83,7 +83,7 @@ export const useSpecifications = () => {
 
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -143,13 +143,13 @@ export const useSpecifications = () => {
         return [];
       }
     },
-    []
+    [],
   );
 
   // Submit form
   const submitSpecifications = async (
     categoryId: number,
-    specifications: SpecificationKey[]
+    specifications: SpecificationKey[],
   ): Promise<ApiResponse> => {
     try {
       // Prepare the payload with productId, specifications, and apiUrl
@@ -219,12 +219,12 @@ export const useSpecifications = () => {
 
   const submitSpecificationsKeys = async (
     productId: number,
-    specifications: SpecificationInt[]
+    specifications: SpecificationInt[],
   ): Promise<ApiResponse> => {
     console.log("=== DEBUGGING SUBMISSION ===");
     console.log(
       "Raw input specifications:",
-      JSON.stringify(specifications, null, 2)
+      JSON.stringify(specifications, null, 2),
     );
     console.log("Product ID:", productId);
 
@@ -273,7 +273,7 @@ export const useSpecifications = () => {
           specKeyId = parseInt(specKeyId, 10);
           if (isNaN(specKeyId)) {
             console.warn(
-              `Skipping spec ${index}: invalid specification_key_id "${spec.specification_key_id}"`
+              `Skipping spec ${index}: invalid specification_key_id "${spec.specification_key_id}"`,
             );
             continue;
           }
@@ -315,7 +315,7 @@ export const useSpecifications = () => {
         !Array.isArray(realPayload.specifications)
       ) {
         console.error(
-          "Invalid payload structure - specifications should be an array"
+          "Invalid payload structure - specifications should be an array",
         );
         return {
           success: false,
@@ -333,20 +333,27 @@ export const useSpecifications = () => {
         };
       }
 
+      // Send all specifications in a single bulk request
+      const specs = realPayload.specifications;
+      console.log(`Submitting ${specs.length} specifications in a single bulk request`);
+
+      const start = Date.now();
       const response = await fetchApi(apiEndpoints.buckSpecUpdate, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: realPayload,
+        headers: { "Content-Type": "application/json" },
+        body: { specifications: specs },
       });
+      const duration = Date.now() - start;
+      console.log(`Bulk upsert completed in ${duration}ms`, response);
 
-      console.log("Success response:", response);
+      if (!response || (response as any).success === false) {
+        return {
+          success: false,
+          error: (response as any).error || "Submission failed",
+        };
+      }
 
-      return {
-        success: true,
-        data: response,
-      };
+      return { success: true, data: response };
     } catch (error) {
       console.error("Catch error:", error);
       return {
@@ -360,7 +367,7 @@ export const useSpecifications = () => {
   // Submit translated values only (simplified version)
   const submitSpecTranslationValues = async (
     productId: number,
-    specifications: SpecKeyTranslation[]
+    specifications: SpecKeyTranslation[],
   ): Promise<ApiResponse> => {
     console.log("=== SUBMITTING SPEC TRANSLATION VALUES ===");
     console.log("Product ID:", productId);
@@ -412,7 +419,7 @@ export const useSpecifications = () => {
             "Content-Type": "application/json",
           },
           body: payload,
-        }
+        },
       );
 
       console.log("Success response:", response);
@@ -434,12 +441,12 @@ export const useSpecifications = () => {
   // Submit form (original version for backwards compatibility)
   const submitSpecKeyTranslation = async (
     productId: number,
-    specifications: SpecKeyTranslation[]
+    specifications: SpecKeyTranslation[],
   ): Promise<ApiResponse> => {
     console.log("=== DEBUGGING SPEC TRANSLATION SUBMISSION ===");
     console.log(
       "Raw input specifications:",
-      JSON.stringify(specifications, null, 2)
+      JSON.stringify(specifications, null, 2),
     );
     console.log("Product ID:", productId);
 
@@ -540,7 +547,7 @@ export const useSpecifications = () => {
     const apiEndpoint = `get-public-spec/${productId}?locale=${locale}`;
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 

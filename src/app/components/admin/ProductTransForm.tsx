@@ -33,7 +33,7 @@ interface ApiTranslationData {
 const ProductTransForm = ({ product }: ProductFormProps) => {
 
     const [name, setName] = useState(''); // Don't initialize with product name - use translation data
-    const [price, setPrice] = useState(0); // Don't initialize with product price - use translation data
+    const [price, setPrice] = useState(""); // Don't initialize with product price - use translation data
     const { Translation, getProductTranslations } = useProducts();
     const id = product && product.id;
     const [submitStatus, setSubmitStatus] = useState('');
@@ -46,7 +46,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
 
         // Always clear the form first
         setName('');
-        setPrice(0);
+        setPrice("");
 
         // If we have translations, try to find one for this locale
         if (availableTranslations && availableTranslations.length > 0) {
@@ -74,19 +74,19 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                 } else if (typeof itemPrice === 'number') {
                     priceValue = itemPrice;
                 }
-                setPrice(priceValue);
+                setPrice(priceValue.toString());
             } else {
                 // For 'bn' locale, use original product data as fallback
                 if (locale === 'bn' && product) {
                     setName(product.name || '');
-                    setPrice(product.price || 0);
+                    setPrice(product.price.toString()); // Convert number to string
                 }
             }
         } else {
             // For 'bn' locale, use original product data as fallback even when no translations exist
             if (locale === 'bn' && product) {
                 setName(product.name || '');
-                setPrice(product.price || 0);
+                setPrice(product.price.toString()); // Convert number to string
             }
         }
     };
@@ -139,7 +139,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                                 }
 
                                 if (priceValue > 0) {
-                                    setPrice(priceValue);
+                                    setPrice(priceValue.toString());
                                     priceSet = true;
                                 }
                             }
@@ -157,9 +157,11 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     nameSet = true;
                 }
 
-                if (!priceSet && product.price && product.price > 0) {
-                    setPrice(product.price);
-                    priceSet = true;
+                // Refine logic to ensure Bengali numeral prices are preserved
+                if (!priceSet && product?.price && !price) {
+                    setPrice(product.price.toString()); // Convert number to string
+                } else if (!priceSet && !price) {
+                    setPrice(''); // Ensure no unnecessary overwriting
                 }
             }
 
@@ -168,7 +170,7 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                 setName('');
             }
             if (!priceSet) {
-                setPrice(0);
+                setPrice('0');
             }
 
             // Always try to set translations from product props as fallback
@@ -194,7 +196,14 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     // Handle language switching - only populate if we have translations loaded
     useEffect(() => {
         if (selectedTranslation && translations && translations.length > 0) {
-            populateFormForLanguage(selectedTranslation, translations);
+            const currentTranslation = translations.find((t) => {
+                const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
+                return locale === selectedTranslation;
+            });
+
+            if (currentTranslation && currentTranslation.price) {
+                setPrice(currentTranslation.price); // Preserve Bengali numeral price
+            }
         }
     }, [selectedTranslation, translations]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -304,12 +313,11 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
                         id="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
+                        type="text"
+
                         placeholder={`Enter price in ${selectedTranslation.toUpperCase()} currency`}
                         value={price || ''}
-                        onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => setPrice(e.target.value || '0')}
                     />
                     <p className="text-gray-600 text-xs mt-1">
                         Enter the price in the local currency for {selectedTranslation.toUpperCase()} market

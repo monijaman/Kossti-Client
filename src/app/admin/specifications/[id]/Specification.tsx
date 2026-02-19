@@ -1,8 +1,8 @@
 "use client";
 import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
-import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
@@ -50,8 +50,16 @@ const Specification = ({ params }: PageProps) => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // Call the submit function with the mapped data
-        await submitSpecificationsKeys(id, specifications);
+        // Prepare and filter specifications before sending in one bulk call
+        const specsToSave = specifications
+            .map(s => ({
+                id: s.id ?? undefined,
+                specification_key_id: typeof s.specification_key_id === 'string' ? parseInt(String(s.specification_key_id), 10) : s.specification_key_id,
+                value: s.value != null ? String(s.value).trim() : ''
+            }))
+            .filter(s => s.specification_key_id && Number(s.specification_key_id) > 0);
+
+        await submitSpecificationsKeys(id, specsToSave as any);
 
     };
 
@@ -151,7 +159,7 @@ const Specification = ({ params }: PageProps) => {
                             >
                                 Submit
                             </button>
-                          
+
                         </div>
                     </form>
                 </div>
