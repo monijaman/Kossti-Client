@@ -28,7 +28,7 @@ const DragNdrop = ({
   height,
 }: DragNdropProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const approvedFileTypes = [".zip", ".mp4", ".jpg",  ".jpeg",".png", ".gif", ".webp", ".svg"];
+  const approvedFileTypes = [".zip", ".mp4", ".jpg",  ".jpeg",".png", ".gif", ".webp", ".svg", ".avif"];
   const dispatch = useAppDispatch();
   const selectedFilesRef = useRef<File[]>([]);
 
@@ -171,7 +171,7 @@ const DragNdrop = ({
               <div className="text-4xl">🖼️</div>
               <div>
                 <h5>Add Image file</h5>
-                <h6> All .gif, .png, .jpg</h6>
+                <h6> All .gif, .png, .jpg, .avif</h6>
               </div>
             </div>
           </div>
@@ -192,7 +192,7 @@ const DragNdrop = ({
                 hidden
                 id="browse"
                 onChange={handleFileChange}
-                accept=".zip,.mp4,.jpg,.png.gif"
+                accept=".zip,.mp4,.jpg,.png,.gif,.avif"
                 multiple
               />
               <label htmlFor="browse" className="browse-btn">
