@@ -6,7 +6,7 @@ import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
-import { generateAIReview, extractRatingFromReview } from '@/lib/openai-service';
+import { generateAIReview, extractRatingFromReview, ReviewStyle } from '@/lib/openai-service';
 import { AdditionalDetails, Product, Review, ReviewTranslation } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useRef, useState } from 'react';
@@ -43,6 +43,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [aiError, setAiError] = useState<string>('');
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
+    const [aiReviewStyle, setAiReviewStyle] = useState<ReviewStyle>('aesops-fable');
     const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
@@ -234,6 +235,7 @@ const ReviewForm = ({ params }: PageProps) => {
                 productCategory: products.category_slug || '',
                 locale: 'en',
                 customPrompt: aiReviewPrompt || undefined,
+                style: aiReviewStyle,
             });
 
 
@@ -650,18 +652,40 @@ const ReviewForm = ({ params }: PageProps) => {
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
-                        <p className="font-medium mb-2">📋 Review will include:</p>
-                        <ul className="list-disc list-inside space-y-1 text-xs">
-                            <li>Key Features & Highlights</li>
-                            <li>Pros & Advantages (8-10 points)</li>
-                            <li>Cons & Disadvantages (8-10 points)</li>
-                            <li>Who Should Buy / Who Should NOT Buy</li>
-                            <li>Price & Cost Analysis</li>
-                            <li>Performance Ratings (8 dimensions)</li>
-                            <li>FAQ with 6-8 Common Questions</li>
-                            <li>Final Verdict & Recommendation</li>
-                        </ul>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Review Style</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {([
+                                { value: 'aesops-fable', label: "🦊 Aesop's Fable", desc: 'Storytelling with parables & morals' },
+                                { value: 'technical-expert', label: '🔧 Technical Expert', desc: 'Data-driven engineering analysis' },
+                                { value: 'casual-friendly', label: '😊 Casual & Friendly', desc: 'Conversational everyday language' },
+                                { value: 'critical-honest', label: '🔍 Critical & Honest', desc: 'Brutally honest, no-nonsense' },
+                                { value: 'luxury-premium', label: '💎 Luxury Premium', desc: 'Aspirational, premium experience' },
+                                { value: 'budget-practical', label: '💡 Budget Practical', desc: 'Value-focused, smart spending' },
+                                { value: 'family-safe', label: '👨‍👩‍👧 Family Safe', desc: 'Safety, space & child-friendliness' },
+                                { value: 'performance-enthusiast', label: '🏆 Performance', desc: 'Track-ready, 0-100, driver thrills' },
+                                { value: 'eco-conscious', label: '🌿 Eco Conscious', desc: 'Emissions, efficiency & sustainability' },
+                                { value: 'urban-commuter', label: '🏙️ Urban Commuter', desc: 'City parking, stop-go & congestion' },
+                                { value: 'sherlock-detective', label: '🔎 Sherlock', desc: 'Deductive investigation, case & verdict' },
+                                { value: 'shakespearean-drama', label: '🎭 Shakespeare', desc: 'Five-act theatrical drama & soliloquy' },
+                                { value: 'epic-mythology', label: '⚡ Epic Mythology', desc: 'Greek/Norse hero legend & divine gifts' },
+                                { value: 'film-noir', label: '🕵️ Film Noir', desc: 'Hard-boiled 1940s detective monologue' },
+                            ] as { value: ReviewStyle; label: string; desc: string }[]).map(({ value, label, desc }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setAiReviewStyle(value)}
+                                    className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${
+                                        aiReviewStyle === value
+                                            ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                            : 'border-gray-200 hover:border-gray-400 text-gray-700'
+                                    }`}
+                                >
+                                    <div className="font-medium">{label}</div>
+                                    <div className="text-xs text-gray-500">{desc}</div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div>

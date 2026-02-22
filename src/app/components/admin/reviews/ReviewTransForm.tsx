@@ -69,9 +69,12 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             const translation = transData.find((trans) => trans.locale === selectedLocale);
             if (translation) {
                 setSelectedTranslation(translation); // Set selectedTranslation to the correct translation
-                // Keep rating as-is (whether it's Bengali string "৪.१५" or English "4.15")
                 const ratingValue = translation.rating;
-                const ratingString = typeof ratingValue === 'string' ? ratingValue : (typeof ratingValue === 'number' ? String(ratingValue) : '');
+                let ratingString = typeof ratingValue === 'string' ? ratingValue : (typeof ratingValue === 'number' ? String(ratingValue) : '');
+                // Convert to Bengali numerals when viewing Bengali locale
+                if (selectedLocale === 'bn' && ratingString) {
+                    ratingString = convertTobengaliNumerals(ratingString);
+                }
                 console.log('Setting ratingInput to:', ratingString);
                 setRatingInput(ratingString);
                 setAdditionalDetails(translation.additional_details); // Set additional details
@@ -143,7 +146,10 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             });
 
             // Update rating input
-            setRatingInput(String(extractedRating));
+            const ratingStr = selectedLocale === 'bn'
+                ? convertTobengaliNumerals(String(extractedRating))
+                : String(extractedRating);
+            setRatingInput(ratingStr);
 
             // Show success message
             setTransSuccessMessage('✅ AI review generated successfully');
@@ -218,14 +224,12 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
             setTransData(updatedTransData);
 
-            // Convert English rating to Bengali numerals if available
-            if (englishTranslation.rating) {
-                const bengaliRating = convertTobengaliNumerals(String(englishTranslation.rating));
-
-                // Only update UI if currently viewing Bengali
-                if (selectedLocale === 'bn') {
-                    setRatingInput(bengaliRating);
-                }
+            // Convert English rating to Bengali numerals
+            const bengaliRating = englishTranslation.rating
+                ? convertTobengaliNumerals(String(englishTranslation.rating))
+                : '';
+            if (selectedLocale === 'bn' && bengaliRating) {
+                setRatingInput(bengaliRating);
             }
 
             // Update selectedTranslation if currently viewing Bengali
@@ -282,7 +286,10 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
                 // Update ratingInput to show the newly saved rating (preserve Bengali format)
                 if (details && details.rating) {
-                    setRatingInput(String(details.rating));
+                    const savedRating = selectedLocale === 'bn'
+                        ? convertTobengaliNumerals(String(details.rating))
+                        : String(details.rating);
+                    setRatingInput(savedRating);
                 }
 
                 // Force reload the translation to ensure fresh data from server

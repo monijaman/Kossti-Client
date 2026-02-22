@@ -316,20 +316,14 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     </div>
 
                     <div>
-
-                        <div>
-                            <input
-                                type="text"
-                                name="translated_value"
-                                value={spec.translated_value || ''}
-                                onChange={(event) => handleInputChange(index, event)}
-                                placeholder={spec.source_value || 'Enter translated value'}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            />
-                            {spec.source_value && !spec.translated_value && (
-                                <div className="mt-1 text-xs text-gray-400">English: {spec.source_value}</div>
-                            )}
-                        </div>
+                        <input
+                            type="text"
+                            name="translated_value"
+                            value={spec.translated_value || ''}
+                            onChange={(event) => handleInputChange(index, event)}
+                            placeholder={spec.source_value || 'Enter translated value'}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
                     </div>
                 </div>
             ))}
