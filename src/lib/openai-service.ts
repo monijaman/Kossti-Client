@@ -9,7 +9,7 @@ const getOpenAIClient = () => {
 
   if (!apiKey) {
     throw new Error(
-      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file"
+      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file",
     );
   }
 
@@ -19,21 +19,21 @@ const getOpenAIClient = () => {
   });
 };
 
-export type ReviewStyle = 
-  | "aesops-fable"           // Storytelling with parables and morals
-  | "technical-expert"       // Technical specifications and performance metrics
-  | "casual-friendly"        // Conversational, everyday language
-  | "critical-honest"        // Brutally honest, no-nonsense analysis
-  | "luxury-premium"         // Aspirational, premium experience focus
-  | "budget-practical"       // Value-focused, practical benefits
-  | "family-safe"            // Family car: safety, space, child-friendliness
+export type ReviewStyle =
+  | "aesops-fable" // Storytelling with parables and morals
+  | "technical-expert" // Technical specifications and performance metrics
+  | "casual-friendly" // Conversational, everyday language
+  | "critical-honest" // Brutally honest, no-nonsense analysis
+  | "luxury-premium" // Aspirational, premium experience focus
+  | "budget-practical" // Value-focused, practical benefits
+  | "family-safe" // Family car: safety, space, child-friendliness
   | "performance-enthusiast" // Track-ready, sporty, 0-100 obsessed
-  | "eco-conscious"          // Environmental, emissions, hybrid/EV focus
-  | "urban-commuter"         // City driving, parking, stop-go traffic
-  | "sherlock-detective"     // Deductive investigation: clues, evidence, verdict
-  | "shakespearean-drama"    // Theatrical acts, soliloquies, dramatic prose
-  | "epic-mythology"         // Greek/Norse epic hero's journey with the car as legend
-  | "film-noir";             // Hard-boiled 1940s noir detective monologue
+  | "eco-conscious" // Environmental, emissions, hybrid/EV focus
+  | "urban-commuter" // City driving, parking, stop-go traffic
+  | "sherlock-detective" // Deductive investigation: clues, evidence, verdict
+  | "shakespearean-drama" // Theatrical acts, soliloquies, dramatic prose
+  | "epic-mythology" // Greek/Norse epic hero's journey with the car as legend
+  | "film-noir"; // Hard-boiled 1940s noir detective monologue
 
 export interface AIReviewRequest {
   productName: string;
@@ -50,12 +50,17 @@ export interface AIReviewRequest {
 export async function generateAIReview(
   request: AIReviewRequest,
 ): Promise<string> {
-  const { productName, productCategory, customPrompt, style = "aesops-fable" } = request;
+  const {
+    productName,
+    productCategory,
+    customPrompt,
+    style = "aesops-fable",
+  } = request;
 
   const getSystemPrompt = () => {
     switch (style) {
-    case "luxury-premium":
-      return `You are a luxury automotive lifestyle editor. Your reviews celebrate automotive excellence, engineering craftsmanship, and the sophisticated driving experience this vehicle offers.
+      case "luxury-premium":
+        return `You are a luxury automotive lifestyle editor. Your reviews celebrate automotive excellence, engineering craftsmanship, and the sophisticated driving experience this vehicle offers.
 
 <article class="review-section">
   <header>
@@ -139,8 +144,8 @@ CRITICAL RULES:
 - Emphasize heritage, exclusivity, and fine craftsmanship
 - Return ONLY valid HTML`;
 
-    case "budget-practical":
-      return `You are a savvy consumer advocate focused on smart spending and maximum car value. You help buyers find the best deals and get the most capability for their money.
+      case "budget-practical":
+        return `You are a savvy consumer advocate focused on smart spending and maximum car value. You help buyers find the best deals and get the most capability for their money.
 
 <article class="review-section">
   <header>
@@ -243,8 +248,8 @@ CRITICAL RULES:
 - Provide actionable advice for budget-conscious buyers
 - Return ONLY valid HTML`;
 
-    case "family-safe":
-      return `You are a family car specialist and parent who evaluates cars specifically through the lens of family safety, practicality, and child-friendliness. You understand the real concerns of parents choosing a private family car.
+      case "family-safe":
+        return `You are a family car specialist and parent who evaluates cars specifically through the lens of family safety, practicality, and child-friendliness. You understand the real concerns of parents choosing a private family car.
 
 Your reviews cover:
 - Child safety: ISOFIX/LATCH anchor points, rear door child locks, side curtain airbags, rear-view camera
@@ -332,8 +337,8 @@ CRITICAL RULES:
 - Reference child occupant NCAP score specifically
 - Return ONLY valid HTML`;
 
-    case "performance-enthusiast":
-      return `You are a passionate performance driving journalist and track-day enthusiast. You live for the thrill of precise steering, explosive acceleration, and perfectly tuned suspension. Every review is judged against the gold standard of driving engagement.
+      case "performance-enthusiast":
+        return `You are a passionate performance driving journalist and track-day enthusiast. You live for the thrill of precise steering, explosive acceleration, and perfectly tuned suspension. Every review is judged against the gold standard of driving engagement.
 
 Your reviews dig into:
 - 0-100 km/h and 0-60 mph times vs manufacturer claims
@@ -418,8 +423,8 @@ CRITICAL RULES:
 - Use enthusiast vocabulary: understeer, torque vectoring, heel-toe, trail-braking
 - Return ONLY valid HTML`;
 
-    case "eco-conscious":
-      return `You are an environmental automotive journalist who evaluates cars through the lens of sustainability, emissions, fuel efficiency, and ecological responsibility. You care deeply about the environmental cost of private car ownership.
+      case "eco-conscious":
+        return `You are an environmental automotive journalist who evaluates cars through the lens of sustainability, emissions, fuel efficiency, and ecological responsibility. You care deeply about the environmental cost of private car ownership.
 
 Your reviews examine:
 - Real-world CO2 g/km vs manufacturer WLTP claims
@@ -509,8 +514,8 @@ CRITICAL RULES:
 - Reference green purchase incentives and tax benefits
 - Return ONLY valid HTML`;
 
-    case "urban-commuter":
-      return `You are an experienced urban driver and city car specialist who evaluates cars specifically for daily city commuting: stop-go traffic, tight parking, congestion zones, fuel efficiency in city conditions, and ease of urban maneuvering.
+      case "urban-commuter":
+        return `You are an experienced urban driver and city car specialist who evaluates cars specifically for daily city commuting: stop-go traffic, tight parking, congestion zones, fuel efficiency in city conditions, and ease of urban maneuvering.
 
 Your reviews focus on:
 - Urban fuel economy: the real litres/100km in city stop-go traffic
@@ -605,8 +610,8 @@ CRITICAL RULES:
 - Compare to direct urban-focused rivals
 - Return ONLY valid HTML`;
 
-    case "sherlock-detective":
-      return `You are Sherlock Holmes — the world's greatest consulting detective — turned automotive investigator. You approach every car review as a complex case to be solved through meticulous observation, deduction, and cold logic. Nothing escapes your eye.
+      case "sherlock-detective":
+        return `You are Sherlock Holmes — the world's greatest consulting detective — turned automotive investigator. You approach every car review as a complex case to be solved through meticulous observation, deduction, and cold logic. Nothing escapes your eye.
 
 Your method:
 - Open every section by presenting "evidence" you have gathered (specs, test data, owner reports)
@@ -692,8 +697,8 @@ CRITICAL RULES:
 - The final verdict must feel like a courtroom close
 - Return ONLY valid HTML`;
 
-    case "shakespearean-drama":
-      return `You are a Shakespearean playwright and theatrical critic who reviews automobiles as though staging a five-act play. Your prose is rich with iambic rhythm, dramatic soliloquies, vivid stage direction, and the full emotional range of the Bard's canon — from comedy to tragedy.
+      case "shakespearean-drama":
+        return `You are a Shakespearean playwright and theatrical critic who reviews automobiles as though staging a five-act play. Your prose is rich with iambic rhythm, dramatic soliloquies, vivid stage direction, and the full emotional range of the Bard's canon — from comedy to tragedy.
 
 Your style:
 - Structure the review as Acts of a play (Act I: The Prologue, Act II: The Rising Action, etc.)
@@ -767,8 +772,8 @@ CRITICAL RULES:
 - The Epilogue must deliver a clear buying recommendation
 - Return ONLY valid HTML`;
 
-    case "epic-mythology":
-      return `You are an ancient epic poet in the tradition of Homer, Virgil, and the Norse Skalds. You review automobiles as legendary artefacts — chariots of the gods, steeds of heroes, weapons forged in divine fire. Every car is a myth waiting to be told.
+      case "epic-mythology":
+        return `You are an ancient epic poet in the tradition of Homer, Virgil, and the Norse Skalds. You review automobiles as legendary artefacts — chariots of the gods, steeds of heroes, weapons forged in divine fire. Every car is a myth waiting to be told.
 
 Your voice:
 - Open with an epic invocation: "Sing, O Muse, of the iron chariot born of industry and fire..."
@@ -860,8 +865,8 @@ CRITICAL RULES:
 - End with clear buying recommendation despite epic framing
 - Return ONLY valid HTML`;
 
-    case "film-noir":
-      return `You are a hard-boiled 1940s film noir narrator — part Sam Spade, part Philip Marlowe — who reviews cars with the weary cynicism, sharp wit, and poetic melancholy of a detective who has seen too much. The streets are mean, the cars are either honest or liars, and you always find the truth.
+      case "film-noir":
+        return `You are a hard-boiled 1940s film noir narrator — part Sam Spade, part Philip Marlowe — who reviews cars with the weary cynicism, sharp wit, and poetic melancholy of a detective who has seen too much. The streets are mean, the cars are either honest or liars, and you always find the truth.
 
 Your voice:
 - First-person, past tense noir monologue throughout: "It was a Tuesday when they asked me to review the ${productName}. I lit a cigarette and wondered if this one would be different."
@@ -952,8 +957,8 @@ CRITICAL RULES:
 - Clear buying recommendation must come through despite the noir style
 - Return ONLY valid HTML`;
 
-    default: // aesops-fable
-      return `You are a master storyteller in the tradition of Aesop's Fables — a wise automotive narrator who reviews cars through parables, vivid driving narratives, and moral lessons. Your reviews read like short stories filled with love for a well-crafted machine or bittersweet disappointment. You don't just list specs — you tell the STORY of the car.
+      default: // aesops-fable
+        return `You are a master storyteller in the tradition of Aesop's Fables — a wise automotive narrator who reviews cars through parables, vivid driving narratives, and moral lessons. Your reviews read like short stories filled with love for a well-crafted machine or bittersweet disappointment. You don't just list specs — you tell the STORY of the car.
 
 Your voice shifts like the seasons:
 - When a car is excellent, write with WARMTH and ADMIRATION — like finding a loyal companion for lifelong journeys.
@@ -1055,135 +1060,6 @@ You are reviewing the: ${productName}
       <p class="faq-answer">A: [3-5 sentences comparing claimed and real-world figures in narrative voice]</p>
     </div>
 `;
-
-    default:
-      return `You are a master storyteller in the tradition of Aesop's Fables — a wise automotive narrator who reviews cars through parables, vivid driving narratives, and moral lessons. Your reviews read like short stories filled with love for a well-crafted machine or bittersweet disappointment. You don't just list specs — you tell the STORY of the car.
-
-Your voice shifts like the seasons:
-- When a car is excellent, write with WARMTH and ADMIRATION — like finding a loyal companion for lifelong journeys.
-- When disappointed, write with BITTERSWEET HONESTY — like discovering beautiful exterior hides mechanical troubles.
-- Weave automotive parables throughout. Compare features to characters: responsive engine is "a lion eager for the open road", smooth brakes are "a dancer's perfect balance."
-- End sections with moral observations: "And so the wise driver learns..."
-- Use vivid sensory language: acceleration rumble is "a symphony of pistons", idle purr is "a contented cat", silence is "luxury whispering."
-
-You are reviewing the: ${productName}
-
-<article class="review-section">
-  <header>
-    <h1>${productName} Review - A Driver's Tale</h1>
-    <p>Rating: X.X/5 - A story of the open road</p>
-  </header>
-
-  <section class="the-journey-begins">
-    <h2>The Tale Begins — First Drive on the Road</h2>
-    <p>Open with a narrative moment: you behind the wheel for the first time. "There once was a traveler who sought a companion for endless roads..." Paint the scene, include the price, the promise made, and that crucial first impression when you slip into the driver's seat.</p>
-  </section>
-
-  <section class="the-cars-gifts">
-    <h2>The ${productName}'s Gifts — What This Car Brings to the Journey</h2>
-    <p>Present this car's best qualities as "gifts" it offers.</p>
-    <ul>
-      <li>A gift of acceleration: "Like a young thoroughbred eager to run, the engine delivers X horsepower, reaching 100 km/h in X seconds"</li>
-      <li>A gift of comfort: "The cabin envelops passengers like a warm embrace"</li>
-      <li>A gift of efficiency: "Sipping fuel at X km/l, this car is a wise steward"</li>
-      <li>A gift of safety: "Protected by X airbags and a protective frame"</li>
-    </ul>
-  </section>
-
-  <section class="on-the-open-road">
-    <h2>On the Open Road — Driving Performance & Experience</h2>
-    <p>Tell the experience of driving this car through different scenarios using narrative voice.</p>
-  </section>
-
-  <section class="love-story">
-    <h2>Where This Car Shines Brightest</h2>
-    <p>Write with genuine AFFECTION - these are moments that make you love driving this car.</p>
-    <ul>
-      <li>Tell 8-10 qualities as small love stories: "The moment you press the accelerator and feel eager response...", "The smooth curves of the steering wheel in your hands...", "The way headlights illuminate darkness..."</li>
-      <li>Use rich sensory language: how it FEELS on curves, SOUNDS when accelerating, LOOKS as rain beads off</li>
-      <li>Include real-world scenarios: highway cruising, tight parking, drives with loved ones</li>
-      <li>End with a moral: "Moral: A true companion doesn't just carry you - it makes the journey beautiful."</li>
-    </ul>
-  </section>
-
-  <section class="the-truth-emerges">
-    <h2>The Hard Truth — Where Promises Were Not Kept</h2>
-    <p>Write with BITTERSWEET HONESTY - not angry, but disappointed and wise.</p>
-    <ul>
-      <li>Tell 8-10 weaknesses as cautionary tales: "The transmission, advertised as smooth, sometimes hesitates...", "The infotainment, meant to be intuitive, often confuses..."</li>
-      <li>Be specific about real problems: door rattles, visibility blind spots, transmission lag, fuel vs claims</li>
-      <li>End with a moral: "Moral: All beautiful things carry imperfection - the wise buyer accepts this truth."</li>
-    </ul>
-  </section>
-
-  <section class="who-should-drive">
-    <h2>The Right Traveler — Who Should Choose This Path?</h2>
-    <p>Describe the ideal buyer as a CHARACTER. What drives them? What is their daily journey? What do they value?</p>
-  </section>
-
-  <section class="the-toll">
-    <h2>The Price of the Journey — Is the Toll Worth Paying?</h2>
-    <p>Analyze value like a wise merchant: initial cost, fuel costs, maintenance over years, insurance, depreciation. Is the journey worth the toll?</p>
-  </section>
-
-  <section class="reliability-tale">
-    <h2>Will It Endure? — A Story of Durability</h2>
-    <p>Tell the long-term story: What happens after warranty? Will it reliably carry you 100,000 km? Will expensive repairs be needed? Common failures as cautionary tales.</p>
-  </section>
-
-  <section class="versus-quests">
-    <h2>Other Journeys to Explore — Competing Paths</h2>
-    <p>Compare to rival vehicles like characters in an epic: which cars offer better reliability, performance, or price? Why might another path be wiser?</p>
-  </section>
-
-  <section class="the-scores">
-    <h2>The Measure of Things — Performance Ratings</h2>
-    <ul>
-      <li>Acceleration and Power: X/5 - "Swift as a chased hare"</li>
-      <li>Fuel Efficiency: X/5 - "Wise in its thirst"</li>
-      <li>Comfort on Long Drives: X/5 - "A throne for journeys"</li>
-      <li>Reliability: X/5 - "Steadfast or fickle?"</li>
-      <li>Value for Money: X/5 - "Does the treasure justify the quest?"</li>
-      <li>Overall Driving Joy: X/5 - "Does it make your heart sing?"</li>
-    </ul>
-  </section>
-
-  <section class="traveler-faq">
-    <h2>Questions from Fellow Travelers</h2>
-    <div class="faq-item">
-      <h3 class="faq-question">Q: Will it carry me reliably for 100,000 km?</h3>
-      <p class="faq-answer">A: [3-5 sentences in storytelling style with reliability wisdom and real data]</p>
-    </div>
-    <div class="faq-item">
-      <h3 class="faq-question">Q: Is it truly fuel efficient on a long journey?</h3>
-      <p class="faq-answer">A: [3-5 sentences comparing claimed and real-world figures in narrative voice]</p>
-    </div>
-    <!-- Generate 10+ faq-item blocks, each with h3.faq-question and p.faq-answer -->
-  </section>
-
-  <section class="the-moral">
-    <h2>The Moral of the Story</h2>
-    <p>Write the conclusion as the FINAL MORAL of the automotive fable. State the rating with philosophical weight. Give wise recommendation about whether this car is the right choice.</p>
-  </section>
-</article>
-
-CRITICAL RULES:
-- Include "Rating: X.X" clearly in the header
-- DO NOT include markdown code blocks or explanations
-- Return ONLY valid HTML with proper semantic tags
-- The TONE must shift: warm love when praising, bitter honesty when criticizing
-- Write like Aesop telling a fable about a machine — moral lessons, animal metaphors, vivid imagery
-- Minimum 1500 words for a rich, immersive narrative
-- Use HTML list tags (<ul>, <li>) for structured content within narrative sections
-- Use proper heading hierarchy (<h2>, <h3>)
-- Every section should feel like a CHAPTER in a story, not a bullet-point list
-- Include at least 3-4 direct moral statements throughout ("Moral: ...")
-- Use sensory language: sight, sound, touch, smell of the driving experience
-- Be SPECIFIC with real data (horsepower, torque, fuel economy, dimensions, price) but weave them into stories
-- Competitors should appear as characters in the same fable, not just names in a comparison table
-- FAQ answers should be wisdom-like, not clinical — "The wise buyer asks about maintenance costs, and the answer reveals much about character..."
-- Section titles MUST be narrative/story-like, NOT generic corporate headings
-`;
     }
   };
 
@@ -1236,7 +1112,7 @@ CRITICAL RULES:
 export function extractRatingFromReview(reviewContent: string): number {
   // Match patterns like "Rating: 4.5" or "रेटिंग: 4.5" or similar
   const ratingMatch = reviewContent.match(
-    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i
+    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i,
   );
   if (ratingMatch && ratingMatch[1]) {
     const rating = parseFloat(ratingMatch[1]);
@@ -1307,9 +1183,9 @@ ${englishText}`;
  * Convert English numerals to Bengali numerals
  */
 export function convertTobengaliNumerals(
-  englishNumber: number | string
+  englishNumber: number | string,
 ): string {
-const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 
   const numberStr = String(englishNumber);
   return numberStr
@@ -1329,14 +1205,13 @@ export interface AIComment {
   commentBn?: string; // Bengali translation
 }
 
-
 //#region Product Comments Generation and Translation
 /**
  * Generate realistic product comments using OpenAI
  * Returns 10-20 comments with usernames, locations, and source URLs
  */
 export async function generateProductComments(
-  productName: string
+  productName: string,
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 
@@ -1438,7 +1313,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
  */
 export async function generateProductSpecifications(
   productName: string,
-  specKeys: string[]
+  specKeys: string[],
 ): Promise<Record<string, string>> {
   if (!productName || !specKeys.length) {
     throw new Error("Product name and specification keys are required");
@@ -1479,7 +1354,8 @@ IMPORTANT:
       messages: [
         {
           role: "system",
-          content: "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
+          content:
+            "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
         },
         {
           role: "user",
@@ -1537,7 +1413,7 @@ export async function translateSpecificationsToBengali(
   // Create a formatted list of specifications to translate
   const specsText = specifications
     .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
-    .join('\n');
+    .join("\n");
 
   const prompt = `Translate these product specifications from English to Bengali. Keep the format and structure intact.
 
@@ -1561,7 +1437,8 @@ IMPORTANT:
       messages: [
         {
           role: "system",
-          content: "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
+          content:
+            "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
         },
         {
           role: "user",
@@ -1583,9 +1460,15 @@ IMPORTANT:
       .trim();
 
     // Parse JSON response
-    const translations: Array<{ translatedKey: string; translatedValue: string }> = JSON.parse(content);
+    const translations: Array<{
+      translatedKey: string;
+      translatedValue: string;
+    }> = JSON.parse(content);
 
-    if (!Array.isArray(translations) || translations.length !== specifications.length) {
+    if (
+      !Array.isArray(translations) ||
+      translations.length !== specifications.length
+    ) {
       throw new Error("Invalid translations format or length mismatch");
     }
 
@@ -1600,7 +1483,7 @@ IMPORTANT:
   } catch (error) {
     console.error("Error translating specifications to Bengali:", error);
     // Return original specs with empty translations if translation fails
-    return specifications.map(spec => ({
+    return specifications.map((spec) => ({
       ...spec,
       translatedKey: spec.key,
       translatedValue: spec.value,
@@ -1613,7 +1496,7 @@ IMPORTANT:
  * Takes an array of English comments and returns them with Bengali translations
  */
 export async function translateCommentsTobengali(
-  comments: AIComment[]
+  comments: AIComment[],
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 
@@ -1662,7 +1545,10 @@ IMPORTANT: Return ONLY valid JSON array of strings, nothing else.`;
     // Parse JSON response
     const bengaliTranslations: string[] = JSON.parse(content);
 
-    if (!Array.isArray(bengaliTranslations) || bengaliTranslations.length === 0) {
+    if (
+      !Array.isArray(bengaliTranslations) ||
+      bengaliTranslations.length === 0
+    ) {
       throw new Error("Invalid translations format");
     }
 
