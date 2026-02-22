@@ -164,6 +164,22 @@ const Page = async ({ searchParams, params }: PageProps) => {
     }),
   ]);
 
+  // Handle API errors gracefully
+  if (!productData.success) {
+    console.error('[Page Error] Failed to fetch products:', productData.error);
+    return (
+      <MainLayout sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm }}>
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load products</h2>
+          <p className="text-gray-600 mb-4">{productData.error || 'The backend service is temporarily unavailable. Please try again later.'}</p>
+          <a href={`/${locale}`} className="text-blue-600 hover:text-blue-800 font-medium">
+            Go back to home
+          </a>
+        </div>
+      </MainLayout>
+    );
+  }
+
   const products = productData.data?.data ?? [];
   const totalProducts = productData.data?.meta?.total ?? 0;
   const totalPages = Math.ceil(totalProducts / limit);

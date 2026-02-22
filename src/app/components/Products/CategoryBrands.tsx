@@ -25,8 +25,14 @@ const CategoryBrands = async ({ categorySlug, countryCode }: CategoryBrandsProps
     let brands: Brand[] = [];
 
     try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+            console.error("[CategoryBrands] NEXT_PUBLIC_API_URL not configured");
+            return null;
+        }
+
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/category-brands?category_slug=${categorySlug}`,
+            `${apiUrl}/category-brands?category_slug=${categorySlug}`,
             {
                 next: { revalidate: 300 }, // Cache for 5 minutes
             }
@@ -35,9 +41,11 @@ const CategoryBrands = async ({ categorySlug, countryCode }: CategoryBrandsProps
         if (response.ok) {
             const data: BrandsApiResponse = await response.json();
             brands = data.brands || [];
+        } else {
+            console.error(`[CategoryBrands] API returned status ${response.status}`);
         }
     } catch (error) {
-        console.error("Error fetching category brands:", error);
+        console.error("[CategoryBrands] Error fetching category brands:", error);
     }
 
     if (brands.length === 0) {

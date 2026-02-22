@@ -38,6 +38,21 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
     next: { revalidate: 60 }, // Cache for 60 seconds
   });
 
+  // Handle API errors gracefully
+  if (!response.success) {
+    console.error('[PopularProducts Error] Failed to fetch popular products:', response.error);
+    return (
+      <>
+        <h2 className="page-title text-2xl font-bold text-gray-800 mb-6 mt-8">
+          {translation.popupar_product}
+        </h2>
+        <div className="text-center py-8 text-gray-600">
+          <p>Unable to load popular products. Please try again later.</p>
+        </div>
+      </>
+    );
+  }
+
   const dataset = response.data?.data ?? [];
 
   return (
