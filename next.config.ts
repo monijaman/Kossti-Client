@@ -62,18 +62,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Proxy /proxy-image to the Go backend so Next.js Image serves it as same-origin
-  // This avoids presigned URL 403s and CORS issues with private S3 buckets
-  async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9090";
-    return [
-      {
-        source: "/proxy-image",
-        destination: `${apiUrl}/proxy-image`,
-      },
-    ];
-  },
-
   // Redirect www to non-www
   async redirects() {
     return [
