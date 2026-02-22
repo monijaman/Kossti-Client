@@ -37,6 +37,8 @@ export interface Product {
   slug: string;
   review: string;
   price: number;
+  start_price?: number;
+  end_price?: number;
   category_id?: number;
   brand_id?: number;
   category_slug?: string;

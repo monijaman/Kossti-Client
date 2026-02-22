@@ -9,7 +9,7 @@ const getOpenAIClient = () => {
 
   if (!apiKey) {
     throw new Error(
-      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file",
+      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file"
     );
   }
 
@@ -31,7 +31,7 @@ export interface AIReviewRequest {
  * Returns HTML formatted review following the template structure
  */
 export async function generateAIReview(
-  request: AIReviewRequest,
+  request: AIReviewRequest
 ): Promise<string> {
   const { productName, productCategory, customPrompt } = request;
 
@@ -58,14 +58,14 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </header>
 
   <section class="introduction">
-    <h2>The Tale Begins — First Encounter</h2>
+    <h2>Example introduction title — your real output must use a different, creative title every time</h2>
     <p>Open with a short narrative scene — you encountering this product for the first time. Set the stage like a 
     fable: "There once was a traveler who sought..." Include the price, the promise the manufacturer makes, and 
     your first emotional reaction. Paint a picture. Make the reader FEEL the moment.</p>
   </section>
 
   <section class="key-highlights">
-    <h2>The ${productName}'s Gifts — What It Brings to the Table</h2>
+    <h2>Example highlights title — your real output must use a different, creative title every time</h2>
     <ul>
       <li>Present 3-4 standout features as "gifts" or "talents" the product possesses</li>
       <li>Each feature should be introduced through a mini-story or metaphor</li>
@@ -75,7 +75,9 @@ Please follow this comprehensive HTML structure and write ONLY in English:
   </section>
 
   <section class="pros">
-    <h2>A Love Letter — Where This ${productCategory || 'Product'} Shines</h2>
+    <h2>Between the Lines of Love — Where This ${
+      productCategory || "Product"
+    } Shines</h2>
     <p>Write this section with genuine AFFECTION. These are the things that made you fall in love.</p>
     <ul>
       <li>List 8-10 strengths, but tell each one as a small love story or moment of delight</li>
@@ -195,10 +197,13 @@ CRITICAL RULES:
 - Section titles MUST be narrative/story-like, NOT generic corporate headings
 `;
 
-
   const userPrompt = customPrompt
-    ? `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
-    : `Create a comprehensive review for: ${productName}${productCategory ? ` (Category: ${productCategory})` : ""}`;
+    ? `Create a comprehensive review for: ${productName}${
+        productCategory ? ` (Category: ${productCategory})` : ""
+      }\n\nCUSTOM INSTRUCTION FROM REVIEWER: ${customPrompt}`
+    : `Create a comprehensive review for: ${productName}${
+        productCategory ? ` (Category: ${productCategory})` : ""
+      }`;
 
   try {
     const client = getOpenAIClient();
@@ -242,7 +247,7 @@ CRITICAL RULES:
 export function extractRatingFromReview(reviewContent: string): number {
   // Match patterns like "Rating: 4.5" or "रेटिंग: 4.5" or similar
   const ratingMatch = reviewContent.match(
-    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i,
+    /(?:Rating|রেটিং|रेटिंग):\s*(\d+(?:\.\d+)?)/i
   );
   if (ratingMatch && ratingMatch[1]) {
     const rating = parseFloat(ratingMatch[1]);
@@ -314,7 +319,7 @@ ${englishText}`;
  * Convert English numerals to Bengali numerals
  */
 export function convertTobengaliNumerals(
-  englishNumber: number | string,
+  englishNumber: number | string
 ): string {
   const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
 
@@ -342,7 +347,7 @@ export interface AIComment {
  * Returns 10-20 comments with usernames, locations, and source URLs
  */
 export async function generateProductComments(
-  productName: string,
+  productName: string
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 
@@ -444,7 +449,7 @@ IMPORTANT: Return ONLY valid JSON array, nothing else.`;
  */
 export async function generateProductSpecifications(
   productName: string,
-  specKeys: string[],
+  specKeys: string[]
 ): Promise<Record<string, string>> {
   if (!productName || !specKeys.length) {
     throw new Error("Product name and specification keys are required");
@@ -526,7 +531,7 @@ IMPORTANT:
  * Takes an array of specification objects and returns them with Bengali translations
  */
 export async function translateSpecificationsToBengali(
-  specifications: Array<{ key: string; value: string }>,
+  specifications: Array<{ key: string; value: string }>
 ): Promise<
   Array<{
     key: string;
@@ -627,7 +632,7 @@ IMPORTANT:
  * Takes an array of English comments and returns them with Bengali translations
  */
 export async function translateCommentsTobengali(
-  comments: AIComment[],
+  comments: AIComment[]
 ): Promise<AIComment[]> {
   const client = getOpenAIClient();
 

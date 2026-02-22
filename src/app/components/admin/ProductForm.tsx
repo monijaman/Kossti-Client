@@ -20,6 +20,8 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [brand, setBrand] = useState(product?.brand_id?.toString() || '');
     const [model, setModel] = useState(product?.model || '');
     const [price, setPrice] = useState(product?.price || 0);
+    const [startPrice, setStartPrice] = useState<number | null>(product?.start_price ?? null);
+    const [endPrice, setEndPrice] = useState<number | null>(product?.end_price ?? null);
     const [status, setStatus] = useState(product?.status || false);
     const [priority, setPriority] = useState<number>(() => {
         const p = product?.priority;
@@ -218,7 +220,10 @@ const ProductForm = ({ product }: ProductFormProps) => {
             name: name,
             category_id: category ? Number(category) : null, // Go server expects snake_case and can be null
             brand_id: brand ? Number(brand) : null, // Go server expects snake_case and can be null
+            // Maintain backward compatibility by sending `price` plus optional start/end prices
             price: parseFloat(price.toString()),
+            start_price: startPrice !== null ? startPrice : null,
+            end_price: endPrice !== null ? endPrice : null,
             status: !!status, // Convert to boolean (true/false)
             priority: Number(priority), // Priority field now exists in Go server's Product entity
         };
@@ -403,19 +408,35 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         />
                     </div>
 
-                    {/* Price */}
+                    {/* Start Price (optional) */}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                            Price
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="start_price">
+                            Start Price (optional)
                         </label>
                         <input
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            id="price"
+                            id="start_price"
                             type="number"
                             step="0.01"
-                            placeholder="Enter product price"
-                            value={price}
-                            onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                            placeholder="Enter start price"
+                            value={startPrice ?? ''}
+                            onChange={(e) => setStartPrice(e.target.value === '' ? null : parseFloat(e.target.value))}
+                        />
+                    </div>
+
+                    {/* End Price (optional) */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="end_price">
+                            End Price (optional)
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="end_price"
+                            type="number"
+                            step="0.01"
+                            placeholder="Enter end price"
+                            value={endPrice ?? ''}
+                            onChange={(e) => setEndPrice(e.target.value === '' ? null : parseFloat(e.target.value))}
                         />
                     </div>
 
@@ -494,7 +515,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             </button>
                         )}
                     </div>
-                        <hr />
+                    <hr />
                     <div className="flex mt-6 items-center justify-between gap-2">
                         {/* Pull Comments Button - Only show if product exists */}
                         {product?.id && (

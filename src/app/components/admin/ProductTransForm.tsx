@@ -34,6 +34,8 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
 
     const [name, setName] = useState(''); // Don't initialize with product name - use translation data
     const [price, setPrice] = useState(""); // Don't initialize with product price - use translation data
+    const [startPrice, setStartPrice] = useState("");
+    const [endPrice, setEndPrice] = useState("");
     const { Translation, getProductTranslations } = useProducts();
     const id = product && product.id;
     const [submitStatus, setSubmitStatus] = useState('');
@@ -219,7 +221,8 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
         const payload = {
             locale: selectedTranslation, // Go server expects lowercase
             translated_name: name?.trim() || '', // Go server expects snake_case, trim whitespace safely
-            price: price.toString(), // Convert number to string for Go API
+            start_price: startPrice ? startPrice.toString() : null, // Convert to string or null
+            end_price: endPrice ? endPrice.toString() : null, // Convert to string or null
         };
 
         try {
@@ -306,21 +309,38 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     </p>
                 </div>
 
+
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
-                        Translated Price ({selectedTranslation.toUpperCase()})
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startPrice">
+                        Start Price (Optional)
                     </label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                        id="price"
+                        id="startPrice"
                         type="text"
-
-                        placeholder={`Enter price in ${selectedTranslation.toUpperCase()} currency`}
-                        value={price || ''}
-                        onChange={(e) => setPrice(e.target.value || '0')}
+                        placeholder="Enter start price"
+                        value={startPrice || ''}
+                        onChange={(e) => setStartPrice(e.target.value)}
                     />
                     <p className="text-gray-600 text-xs mt-1">
-                        Enter the price in the local currency for {selectedTranslation.toUpperCase()} market
+                        Enter the starting price (optional).
+                    </p>
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endPrice">
+                        End Price (Optional)
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                        id="endPrice"
+                        type="text"
+                        placeholder="Enter end price"
+                        value={endPrice || ''}
+                        onChange={(e) => setEndPrice(e.target.value)}
+                    />
+                    <p className="text-gray-600 text-xs mt-1">
+                        Enter the ending price (optional).
                     </p>
                 </div>
 

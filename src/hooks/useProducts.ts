@@ -213,7 +213,7 @@ export const useProducts = () => {
       // Use Go server API URL for product translations
       const goApiUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const url = `${goApiUrl}/products/${id}/translations`;
+      const url = `${goApiUrl}/products/${id}/translation`; // Note: singular "translation" for POST
 
       const response = await fetch(url, {
         method: "POST",
@@ -223,7 +223,8 @@ export const useProducts = () => {
         body: JSON.stringify({
           locale: productData.locale,
           translated_name: productData.translated_name,
-          price: productData.price,
+          start_price: productData.start_price,
+          end_price: productData.end_price,
         }),
       });
 
@@ -359,7 +360,10 @@ export const useProducts = () => {
     }
   };
 
-  const MakePhotoDefault = async (photoId: number | string, productId?: number) => {
+  const MakePhotoDefault = async (
+    photoId: number | string,
+    productId?: number,
+  ) => {
     try {
       const payload = {
         apiUrl: `default-image/${photoId}`,
