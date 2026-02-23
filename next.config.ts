@@ -14,12 +14,25 @@ const nextConfig: NextConfig = {
         hostname: "127.0.0.1",
       },
       {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
         protocol: "https",
-        hostname: "img.youtube.com",
+        hostname: "gocritserver-production.up.railway.app",
       },
       {
         protocol: "http",
-        hostname: "localhost",
+        hostname: "localhost:8080",
+      },
+      {
+        protocol: "https",
+        hostname: "gocritserver-production.up.railway.app",
+        port: "8080",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
       },
       {
         protocol: "https",
