@@ -8,10 +8,14 @@ interface PopularProductsProps {
 }
 
 const ProducShortDetails = ({ product, countryCode, priority = false }: PopularProductsProps) => {
+  // Fallback to product ID if slug is missing
+  const productSlug = product.slug || `product-${product.id}`;
+  const categorySlug = product.category_slug || 'products';
+  
   return (
     <Link
       key={product.id}
-      href={`/${countryCode}/${product.category_slug}/${product.slug}`}
+      href={`/${countryCode}/${categorySlug}/${productSlug}`}
       className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
     >
       {/* Product Image Container */}

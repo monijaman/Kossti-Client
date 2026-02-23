@@ -93,7 +93,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                     href={
                                         searchUrl
                                             ? `/${locale}/${searchUrl}/${product.id}`
-                                            : `/${locale}/${product.category_slug}/${product.slug}`
+                                            : `/${locale}/${product.category_slug || 'products'}/${product.slug || `product-${product.id}`}`
                                     }
                                     className="flex items-center space-x-4 w-full"
                                 >
