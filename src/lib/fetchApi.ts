@@ -19,16 +19,16 @@ type NextFetchRequestConfig = {
 
 const getBaseUrl = () => {
   const url = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-  
+
   if (!url) {
     const errorMsg = `API URL is not defined in env variables.
-    NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'undefined'}
-    API_URL: ${process.env.API_URL || 'undefined'}
-    NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`;
+    NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || "undefined"}
+    API_URL: ${process.env.API_URL || "undefined"}
+    NODE_ENV: ${process.env.NODE_ENV || "undefined"}`;
     console.error(errorMsg);
     throw new Error(errorMsg);
   }
-  
+
   return url;
 };
 
