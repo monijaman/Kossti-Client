@@ -11,6 +11,18 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
   // Fallback to product ID if slug is missing
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
+  
+  // Generate placeholder image with product name if no photo exists
+  const getImageUrl = () => {
+    if (product.photo) {
+      return product.photo;
+    }
+    
+    // Generate a placeholder using a service
+    // Use product name as seed for consistent placeholder
+    const seed = encodeURIComponent(product.name);
+    return `https://ui-avatars.com/api/?name=${seed}&size=500&background=random&bold=true&format=svg`;
+  };
 
   return (
     <Link
@@ -28,13 +40,14 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
           </div>
         )}
         <Image
-          src={product.photo || '/noimage.webp'}
+          src={getImageUrl()}
           alt={product.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           loading={priority ? "eager" : "lazy"}
           priority={priority}
           className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+          unoptimized={!product.photo} // Skip optimization for placeholder images
         />
       </div>
 
