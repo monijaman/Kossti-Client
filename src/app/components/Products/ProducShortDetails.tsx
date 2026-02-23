@@ -11,7 +11,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
   // Fallback to product ID if slug is missing
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
-  
+
   return (
     <Link
       key={product.id}
