@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     // Create response with session and token cookies
     const response = NextResponse.json(
-      { message: "Login successful", email },
+      { message: "Login successful", email, success: true },
       { status: 200 },
     );
 
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
       name: "admin_session",
       value: "authenticated_" + Date.now(),
       httpOnly: true,
-      secure: false, // process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax",
       maxAge: 24 * 60 * 60, // 24 hours
       path: "/",
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
       name: "accessToken",
       value: token,
       httpOnly: true,
-      secure: false, // process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax",
       maxAge: 24 * 60 * 60,
       path: "/",
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
         name: "refreshToken",
         value: refresh_token,
         httpOnly: true,
-        secure: false, // process.env.NODE_ENV === "production",
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 30 * 24 * 60 * 60, // 30 days
         path: "/",
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { message: "An error occurred during login" },
+      { message: "An error occurred during login", success: false },
       { status: 500 },
     );
   }

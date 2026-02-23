@@ -1,25 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.redirect(new URL("/admin/login", request.url), {
-    status: 302,
-  });
-
   // Clear all cookies by setting them with past expiration
+  const response = NextResponse.json(
+    {
+      success: true,
+      message: "Logged out successfully",
+    },
+    { status: 200 },
+  );
+
   const pastDate = new Date(0).toUTCString();
 
-  response.headers.append(
-    "Set-Cookie",
-    "admin_session=; Path=/; Expires=" + pastDate + "; HttpOnly; SameSite=lax",
-  );
-  response.headers.append(
-    "Set-Cookie",
-    "accessToken=; Path=/; Expires=" + pastDate + "; HttpOnly; SameSite=lax",
-  );
-  response.headers.append(
-    "Set-Cookie",
-    "refreshToken=; Path=/; Expires=" + pastDate + "; HttpOnly; SameSite=lax",
-  );
+  response.cookies.set({
+    name: "admin_session",
+    value: "",
+    expires: new Date(0),
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  response.cookies.set({
+    name: "accessToken",
+    value: "",
+    expires: new Date(0),
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  response.cookies.set({
+    name: "refreshToken",
+    value: "",
+    expires: new Date(0),
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+  });
 
   return response;
 }
