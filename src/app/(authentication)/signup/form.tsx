@@ -1,20 +1,25 @@
 'use client'
-import getErrors from '@/components/Form/validation';
+import getErrors from '@/app/components/Form/validation';
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+type ErrorResponse = {
+  message: string;
+  code?: number;
+};
 
-interface ErrorResponse {
-  name?: string[];
-  email?: string[];
-  password?: string[];
-  message?: string;
-  // Add other error fields as needed
-}
+// interface ErrorResponse {
+//   name?: string[];
+//   email?: string[];
+//   password?: string[];
+//   message?: string;
+//   // Add other error fields as needed
+// }
 
 interface FormData {
   [key: string]: string; // Index signature allowing access to any string property
-  name: string;
+  username: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -27,10 +32,10 @@ interface FormErrors {
 export const RegisterForm = () => {
 
   const router = useRouter();
-  const [error, setError] = useState<ErrorResponse | null>(null);
+  const [errors, setErrors] = useState<ErrorResponse | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -46,7 +51,7 @@ export const RegisterForm = () => {
   };
 
   const validationConfig = {
-    name: { required: true },
+    username: { required: true },
     email: { required: true, email: true },
     password: { required: true, minLength: 8 },
     password_confirmation: { required: true, passwordConfirmation: true },
@@ -60,7 +65,6 @@ export const RegisterForm = () => {
     setFormErrors(errors);
     if (Object.keys(errors).length === 0) {
 
-
       setSubmitted(true);
       register();
     }
@@ -73,49 +77,48 @@ export const RegisterForm = () => {
     if (typeof window !== "undefined") {
 
 
-      const formDataToSend = new FormData();
-
-      // Type assertion to inform TypeScript that the keys are strings
-      for (const key in formData) {
-        if (Object.prototype.hasOwnProperty.call(formData, key)) {
-          formDataToSend.append(key, formData[key as keyof typeof formData]);
-          // Using "as keyof typeof formData" to ensure only valid keys are used
-        }
-      }
+      const requestBody = {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      };
 
       try {
 
-        const res = await fetch(`${apiUrl}/api/v1/registration`, {
+        const res = await fetchApi(apiEndpoints.register, {
           method: "POST",
-          body: formDataToSend,
-          // Do not set Content-Type header for FormData
+          body: requestBody,
         });
 
-
-        if (res.ok) {
-          const userData = await res.json();
+        // fetchApi returns parsed JSON response directly
+        if (res.success) {
           setSubmitted(false);
-
-          router.push("/signin");
+          router.push('/signin');
+          setErrors({ message: "Registration successful! You can now sign in." });
         } else {
-          const responseData = await res.json();
           // Check if the error field exists in the response data
           if (
-            responseData.error &&
-            Array.isArray(responseData.error) &&
-            responseData.error.length > 0
+            res.error &&
+            Array.isArray(res.error) &&
+            res.error.length > 0
           ) {
             // Extract and set the first error message
-            const errorMessage = responseData.error[0];
-            setError(errorMessage);
+            const errorMessage = res.error[0];
+            setErrors(errorMessage);
           } else {
             // Handle other types of errors or messages
-            setError({ message: "An error occurred during registration." });
+            setErrors({ message: res.error || "An error occurred during registration." });
           }
         }
-      } catch (error: any) {
-        setError(error?.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setErrors({ message: error.message });
+        } else {
+          setErrors({ message: "An unknown error occurred." });
+          console.error("An unknown error occurred:", errors);
+        }
       }
+
 
     }
   }
@@ -126,19 +129,19 @@ export const RegisterForm = () => {
     <>
       <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto bg-white p-6 rounded-lg">
         <div className="space-y-2">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            Username
           </label>
           <input
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            autoComplete="name"
-            value={formData.name}
+            autoComplete="username"
+            value={formData.username}
             onChange={handleChange}
-            id="name"
-            name="name"
+            id="username"
+            name="username"
           />
 
-          {formErrors.name && formErrors.name.map((err, index) => (
+          {formErrors.username && formErrors.username.map((err, index) => (
             <span key={index} className="text-sm text-red-600">{err}</span>
           ))}
 

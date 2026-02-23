@@ -15,15 +15,23 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
       );
     }
 
-    // Get the access token from cookies
-    const accessToken = req.cookies.get("accessToken")?.value;
+    // Get the access token from cookies or Authorization header
+    let accessToken = req.cookies.get("accessToken")?.value;
+
+    // Fallback to Authorization header if cookie is not present
+    if (!accessToken) {
+      const authHeader = req.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        accessToken = authHeader.substring(7);
+      }
+    }
 
     // Check for missing access token
     if (!accessToken) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing access token",
+          error: "Missing access token. Please log in.",
         },
         { status: 401 }
       );
@@ -44,20 +52,24 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
       );
     }
 
-    // Log formData for debugging
-    formData.forEach((value, key) => console.log(`${key}: ${value}`));
+    // Log formData for debugging (only in development)
+    if (process.env.NODE_ENV === "development") {
+      formData.forEach((value, key) =>
+        console.log(
+          `${key}: ${value instanceof File ? `File: ${value.name}` : value}`
+        )
+      );
+    }
 
-    // Send a POST request to the API endpoint
+    // Send a POST request to the Go server API endpoint
     const response = await fetch(`${apiUrl}/api/v1${endApiUrl}`, {
-      // const response = await fetch(`${apiUrl}${endApiUrl}`, {
       method: "POST",
       body: formData,
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        // Don't set Content-Type header - fetch will set it automatically with boundary for multipart
       },
     });
-
-    // Handle non-JSON responses gracefully
 
     // Parse the JSON response from the API
     const resJson = await response.json();
@@ -77,13 +89,15 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
         { status: response.status }
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle general errors during the request
-    console.error("Error during POST request:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown server error";
+    console.error("Error during multipart POST request:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Unknown server error",
+        error: errorMessage,
       },
       { status: 500 }
     );
@@ -98,17 +112,19 @@ export async function POST(req: NextRequest) {
 
     // Check for missing API URL in environment variables
     if (!apiUrl) {
-      throw new Error("API URL is not defined");
+      throw new Error("API URL is not defined in environment variables");
     }
 
     // Call the common POST request handler function
     return handlePostRequest(req, apiUrl);
-  } catch (error: any) {
-    console.error("Error during POST request:", error);
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown server error";
+    console.error("Error in multipart API route:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Unknown server error",
+        error: errorMessage,
       },
       { status: 500 }
     );

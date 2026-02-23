@@ -2,23 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* Import Quill styles */
+@import "quill/dist/quill.snow.css";
+
+/* Custom ReactQuill wrapper styles */
+.react-quill-wrapper {
+  position: relative;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.react-quill-wrapper .quill {
+  background: white;
 }
 
- 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.react-quill-wrapper .ql-toolbar {
+  border-radius: 4px 4px 0 0;
+  background: #f8f9fa;
+}
+
+.react-quill-wrapper .ql-container {
+  border-radius: 0 0 4px 4px;
+}
+
+/* Loading state styling */
+.react-quill-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  color: #6c757d;
+  font-size: 14px;
 }

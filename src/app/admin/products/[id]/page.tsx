@@ -1,38 +1,53 @@
- 
-import ProductForm from "@/components/admin/ProductForm";
-import ProductTransForm from "@/components/admin/ProductTransForm";
-import { useProducts } from "@/hooks/useProducts";
-import { Product } from '@/lib/types'; // Assuming you have a Product type
-import React, { useEffect, useState, useRef } from 'react';
+// Assuming you have a Product type
+import ProductForm from "@/app/components/admin/ProductForm";
+import ProductTransForm from "@/app/components/admin/ProductTransForm";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+import { Product } from "@/lib/types";
+import { cookies } from "next/headers";
+
 
 interface PageProps {
-    params: {
-        id: number; // Type for the slug
-    };
+    params: Promise<{
+        id: string; // Type for the id
+    }>;
 }
 
-const Products = async ({ params }: PageProps) => {
-    const { getAProductById } = useProducts();
-    const { id } = params;
 
-    const fetchAProductData = async () => {
-        const response = await getAProductById(id);
-        return response.success ? response.data : { products: [], totalProducts: 0 };
+const Products = async ({ params }: PageProps) => {
+
+    const { id } = await params;
+
+    const fetchAProductData = async (): Promise<Product> => {
+        const response = await fetchApi(
+            apiEndpoints.getAProductById(+id),
+            {
+                method: 'GET',
+                accessToken: (await cookies()).get("accessToken")?.value || "",
+                queryParams: { type: 'public' },
+            }
+        );
+        return response.data as Product;
     };
 
-    const dataset = await fetchAProductData();
- 
+    let dataset: Product;
+
+    try {
+        dataset = await fetchAProductData();
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        // Return a fallback response or redirect
+        return <div className="p-4 text-red-500">Error loading product. Product not found.</div>;
+    }
+
     return <>
-
-       
-
         <div className="flex flex-row gap-4">
             <div className="w-1/2  bg-gray-100 border rounded">
-                <ProductForm product={dataset.products} />
+                <ProductForm product={dataset} />
             </div>
 
             <div className="w-1/2">
-                <ProductTransForm product={dataset.products} />
+                <ProductTransForm product={dataset} />
             </div>
         </div>
     </>

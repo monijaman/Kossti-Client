@@ -1,89 +1,113 @@
+
 'use client'
-import CategoryDetails from '@/components/admin/categories/CategoryDetails';
-import Pagination from '@/components/Pagination/index';
+import CategoryDetails from '@/app/components/admin/categories/CategoryDetails';
+import Pagination from '@/app/components/Pagination/index';
+import Input from '@/app/components/ui/input';
 import { useCategory } from '@/hooks/useCategory';
-import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
-import { categoryInt, SearchParams } from '@/lib/types';
+import { categoryInt } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
-interface PageProps {
-    params: {
-        slug: string; // Type for the slug
+// API returns { data: { categories: categoryInt[], total: number } }
+interface CategoryList {
+    data: {
+        categories: categoryInt[];
+        total: number;
     };
-    searchParams: SearchParams; // Include searchParams
 }
+const ListSpecifications = () => {
+    // API returns object with data array and total count
 
-const ListSpecifications = ({ params, searchParams }: PageProps) => {
     const [totalPages, setTotalPages] = useState(0);
     const [categories, setCategories] = useState<categoryInt[]>([]);
-    const [perPage, setPerPage] = useState(10);
     const [loading, setLoading] = useState(true);
-    const { getSpecificationsKeys } = useSpecificationsKeys();
     const { getCategories } = useCategory();
-    const paginate = true;
+    const router = useRouter();
+
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
 
-    const page = parseInt(searchParams.page as string, 10) || 1;
+    const searchParams = useSearchParams();
+    const page = parseInt(searchParams.get('page') ?? '1', 10);
     const limit = 10;
-    const activeCategory = searchParams.category || '';
-    const activeBrands = searchParams.brand || '';
-    const activePriceRange = searchParams.price || '';
-    const locale = searchParams.locale || 'en';
+    const activeCategory = searchParams.get('category') ?? '';
+    const activeBrands = searchParams.get('brand') ?? '';
+    const locale = searchParams.get('locale') ?? 'en';
+    const status = searchParams.get('status') ?? null;
+    const sortBy = searchParams.get('sortBy') ?? 'name';
+    const sortOrder = searchParams.get('sortOrder') ?? 'asc';
+    // Fetch categories with current search, page, and locale
+    const fetchCategories = useCallback(async () => {
 
-    const fetchCategories = async () => {
         try {
             const categoriesResponse = await getCategories({
                 perPage: 10,        // Number of items per page (optional)
                 search: searchTerm,   // Search term (optional)
-                paginate: 'true',   // 'true' or 'false' to enable/disable pagination
+                paginate: true,   // 'true' or 'false' to enable/disable pagination
                 locale: locale,        // Locale, e.g., 'en', 'bn', etc.
                 categoryId: '',      // Category ID (optional, can be empty)
-                status: 0,         // Status filter (optional)
-                page: page           // current page (optional)
+                page: page,           // current page (optional)
+                status: status,       // Status filter (optional)
+                sortBy: sortBy,       // Sort field (optional)
+                sortOrder: sortOrder, // Sort order (optional)
             });
 
-            if (categoriesResponse.success) {
-                setCategories(categoriesResponse.data.data);
-                setTotalPages(Math.ceil(categoriesResponse.data.total / limit));
+
+            if (categoriesResponse.success && categoriesResponse.data) {
+                // Direct access to data since useCategory already unwraps it
+                const dataObj = categoriesResponse.data as CategoryList;
+                setCategories(dataObj.data.categories);
+                setTotalPages(Math.ceil(dataObj.data.total / limit));
                 setLoading(false);
+
+                console.log('Fetched categories:', dataObj.data);
             } else {
                 console.error('Failed to fetch categories');
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
-    };
+    }, [searchTerm, page, locale, getCategories, sortBy, sortOrder, status]);
+
+    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
 
     useEffect(() => {
-        if (debouncedSearchTerm) {
-            fetchCategories();
-        }
-    }, [debouncedSearchTerm]);
+        if (debouncedSearchTerm) fetchCategories();
+    }, [debouncedSearchTerm, fetchCategories]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
+    const handleSort = (sortBy: string, sortOrder: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('sortBy', sortBy);
+        params.set('sortOrder', sortOrder);
+        params.set('page', '1'); // Reset to first page when sorting
+        router.push(`/admin/categories?${params.toString()}`);
+    };
+
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     return (
-        <div className="container mx-auto p-6 bg-white shadow-md rounded-lg p-6 bg-gray-100 min-h-screen">
+        <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">Categories</h2>
 
-            <Link
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                href="/admin/categories/manage"
-            >
-                Add New Key
-            </Link>
+            {userType !== 'reviewer' && (
+                <Link
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                    href="/admin/categories/manage"
+                >
+                    Add New Key
+                </Link>
+            )}
 
             <div className="my-6 flex justify-between items-center bg-white">
-                <input
+                <Input
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
@@ -99,15 +123,25 @@ const ListSpecifications = ({ params, searchParams }: PageProps) => {
             {!loading && (
                 <CategoryDetails
                     categories={categories}
+                    onSort={handleSort}
+                    currentSortBy={sortBy as 'name' | 'status'}
+                    currentSortOrder={sortOrder as 'asc' | 'desc'}
                 />
             )}
 
             {/* Pagination */}
             <Pagination
-                category={activeCategory}
-                selectedBrands={activeBrands}
                 currentPage={page}
                 totalPages={totalPages}
+                baseUrl="/admin/categories"
+                additionalParams={{
+                    category: activeCategory,
+                    brand: activeBrands,
+                    locale: locale,
+                    search: searchTerm,
+                    sortBy: sortBy,
+                    sortOrder: sortOrder,
+                }}
             />
         </div>
     );

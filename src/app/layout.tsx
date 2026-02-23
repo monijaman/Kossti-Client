@@ -1,31 +1,35 @@
-// app/layout.tsx
-import ClientProvider from '@/components/Provider/ClientProvider';
-import type { Metadata } from 'next';
+import ClientProvider from '@/app/components/Provider/ClientProvider';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { ReactNode } from 'react';
-// import { LanguageProvider } from '../context/LanguageContext';
-import './globals.css';
+// Ensure globals.scss is imported for Tailwind CSS
+import './globals.scss';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Viper Front',
-  description: 'By Monir',
-};
-
-interface RootLayoutProps {
-  children: ReactNode;
+  title: 'Kossti - Honest Product Reviews & Comparisons',
+  description: 'Read honest, unbiased product reviews and expert comparisons. Find the best products with detailed analysis, ratings, and user feedback.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com'),
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#1f2937', // gray-800
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* <LanguageProvider> */}
-
-        <ClientProvider>{children}</ClientProvider>
-        {/* </LanguageProvider> */}
+        <ClientProvider>
+          {children}
+        </ClientProvider>
       </body>
     </html>
-  );
+  )
 }

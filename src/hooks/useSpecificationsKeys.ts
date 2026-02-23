@@ -1,72 +1,100 @@
-const cacheBuster = new Date().getTime(); // Cache-busting parameter
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+import { ApiResponse, SpecificationKey } from "@/lib/types";
+
+// Define interfaces for Go server responses
+interface GoSpecKeysResponse {
+  specification_keys: SpecificationKey[];
+  count: number;
+  total: number;
+  returned: number;
+  limit: number;
+  offset: number;
+}
 
 const useSpecificationsKeys = () => {
   const getSpecificationsKeys = async ({
     perPage = 10,
     searchTerm = "",
-    paginate = false,
     page = 1,
   } = {}) => {
-    // Construct query parameters
-    const params = new URLSearchParams({
-      action: "speckey",
-      search: searchTerm,
-      per_page: perPage.toString(),
-      paginate: paginate.toString(),
-      page: page.toString(),
-    });
-
-    // Define the API endpoint
-    const apiEndpoint = `/api/get?${params.toString()}`;
-
     try {
-      // Fetch data with 'no-store' cache policy to avoid cached responses
-      const response = await fetch(apiEndpoint, { cache: "no-store" });
+      // Use server-side search and pagination for all cases
+      const limit = perPage;
+      const offset = (page - 1) * limit;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      const queryParams: Record<string, string | number> = {
+        limit: limit,
+        offset: offset,
+      };
+
+      // Add search parameter if provided
+      if (searchTerm) {
+        queryParams.search = searchTerm;
       }
 
-      // Parse and return JSON response data
-      const dataset = await response.json();
-      return dataset.data;
+      const response = await fetchApi(apiEndpoints.getSpecKeys, {
+        queryParams: queryParams,
+      });
+
+      if (response.success && response.data) {
+        const goData = response.data as GoSpecKeysResponse;
+        const keys = goData.specification_keys || [];
+
+        return {
+          data: keys,
+          total: goData.total || keys.length, // Use server total count
+          per_page: perPage,
+          current_page: page,
+        };
+      }
+
+      console.error("API returned no data");
+      return null;
     } catch (error) {
       console.error("Error fetching specification keys:", error);
-      return null; // Return null in case of an error
+      return null;
     }
   };
 
   const getSpecificationsKeysById = async (id: number) => {
-    const apiEndpoint = `?action=speckey/${id}`;
-
     try {
-      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
+      // Use fetchApi to call the Go server directly
+      const response = await fetchApi(apiEndpoints.getSpecKeyById(id));
 
-      const dataset = await response.json();
-      return dataset;
+      if (response.success) {
+        return response;
+      } else {
+        console.error("API returned error:", response.error);
+        return { success: false, error: response.error };
+      }
     } catch (error) {
-      console.error("Error fetching campaigns:", error);
+      console.error("Error fetching specification key by ID:", error);
+      return { success: false, error: "Failed to fetch specification key" };
     }
   };
 
   const getKeysTranslationById = async ({ key_id = 0, locale = "" } = {}) => {
-    const params = new URLSearchParams({
-      action: "speckey-translation",
-      locale,
-      key_id: key_id.toString(), // Convert number to string
-    });
-
-    // Define the API endpoint
-    const apiEndpoint = `/api/get?${params.toString()}`;
-
     try {
-      const response = await fetch(apiEndpoint); // Adjust API endpoint
+      // Build query parameters for translation lookup
+      const queryParams: Record<string, string | number> = {};
+      if (key_id) queryParams.key_id = key_id;
+      if (locale) queryParams.locale = locale;
 
-      const dataset = await response.json();
-      return dataset;
+      // Use fetchApi to call the Go server directly
+      const response = await fetchApi(apiEndpoints.getSpecKeyTranslations, {
+        queryParams,
+      });
+
+      if (response.success) {
+        return response;
+      } else {
+        console.error("API returned error:", response.error);
+        return { success: false, error: response.error };
+      }
     } catch (error) {
-      console.error("Error fetching campaigns:", error);
+      console.error("Error fetching key translations:", error);
+      return { success: false, error: "Failed to fetch key translations" };
     }
   };
 
@@ -76,27 +104,24 @@ const useSpecificationsKeys = () => {
   }: {
     speckeyId?: number | null;
     speckey: string;
-  }): Promise<any> => {
+  }): Promise<ApiResponse> => {
     try {
-      // Prepare the payload with productId, specificationKey, and apiUrl
+      // Prepare the payload for the Go server
       const payload = {
-        id: speckeyId, // Consistent naming with snake_case
+        id: speckeyId || undefined, // Only include ID for updates
         specification_key: speckey,
-        apiUrl: "speckey",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
+      // Use fetchApi to call the Go server directly
+      const response = await fetchApi(apiEndpoints.createSpecKey, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
-      // Return the JSON response
-      return await response.json();
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
-      throw error; // Properly propagate the error
+      return { success: false, error: "Failed to submit specification key" };
     }
   };
   const submitKeysTranslation = async ({
@@ -107,28 +132,39 @@ const useSpecificationsKeys = () => {
     locale: string;
     speckeyId?: number | null;
     speckey: string;
-  }): Promise<any> => {
+  }): Promise<ApiResponse> => {
     try {
-      // Prepare the payload with consistent naming
+      // Prepare the payload for the Go server
       const payload = {
-        specification_key_id: speckeyId, // Use speckeyId as the identifier
-        translated_key: speckey, // Ensure this matches the key you expect on the server
+        specification_key_id: speckeyId,
+        translated_key: speckey,
         locale,
-        apiUrl: "speckey-translation",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
+      // Use fetchApi to call the Go server directly
+      const response = await fetchApi(apiEndpoints.createSpecKeyTranslation, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
-      // Return the JSON response
-      return await response.json();
+      return response;
     } catch (error) {
-      console.error("Error submitting specifications:", error);
-      throw error; // Properly propagate the error
+      console.error("Error submitting key translation:", error);
+      return { success: false, error: "Failed to submit key translation" };
+    }
+  };
+
+  const deleteSpecificationKey = async (id: number): Promise<ApiResponse> => {
+    try {
+      // Use fetchApi to call the Go server directly
+      const response = await fetchApi(apiEndpoints.removeSpec(id), {
+        method: "POST", // Go server expects POST for delete
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Error deleting specification key:", error);
+      return { success: false, error: "Failed to delete specification key" };
     }
   };
 
@@ -138,6 +174,7 @@ const useSpecificationsKeys = () => {
     submitSpecificationsKeys,
     getSpecificationsKeysById,
     getKeysTranslationById,
+    deleteSpecificationKey,
   };
 };
 

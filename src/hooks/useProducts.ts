@@ -1,7 +1,7 @@
-const cacheBuster = new Date().getTime(); // Cache-busting parameter
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 
-// Function to get cookie by name
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const useProducts = () => {
   const getProducts = async (
@@ -12,7 +12,7 @@ export const useProducts = () => {
     priceRange?: string,
     searchTerm?: string,
     locale?: string,
-    sortby?: string
+    sortby?: string,
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -20,12 +20,13 @@ export const useProducts = () => {
       // _: cacheBuster.toString(), // Cache-busting parameter
     };
 
-    // Add optional parameters only if they are defined
+    // Add optional parameters only if they are defined and not empty
+    if (locale) params.locale = locale;
     if (category) params.category = category;
     if (brands) params.brand = brands;
-    if (priceRange) params.pricerange = priceRange;
-    if (searchTerm) params.searchterm = searchTerm;
-    if (locale) params.locale = locale;
+    if (priceRange) params.priceRange = priceRange; // Updated to match Go server format
+    if (searchTerm && searchTerm.trim() !== "")
+      params.search = searchTerm.trim();
     if (sortby) params.sortby = sortby;
 
     // Build the query string
@@ -34,20 +35,27 @@ export const useProducts = () => {
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
 
+    console.log("API URL being called:", fullUrl);
+    console.log("Search term:", searchTerm);
+
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
 
+      // Handle Laravel-compatible response format
       return {
         success: true,
-        data: dataset,
-        totalProducts: dataset.totalProducts,
+        data: {
+          products: dataset.data || [], // Laravel format uses 'data' field
+          totalProducts: dataset.meta?.total || 0, // Laravel format uses 'meta.total'
+        },
+        totalProducts: dataset.meta?.total || 0,
       };
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -67,7 +75,7 @@ export const useProducts = () => {
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -96,13 +104,13 @@ export const useProducts = () => {
     // Build the query string (if params are provided)
     const queryString = new URLSearchParams(params).toString();
     const fullUrl = queryString
-      ? `${apiUrl}/product/${id}?${queryString}&type=public`
-      : `${apiUrl}/product/${id}?type=public`;
+      ? `${apiUrl}/products/${id}?${queryString}&type=public`
+      : `${apiUrl}/products/${id}?type=public`;
 
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
-        new Error("API URL is not defined in environment variables")
+        new Error("API URL is not defined in environment variables"),
       );
     }
 
@@ -126,7 +134,7 @@ export const useProducts = () => {
     }
   };
 
-  const createProduct = async (productData: Record<string, any>) => {
+  const createProduct = async (productData: Record<string, unknown>) => {
     try {
       const apiUrl = "products"; // Assuming this is the API route
 
@@ -146,7 +154,7 @@ export const useProducts = () => {
         // If the response status is not OK, throw an error
         const errorData = await response.json();
         throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
+          `Error creating product: ${errorData.message || response.statusText}`,
         );
       }
 
@@ -168,132 +176,115 @@ export const useProducts = () => {
 
   const updateProduct = async (
     id: number | string,
-    productData: Record<string, any>
+    productData: Record<string, unknown>,
   ) => {
     try {
-      const apiUrl = `products/update/${id}`; // Example API endpoint
-
-      // Append apiUrl to productData
-      const payload = { ...productData, apiUrl };
-
-      // Make the PUT request to the backend API
-      const response = await fetch(`/api/post/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Ensure you're sending JSON data
-        },
-        body: JSON.stringify(payload), // Convert the payload to JSON format
+      // Use the correct Go server endpoint for updating products
+      const response = await fetchApi(apiEndpoints.updateProduct(id), {
+        method: "PATCH",
+        body: productData,
       });
 
-      if (!response.ok) {
-        // If the response status is not OK, throw an error
-        const errorData = await response.json();
-        throw new Error(
-          `Error updating product: ${errorData.message || response.statusText}`
-        );
-      }
-
-      // Parse the response body as JSON if the request was successful
-      const dataset = await response.json();
-
-      // Return success along with the data
       return {
         success: true,
-        ...dataset,
+        data: response.data,
       };
     } catch (error) {
-      // Type the error as `Error` to access the `message` property
-      const err = error as Error;
-      console.error("Error updating product:", err.message);
-
-      return { success: false, data: [], error: err.message };
+      console.error("Error updating product:", error);
+      return {
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 
-  const updateProducts = async (
-    id: number | string,
-    productData: Record<string, any>
+  const Translation = async (
+    productData: Record<string, unknown>,
+    id: number,
   ) => {
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    const fullUrl = `/products/update/${id}`;
-
     try {
-      const response = await fetch("/api/post", {
+      console.log(
+        "Creating/updating translation for product:",
+        id,
+        productData,
+      );
+
+      // Use Go server API URL for product translations
+      const goApiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const url = `${goApiUrl}/products/${id}/translation`; // Note: singular "translation" for POST
+
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(productData),
+        body: JSON.stringify({
+          locale: productData.locale,
+          translated_name: productData.translated_name,
+          start_price: productData.start_price,
+          end_price: productData.end_price,
+        }),
       });
 
       if (!response.ok) {
-        // If response status is not 200-299, throw an error with status info
-        const errorData = await response.json();
-        throw new Error(
-          `Error updating product: ${errorData.message || response.statusText}`
-        );
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Parse the response body as JSON if the request was successful
-      const dataset = await response.json();
+      const data = await response.json();
 
-      // Return success along with the data
       return {
-        success: true,
-        data: dataset,
+        success: data.success || true,
+        data: data.translation || data,
+        message: data.message || "Translation created/updated successfully",
       };
     } catch (error) {
-      // Type the error as `Error` to access the `message` property
-      const err = error as Error;
-      console.error("Error updating product:", err.message);
-
-      return { success: false, data: [], error: err.message };
+      console.error("Error creating translation:", error);
+      return {
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 
-  const Translation = async (productData: Record<string, any>, id: number) => {
+  const getProductTranslations = async (productId: number, locale?: string) => {
     try {
-      const apiUrl = `product-trans/${id}`; // Assuming this is the API route
+      console.log(`Getting translations for product ${productId}`);
 
-      // Append apiUrl to productData
-      const payload = { ...productData, apiUrl };
+      // Use Go server API URL for product translations
+      const goApiUrl =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const url = locale
+        ? `${goApiUrl}/products/${productId}/translations?locale=${locale}`
+        : `${goApiUrl}/products/${productId}/translations`;
 
-      // Make the POST request to the backend API
-      const response = await fetch("/api/post", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: "GET",
         headers: {
-          "Content-Type": "application/json", // Ensure you're sending JSON data
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload), // Convert the payload with apiUrl to JSON format
       });
 
       if (!response.ok) {
-        // If the response status is not OK, throw an error
-        const errorData = await response.json();
-        throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
-        );
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Parse the response body as JSON if the request was successful
-      const dataset = await response.json();
+      const data = await response.json();
 
-      // Return success along with the data
       return {
-        success: true,
-        ...dataset,
+        success: data.success || true,
+        data: data.data || [],
+        message: data.message || "Translations retrieved successfully",
       };
     } catch (error) {
-      const err = error as Error;
-      console.error("Error updating product:", err.message);
-
-      return { success: false, data: [], error: err.message };
+      console.error("Error fetching translations:", error);
+      return {
+        success: false,
+        data: [],
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   };
 
@@ -314,12 +305,28 @@ export const useProducts = () => {
     }
   };
 
+  const getVideosByProductId = async (productId: number) => {
+    const fullUrl = `${apiUrl}/product-videos/${productId}`;
+
+    try {
+      const response = await fetch(fullUrl);
+      const dataset = await response.json();
+
+      return {
+        success: true,
+        data: dataset.data || dataset.videos || [],
+      };
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      return { success: false, data: [] };
+    }
+  };
+
   const incrementViews = async (productId: number) => {
     try {
       const fullUrl = `${apiUrl}/products/${productId}/increment-views`; // Assuming this is the API route
 
       // Append apiUrl to productData
-      const payload = { apiUrl };
 
       // Make the POST request to the backend API
       const response = await fetch(fullUrl, {
@@ -333,7 +340,7 @@ export const useProducts = () => {
         // If the response status is not OK, throw an error
         const errorData = await response.json();
         throw new Error(
-          `Error creating product: ${errorData.message || response.statusText}`
+          `Error creating product: ${errorData.message || response.statusText}`,
         );
       }
 
@@ -353,7 +360,10 @@ export const useProducts = () => {
     }
   };
 
-  const MakePhotoDefault = async (photoId: number | string) => {
+  const MakePhotoDefault = async (
+    photoId: number | string,
+    productId?: number,
+  ) => {
     try {
       const payload = {
         apiUrl: `default-image/${photoId}`,
@@ -372,16 +382,27 @@ export const useProducts = () => {
 
       // Parse the response body as JSON
       const dataset = await response.json();
+      console.log("[MakePhotoDefault] Response:", dataset);
 
-      // Return success along with the data
+      // After setting the default, fetch the updated photos list
+      if (productId) {
+        const photosResponse = await getPhotosByProductId(productId);
+        return {
+          success: true,
+          data: photosResponse.data || [],
+        };
+      }
+
+      // If no productId provided, return empty data (caller should refetch)
       return {
         success: true,
-        data: dataset.data.images,
+        data: [],
+        message: dataset.message || "Image set as default",
       };
     } catch (error) {
       // Type the error to access the message property
       const err = error as Error;
-      console.error("Error updating product:", err.message);
+      console.error("Error setting photo as default:", err.message);
 
       return { success: false, data: [], error: err.message };
     }
@@ -394,7 +415,9 @@ export const useProducts = () => {
     getAProductById,
     createProduct,
     updateProduct,
+    getProductTranslations,
     getPhotosByProductId,
+    getVideosByProductId,
     MakePhotoDefault,
     incrementViews,
   };

@@ -1,26 +1,31 @@
-const cacheBuster = new Date().getTime(); // Cache-busting parameter
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+import {
+  ApiResponse,
+  CategoryTranslationResponse,
+  MessageInfo,
+} from "@/lib/types";
 
 export const useCategory = () => {
   // get all categories
-  const getCategory = async () => {
-    const apiEndpoint = `categories`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
+  const getCategory = async (): Promise<{
+    success: boolean;
+    data: unknown;
+  }> => {
     try {
-      const response = await fetch(fullUrl); // Adjust API endpoint
-      const dataset = await response.json();
+  // Request a larger page size to return more rows (backend defaults to 50 per page)
+  // If the backend enforces pagination, consider using getCategories/getWideCategories with pagination params.
+  const dataset = await fetchApi(`${apiEndpoints.getCategories}?limit=1000&offset=0`);
+
+      // Type the response to handle Go server structure
+      const responseData = dataset.data as {
+        categories?: unknown;
+        [key: string]: unknown;
+      };
 
       return {
         success: true,
-        data: dataset,
+        data: responseData.categories || responseData, // Extract categories from Go server response
       };
     } catch (error) {
       console.error("Error fetching category:", error);
@@ -32,49 +37,55 @@ export const useCategory = () => {
   const getCategories = async ({
     perPage = "",
     search = "",
-    paginate = "false",
+    paginate = false,
     locale = "en",
     categoryId = "",
     status = null,
     page = null,
+    sortBy = "",
+    sortOrder = "",
   }: {
     perPage?: number | string;
     search?: string;
-    paginate?: "true" | "false";
+    paginate?: boolean;
     locale?: string;
     categoryId?: number | string;
-    status?: number | null;
+    status: string | null;
     page?: number | null;
-  }) => {
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<{ success: boolean; data: unknown }> => {
     // Construct query parameters dynamically
     const queryParams = new URLSearchParams({
       per_page: perPage.toString(),
       search,
-      paginate,
+      paginate: paginate.toString(),
       locale,
       category_id: categoryId.toString(),
     });
 
-    queryParams.append("status", status !== null ? status.toString() : "");
-    queryParams.append("page", page !== null ? page.toString() : "");
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
+    // Only append status if it's not null
+    if (status !== null) {
+      queryParams.append("status", status.toString());
     }
 
-    // Construct the full URL with the query string
-    const fullUrl = `${apiUrl}/wide-categories?${queryParams.toString()}`;
+    // Only append page if it's not null
+    if (page !== null) {
+      queryParams.append("page", page.toString());
+    }
+
+    // Only append sort parameters if they're not empty
+    if (sortBy) {
+      queryParams.append("sort_by", sortBy);
+    }
+    if (sortOrder) {
+      queryParams.append("sort_order", sortOrder);
+    }
 
     try {
-      const response = await fetch(fullUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const dataset = await response.json();
+      const dataset = await fetchApi(
+        `${apiEndpoints.getWideCategories}?${queryParams.toString()}`
+      );
 
       return {
         success: true,
@@ -86,108 +97,77 @@ export const useCategory = () => {
     }
   };
 
-  const getCategoriess = async ({
-    perPage = 10,
-    searchTerm = "",
-    paginate = false,
-    page = 1,
-    locale = "en",
-  } = {}) => {
-    // Construct query parameters
-    const params = new URLSearchParams({
-      action: "wide-categories",
-      search: searchTerm,
-      per_page: perPage.toString(),
-      paginate: paginate.toString(),
-      page: page.toString(),
-      locale: page.toString(),
-    });
-
-    // const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
-    // Define the API endpoint
-    const apiEndpoint = `${apiUrl}/api/get?${params.toString()}`;
-    try {
-      // Fetch data with 'no-store' cache policy to avoid cached responses
-      const response = await fetch(apiEndpoint, { cache: "no-store" });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // Parse and return JSON response data
-      const dataset = await response.json();
-      return dataset.data;
-    } catch (error) {
-      console.error("Error fetching specification keys:", error);
-      return null; // Return null in case of an error
-    }
-  };
-
   const submitCategory = async ({
     categoryId = null,
     category,
   }: {
     categoryId?: number | null;
     category: string;
-  }): Promise<any> => {
+  }): Promise<ApiResponse<MessageInfo>> => {
     try {
-      // Prepare the payload with productId, specificationKey, and apiUrl
+      // Prepare the payload
       const payload = {
-        id: categoryId, // Consistent naming with snake_case
         name: category,
-        apiUrl: "categories",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      // Send the request to the backend using fetchApi
+      const endpoint = categoryId
+        ? apiEndpoints.category(categoryId)
+        : apiEndpoints.createCategory;
+      const method = categoryId ? "PUT" : "POST";
+
+      const response = await fetchApi(endpoint, {
+        method,
+        body: payload,
       });
 
-      // Return the JSON response
-      return await response.json();
+      return response as ApiResponse<MessageInfo>;
     } catch (error) {
-      console.error("Error submitting specifications:", error);
-      throw error; // Properly propagate the error
+      console.error("Error submitting category:", error);
+      throw error;
     }
   };
 
   const getCategoryById = async (id: number) => {
-    const apiEndpoint = `?action=categories/${id}`;
-
     try {
-      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
-
-      const dataset = await response.json();
-
+      const dataset = await fetchApi(apiEndpoints.getCategoryById(id));
       return dataset;
     } catch (error) {
-      console.error("Error fetching campaigns:", error);
+      console.error("Error fetching category:", error);
     }
   };
 
   const getCategoryTranslationById = async ({
     category_id = 0,
     locale = "",
-  } = {}) => {
-    const params = new URLSearchParams({
-      action: `category-translation/${category_id}`,
-      locale,
-    });
-
-    // Define the API endpoint
-    const apiEndpoint = `/api/get?${params.toString()}`;
-
+  } = {}): Promise<
+    { success: boolean; data: CategoryTranslationResponse } | undefined
+  > => {
     try {
-      const response = await fetch(apiEndpoint); // Adjust API endpoint
+      const response = await fetchApi(
+        apiEndpoints.getCategoryTranslation(category_id),
+        {
+          method: "GET",
+          headers: {
+            "Accept-Language": locale,
+          },
+        }
+      );
 
-      const dataset = await response.json();
+      if (response && response.success && response.data) {
+        return {
+          success: true,
+          data: response.data as CategoryTranslationResponse,
+        };
+      }
 
-      return dataset.data;
+      return {
+        success: false,
+        data: { category_id: 0, count: 0, translations: [] },
+      };
     } catch (error) {
-      console.error("Error fetching campaigns:", error);
+      console.error("Error fetching category translation:", error);
+      return undefined;
     }
   };
 
@@ -199,25 +179,31 @@ export const useCategory = () => {
     locale: string;
     categoryId?: number | null;
     category: string;
-  }): Promise<any> => {
+  }): Promise<ApiResponse> => {
     try {
       // Prepare the payload with consistent naming
       const payload = {
-        category_id: categoryId, // Use speckeyId as the identifier
-        name: category, // Ensure this matches the key you expect on the server
+        name: category,
         locale,
-        apiUrl: "category-translation",
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      if (!categoryId) {
+        throw new Error("Category ID is required for translation submission");
+      }
 
-      // Return the JSON response
-      return await response.json();
+      const methodType = categoryId ? "PUT" : "POST";
+
+      // Send the request to the backend using fetchApi
+      const response = await fetchApi(
+        apiEndpoints.categoryTranslationById(categoryId),
+        {
+          method: methodType,
+          body: payload,
+        }
+      );
+
+      // Return the response
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error
@@ -231,13 +217,6 @@ export const useCategory = () => {
   }) => {
     const { category_id, locale } = options;
 
-    // Ensure the API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
     // Build query string based on optional parameters
     const queryParams = new URLSearchParams();
     if (category_id !== undefined) {
@@ -247,38 +226,30 @@ export const useCategory = () => {
       queryParams.append("locale", locale);
     }
 
-    // Construct the full URL with query parameters
-    const apiEndpoint = `category-brands`;
-    const fullUrl = `${apiUrl}/${apiEndpoint}?${queryParams.toString()}`;
     try {
-      // Fetch data from the API
-      const response = await fetch(fullUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Fetch data from the API using fetchApi
+      const dataset = await fetchApi(
+        `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`
+      );
 
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.statusText}`);
-      }
-
-      // Parse the JSON data
-      const dataset = await response.json();
-
-      // Return success with data
+      // Return success with parsed body (dataset.data contains parsed JSON)
       return {
         success: true,
-        data: dataset,
+        data: dataset.data,
       };
-    } catch (error: any) {
-      // Log any errors and return failure
+    } catch (error: unknown) {
       console.error("Error fetching category:", error);
+
+      let errorMessage = "An unknown error occurred";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       return {
         success: false,
         data: [],
-        error: error.message || "An unknown error occurred",
+        error: errorMessage,
       };
     }
   };
@@ -289,23 +260,24 @@ export const useCategory = () => {
   }: {
     category_id: number;
     status: number;
-  }): Promise<any> => {
+  }): Promise<ApiResponse> => {
     try {
       // Prepare the payload with consistent naming
       const payload = {
-        status: status, // Use speckeyId as the identifier
-        apiUrl: `category-status/${category_id}`,
+        status: status,
       };
 
-      // Send the request to the backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Send the request to the backend using fetchApi
+      const response = await fetchApi(
+        apiEndpoints.updateCategoryStatus(category_id),
+        {
+          method: "PUT",
+          body: payload,
+        }
+      );
 
       // Return the JSON response
-      return await response.json();
+      return response;
     } catch (error) {
       console.error("Error submitting specifications:", error);
       throw error; // Properly propagate the error

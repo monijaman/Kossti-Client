@@ -8,6 +8,15 @@ export interface brandInt {
   updated_at: string;
 }
 
+export type SubmitSpecResponse = {
+  success: boolean;
+  error?: string;
+  data?: {
+    message: string;
+    // other fields if any
+  };
+};
+
 export interface categoryInt {
   id: number;
   name: string;
@@ -16,7 +25,7 @@ export interface categoryInt {
   status?: boolean;
   total?: number;
   priority: number;
-  deleted_at: null;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,29 +33,48 @@ export interface categoryInt {
 export interface Product {
   id: number;
   name: string;
-  category_id: number;
-  brand_id: number;
+  description?: string;
   slug: string;
-  category_slug: string;
-  brand: string;
-  category: string;
-  model?: string | null;
-  photo: string;
-  price: number; // or number
-  status?: number; // or whatever type it is
-  priority?: number; // or whatever type it is
-  reviews?: Review[];
-  translations?: ProductTranslation[]; // or whatever type it is
+  review: string;
+  price: number;
+  start_price?: number;
+  end_price?: number;
+  category_id?: number;
+  brand_id?: number;
+  category_slug?: string;
+  brand_slug?: string;
+  model?: string;
+  status?: boolean;
+  priority?: number;
+  translations?: ProductTranslation[];
 
-  specifications?: SpecificationInt[]; // Ensure specifications is included here
+  // Enhanced fields - full objects (like Laravel relationships)
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+
+  brand?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+
+  photo?: string;
+  views_count?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductTranslation {
   id: number;
   product_id: number;
   locale: string;
-  name: string;
-  price: number;
+  translated_name: string; // Changed from 'name' to 'translated_name' to match Go API
+  price: string; // Changed from number to string to match Go API
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SidebarParams {
@@ -56,6 +84,7 @@ export interface SidebarParams {
   activePriceRange?: string; // Change from string[] to string
   searchTerm?: string;
   countryCode?: string;
+  initialBrands?: Brand[];
 }
 
 export interface ProductApiResponse {
@@ -69,7 +98,10 @@ export interface ProductApiResponse {
 //   activeCategory?: string; // Change from string[] to string
 //   activePriceRange?: string; // Change from string[] to string
 // }
-
+export interface MessageInfo {
+  message: string;
+  id: number;
+}
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T | null; // Data will be null if the request fails
@@ -80,6 +112,7 @@ export interface ApiResponse<T = unknown> {
 export interface SearchBoxProps {
   initialSearchTerm?: string;
   searchUrl?: string;
+  countryCode?: string;
 }
 
 export interface SearchParams {
@@ -106,12 +139,15 @@ export interface SpecTranslation {
 
 export interface Review {
   id: number;
-  user_id: string;
+  product_id: number;
+  rating: number;
   reviews: string;
-  rating: string;
+  additional_details: string | VideoItem[]; // Allow both string and VideoItem[]
   price: number;
-  additional_details: [];
-  translations: ReviewTranslation[];
+  locale: string;
+  created_at: string; // Added created_at field
+  updated_at: string;
+  translations?: ReviewTranslation[];
 }
 
 export interface ReviewTranslation {
@@ -130,6 +166,7 @@ export interface ReviewTranslation {
 export interface AdditionalDetails {
   youtubeUrl?: string;
   sourceUrl?: string;
+  phone?: string;
 }
 
 export interface Category {
@@ -146,35 +183,55 @@ export interface Brand {
   total?: number;
 }
 
+export interface BrandTranslation {
+  id: number;
+  brand_id: number;
+  locale: string;
+  translated_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProductPhotos {
   id: number;
-  name: string;
+  name?: string;
   product_id: number;
-  defaultphoto: number;
+  defaultphoto?: number;
   path: string;
-  status: string;
+  status?: string;
   media_type?: string;
   file_size?: number;
-  asset_url: string;
+  asset_url?: string; // Legacy field - kept for backwards compatibility
+  url: string; // New field - presigned URL from S3
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SpecificationInt {
   id?: number;
-  specification_key_id: string;
+  product_id?: number;
+  specification_key_id: string | number;
+  specification_key?: string;
   value: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SpecKeyTranslation {
   id: null | number;
   locale: string;
-  specification_id: number | null;
-  translated_key: null | number;
-  translated_value: string; // Allow undefined
+  specification_key_id: number | null;
+  translated_key: string;
+  TranslatedKey?: string;
+  translated_value?: string;
+  source_value?: string;
 }
 
 export interface SpecificationKey {
   id: number | null;
   specification_key: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface country {
@@ -201,4 +258,36 @@ export interface Translations {
   [key: string]: string; // Optional: Allows additional keys
 }
 
+export interface CategoryTranslation {
+  id: number;
+  category_id: number;
+  locale: string;
+  translated_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoryTranslationResponse {
+  category_id: number;
+  count: number;
+  translations: CategoryTranslation[];
+}
+
 export type LocaleKeys = "en" | "bn";
+
+export interface VideoItem {
+  id: number;
+  url: string;
+  title: string;
+  youtubeUrl?: string; // Optional property to resolve the issue
+}
+
+export interface MarketProduct {
+  name: string;
+  description: string;
+  type: string;
+  // Add other fields as necessary for import
+  price?: number;
+  category_id?: number;
+  brand_id?: number;
+}

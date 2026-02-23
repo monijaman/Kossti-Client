@@ -1,193 +1,45 @@
-'use client';
-import { useBrands } from "@/hooks/useBrands";
-import { useCategory } from "@/hooks/useCategory";
-import { Brand, Category } from '@/lib/types';
-import { FormEvent, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
-
-interface Specification {
-    id: number | null;
-    specification_key: number | null;
-}
+import { apiEndpoints } from '@/lib/constants';
+import fetchApi from '@/lib/fetchApi';
+import { Category } from '@/lib/types';
+import CategoryBrandsClient from './CategoryBrandsClient';
 
 interface PageProps {
-    params: {
-        id: number;
-    };
+    params: Promise<{ id: string }>;
 }
 
-const Specification = ({ params }: PageProps) => {
-    const { id: category_id } = params;
+export default async function Page({ params }: PageProps) {
+    const resolvedParams = await params;
 
-    const { getCategories, getCategoryRelBrands } = useCategory();
-    const { getAllBrands, submitBrands } = useBrands();
+    // server-side fetch categories to preselect the option and avoid client flicker
+    let categoriesFromServer: Category[] = [];
 
-    const [brands, setBrands] = useState<Brand[]>([]);
-    const [activeBrands, setActiveBrands] = useState<Brand[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(category_id);
-    const [productName, setProductName] = useState<string>('');
-    const [formStatus, setFormStatus] = useState<string | null>(null);
+    try {
+        const res = await fetchApi(apiEndpoints.getWideCategories, {
+            queryParams: { per_page: 100, paginate: 'false' },
+        });
 
-    // Fetch categories
-    const fetchCategories = async () => {
-        try {
-            const categoriesResponse = await getCategories({
-                perPage: 10,
-                search: '',
-                paginate: 'true',
-                locale: 'en',
-                categoryId: '',
-            });
-            if (categoriesResponse.success) {
-                setCategories(categoriesResponse.data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
-    // Fetch brands
-    const fetchBrands = async () => {
-        try {
-            const response = await getAllBrands();
-            setBrands(response.data.data);
-        } catch (error) {
-            console.error("Error fetching brands:", error);
-        }
-    };
-
-    // Fetch active brands for selected category
-    const fetchActiveBrands = async () => {
-        if (selectedCategory) {
-            try {
-                const response = await getCategoryRelBrands({ category_id: selectedCategory });
-                setActiveBrands(response.data.data);
-            } catch (error) {
-                console.error("Error fetching category brands:", error);
+        if (res && res.success) {
+            const d: unknown = res.data;
+            if (Array.isArray(d)) categoriesFromServer = d as Category[];
+            else if (typeof d === 'object' && d !== null) {
+                const obj = d as Record<string, unknown>;
+                if (Array.isArray(obj.categories)) categoriesFromServer = obj.categories as Category[];
+                else if (obj.data && typeof obj.data === 'object' && Array.isArray((obj.data as Record<string, unknown>).categories)) categoriesFromServer = (obj.data as Record<string, unknown>).categories as Category[];
+                else categoriesFromServer = [];
             }
         }
-    };
+    } catch (err) {
+        // swallow; client fallback exists
+        console.error('Server fetch categories failed:', err);
+    }
 
-    useEffect(() => {
-        fetchCategories();
-        fetchBrands();
-    }, []);
-
-    useEffect(() => {
-        fetchActiveBrands();
-    }, [selectedCategory]);
-
-    // Handle category selection
-    const handleCategoryChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) setSelectedCategory(selectedOption.value);
-    };
-
-    // Handle brand selection
-    const handleBrandChange = (index: number, selectedOption: SingleValue<{ value: number; label: string }>) => {
-        if (selectedOption) {
-            const updatedBrands = [...activeBrands];
-            updatedBrands[index].id = selectedOption.value;
-            updatedBrands[index].name = selectedOption.label;
-            setActiveBrands(updatedBrands);
-        }
-    };
-
-    // Add more brands
-    const addMoreBrands = () => setActiveBrands([...activeBrands, { id: null, name: '' }]);
-
-    // Remove brand
-    const removeBrand = (index: number) => setActiveBrands(activeBrands.filter((_, i) => i !== index));
-
-    // Handle form submission
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const response = await submitBrands(selectedCategory ?? 0, activeBrands);
-        if (response.success) {
-            setFormStatus(response.data.message);
-        } else {
-            setFormStatus("Failed to submit data");
-        }
-    };
+    const category_id = resolvedParams?.id ?? undefined;
+    const numericCategoryId = category_id ? Number(category_id) : null;
 
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8  bg-gray-100  ">
-            <h1 className="text-2xl font-bold mb-6">Manage Related Brands for Category</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Category Select Dropdown */}
-                <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                        Select Category
-                    </label>
-                    <Select
-                        name="category"
-                        value={categories
-                            .map((cat) => ({ value: cat.id, label: cat.name }))
-                            .find((option) => option.value === selectedCategory) || null}
-                        onChange={handleCategoryChange}
-                        options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
-                        className="block w-full"
-                        placeholder="Select a category"
-                        isSearchable
-                        required
-                    />
-                </div>
-
-                {/* Brands List */}
-                {activeBrands.map((item, index) => (
-                    <div key={index} className="flex gap-4 items-center">
-                        <Select
-                            value={brands
-                                .map((brand) => ({ value: brand.id!, label: brand.name || "" }))
-                                .find((option) => option.value === item.id) || null}
-                            onChange={(selectedOption) => handleBrandChange(index, selectedOption)}
-                            options={brands.map((brand) => ({
-                                value: brand.id ?? 0,
-                                label: brand.name?.toString() || "",
-                            }))}
-                            className="flex-1"
-                            placeholder="Select a brand"
-                            isSearchable
-                            required
-                        />
-                        <button
-                            type="button"
-                            onClick={() => removeBrand(index)}
-                            className="text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md"
-                        >
-                            Remove
-                        </button>
-                    </div>
-                ))}
-
-                {/* Add Brand Button */}
-                <div className="flex justify-between items-center">
-                    <button
-                        type="button"
-                        onClick={addMoreBrands}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                    >
-                        Add More
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
-                    >
-                        Submit
-                    </button>
-                </div>
-
-                {/* Form Status Message */}
-                {formStatus && (
-                    <div
-                        className={`p-4 mt-4 text-sm rounded-lg ${formStatus.includes('success') ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
-                    >
-                        {formStatus}
-                    </div>
-                )}
-            </form>
-        </div>
+        <CategoryBrandsClient
+            numericCategoryId={numericCategoryId}
+            categoriesFromServer={categoriesFromServer}
+        />
     );
-};
-
-export default Specification;
+}

@@ -1,6 +1,6 @@
-const cacheBuster = new Date().getTime(); // Cache-busting parameter
-const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import { AdditionalDetails } from "@/lib/types";
+import { useCallback } from "react";
 
 export const useReviews = () => {
   const getReview = async (
@@ -52,38 +52,6 @@ export const useReviews = () => {
     }
   };
 
-  const getReviewByProductSlug = async (slug: string, locale?: string) => {
-    const params: Record<string, string> = {};
-
-    // Add optional parameters only if they are defined
-    if (locale) params.locale = locale;
-
-    // Build the query string
-    const queryString = new URLSearchParams(params).toString();
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-
-    const fullUrl = `${apiUrl}/${slug}?${queryString}`;
-
-    try {
-      const response = await fetch(fullUrl);
-      const dataset = await response.json();
-
-      return {
-        success: true,
-        data: dataset.products,
-        totalProducts: dataset.totalProducts,
-      };
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return { success: false, data: [] };
-    }
-  };
   const getReviewByProductId = async (id: number, locale?: string) => {
     const params: Record<string, string> = {};
 
@@ -99,29 +67,28 @@ export const useReviews = () => {
         new Error("API URL is not defined in environment variables")
       );
     }
-
-    const fullUrl = `${apiUrl}/products/${id}/reviews?${queryString}`;
+    
+    // Use the new /product-reviews endpoint to fetch reviews by product_id
+    // Append locale parameter if provided
+    const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ''}`;
 
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
-
+ 
+      // The API returns { product_id: <id>, count: <n>, reviews: [...] }
+      // Return the whole dataset as `data` so callers can access reviews
       return {
         success: true,
-        data: dataset.product,
+        data: dataset,
       };
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching reviews by product id:", error);
       return { success: false, data: [] };
     }
   };
 
   const getImagesByProductId = async (id: number) => {
-    const params: Record<string, string> = {};
-
-    // Build the query string
-    const queryString = new URLSearchParams(params).toString();
-
     // Ensure API URL is defined
     if (!apiUrl) {
       return Promise.reject(
@@ -153,31 +120,56 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Prepare the form data
-      const newFormData = {
-        product_id,
-        rating,
+      // Ensure API base URL is available
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      // Validate rating is a number
+      const numRating = rating ? Number(rating) : null;
+      if (numRating === null || isNaN(numRating)) {
+        throw new Error("Rating must be a valid number");
+      }
+
+      // Ensure additional_details is an array and filter out empty entries
+      const cleanedDetails = Array.isArray(additional_details) 
+        ? additional_details.filter(detail => {
+            const youtubeUrl = (detail as any).youtubeUrl?.trim();
+            const sourceUrl = (detail as any).sourceUrl?.trim();
+            const phone = (detail as any).phone?.trim();
+            return youtubeUrl || sourceUrl || phone;
+          })
+        : [];
+
+      // POST to the backend create-review endpoint: {BASEURL}/reviews/{product_id}
+      // If you want to update an existing review instead, use /product/{id}/review/{reviewid}
+      const fullUrl = `${apiUrl}/reviews/${product_id}`;
+
+      const payload: Record<string, any> = {
+        rating: numRating,
         reviews,
-        additional_details, // Extract detail strings if needed
-        apiUrl: `reviews/${product_id}`,
       };
 
-      // Make the POST request
-      const response = await fetch("/api/post", {
+      // Only include additional_details if there are non-empty items
+      if (cleanedDetails.length > 0) {
+        payload.additional_details = cleanedDetails;
+      }
+
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify(payload),
       });
 
-      // Handle response
       if (!response.ok) {
-        throw new Error("Failed to submit review");
+        const text = await response.text();
+        throw new Error(`Failed to submit review: ${response.status} ${text}`);
       }
 
       const responseData = await response.json();
-      return responseData; // Return the response if needed
+      return responseData;
     } catch (error) {
       console.error("Error submitting review:", error);
     }
@@ -186,63 +178,67 @@ export const useReviews = () => {
   // services/reviewService.ts
   const addReviewTranslation = async (
     product_id: number | null = null, // Changed to product_review_id
-    rating: number | null = null,
+    rating: string | null = null, // Changed to string to accept Bangla numerals
     review: string = "",
     locale: string = "",
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Prepare the form data
-      const newFormData = {
-        product_id, // Keep the id as per your backend requirement
-        rating,
-        review,
+      // Ensure API base URL is available
+      if (!apiUrl) {
+        throw new Error("API URL is not defined in environment variables");
+      }
+
+      // Serialize additional_details as JSON
+      let serializedDetails: string | null = null;
+      if (additional_details && additional_details.length > 0) {
+        serializedDetails = JSON.stringify(additional_details);
+      }
+
+      // Build the payload expected by the Go server
+      const payload: Record<string, string | number | null | object> = {
+        product_id,
         locale,
-        additional_details, // Send additional details as an array
-        apiUrl: "review/translation", // Assuming this is used on the backend for some routing logic
+        review,
+        rating: rating || "", // Send rating as string (Bangla numerals or ASCII)
       };
 
-      // Make the POST request
-      const response = await fetch("/api/post", {
+      // Add additional_details only if it's not empty
+      if (serializedDetails) {
+        payload.additional_details = JSON.parse(serializedDetails);
+      }
+
+      // POST directly to the Go server translation endpoint
+      const fullUrl = `${apiUrl}/review/translation`;
+
+      const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newFormData),
+        body: JSON.stringify(payload),
       });
 
-      // Handle response
       if (!response.ok) {
-        throw new Error("Failed to submit review");
+        const text = await response.text();
+        throw new Error(
+          `Failed to submit translation: ${response.status} ${text}`
+        );
       }
 
       const responseData = await response.json();
-      return responseData; // Return the response if needed
+      return responseData;
     } catch (error) {
       console.error("Error submitting review:", error);
       throw error;
     }
   };
 
-  const getReviewsw = async (keyword: string) => {
-    if (!keyword) {
-      return;
-    }
-
-    let apiEndpoint = `?action=search-users&keyword=${keyword}`;
-    try {
-      const response = await fetch(`/api/get${apiEndpoint}`); // Adjust API endpoint
-      const dataset = await response.json();
-      return dataset;
-    } catch (error) {
-      console.error("Error fetching campaigns:", error);
-    }
-  };
-
-  const getReviews = async (
+  const getReviews = useCallback(async (
     page: number,
     limit: number,
-    searchTerm?: string
+    searchTerm?: string,
+    category?: number | null
   ) => {
     const params: Record<string, string> = {
       page: page.toString(),
@@ -251,6 +247,7 @@ export const useReviews = () => {
 
     // Add optional parameters only if they are defined
     if (searchTerm) params.searchterm = searchTerm;
+    if (category) params.category = category.toString();
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
@@ -285,7 +282,7 @@ export const useReviews = () => {
         };
       }
     }
-  };
+  }, []);
 
   const getPublicReviewsByProductId = async (id: number, locale?: string) => {
     const params: Record<string, string> = {};
@@ -319,9 +316,90 @@ export const useReviews = () => {
       return { success: false, data: [] };
     }
   };
+  // Update review helper (used by updateReview below)
+  async function updateReviewInternal(
+    apiUrlVal: string | undefined,
+    product_id: number | null,
+    review_id: number | null,
+    rating: number | null,
+    reviewsStr: string,
+    additional_details: AdditionalDetails[]
+  ) {
+    if (!apiUrlVal)
+      throw new Error("API URL is not defined in environment variables");
+    if (!product_id || !review_id)
+      throw new Error("product_id and review_id are required");
+
+    // Validate rating is a number
+    const numRating = rating ? Number(rating) : null;
+    if (numRating === null || isNaN(numRating)) {
+      throw new Error("Rating must be a valid number");
+    }
+
+    // Ensure additional_details is an array and filter out empty entries
+    const cleanedDetails = Array.isArray(additional_details) 
+      ? additional_details.filter(detail => {
+          const youtubeUrl = (detail as any).youtubeUrl?.trim();
+          const sourceUrl = (detail as any).sourceUrl?.trim();
+          const phone = (detail as any).phone?.trim();
+          return youtubeUrl || sourceUrl || phone;
+        })
+      : [];
+
+    const fullUrl = `${apiUrlVal}/product/${product_id}/review/${review_id}`;
+
+    const payload: Record<string, any> = {
+      rating: numRating,
+      reviews: reviewsStr,
+    };
+
+    // Only include additional_details if there are non-empty items
+    if (cleanedDetails.length > 0) {
+      payload.additional_details = cleanedDetails;
+    }
+
+    const response = await fetch(fullUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to update review: ${response.status} ${text}`);
+    }
+
+    return await response.json();
+  }
+
+  // expose updateReview for hook users
+  const updateReview = async (
+    product_id: number | null = null,
+    review_id: number | null = null,
+    rating: number | null = null,
+    reviews: string = "",
+    additional_details: AdditionalDetails[] = []
+  ) => {
+    try {
+      return await updateReviewInternal(
+        apiUrl,
+        product_id,
+        review_id,
+        rating,
+        reviews,
+        additional_details
+      );
+    } catch (error) {
+      console.error("Error updating review:", error);
+      throw error;
+    }
+  };
 
   return {
     addReview,
+    updateReview,
     getReview,
     getReviews,
     getReviewByProductId,

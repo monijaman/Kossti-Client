@@ -1,10 +1,10 @@
 // src/app/products/page.tsx
-import MainLayout from '@/components/layout/MainLayout';
-import Pagination from '@/components/Pagination/index';
-import PopularProducts from '@/components/Products/PopularProducts';
-import ProductReview from '@/components/Products/ProductReview';
-import SearchBox from '@/components/Search';
-import { DEFAULT_LOCALE } from '@/lib/constants';
+import MainLayout from '@/app/components/layout/MainLayout';
+import Pagination from '@/app/components/Pagination/index';
+import CategoryBrands from '@/app/components/Products/CategoryBrands';
+import PopularProducts from '@/app/components/Products/PopularProducts';
+import ProductReview from '@/app/components/Products/ProductReview';
+import { apiEndpoints, DEFAULT_LOCALE } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { cookies } from 'next/headers';
@@ -13,74 +13,52 @@ type ProductApiResponse = {
   products: Product[];
   totalProducts: number;
 };
+interface PageProps {
+  searchParams: Promise<SearchParams>;
+}
 
 // Server Component
-const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
+const Page = async ({ searchParams }: PageProps) => {
   // const { getProducts } = useProducts();
+  const resolvedSearchParams = await searchParams;
 
-  const getProducts = async (
-    page: number,
-    limit: number,
-    category?: string,
-    brands?: string,
-    priceRange?: string,
-    searchTerm?: string,
-    locale?: string,
-    sortby?: string
-  ) => {
-    const params: Record<string, string> = {
-      page: page.toString(),
-      limit: limit.toString(),
-      // _: cacheBuster.toString(), // Cache-busting parameter
-    };
-
-    // Add optional parameters only if they are defined
-    if (category) params.category = category;
-    if (brands) params.brand = brands;
-    if (priceRange) params.pricerange = priceRange;
-    if (searchTerm) params.searchterm = searchTerm;
-    if (locale) params.locale = locale;
-    if (sortby) params.sortby = sortby;
-
-    // Build the query string
-    // const queryString = new URLSearchParams(params).toString();
-
-
-    // const fullUrl = `${fetchApi}/products?${queryString}`;
-
-    try {
-      const dataset = await fetchApi<ProductApiResponse>('/products', {
-        method: 'GET',
-        queryParams: params,
-      });
-
-
-
-      return dataset;
-
-
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return { success: false, data: [] };
-    }
-  };
-
-  const page = parseInt(searchParams.page as string, 10) || 1;
+  const page = parseInt(resolvedSearchParams.page as string, 10) || 1;
   const limit = 20;
-  const activeCategory = searchParams.category || '';
-  const activeBrands = searchParams.brand || '';
-  const activePriceRange = searchParams.price || '';
-  const searchTerm = searchParams.searchterm || '';
+  const activeCategory = resolvedSearchParams.category || '';
+  const activeBrands = resolvedSearchParams.brand || '';
+  const activePriceRange = resolvedSearchParams.price || '';
+  const searchTerm = resolvedSearchParams.searchterm || '';
   const cookieStore = await cookies();
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE; // Default to 'en' if not found
+  const token = cookieStore.get("accessToken")?.value || "";
 
-  const fetchProductData = async () => {
-    const response = await getProducts(page, limit, activeCategory, activeBrands, activePriceRange, searchTerm, countryCode);
-    return { products: [], totalProducts: 0 };
+  const fetchProductData = async (): Promise<{ products: Product[]; totalProducts: number }> => {
+
+    const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+      method: 'GET',
+      accessToken: token,
+      queryParams: {
+        page: page.toString(),
+        limit: limit.toString(),
+        category: activeCategory,
+        brand: activeBrands,
+        priceRange: activePriceRange,
+        search: searchTerm,
+        locale: countryCode,
+        sortby: 'popular',
+      },
+    });
+
+    return {
+      products: response.data?.products ?? [],
+      totalProducts: response.data?.totalProducts ?? 0,
+    };
+
+
   };
 
   const dataset = await fetchProductData();
-  const totalPages = 0;//Math.ceil(dataset.totalProducts / limit);
+  const totalPages = Math.ceil(dataset.totalProducts / limit);
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -92,13 +70,12 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   return (
     <MainLayout sidebarProps={sidebarProps}>
-      <SearchBox initialSearchTerm={searchTerm} />
+      {/* <SearchBox initialSearchTerm={searchTerm} /> */}
+      <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
 
-      <ProductReview products={dataset?.products} countryCode={countryCode} />
-      <PopularProducts countryCode={countryCode} />
+      <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
+      <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
       <Pagination
-        category={activeCategory}
-        selectedBrands={activeBrands}
         currentPage={page}
         totalPages={totalPages}
       />

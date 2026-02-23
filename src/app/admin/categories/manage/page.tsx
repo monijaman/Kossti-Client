@@ -1,5 +1,5 @@
 
-import CategoryForm from "@/components/admin/categories/CategoryForm";
+import CategoryForm from "@/app/components/admin/categories/CategoryForm";
 
 
 export default function CreateSpecification() {

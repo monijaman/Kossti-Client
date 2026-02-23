@@ -1,51 +1,58 @@
 'use client'
-import CategoryForm from "@/components/admin/categories/CategoryForm";
-import CategoryTransForm from "@/components/admin/categories/CategoryTransForm";
+import CategoryForm from "@/app/components/admin/categories/CategoryForm";
+import CategoryTransForm from "@/app/components/admin/categories/CategoryTransForm";
 import { useCategory } from '@/hooks/useCategory';
-import useSpecificationsKeys from '@/hooks/useSpecificationsKeys';
+import { apiEndpoints } from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
 import { Category } from '@/lib/types'; // Assuming you have a Product type
-import { useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 interface PageProps {
-    params: {
-        id: number; // Type for the slug
-    };
+  params: Promise<{
+    id: number; // Type for the slug
+  }>;
 }
 
 const CreateSpecificationKeys = ({ params }: PageProps) => {
 
-    const { getSpecificationsKeysById } = useSpecificationsKeys();
-    const { getCategoryById } = useCategory();
-    const { id } = params;
-    const [category, setCategory] = useState<Category>()
+  const { getCategoryById } = useCategory();
+  const { id } = use(params);
+  const [category, setCategory] = useState<Category | null>(null)
 
-    const fetchKeys = async () => {
-        const response = await getCategoryById(id);
-        if (response.success) {
-            setCategory(response.data)
-        }
 
-    };
+  const fetchKeys = useCallback(async () => {
 
-    useEffect(() => {
-        if (id) {
-            fetchKeys();
-        }
+    try {
+      const response = await fetchApi(apiEndpoints.getCategoryById(id));
 
-    }, [])
+      if (response && response.success && response.data) {
+        const apiResponse = response.data as { data?: Category; message?: string };
+        setCategory(apiResponse.data || null);
+      }
+    } catch (error) {
+      console.error("Error fetching category:", error);
+    }
 
-    return (
-        <>
-            <div className="flex flex-row gap-4">
-                <div className="w-1/2  bg-gray-100 border rounded">
-                    <CategoryForm categoryData={category} />
-                </div>
+  }, [getCategoryById, id]);
 
-                <div className="w-1/2">
-                    {category && <CategoryTransForm categoryData={category} />}
-                </div>
-            </div>
-        </>
-    );
+  useEffect(() => {
+    if (id) {
+      fetchKeys();
+    }
+  }, []);
+
+  return (
+    <>
+      <div className="flex flex-row gap-4">
+        <div className="w-1/2  bg-gray-100 border rounded">
+          <CategoryForm categoryData={category || undefined} />
+        </div>
+
+        <div className="w-1/2">
+          {category && <CategoryTransForm categoryData={category} />}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default CreateSpecificationKeys;

@@ -1,5 +1,5 @@
-import ProductForm from "@/components/admin/ProductForm";
-import ProductTransForm from "@/components/admin/ProductTransForm";
+import ProductForm from "@/app/components/admin/ProductForm";
+import ProductTransForm from "@/app/components/admin/ProductTransForm";
 
 
 const CreateProduct = async () => {

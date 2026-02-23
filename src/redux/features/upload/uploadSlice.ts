@@ -48,47 +48,94 @@ interface ApiResponse {
 // Create the async thunk for uploading media
 export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
   "upload/files",
-  async (payload, { getState }) => {
+  async (payload) => {
     const { productId, files } = payload; // Fixed typo from prodductId to productId
 
-    // Initialize formData as a FormData object
-    const formData = new FormData();
-    const state = getState() as RootState;
-
-    formData.append("product_id", productId.toString()); // Convert to string
-    formData.append("apiUrl", "/productimages");
-
-    // Append each file to the FormData object
-    files.forEach((file, index) => {
-      formData.append(`files[${index}]`, file);
-    });
+    // Presigned S3 upload flow:
+    // 1) For each file request a presigned URL from the Next.js proxy /api/s3-presign
+    // 2) PUT the file to the presigned URL
+    // 3) Register the uploaded keys with the backend via /api/s3-register
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     try {
-      // Handle the API call
-      const response = await fetch("/api/multipart", {
+      const uploadedFiles: {
+        key: string;
+        name: string;
+        url: string;
+        size: number;
+      }[] = [];
+
+      for (const file of files) {
+        // 1) get presign URL
+        const presignResp = await fetch("/api/s3-presign", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            productId,
+          }),
+        });
+
+        const presignJson = await presignResp.json();
+        if (!presignResp.ok || !presignJson.data) {
+          return {
+            success: false,
+            error: presignJson.error || "Failed to get presign URL",
+          };
+        }
+
+        const { url, key, objectUrl } = presignJson.data as {
+          url: string;
+          key: string;
+          objectUrl?: string;
+        };
+
+        // 2) PUT file to S3
+        const putResp = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type,
+          },
+          body: file,
+        });
+
+        if (!putResp.ok) {
+          return { success: false, error: `Failed to upload ${file.name}` };
+        }
+
+        uploadedFiles.push({
+          key,
+          name: file.name,
+          url: objectUrl || "",
+          size: file.size,
+        });
+      }
+
+      // 3) Register uploaded files with backend
+      const registerResp = await fetch("/api/s3-register", {
         method: "POST",
-        body: formData, // FormData is used directly as body
-        // Note: Do not set Content-Type header, fetch will automatically set it to multipart/form-data
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ product_id: productId, files: uploadedFiles }),
       });
 
-      // Assuming the response is JSON
-      const responseArray = await response.json();
-      const { data } = responseArray;
-      // Check if the request was successful
-
-      if (data.images) {
-        return {
-          success: true,
-          productId: productId,
-        };
-      } else {
+      const registerJson = await registerResp.json();
+      if (!registerResp.ok) {
         return {
           success: false,
-          error: `"Unknown error`,
+          error: registerJson.error || "Failed to register files",
         };
       }
+
+      return { success: true, productId };
     } catch (error) {
-      // Handle any errors that occurred during the fetch
       return {
         success: false,
         error: (error as Error).message || "Unknown server error",
@@ -98,28 +145,29 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
 );
 export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   "upload/removemedia",
-  async (payload, { getState }) => {
+  async (payload) => {
     const { productId } = payload;
 
-    const newFormData = {
-      apiUrl: `imageremove/${productId}`,
-    };
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";
+    const endpoint = `${apiUrl}/imageremove/${productId}`;
 
-    const response = await fetch("/api/post", {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(newFormData), // Include apiUrl in the request body
     });
 
     if (!response.ok) {
-      throw new Error("Failed to delete campaign");
+      throw new Error("Failed to delete image");
     }
 
-    const responseArray = await response.json();
+    const data = await response.json();
 
-    const { data } = responseArray;
+    return {
+      success: true,
+      data: data,
+    };
 
     if (data.images) {
       return {
