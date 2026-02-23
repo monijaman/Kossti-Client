@@ -72,7 +72,8 @@ export interface ProductTranslation {
   product_id: number;
   locale: string;
   translated_name: string; // Changed from 'name' to 'translated_name' to match Go API
-  price: string; // Changed from number to string to match Go API
+  start_price?: string; // Changed from number to string to match Go API
+  end_price?: string; // Changed from number to string to match Go API
   created_at?: string;
   updated_at?: string;
 }
