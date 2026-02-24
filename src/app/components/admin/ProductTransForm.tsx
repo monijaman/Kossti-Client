@@ -17,7 +17,7 @@ interface TranslationItem {
 }
 
 const ProductTransForm = ({ product }: ProductFormProps) => {
-    const { Translation, getProductTranslations } = useProducts();
+    const { Translation, getProductTranslations, getAProductById } = useProducts();
 
     const id = product?.id;
 
@@ -27,6 +27,8 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     const [startPrice, setStartPrice] = useState("");
     const [endPrice, setEndPrice] = useState("");
     const [submitStatus, setSubmitStatus] = useState("");
+    const [translateLoading, setTranslateLoading] = useState(false);
+    const [translateStatus, setTranslateStatus] = useState("");
 
     // 🔥 Normalize ANY backend response format safely
     const normalizeTranslations = (data: any[]): TranslationItem[] => {
@@ -72,12 +74,10 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
             },
         ]);
     };
-    // Load translations when locale changes
+    // Load translations when locale changes or product updates
     useEffect(() => {
-
-
         loadTranslations();
-    }, [id, selectedLocale]);
+    }, [id, selectedLocale, product?.start_price, product?.end_price]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -105,6 +105,58 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
     const translationExists = translations.some(
         (t) => t.locale === selectedLocale
     );
+
+
+    const handleTranslate = async () => {
+        if (!id) {
+            setTranslateStatus("Product ID not available");
+            return;
+        }
+
+        setTranslateLoading(true);
+        setTranslateStatus("");
+
+        try {
+            // Always fetch the latest product data so we use up-to-date name/prices
+            // even if the user just updated the product without refreshing the page.
+            const productResult = await getAProductById(id);
+            const freshProduct: Product | undefined =
+                productResult?.data as Product | undefined;
+
+            const productName = freshProduct?.name || product?.name;
+            if (!productName) {
+                setTranslateStatus("Product name not available");
+                return;
+            }
+
+            const response = await fetch("/api/openai/translate-product", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productName,
+                    startPrice: freshProduct?.start_price ?? product?.start_price ?? "",
+                    endPrice: freshProduct?.end_price ?? product?.end_price ?? "",
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setTranslateStatus(`Translation failed: ${data.error}`);
+                return;
+            }
+
+            setName(data.translated_name || "");
+            if (data.start_price) setStartPrice(data.start_price);
+            if (data.end_price) setEndPrice(data.end_price);
+            setTranslateStatus("Translation complete! Review and submit.");
+        } catch (error) {
+            setTranslateStatus(
+                `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+        } finally {
+            setTranslateLoading(false);
+        }
+    };
 
     return (
         <>
@@ -166,18 +218,45 @@ const ProductTransForm = ({ product }: ProductFormProps) => {
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-6 py-2 rounded"
-                >
-                    {translationExists
-                        ? `Update (${selectedLocale.toUpperCase()})`
-                        : `Create (${selectedLocale.toUpperCase()})`}
-                </button>
+                <div className="flex gap-3 mb-4">
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                    >
+                        {translationExists
+                            ? `Update (${selectedLocale.toUpperCase()})`
+                            : `Create (${selectedLocale.toUpperCase()})`}
+                    </button>
+
+
+
+                    {selectedLocale === "bn" && (id || product?.name) && (
+                        <button
+                            type="button"
+                            onClick={handleTranslate}
+                            disabled={translateLoading}
+                            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
+                        >
+                            {translateLoading ? "Translating..." : "🤖 Translate with AI"}
+                        </button>
+                    )}
+                </div>
 
                 {submitStatus && (
                     <div className="mt-4 text-sm text-green-600">
                         {submitStatus}
+                    </div>
+                )}
+
+                {translateStatus && (
+                    <div
+                        className={`mt-4 text-sm ${translateStatus.includes("Error") ||
+                            translateStatus.includes("failed")
+                            ? "text-red-600"
+                            : "text-green-600"
+                            }`}
+                    >
+                        {translateStatus}
                     </div>
                 )}
             </form>

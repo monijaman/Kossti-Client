@@ -212,6 +212,38 @@ const ProductForm = ({ product }: ProductFormProps) => {
         }
     };
 
+    const handleFetchPrices = async () => {
+        if (!name) return;
+
+        setLoading(true);
+        setSubmitStatus("");
+
+        try {
+            const categoryName = categories.find(c => c.id.toString() === category)?.name || "";
+            const response = await fetch("/api/openai/suggest-prices", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productName: name, categoryName }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setSubmitStatus(`Failed to fetch prices: ${data.error}`);
+                return;
+            }
+
+            if (data.start_price !== null) setStartPrice(data.start_price);
+            if (data.end_price !== null) setEndPrice(data.end_price);
+            setSubmitStatus("Prices fetched successfully from OpenAI");
+        } catch (error) {
+            setSubmitStatus(
+                `Error: ${error instanceof Error ? error.message : "Failed to fetch prices"}`
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true); // Set loading state
@@ -417,7 +449,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="start_price"
                             type="number"
-                            step="0.01"
+                            step="1"
                             placeholder="Enter start price"
                             value={startPrice ?? ''}
                             onChange={(e) => setStartPrice(e.target.value === '' ? null : parseFloat(e.target.value))}
@@ -433,7 +465,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="end_price"
                             type="number"
-                            step="0.01"
+                            step="1"
                             placeholder="Enter end price"
                             value={endPrice ?? ''}
                             onChange={(e) => setEndPrice(e.target.value === '' ? null : parseFloat(e.target.value))}
@@ -485,6 +517,16 @@ const ProductForm = ({ product }: ProductFormProps) => {
                         >
                             {loading ? 'Submitting...' : product?.id ? 'Update Product' : 'Create Product'}
                         </button>
+
+                        {product?.id && (
+                            <button
+                                className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="button"
+                                onClick={handleFetchPrices}
+                            >
+                                📥 Fetch Prices
+                            </button>
+                        )}
 
 
 
