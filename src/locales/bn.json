@@ -1,8 +1,20 @@
 {
+  "categories_heading": "বিভাগ সমূহ",
+  "brands_heading": "ব্র্যান্ড সমূহ",
   "title": "শিরোনাম",
   "content": "ক্যাটেগরি",
   "clear_Category": "বিভাগ মুছুন",
   "copyright": "© ২০২৪ আপনার সাইট। সর্বস্বত্ব সংরক্ষিত।",
   "popupar_product": "জনপ্রিয় পণ্য",
-  "latest_review": "সর্বশেষ পর্যালোচনা"
+  "latest_review": "সর্বশেষ পর্যালোচনা",
+  "similar_products": "অনুরূপ পণ্য",
+  "nav_home": "হোম",
+  "label_brand": "ব্র্যান্ড",
+  "label_category": "ক্যাটেগরি",
+  "label_added_on": "যোগ করা হয়েছে",
+  "label_last_updated": "সর্বশেষ আপডেট",
+  "unofficial_specs": "অনানুষ্ঠানিক স্পেসিফিকেশন",
+  "label_specifications": "স্পেসিফিকেশন",
+  "coming_soon": "শীঘ্রই আসছে",
+  "add_to_compare": "তুলনায় যোগ করুন"
 }

@@ -156,7 +156,8 @@ export async function generateMetadata(props: {
 const Page = async ({ params, searchParams }: PageProps) => {
   const { slug, locale } = await params;
   const cookieStore = await cookies();
-  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE;
+  // Use URL locale as primary source — cookie is only a fallback
+  const countryCode = locale || cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   const resolvedSearchParams = await searchParams;
 
   const searchTerm = resolvedSearchParams.searchterm || '';
@@ -166,6 +167,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
     try {
       const response = await fetchApi(`/products-by-slug/${slug}`, {
         method: 'GET',
+        queryParams: { locale: countryCode },
         headers: {
           'Accept': 'application/json',
         },

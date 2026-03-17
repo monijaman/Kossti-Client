@@ -33,6 +33,7 @@ export interface categoryInt {
 export interface Product {
   id: number;
   name: string;
+  translated_name?: string; // Bengali (or other locale) name returned by API when locale != 'en'
   description?: string;
   slug: string;
   review: string;

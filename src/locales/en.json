@@ -1,9 +1,20 @@
 {
-    "title": "Welcome",
-    "content": "This is the English content.",
-    "latest_review": " Latest Reviews",
-    "clear_Category": " Clear Categories",
-    "popupar_product": " Popular Products",
-    "copyright": "© 2026 Your Site. All rights reserved."
-  }
-  
+  "categories_heading": "Categories",
+  "brands_heading": "Brands",
+  "title": "Welcome",
+  "content": "This is the English content.",
+  "latest_review": "Latest Reviews",
+  "clear_Category": "Clear Categories",
+  "popupar_product": "Popular Products",
+  "copyright": "© 2026 Your Site. All rights reserved.",
+  "similar_products": "Similar Products",
+  "nav_home": "Home",
+  "label_brand": "Brand",
+  "label_category": "Category",
+  "label_added_on": "Added on",
+  "label_last_updated": "Last updated",
+  "unofficial_specs": "Unofficial specifications",
+  "label_specifications": "Specifications",
+  "coming_soon": "COMING SOON",
+  "add_to_compare": "Add to Compare"
+}

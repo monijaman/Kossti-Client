@@ -25,12 +25,16 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
     }, [debouncedSearchTerm]);
 
     useEffect(() => {
-        // Safely access localStorage on the client side
-        const storedLocale = localStorage.getItem('locale');
-        if (storedLocale) {
-            setLocale(storedLocale);
+        // Only fall back to localStorage when no explicit countryCode prop was passed
+        if (!countryCode || countryCode === DEFAULT_LOCALE) {
+            const storedLocale = localStorage.getItem('locale');
+            if (storedLocale) {
+                setLocale(storedLocale);
+            }
+        } else {
+            setLocale(countryCode);
         }
-    }, []); // Run only on component mount
+    }, [countryCode]); // re-sync when prop changes
 
     // Handle search input change and update suggestions
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

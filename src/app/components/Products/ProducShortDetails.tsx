@@ -12,6 +12,14 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
 
+  // Prefer translated_name (from API) then translations array, then English name
+  const displayName =
+    product.translated_name ||
+    (countryCode !== 'en'
+      ? product.translations?.find((t) => t.locale === countryCode)?.translated_name
+      : undefined) ||
+    product.name;
+
   return (
     <Link
       key={product.id}
@@ -41,7 +49,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
       {/* Product Details */}
       <div className="p-5 space-y-3">
         <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {product.name}
+          {displayName}
         </h3>
 
         <p className="text-sm text-gray-600 line-clamp-2">

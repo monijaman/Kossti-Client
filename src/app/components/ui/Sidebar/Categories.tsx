@@ -6,14 +6,15 @@ interface CategoriesProps {
   activeCategory?: string;
   locale: string;
   clearCategoryText: string;
+  heading?: string;
 }
 
-const Categories = ({ categories, activeCategory, locale, clearCategoryText }: CategoriesProps) => {
+const Categories = ({ categories, activeCategory, locale, clearCategoryText, heading = 'Categories' }: CategoriesProps) => {
   const clearCategoryUrl = `/${locale}`;
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">Categories</h2>
+      <h2 className="text-lg font-semibold mb-4">{heading}</h2>
       <div className="mb-4">
         <div className="mb-4">
           {categories &&

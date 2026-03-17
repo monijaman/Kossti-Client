@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from '@/lib/constants';
 import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
@@ -7,8 +8,6 @@ import LanguageSwitcher from '../Language/LanguageSwitcher';
 import AccountDropdown from '../ui/AccountDropdown';
 import Breadcrumbs from '../ui/Breadcrumbs';
 import Sidebar from '../ui/Sidebar/Sidebar';
-
-const DEFAULT_LOCALE = 'en';
 
 interface MainLayoutProps {
   children: ReactNode;
