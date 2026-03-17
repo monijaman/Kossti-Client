@@ -70,7 +70,7 @@ const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm }: Sidebar
                             className={`w-5 h-5 rounded-full ${selected.includes(brand.slug || '') ? 'bg-gray-300' : 'border-2 border-gray-400'}`}
 
                         />
-                        <span className="ml-2">{brand.name || 'Unknown Brand'} ({brand.total})</span>
+                        <span className="ml-2">{brand.translated_name || brand.name || 'Unknown Brand'} ({brand.total})</span>
                     </div>
 
 
