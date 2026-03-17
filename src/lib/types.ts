@@ -20,6 +20,7 @@ export type SubmitSpecResponse = {
 export interface categoryInt {
   id: number;
   name: string;
+  translated_name?: string; // Bengali (or other locale) name returned by API when locale != 'en'
   category_slug: string;
   slug: string;
   status?: boolean;

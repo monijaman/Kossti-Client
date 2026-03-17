@@ -25,7 +25,7 @@ const Categories = ({ categories, activeCategory, locale, clearCategoryText, hea
                   href={`/${locale}?category=${categoryItem.slug}`}
                   className={`block px-4 py-2 rounded-md cursor-pointer hover:bg-gray-200 transition duration-300 ${activeCategory === categoryItem.slug ? 'bg-gray-300 text-gray-800' : 'bg-white text-gray-700'}`}
                 >
-                  {categoryItem.name}
+                  {categoryItem.translated_name || categoryItem.name}
                 </Link>
               );
             })}
