@@ -12,9 +12,8 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
-// Enable Incremental Static Regeneration (ISR) - revalidate every 10 seconds
-// Note: Do NOT use `dynamic = 'force-dynamic'` here - it overrides revalidate and disables ALL caching
-export const revalidate = 10;
+// Always fetch fresh data so priority changes reflect immediately
+export const dynamic = 'force-dynamic';
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
@@ -161,7 +160,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         search: searchTerm,
         sortby: 'priority',
       },
-      next: { revalidate: 10 }, // Cache for 10 seconds
+      next: { revalidate: 0 }, // No cache - always fresh
     }),
   ]);
 

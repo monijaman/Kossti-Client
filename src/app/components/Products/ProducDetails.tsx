@@ -80,7 +80,7 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
         <nav className="text-sm mb-6 text-gray-600">
           <span>{t.nav_home || 'Home'}</span>
           <span className="mx-2">›</span>
-          <span>{product.brand?.name}</span>
+          <span>{countryCode === 'bn' && product.brand?.translated_name ? product.brand.translated_name : product.brand?.name}</span>
           <span className="mx-2">›</span>
           <span className="text-gray-900 font-medium">{displayName}</span>
         </nav>
