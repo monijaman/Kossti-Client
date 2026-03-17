@@ -3,6 +3,7 @@ import CategoryBrandsClient from "./CategoryBrandsClient";
 interface Brand {
     id: number;
     name: string;
+    translated_name?: string;
     slug: string;
     status: number;
 }
@@ -31,8 +32,13 @@ const CategoryBrands = async ({ categorySlug, countryCode }: CategoryBrandsProps
             return null;
         }
 
+        const params = new URLSearchParams({ category_slug: categorySlug });
+        if (countryCode) {
+            params.append("locale", countryCode);
+        }
+
         const response = await fetch(
-            `${apiUrl}/category-brands?category_slug=${categorySlug}`,
+            `${apiUrl}/category-brands?${params.toString()}`,
             {
                 next: { revalidate: 300 }, // Cache for 5 minutes
             }

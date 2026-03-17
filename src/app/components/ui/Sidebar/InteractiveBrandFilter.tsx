@@ -4,7 +4,12 @@ import { Brand, SidebarParams } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
 import { useEffect, useState } from 'react';
-const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm }: SidebarParams) => {
+
+interface InteractiveBrandFilterProps extends SidebarParams {
+    countryCode?: string;
+}
+
+const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm, countryCode = 'bn' }: InteractiveBrandFilterProps) => {
     const [selected, setSelected] = useState<string[]>([]);
     const router = useRouter();
     // Update the URL whenever the selected brands change
@@ -26,10 +31,10 @@ const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm }: Sidebar
                 currentParams.delete('brand');
             }
             // Generate the new query string
-            const newQueryString = `/?${currentParams.toString()}`;
+            const newQueryString = `/${countryCode}?${currentParams.toString()}`;
 
             // Only update the URL if there is a real change
-            if (newQueryString !== `/?${window.location.search}`) {
+            if (newQueryString !== `/${countryCode}?${window.location.search.replace('?', '')}`) {
                 router.replace(newQueryString); // Use replace to avoid looping
             }
         }
@@ -77,7 +82,7 @@ const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm }: Sidebar
                 ))}
             </div>
 
-            <Link href="/" className="text-blue-500 hover:underline mb-4 block">
+            <Link href={`/${countryCode}`} className="text-blue-500 hover:underline mb-4 block">
                 Clear Brands
             </Link>
         </>

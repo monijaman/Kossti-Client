@@ -2,10 +2,10 @@ import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 
 import {
-    ApiResponse,
-    SpecificationInt,
-    SpecificationKey,
-    SpecKeyTranslation,
+  ApiResponse,
+  SpecificationInt,
+  SpecificationKey,
+  SpecKeyTranslation,
 } from "@/lib/types";
 import { useCallback } from "react";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -335,7 +335,9 @@ export const useSpecifications = () => {
 
       // Send all specifications in a single bulk request
       const specs = realPayload.specifications;
-      console.log(`Submitting ${specs.length} specifications in a single bulk request`);
+      console.log(
+        `Submitting ${specs.length} specifications in a single bulk request`,
+      );
 
       const start = Date.now();
       const response = await fetchApi(apiEndpoints.buckSpecUpdate, {
@@ -388,9 +390,21 @@ export const useSpecifications = () => {
         };
       }
 
-      // Transform to simpler payload structure
+      // Transform to simpler payload structure — only send specs that:
+      // 1. Have a positive id (meaning the specification row has been saved to the DB)
+      // 2. Have a non-empty translated_value
+      // If id === 0 it means the parent specification has not been saved to the DB yet;
+      // the user must save specifications before saving translations.
       const validSpecs = specifications
-        .filter((spec) => spec.id && spec.locale && spec.translated_value)
+        .filter(
+          (spec) =>
+            spec.id !== undefined &&
+            spec.id !== null &&
+            Number(spec.id) > 0 &&
+            spec.locale &&
+            spec.translated_value &&
+            spec.translated_value.trim() !== "",
+        )
         .map((spec) => ({
           id: Number(spec.id),
           locale: spec.locale,
@@ -398,10 +412,24 @@ export const useSpecifications = () => {
         }));
 
       if (validSpecs.length === 0) {
+        const hasUnsavedSpecs = specifications.some(
+          (spec) => spec.id === 0 || spec.id === null,
+        );
+        const reason = hasUnsavedSpecs
+          ? "Specifications must be saved before translations can be added. Please submit the specification form first, then return here to save translations."
+          : "No translations to save.";
+        console.warn("[submitSpecTranslationValues]", reason);
         return {
           success: false,
-          error: "No valid specifications with translated values",
+          error: reason,
         };
+      }
+
+      const skipped = specifications.length - validSpecs.length;
+      if (skipped > 0) {
+        console.warn(
+          `[submitSpecTranslationValues] Skipping ${skipped} spec(s) with missing translated_value`,
+        );
       }
 
       const payload = {

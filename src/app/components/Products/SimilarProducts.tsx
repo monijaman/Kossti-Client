@@ -1,9 +1,9 @@
 "use client"
-import { useTranslation } from "@/hooks/useLocale"; // Assuming this hook exists or similar
+import { useTranslation } from "@/hooks/useLocale";
+import fetchApi from "@/lib/fetchApi";
 import { Product } from "@/lib/types";
 import { useEffect, useState } from "react";
 import ProducShortDetails from "./ProducShortDetails";
-import fetchApi from "@/lib/fetchApi";
 
 interface PageProps {
     countryCode: string;
@@ -13,12 +13,14 @@ interface PageProps {
 const SimilarProducts = ({ countryCode, slug }: PageProps) => {
     const [dataset, setDataSet] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const t = useTranslation(countryCode);
 
     const fetchSimilarProducts = async () => {
         try {
             setLoading(true);
             const response = await fetchApi(`/products-by-slug/${slug}/similar`, {
                 method: 'GET',
+                queryParams: { locale: countryCode },
             });
 
             if (response.success && response.data && typeof response.data === 'object' && 'products' in response.data) {
@@ -48,7 +50,7 @@ const SimilarProducts = ({ countryCode, slug }: PageProps) => {
     return (
         <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                Similar Products
+                {t.similar_products || 'Similar Products'}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

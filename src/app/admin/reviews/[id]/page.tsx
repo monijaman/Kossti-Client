@@ -4,9 +4,9 @@ import Modal from '@/app/components/Modal/client';
 import AdditionalDetailsForm from '@/app/components/reviews/AdditionalDetails';
 import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
-import { useReviews } from '@/hooks/useReviews';
 import { useProducts } from '@/hooks/useProducts';
-import { generateAIReview, extractRatingFromReview, ReviewStyle } from '@/lib/openai-service';
+import { useReviews } from '@/hooks/useReviews';
+import { extractRatingFromReview, generateAIReview, ReviewStyle } from '@/lib/openai-service';
 import { AdditionalDetails, Product, Review, ReviewTranslation } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useRef, useState } from 'react';
@@ -44,6 +44,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
     const [aiReviewStyle, setAiReviewStyle] = useState<ReviewStyle>('aesops-fable');
+    const [activeStyleTab, setActiveStyleTab] = useState<'entertainment' | 'tech' | 'automotive'>('entertainment');
     const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
@@ -653,19 +654,43 @@ const ReviewForm = ({ params }: PageProps) => {
                     <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Review Style</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Review Style</label>
+
+                        {/* Style Category Tabs */}
+                        <div className="flex gap-2 mb-4 border-b border-gray-200">
+                            <button
+                                onClick={() => setActiveStyleTab('entertainment')}
+                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'entertainment'
+                                        ? 'border-b-2 border-blue-500 text-blue-600'
+                                        : 'text-gray-600 hover:text-gray-800'
+                                    }`}
+                            >
+                                🎭 Entertainment
+                            </button>
+                            <button
+                                onClick={() => setActiveStyleTab('tech')}
+                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'tech'
+                                        ? 'border-b-2 border-blue-500 text-blue-600'
+                                        : 'text-gray-600 hover:text-gray-800'
+                                    }`}
+                            >
+                                💻 Tech & Products
+                            </button>
+                            <button
+                                onClick={() => setActiveStyleTab('automotive')}
+                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'automotive'
+                                        ? 'border-b-2 border-blue-500 text-blue-600'
+                                        : 'text-gray-600 hover:text-gray-800'
+                                    }`}
+                            >
+                                🚗 Automotive
+                            </button>
+                        </div>
+
+                        {/* Styles Grid - Shows based on active tab */}
                         <div className="grid grid-cols-2 gap-2">
-                            {([
+                            {activeStyleTab === 'entertainment' && ([
                                 { value: 'aesops-fable', label: "🦊 Aesop's Fable", desc: 'Storytelling with parables & morals' },
-                                { value: 'technical-expert', label: '🔧 Technical Expert', desc: 'Data-driven engineering analysis' },
-                                { value: 'casual-friendly', label: '😊 Casual & Friendly', desc: 'Conversational everyday language' },
-                                { value: 'critical-honest', label: '🔍 Critical & Honest', desc: 'Brutally honest, no-nonsense' },
-                                { value: 'luxury-premium', label: '💎 Luxury Premium', desc: 'Aspirational, premium experience' },
-                                { value: 'budget-practical', label: '💡 Budget Practical', desc: 'Value-focused, smart spending' },
-                                { value: 'family-safe', label: '👨‍👩‍👧 Family Safe', desc: 'Safety, space & child-friendliness' },
-                                { value: 'performance-enthusiast', label: '🏆 Performance', desc: 'Track-ready, 0-100, driver thrills' },
-                                { value: 'eco-conscious', label: '🌿 Eco Conscious', desc: 'Emissions, efficiency & sustainability' },
-                                { value: 'urban-commuter', label: '🏙️ Urban Commuter', desc: 'City parking, stop-go & congestion' },
                                 { value: 'sherlock-detective', label: '🔎 Sherlock', desc: 'Deductive investigation, case & verdict' },
                                 { value: 'shakespearean-drama', label: '🎭 Shakespeare', desc: 'Five-act theatrical drama & soliloquy' },
                                 { value: 'epic-mythology', label: '⚡ Epic Mythology', desc: 'Greek/Norse hero legend & divine gifts' },
@@ -675,11 +700,60 @@ const ReviewForm = ({ params }: PageProps) => {
                                     key={value}
                                     type="button"
                                     onClick={() => setAiReviewStyle(value)}
-                                    className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${
-                                        aiReviewStyle === value
-                                            ? 'border-blue-500 bg-blue-50 text-blue-800'
-                                            : 'border-gray-200 hover:border-gray-400 text-gray-700'
-                                    }`}
+                                    className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${aiReviewStyle === value
+                                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                        : 'border-gray-200 hover:border-gray-400 text-gray-700'
+                                        }`}
+                                >
+                                    <div className="font-medium">{label}</div>
+                                    <div className="text-xs text-gray-500">{desc}</div>
+                                </button>
+                            ))}
+
+                            {activeStyleTab === 'tech' && ([
+                                { value: 'technical-expert', label: '🔧 Technical Expert', desc: 'Data-driven engineering analysis' },
+                                { value: 'tech-journalist', label: '📱 Tech Journalist', desc: 'CNET-style specs, benchmarks & testing' },
+                                { value: 'the-verge', label: '🎨 The Verge', desc: 'Design-focused tech journalism & culture' },
+                                { value: 'consumer-reports', label: '📊 Consumer Reports', desc: 'Scientific rigorous testing methodology' },
+                                { value: 'pcmag', label: '💻 PCMag', desc: 'Professional comprehensive tech reviews' },
+                                { value: 'anandtech', label: '🔬 AnandTech', desc: 'Deep technical analysis for enthusiasts' },
+                                { value: 'casual-friendly', label: '😊 Casual & Friendly', desc: 'Conversational everyday language' },
+                                { value: 'critical-honest', label: '🔍 Critical & Honest', desc: 'Brutally honest, no-nonsense' },
+                                { value: 'wirecutter', label: '🛒 Wirecutter', desc: 'Practical expert testing & honest buyer guide' },
+                            ] as { value: ReviewStyle; label: string; desc: string }[]).map(({ value, label, desc }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setAiReviewStyle(value)}
+                                    className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${aiReviewStyle === value
+                                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                        : 'border-gray-200 hover:border-gray-400 text-gray-700'
+                                        }`}
+                                >
+                                    <div className="font-medium">{label}</div>
+                                    <div className="text-xs text-gray-500">{desc}</div>
+                                </button>
+                            ))}
+
+                            {activeStyleTab === 'automotive' && ([
+                                { value: 'luxury-premium', label: '💎 Luxury Premium', desc: 'Aspirational, premium experience' },
+                                { value: 'budget-practical', label: '💡 Budget Practical', desc: 'Value-focused, smart spending' },
+                                { value: 'family-safe', label: '👨‍👩‍👧 Family Safe', desc: 'Safety, space & child-friendliness' },
+                                { value: 'performance-enthusiast', label: '🏆 Performance', desc: 'Track-ready, 0-100, driver thrills' },
+                                { value: 'eco-conscious', label: '🌿 Eco Conscious', desc: 'Emissions, efficiency & sustainability' },
+                                { value: 'urban-commuter', label: '🏙️ Urban Commuter', desc: 'City parking, stop-go & congestion' },
+                                { value: 'edmunds', label: '🚗 Edmunds', desc: "Automotive buyer's guide & value focus" },
+                                { value: 'car-and-driver', label: '🏎️ Car and Driver', desc: 'Performance, dynamics & driving passion' },
+                                { value: 'motor-trend', label: '📸 Motor Trend', desc: 'Professional automotive journalism' },
+                            ] as { value: ReviewStyle; label: string; desc: string }[]).map(({ value, label, desc }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setAiReviewStyle(value)}
+                                    className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${aiReviewStyle === value
+                                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                                        : 'border-gray-200 hover:border-gray-400 text-gray-700'
+                                        }`}
                                 >
                                     <div className="font-medium">{label}</div>
                                     <div className="text-xs text-gray-500">{desc}</div>

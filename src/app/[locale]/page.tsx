@@ -141,7 +141,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const activePriceRange = resolvedSearchParams.price || '';
   const searchTerm = resolvedSearchParams.searchterm || '';
   const cookieStore = await cookies();
-  const countryCode = cookieStore.get('country-code')?.value || locale || DEFAULT_LOCALE;
+  // Use URL locale as primary source — cookie is only a fallback for non-localised routes
+  const countryCode = locale || cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
 
   // Fetch all data in parallel for better performance
@@ -168,7 +169,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   if (!productData.success) {
     console.error('[Page Error] Failed to fetch products:', productData.error);
     return (
-      <MainLayout sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm }}>
+      <MainLayout sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm, countryCode }}>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load products</h2>
           <p className="text-gray-600 mb-4">{productData.error || 'The backend service is temporarily unavailable. Please try again later.'}</p>
@@ -190,6 +191,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
     selectedBrands: activeBrands,
     activePriceRange,
     searchTerm,
+    countryCode,
   };
 
   return (

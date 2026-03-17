@@ -6,14 +6,15 @@ interface CategoriesProps {
   activeCategory?: string;
   locale: string;
   clearCategoryText: string;
+  heading?: string;
 }
 
-const Categories = ({ categories, activeCategory, locale, clearCategoryText }: CategoriesProps) => {
+const Categories = ({ categories, activeCategory, locale, clearCategoryText, heading = 'Categories' }: CategoriesProps) => {
   const clearCategoryUrl = `/${locale}`;
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">Categories</h2>
+      <h2 className="text-lg font-semibold mb-4">{heading}</h2>
       <div className="mb-4">
         <div className="mb-4">
           {categories &&
@@ -24,7 +25,7 @@ const Categories = ({ categories, activeCategory, locale, clearCategoryText }: C
                   href={`/${locale}?category=${categoryItem.slug}`}
                   className={`block px-4 py-2 rounded-md cursor-pointer hover:bg-gray-200 transition duration-300 ${activeCategory === categoryItem.slug ? 'bg-gray-300 text-gray-800' : 'bg-white text-gray-700'}`}
                 >
-                  {categoryItem.name}
+                  {categoryItem.translated_name || categoryItem.name}
                 </Link>
               );
             })}

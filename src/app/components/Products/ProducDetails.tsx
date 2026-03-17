@@ -1,6 +1,7 @@
 "use client"
 import SpecDetails from '@/app/components/Products/SpecDetails';
 import ProductReviewsSection from '@/app/components/reviews/ProductReviewsSection';
+import { useTranslation } from '@/hooks/useLocale';
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -12,6 +13,15 @@ interface PopularProductsProps {
 
 const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) => {
   const [selectedImage, setSelectedImage] = useState(product.photo || '/noimage.webp');
+  const t = useTranslation(countryCode);
+
+  // Prefer translated_name (from API) then translations array, then English name
+  const displayName =
+    product.translated_name ||
+    (countryCode !== 'en'
+      ? product.translations?.find((tr) => tr.locale === countryCode)?.translated_name
+      : undefined) ||
+    product.name;
 
   // Mock data for demonstration - replace with actual data from API
   const productImages = [
@@ -25,29 +35,29 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <nav className="text-sm mb-6 text-gray-600">
-        <span>Home</span>
+        <span>{t.nav_home || 'Home'}</span>
         <span className="mx-2">›</span>
         <span>{product.brand?.name}</span>
         <span className="mx-2">›</span>
-        <span className="text-gray-900 font-medium">{product.name}</span>
+        <span className="text-gray-900 font-medium">{displayName}</span>
       </nav>
 
       {/* Product Header */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{product.name}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">{displayName}</h1>
 
       {/* Product Info Section - Now at Top */}
       <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl">
         <div className="flex flex-wrap gap-4 items-center mb-6">
           {/* Coming Soon Badge */}
           <span className="bg-teal-500 text-white text-sm font-semibold px-4 py-2 rounded-md">
-            COMING SOON
+            {t.coming_soon || 'COMING SOON'}
           </span>
 
           {/* Add to Compare */}
           <div className="flex items-center gap-2">
             <input type="checkbox" id="compare" className="w-4 h-4" />
             <label htmlFor="compare" className="text-sm font-medium cursor-pointer">
-              Add to Compare
+              {t.add_to_compare || 'Add to Compare'}
             </label>
           </div>
         </div>
@@ -55,21 +65,21 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
         {/* Product Meta */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-sm">
           <div>
-            <span className="text-gray-600">Brand:</span>
+            <span className="text-gray-600">{t.label_brand || 'Brand'}:</span>
             <span className="ml-2 font-semibold text-gray-900">{product.brand?.name || 'N/A'}</span>
           </div>
           <div>
-            <span className="text-gray-600">Category:</span>
+            <span className="text-gray-600">{t.label_category || 'Category'}:</span>
             <span className="ml-2 font-semibold text-gray-900">{product.category?.name || 'N/A'}</span>
           </div>
           <div>
-            <span className="text-gray-600">Added on:</span>
+            <span className="text-gray-600">{t.label_added_on || 'Added on'}:</span>
             <span className="ml-2 text-gray-700" suppressHydrationWarning>
               {product.created_at ? new Date(product.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
             </span>
           </div>
           <div>
-            <span className="text-gray-600">Last updated:</span>
+            <span className="text-gray-600">{t.label_last_updated || 'Last updated'}:</span>
             <span className="ml-2 text-gray-700" suppressHydrationWarning>
               {product.updated_at ? new Date(product.updated_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
             </span>
@@ -202,10 +212,10 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
       {/* Specifications Table */}
       <div className="mt-12">
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-          <p className="text-sm text-yellow-800">Unofficial specifications</p>
+          <p className="text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Specifications</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">{t.label_specifications || 'Specifications'}</h2>
         <SpecDetails productId={product.id} countryCode={countryCode} />
       </div>
 

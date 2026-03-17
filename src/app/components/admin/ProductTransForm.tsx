@@ -1,384 +1,262 @@
 "use client";
+
 import { useProducts } from "@/hooks/useProducts";
-import { LOCALES } from '@/lib/constants';
-import { Product, ProductTranslation } from '@/lib/types'; // Assuming you have a Product type
-import { useEffect, useState } from 'react';
+import { LOCALES } from "@/lib/constants";
+import { Product } from "@/lib/types";
+import { useEffect, useState } from "react";
 
 interface ProductFormProps {
-    product?: Product; // Make it optional for the create case
+    product?: Product;
 }
 
-// Go server response interface
-interface GoServerTranslationResponse {
-    message: string;
-    translation: ProductTranslation;
-    action: {
-        created: boolean;
-        updated: boolean;
-    };
+interface TranslationItem {
+    locale: string;
+    translated_name: string;
+    start_price?: string;
+    end_price?: string;
 }
-
-// API translation response structure
-interface ApiTranslationData {
-    ID: number;
-    ProductID: number;
-    Locale: string;
-    TranslatedName: string;
-    price: string;
-    CreatedAt: string;
-    UpdatedAt: string;
-}
-
 
 const ProductTransForm = ({ product }: ProductFormProps) => {
+    const { Translation, getProductTranslations, getAProductById } = useProducts();
 
-    const [name, setName] = useState(''); // Don't initialize with product name - use translation data
-    const [price, setPrice] = useState(""); // Don't initialize with product price - use translation data
+    const id = product?.id;
+
+    const [selectedLocale, setSelectedLocale] = useState("bn");
+    const [translations, setTranslations] = useState<TranslationItem[]>([]);
+    const [name, setName] = useState("");
     const [startPrice, setStartPrice] = useState("");
     const [endPrice, setEndPrice] = useState("");
-    const { Translation, getProductTranslations } = useProducts();
-    const id = product && product.id;
-    const [submitStatus, setSubmitStatus] = useState('');
-    const [selectedTranslation, setSelectedTranslation] = useState('');
-    const [translations, setTranslations] = useState<(ProductTranslation | ApiTranslationData)[] | undefined>(product?.translations);
+    const [submitStatus, setSubmitStatus] = useState("");
+    const [translateLoading, setTranslateLoading] = useState(false);
+    const [translateStatus, setTranslateStatus] = useState("");
 
-    // Helper function to populate form fields for a specific language
-    const populateFormForLanguage = (locale: string, translationData?: (ProductTranslation | ApiTranslationData)[]) => {
-        const availableTranslations = translationData || translations;
-
-        // Always clear the form first
-        setName('');
-        setPrice("");
-
-        // If we have translations, try to find one for this locale
-        if (availableTranslations && availableTranslations.length > 0) {
-            // Check if it's API data or ProductTranslation data
-            const item = availableTranslations.find((item: ProductTranslation | ApiTranslationData) => {
-                // Handle both API format (Locale) and ProductTranslation format (locale)
-                const itemLocale = (item as ApiTranslationData).Locale || (item as ProductTranslation).locale;
-                return itemLocale === locale;
-            });
-
-            if (item) {
-                // Handle API format vs ProductTranslation format
-                const apiItem = item as ApiTranslationData;
-                const translationItem = item as ProductTranslation;
-
-                // Set name - try API format first, then ProductTranslation format
-                const translatedName = apiItem.TranslatedName || translationItem.translated_name;
-                setName(translatedName || '');
-
-                // Handle price conversion more carefully
-                let priceValue = 0;
-                const itemPrice = apiItem.price || translationItem.price;
-                if (typeof itemPrice === 'string') {
-                    priceValue = parseFloat(itemPrice) || 0;
-                } else if (typeof itemPrice === 'number') {
-                    priceValue = itemPrice;
-                }
-                setPrice(priceValue.toString());
-            } else {
-                // For 'bn' locale, use original product data as fallback
-                if (locale === 'bn' && product) {
-                    setName(product.name || '');
-                    setPrice(product.price.toString()); // Convert number to string
-                }
-            }
-        } else {
-            // For 'bn' locale, use original product data as fallback even when no translations exist
-            if (locale === 'bn' && product) {
-                setName(product.name || '');
-                setPrice(product.price.toString()); // Convert number to string
-            }
-        }
-    };
-
-    // Handle language switch
-    const handleLanguageSwitch = (locale: string) => {
-        const selectedLang = LOCALES.find((lang) => lang === locale);
-        if (selectedLang) {
-            setSelectedTranslation(locale);
-        }
-
-        populateFormForLanguage(locale);
+    // 🔥 Normalize ANY backend response format safely
+    const normalizeTranslations = (data: any[]): TranslationItem[] => {
+        return data.map((item) => ({
+            locale: item.locale || item.Locale,
+            translated_name:
+                item.translated_name || item.TranslatedName || "",
+            start_price:
+                item.start_price ||
+                item.StartPrice ||
+                "",
+            end_price:
+                item.end_price ||
+                item.EndPrice ||
+                "",
+        }));
     };
 
 
-    // Load translations when product ID is available - HIGH PRIORITY for name and price setting
     const loadTranslations = async () => {
-        if (id) {
-            let nameSet = false;
-            let priceSet = false;
+        if (!id) return;
 
-            try {
+        const result = await getProductTranslations(id, selectedLocale);
 
-                const result = await getProductTranslations(id);
+        if (!result?.success || !result.data) return;
 
-                if (result.success && result.data) {
-                    // result.data is an array of translations
-                    if (Array.isArray(result.data)) {
-                        setTranslations(result.data);
+        console.log("API RESPONSE:", result.data);
 
-                        // HIGH PRIORITY: Find translation for current locale or 'bn' as fallback
-                        const currentTranslation = result.data.find((t: ApiTranslationData) =>
-                            t.Locale === selectedTranslation || t.Locale === 'bn'
-                        );
+        // 🔥 HANDLE SINGLE OBJECT RESPONSE
+        const translation = result.data;
 
-                        if (currentTranslation) {
-                            // Set name from API data
-                            if (currentTranslation.TranslatedName) {
-                                setName(currentTranslation.TranslatedName);
-                                nameSet = true;
-                            }
+        setName(translation.translated_name || "");
+        setStartPrice(translation.start_price || "");
+        setEndPrice(translation.end_price || "");
 
-                            // Set price from API data
-                            if (currentTranslation.price !== undefined && currentTranslation.price !== null) {
-                                let priceValue = 0;
-                                if (typeof currentTranslation.price === 'string') {
-                                    priceValue = parseFloat(currentTranslation.price) || 0;
-                                } else if (typeof currentTranslation.price === 'number') {
-                                    priceValue = currentTranslation.price;
-                                }
-
-                                if (priceValue > 0) {
-                                    setPrice(priceValue.toString());
-                                    priceSet = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch {
-                // Silent error handling - will use fallback options below
-            }
-
-            // FALLBACK OPTIONS: If name or price still not set, use product data
-            if ((!nameSet || !priceSet) && product) {
-                if (!nameSet && product.name) {
-                    setName(product.name);
-                    nameSet = true;
-                }
-
-                // Refine logic to ensure Bengali numeral prices are preserved
-                if (!priceSet && product?.price && !price) {
-                    setPrice(product.price.toString()); // Convert number to string
-                } else if (!priceSet && !price) {
-                    setPrice(''); // Ensure no unnecessary overwriting
-                }
-            }
-
-            // FINAL FALLBACK: If still no name or price, set empty/zero values
-            if (!nameSet) {
-                setName('');
-            }
-            if (!priceSet) {
-                setPrice('0');
-            }
-
-            // Always try to set translations from product props as fallback
-            if (!translations && product?.translations) {
-                setTranslations(product.translations);
-            }
-        }
+        // store as array for button check logic
+        setTranslations([
+            {
+                locale: translation.locale,
+                translated_name: translation.translated_name,
+                start_price: translation.start_price,
+                end_price: translation.end_price,
+            },
+        ]);
     };
-
-    // Select 'bn' translation by default on mount
+    // Load translations when locale changes or product updates
     useEffect(() => {
-        setSelectedTranslation('bn');
-        loadTranslations(); // API data takes priority
-    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Only update translations if we don't already have API data loaded
-    useEffect(() => {
-        if (product?.translations && !translations) {
-            setTranslations(product.translations);
-        }
-    }, [product?.translations, translations]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // Handle language switching - only populate if we have translations loaded
-    useEffect(() => {
-        if (selectedTranslation && translations && translations.length > 0) {
-            const currentTranslation = translations.find((t) => {
-                const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
-                return locale === selectedTranslation;
-            });
-
-            if (currentTranslation && currentTranslation.price) {
-                setPrice(currentTranslation.price); // Preserve Bengali numeral price
-            }
-        }
-    }, [selectedTranslation, translations]); // eslint-disable-line react-hooks/exhaustive-deps
+        loadTranslations();
+    }, [id, selectedLocale, product?.start_price, product?.end_price]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Validation
-        if (!selectedTranslation) {
-            setSubmitStatus('Error: Please select a language');
-            return;
-        }
+        if (!id) return;
 
         const payload = {
-            locale: selectedTranslation, // Go server expects lowercase
-            translated_name: name?.trim() || '', // Go server expects snake_case, trim whitespace safely
-            start_price: startPrice ? startPrice.toString() : null, // Convert to string or null
-            end_price: endPrice ? endPrice.toString() : null, // Convert to string or null
+            locale: selectedLocale,
+            translated_name: name.trim(),
+            start_price: startPrice || null,
+            end_price: endPrice || null,
         };
 
         try {
-            if (!id) {
-                setSubmitStatus('Error: Product ID is undefined');
-                return;
-            }
-
-            // Call the Translation API
             const response = await Translation(payload, id);
 
             if (response.success) {
-                const responseData = response.data as unknown as GoServerTranslationResponse;
-                const actionType = responseData?.action?.created ? 'created' : 'updated';
-                setSubmitStatus(`Translation ${actionType} successfully!`);
-
-                // Update translations state with the new/updated translation
-                if (responseData?.translation) {
-                    setTranslations((prevTranslations: (ProductTranslation | ApiTranslationData)[] | undefined) => {
-                        const updatedTranslations = prevTranslations || [];
-                        const existingIndex = updatedTranslations.findIndex(
-                            (t) => {
-                                const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
-                                return locale === selectedTranslation;
-                            }
-                        );
-
-                        if (existingIndex >= 0) {
-                            // Update existing translation
-                            updatedTranslations[existingIndex] = responseData.translation;
-                            return [...updatedTranslations];
-                        } else {
-                            // Add new translation
-                            return [...updatedTranslations, responseData.translation];
-                        }
-                    });
-                }
-
-            } else {
-                setSubmitStatus('Error submitting form: ' + (response.error || 'Unknown error'));
+                setSubmitStatus("Translation saved successfully");
             }
         } catch (error) {
-            setSubmitStatus('Error submitting form: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            setSubmitStatus("Error saving translation");
         }
     };
 
+    const translationExists = translations.some(
+        (t) => t.locale === selectedLocale
+    );
+
+
+    const handleTranslate = async () => {
+        if (!id) {
+            setTranslateStatus("Product ID not available");
+            return;
+        }
+
+        setTranslateLoading(true);
+        setTranslateStatus("");
+
+        try {
+            // Always fetch the latest product data so we use up-to-date name/prices
+            // even if the user just updated the product without refreshing the page.
+            const productResult = await getAProductById(id);
+            const freshProduct: Product | undefined =
+                productResult?.data as Product | undefined;
+
+            const productName = freshProduct?.name || product?.name;
+            if (!productName) {
+                setTranslateStatus("Product name not available");
+                return;
+            }
+
+            const response = await fetch("/api/openai/translate-product", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    productName,
+                    startPrice: freshProduct?.start_price ?? product?.start_price ?? "",
+                    endPrice: freshProduct?.end_price ?? product?.end_price ?? "",
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setTranslateStatus(`Translation failed: ${data.error}`);
+                return;
+            }
+
+            setName(data.translated_name || "");
+            if (data.start_price) setStartPrice(data.start_price);
+            if (data.end_price) setEndPrice(data.end_price);
+            setTranslateStatus("Translation complete! Review and submit.");
+        } catch (error) {
+            setTranslateStatus(
+                `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+        } finally {
+            setTranslateLoading(false);
+        }
+    };
 
     return (
         <>
             <div className="mb-4">
-                {LOCALES.map((translation) => (
+                {LOCALES.map((locale) => (
                     <button
-                        key={translation}
-                        onClick={() => handleLanguageSwitch(translation)}
-                        className={`px-4 py-2 mr-2 ${selectedTranslation === translation ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                        key={locale}
+                        onClick={() => setSelectedLocale(locale)}
+                        className={`px-4 py-2 mr-2 ${selectedLocale === locale
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200"
                             }`}
                     >
-                        {translation.toUpperCase()}
-                        {translations?.find(t => {
-                            const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
-                            return locale === translation;
-                        }) && (
-                                <span className="ml-1 text-xs">✓</span>
-                            )}
+                        {locale.toUpperCase()}
+                        {translations.find((t) => t.locale === locale) && (
+                            <span className="ml-1 text-xs">✓</span>
+                        )}
                     </button>
                 ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+            >
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                        Translated Product Name ({selectedTranslation.toUpperCase()})
+                    <label className="block text-sm font-bold mb-2">
+                        Translated Product Name ({selectedLocale.toUpperCase()})
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                        id="name"
+                        className="border rounded w-full py-2 px-3"
                         type="text"
-                        placeholder={`Enter product name in ${selectedTranslation.toUpperCase()}`}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
-                    <p className="text-gray-600 text-xs mt-1">
-                        Enter the product name as it should appear in {selectedTranslation.toUpperCase()}
-                    </p>
                 </div>
 
-
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startPrice">
-                        Start Price (Optional)
+                    <label className="block text-sm font-bold mb-2">
+                        Start Price
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                        id="startPrice"
+                        className="border rounded w-full py-2 px-3"
                         type="text"
-                        placeholder="Enter start price"
-                        value={startPrice || ''}
+                        value={startPrice}
                         onChange={(e) => setStartPrice(e.target.value)}
                     />
-                    <p className="text-gray-600 text-xs mt-1">
-                        Enter the starting price (optional).
-                    </p>
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endPrice">
-                        End Price (Optional)
+                    <label className="block text-sm font-bold mb-2">
+                        End Price
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                        id="endPrice"
+                        className="border rounded w-full py-2 px-3"
                         type="text"
-                        placeholder="Enter end price"
-                        value={endPrice || ''}
+                        value={endPrice}
                         onChange={(e) => setEndPrice(e.target.value)}
                     />
-                    <p className="text-gray-600 text-xs mt-1">
-                        Enter the ending price (optional).
-                    </p>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex gap-3 mb-4">
                     <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
                         type="submit"
-                        disabled={!selectedTranslation}
+                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
                     >
-                        {translations?.find(t => {
-                            const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
-                            return locale === selectedTranslation;
-                        })
-                            ? `Update Translation (${selectedTranslation.toUpperCase()})`
-                            : `Create Translation (${selectedTranslation.toUpperCase()})`}
+                        {translationExists
+                            ? `Update (${selectedLocale.toUpperCase()})`
+                            : `Create (${selectedLocale.toUpperCase()})`}
                     </button>
 
-                    {translations?.find(t => {
-                        const locale = (t as ApiTranslationData).Locale || (t as ProductTranslation).locale;
-                        return locale === selectedTranslation;
-                    }) && (
-                            <span className="text-sm text-gray-600">
-                                ✓ Translation exists for {selectedTranslation.toUpperCase()}
-                            </span>
-                        )}
+
+
+                    {selectedLocale === "bn" && (id || product?.name) && (
+                        <button
+                            type="button"
+                            onClick={handleTranslate}
+                            disabled={translateLoading}
+                            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
+                        >
+                            {translateLoading ? "Translating..." : "🤖 Translate with AI"}
+                        </button>
+                    )}
                 </div>
 
-
-
                 {submitStatus && (
-                    <div
-                        className={`p-4 mt-4 text-sm rounded-lg ${submitStatus.includes('successfully')
-                            ? 'text-green-700 bg-green-100'
-                            : 'text-red-700 bg-red-100'
-                            }`}
-                        role="alert"
-                    >
+                    <div className="mt-4 text-sm text-green-600">
                         {submitStatus}
+                    </div>
+                )}
+
+                {translateStatus && (
+                    <div
+                        className={`mt-4 text-sm ${translateStatus.includes("Error") ||
+                            translateStatus.includes("failed")
+                            ? "text-red-600"
+                            : "text-green-600"
+                            }`}
+                    >
+                        {translateStatus}
                     </div>
                 )}
             </form>

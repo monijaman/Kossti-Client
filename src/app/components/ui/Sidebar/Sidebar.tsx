@@ -1,4 +1,5 @@
 import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
+import { useTranslation } from '@/hooks/useLocale';
 import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
 import Categories from './Categories';
@@ -6,8 +7,11 @@ import Categories from './Categories';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarParams) => {
-  const countryCode = (await cookies()).get('country-code')?.value ?? 'en';
+const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode: propCountryCode }: SidebarParams) => {
+  const cookieCode = (await cookies()).get('country-code')?.value;
+  // Props from URL locale take priority over the cookie
+  const countryCode = propCountryCode || cookieCode || 'bn';
+  const t = useTranslation(countryCode);
 
 
   async function fetchCategories(countryCode: string) {
@@ -27,12 +31,12 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
       });
 
       const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
-      const response = await fetch(fullUrl, { next: { revalidate: 300 } }); // Cache categories for 5 minutes
+      const response = await fetch(fullUrl, { cache: 'no-store' });
 
       if (!response.ok) {
         // Try with /api prefix as fallback
         console.log('Trying /wide-categories...');
-        const altResponse = await fetch(`${API_BASE_URL}/wide-categories`);
+        const altResponse = await fetch(`${API_BASE_URL}/wide-categories?locale=${countryCode}`, { cache: 'no-store' });
         if (altResponse.ok) {
           const data = await altResponse.json();
           return data.categories || [];
@@ -58,13 +62,15 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm }: SidebarPa
         categories={categories}
         activeCategory={activeCategory}
         locale={countryCode}
-        clearCategoryText="Clear Category"
+        heading={t.categories_heading || 'Categories'}
+        clearCategoryText={t.clear_Category}
       />
       <BrandsListClient
         selectedBrands={selectedBrands}
         activeCategory={activeCategory}
         searchTerm={searchTerm}
         countryCode={countryCode}
+        brandsHeading={t.brands_heading || 'Brands'}
       />
     </aside>
   );

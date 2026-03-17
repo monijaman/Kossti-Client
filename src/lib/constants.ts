@@ -70,7 +70,8 @@ export const apiEndpoints = {
   deleteBrand: (id: number | string) => `/brands/${id}`,
   getPublicBrands: "/public-brands",
   BrandStatus: (brand_id: number) => `/brand-status/${brand_id}`, //post
-
+  productTranslation: (productId: number, locale: string) =>
+    `products/${productId}/translations?locale=${locale}}`, // get product translation for a locale
   // Specification endpoints
   getSpecificationById: (id: number | string) => `/specifications/${id}`,
   updateSpecification: (id: number | string) => `/specifications/${id}`,

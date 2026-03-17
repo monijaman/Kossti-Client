@@ -6,6 +6,8 @@ import fetchApi from "@/lib/fetchApi";
 import { Product } from "@/lib/types";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 
 interface PageProps {
     params: Promise<{
@@ -25,6 +27,7 @@ const Products = async ({ params }: PageProps) => {
                 method: 'GET',
                 accessToken: (await cookies()).get("accessToken")?.value || "",
                 queryParams: { type: 'public' },
+                next: { revalidate: 0 },
             }
         );
         return response.data as Product;

@@ -5,7 +5,11 @@ import { useBrands } from '@/hooks/useBrands';
 import { Brand, SidebarParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
-const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode, initialBrands }: SidebarParams) => {
+interface BrandsClientProps extends SidebarParams {
+    brandsHeading?: string;
+}
+
+const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryCode, initialBrands, brandsHeading = 'Brands' }: BrandsClientProps) => {
     const { getCategoryRelBrands } = useBrands();
     const [brands, setBrands] = useState<Brand[]>(initialBrands || []);
 
@@ -45,12 +49,13 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
     return (
         brands.length > 0 ? (
             <div>
-                <h2 className="text-lg font-semibold mb-4">Brands</h2>
+                <h2 className="text-lg font-semibold mb-4">{brandsHeading}</h2>
                 <InteractiveBrandFilter
                     dataset={brands}
                     selectedBrands={selectedBrands}
                     activeCategory={categories}
                     searchTerm={searchterm}
+                    countryCode={countryCode}
                 />
             </div>
         ) : null

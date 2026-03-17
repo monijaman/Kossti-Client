@@ -20,6 +20,7 @@ export type SubmitSpecResponse = {
 export interface categoryInt {
   id: number;
   name: string;
+  translated_name?: string; // Bengali (or other locale) name returned by API when locale != 'en'
   category_slug: string;
   slug: string;
   status?: boolean;
@@ -33,6 +34,7 @@ export interface categoryInt {
 export interface Product {
   id: number;
   name: string;
+  translated_name?: string; // Bengali (or other locale) name returned by API when locale != 'en'
   description?: string;
   slug: string;
   review: string;
@@ -72,7 +74,8 @@ export interface ProductTranslation {
   product_id: number;
   locale: string;
   translated_name: string; // Changed from 'name' to 'translated_name' to match Go API
-  price: string; // Changed from number to string to match Go API
+  start_price?: string; // Changed from number to string to match Go API
+  end_price?: string; // Changed from number to string to match Go API
   created_at?: string;
   updated_at?: string;
 }
@@ -178,6 +181,7 @@ export interface Category {
 export interface Brand {
   id: number | null;
   name: string | null;
+  translated_name?: string | null;
   slug?: string;
   status?: boolean;
   total?: number;

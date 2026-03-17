@@ -61,6 +61,8 @@ const Specification = ({ params }: PageProps) => {
 
         await submitSpecificationsKeys(id, specsToSave as any);
 
+        // Refresh specifications to get DB-assigned IDs (needed before saving translations)
+        await fetchSpecifications();
     };
 
     // Fetch the specification keys
