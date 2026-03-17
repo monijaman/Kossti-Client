@@ -104,7 +104,7 @@ const ProductForm = ({ product }: ProductFormProps) => {
             setModel(product.model || '');
             setPrice(product.price || 0);
             setStatus(product.status || false);
-            setPriority(product.priority && product.priority > 0 ? product.priority : 1);
+            setPriority(product.priority != null ? product.priority : 1);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id, product?.priority]); // Watch both ID and priority for updates

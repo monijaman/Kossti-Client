@@ -35,7 +35,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
       search: '',
       sortby: 'priority',
     },
-    next: { revalidate: 60 }, // Cache for 60 seconds
+    next: { revalidate: 10 }, // Cache for 10 seconds
   });
 
   // Handle API errors gracefully
