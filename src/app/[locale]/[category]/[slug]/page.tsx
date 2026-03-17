@@ -1,6 +1,5 @@
 import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
-import ProductPhotosPage from '@/app/components/reviews/ProductPhotos';
 import SearchBox from '@/app/components/Search';
 import { DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
@@ -232,7 +231,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
       </h3>
 
       {/* SEO-Critical Components - Keep Synchronous */}
-      <ProductPhotosPage productId={dataset.id} />
       <ProducDetails product={dataset} countryCode={countryCode} />
 
       {/* Non-Critical Components - Lazy Load */}

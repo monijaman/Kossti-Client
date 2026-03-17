@@ -141,14 +141,6 @@ async function handleTokenAndRedirect(
 
 // Main middleware function
 export async function middleware(request: RequestWithGeo) {
-  // Handle www to non-www redirect
-  const hostname = request.headers.get("host");
-  if (hostname?.startsWith("www.")) {
-    const url = request.nextUrl.clone();
-    url.hostname = hostname.slice(4); // Remove 'www.'
-    return NextResponse.redirect(url, 301);
-  }
-
   const response = NextResponse.next();
 
   const token = request.cookies.get("accessToken")?.value;

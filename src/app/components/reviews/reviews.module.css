@@ -6,26 +6,26 @@
 }
 
 .reviewContent h2 {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #1f2937;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .reviewContent h3 {
-  font-size: 1.125rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #1f2937;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .reviewContent p {
-  margin-bottom: 1rem;
-  text-align: justify;
+  margin-bottom: 0.4rem;
+  text-align: left;
 }
 
 .reviewContent ul {
@@ -58,10 +58,9 @@
 .reviewCard {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: box-shadow 0.2s ease;
 }
 
 .reviewCard:hover {
@@ -198,8 +197,8 @@
 
 /* Pros and Cons Side-by-Side Layout */
 .reviewContent {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* display: grid;
+  grid-template-columns: 1fr 1fr; */
   gap: 2rem;
 }
 
