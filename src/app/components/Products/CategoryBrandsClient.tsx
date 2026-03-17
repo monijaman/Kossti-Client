@@ -5,6 +5,7 @@ import { useState } from "react";
 interface Brand {
     id: number;
     name: string;
+    translated_name?: string;
     slug: string;
     status: number;
 }
@@ -32,7 +33,7 @@ const CategoryBrandsClient = ({ brands, categorySlug, countryCode }: CategoryBra
                         className="brand-card text-center p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all"
                     >
                         <span className="text-sm font-medium text-gray-700 hover:text-blue-600">
-                            {brand.name}
+                            {brand.translated_name || brand.name}
                         </span>
                     </Link>
                 ))}

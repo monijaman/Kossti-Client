@@ -181,6 +181,7 @@ export interface Category {
 export interface Brand {
   id: number | null;
   name: string | null;
+  translated_name?: string | null;
   slug?: string;
   status?: boolean;
   total?: number;
