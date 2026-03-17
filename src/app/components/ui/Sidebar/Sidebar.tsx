@@ -31,12 +31,12 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
       });
 
       const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
-      const response = await fetch(fullUrl, { next: { revalidate: 300 } }); // Cache categories for 5 minutes
+      const response = await fetch(fullUrl, { cache: 'no-store' });
 
       if (!response.ok) {
         // Try with /api prefix as fallback
         console.log('Trying /wide-categories...');
-        const altResponse = await fetch(`${API_BASE_URL}/wide-categories`);
+        const altResponse = await fetch(`${API_BASE_URL}/wide-categories?locale=${countryCode}`, { cache: 'no-store' });
         if (altResponse.ok) {
           const data = await altResponse.json();
           return data.categories || [];
