@@ -30,10 +30,10 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
                     const raw = response.data as any;
                     const brandList: Brand[] =
                         Array.isArray(raw) ? raw :
-                        Array.isArray(raw?.brands) ? raw.brands :
-                        Array.isArray(raw?.data?.brands) ? raw.data.brands :
-                        Array.isArray(raw?.data) ? raw.data :
-                        [];
+                            Array.isArray(raw?.brands) ? raw.brands :
+                                Array.isArray(raw?.data?.brands) ? raw.data.brands :
+                                    Array.isArray(raw?.data) ? raw.data :
+                                        [];
                     setBrands(brandList);
                 } else {
                     setBrands([]);
