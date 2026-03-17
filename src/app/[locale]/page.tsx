@@ -159,7 +159,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         brand: activeBrands,
         priceRange: activePriceRange,
         search: searchTerm,
-        sortby: 'popular',
+        sortby: 'priority',
       },
       next: { revalidate: 60 }, // Cache for 60 seconds
     }),

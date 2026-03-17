@@ -33,7 +33,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
       brand: '',
       priceRange: '',
       search: '',
-      sortby: 'popular',
+      sortby: 'priority',
     },
     next: { revalidate: 60 }, // Cache for 60 seconds
   });

@@ -20,17 +20,17 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   return (
     <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
-      <header className="bg-gray-100 text-white p-4 flex items-center justify-between">
+      <header className="bg-gray-100 text-white p-1 flex items-center justify-between">
         <Link href="/" suppressHydrationWarning>
           <Image
-            src="/kossti.svg"
+            src="/logo.png"
             alt="Kosti"
             style={{
               width: "auto",
-              height: "90px",
+              height: "120px",
             }}
-            width={300}
-            height={90}
+            width={500}
+            height={170}
             className="rounded"
           />
         </Link>
