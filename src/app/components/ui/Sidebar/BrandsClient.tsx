@@ -21,8 +21,15 @@ const BrandsListClient = ({ activeCategory, selectedBrands, searchTerm, countryC
                 });
 
                 if (response.success && response.data) {
-                    const data = response.data as { data?: Brand[] } | Brand[];
-                    const brandList = Array.isArray(data) ? data : (data.data || []);
+                    // API returns: fetchApi wraps as { success, status, data: { brands: [...] } }
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const raw = response.data as any;
+                    const brandList: Brand[] =
+                        Array.isArray(raw) ? raw :
+                        Array.isArray(raw?.brands) ? raw.brands :
+                        Array.isArray(raw?.data?.brands) ? raw.data.brands :
+                        Array.isArray(raw?.data) ? raw.data :
+                        [];
                     setBrands(brandList);
                 } else {
                     setBrands([]);
