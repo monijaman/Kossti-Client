@@ -390,11 +390,17 @@ export const useSpecifications = () => {
         };
       }
 
-      // Transform to simpler payload structure — only send specs with an id and a translated value
+      // Transform to simpler payload structure — only send specs that:
+      // 1. Have a positive id (meaning the specification row has been saved to the DB)
+      // 2. Have a non-empty translated_value
+      // If id === 0 it means the parent specification has not been saved to the DB yet;
+      // the user must save specifications before saving translations.
       const validSpecs = specifications
         .filter(
           (spec) =>
-            spec.id &&
+            spec.id !== undefined &&
+            spec.id !== null &&
+            Number(spec.id) > 0 &&
             spec.locale &&
             spec.translated_value &&
             spec.translated_value.trim() !== "",
@@ -406,10 +412,16 @@ export const useSpecifications = () => {
         }));
 
       if (validSpecs.length === 0) {
-        const totalSkipped = specifications.length;
+        const hasUnsavedSpecs = specifications.some(
+          (spec) => spec.id === 0 || spec.id === null,
+        );
+        const reason = hasUnsavedSpecs
+          ? "Specifications must be saved before translations can be added. Please submit the specification form first, then return here to save translations."
+          : "No translations to save.";
+        console.warn("[submitSpecTranslationValues]", reason);
         return {
           success: false,
-          error: `No specs with translated values to save (${totalSkipped} spec(s) have empty translated_value — run AI translation or fill in values first)`,
+          error: reason,
         };
       }
 

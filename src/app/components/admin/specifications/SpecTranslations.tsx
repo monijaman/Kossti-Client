@@ -93,7 +93,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                 // Find the corresponding specKey to get the specification_key name
                 const specKey = specKeys.find(key => key.id === +item.specification_key_id);
 
-                return {
+                const spec = {
                     id: item.id ?? null,  // Ensure id is either a number or null
                     locale: selectedLocale,
                     specification_key_id: +item.specification_key_id,
@@ -104,7 +104,19 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     // Keep the original English value as a read-only source hint
                     source_value: item.value || '',
                 };
+
+                console.log(`Spec ${item.id} initialized:`, {
+                    id: spec.id,
+                    specification_key_id: spec.specification_key_id,
+                    translated_value: spec.translated_value,
+                    hasTranslation: !!keyValue?.translations?.translated_value,
+                });
+
+                return spec;
             })
+
+            console.log('Total specs to translate:', transSpec.length);
+            console.log('Empty translation count:', transSpec.filter(s => !s.translated_value).length);
 
             setTranSpecifications(transSpec);
         }
@@ -180,7 +192,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
         }
 
         setTranslationLoading(true);
-        setFormStatus('');
+        setFormStatus('⏳ Connecting to AI service to translate specifications...');
 
         try {
             // Prepare specifications for translation, keeping their original indices and key IDs
@@ -190,6 +202,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     return {
                         index: idx,
                         specification_key_id: spec.specification_key_id,
+                        specification_id: spec.id,
                         key: keyObj?.specification_key || 'Unknown',
                         value: spec.value || ''
                     };
@@ -202,6 +215,8 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                 setFormStatus('No specification values to translate');
                 return;
             }
+
+            setFormStatus(`⏳ Translating ${specsWithIndex.length} specifications...`);
 
             // Call server-side API route for translation (avoids browser CORS & keeps API key safe)
             const specsToTranslate = specsWithIndex.map(s => ({ key: s.key, value: s.value }));
@@ -225,9 +240,12 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
             const translatedSpecs = data.translations;
             console.log('translatedSpecs:', translatedSpecs);
+            console.log(`Received ${translatedSpecs.length} translations`);
 
-            // Map translated results back by matching specification_key_id
+            // Map translated results back by matching specification ID directly
             const updatedTranSpecs = [...tranSpecifications];
+            let successCount = 0;
+
             translatedSpecs.forEach((translated: { key: string; value: string; translatedKey?: string; translatedValue?: string }, i: number) => {
                 const original = specsWithIndex[i];
                 if (!original) {
@@ -235,25 +253,36 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     return;
                 }
 
-                // Find the corresponding item in tranSpecifications by specification_key_id
-                const targetIdx = updatedTranSpecs.findIndex(spec => spec.specification_key_id === original.specification_key_id);
+                // Find the corresponding item in tranSpecifications - use a more direct matching approach
+                // First try to match by specification ID
+                let targetIdx = -1;
+                if (original.specification_id) {
+                    targetIdx = updatedTranSpecs.findIndex(spec => spec.id === original.specification_id);
+                }
 
-                console.log(`Mapping translated[${i}] (key: ${translated.key}, value: ${translated.translatedValue}) to specification_key_id ${original.specification_key_id}, found at index ${targetIdx}`);
+                // If no match by ID, try matching by specification_key_id
+                if (targetIdx === -1) {
+                    targetIdx = updatedTranSpecs.findIndex(spec => spec.specification_key_id === original.specification_key_id);
+                }
+
+                console.log(`Mapping translated[${i}] (spec_id: ${original.specification_id}, key: "${translated.key}", value: "${translated.translatedValue}") to specification_key_id ${original.specification_key_id}, found at index ${targetIdx}`);
 
                 if (targetIdx !== -1) {
                     updatedTranSpecs[targetIdx] = {
                         ...updatedTranSpecs[targetIdx],
-                        translated_key: translated.translatedKey || updatedTranSpecs[targetIdx].translated_key,
-                        translated_value: translated.translatedValue || updatedTranSpecs[targetIdx].translated_value,
+                        translated_key: translated.translatedKey ?? updatedTranSpecs[targetIdx].translated_key ?? '',
+                        translated_value: translated.translatedValue ?? updatedTranSpecs[targetIdx].translated_value ?? '',
                     };
                     console.log(`Updated tranSpecifications[${targetIdx}]:`, updatedTranSpecs[targetIdx]);
+                    successCount++;
                 } else {
-                    console.error(`No tranSpecification found with specification_key_id ${original.specification_key_id}`);
+                    console.error(`No tranSpecification found with specification_id ${original.specification_id} or specification_key_id ${original.specification_key_id}`);
+                    console.warn(`Available specs in tranSpecifications:`, updatedTranSpecs.map((s, idx) => ({ idx, id: s.id, specification_key_id: s.specification_key_id })));
                 }
             });
 
             setTranSpecifications(updatedTranSpecs);
-            setFormStatus('✅ Specifications translated to Bangla successfully');
+            setFormStatus(`✅ Successfully translated ${successCount}/${translatedSpecs.length} specifications to Bangla`);
         } catch (error) {
             console.error('Error translating to Bangla:', error);
             setFormStatus(`❌ Failed to translate: ${error instanceof Error ? error.message : 'Unknown error'}`);
