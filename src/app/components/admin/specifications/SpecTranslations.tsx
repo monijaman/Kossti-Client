@@ -90,7 +90,21 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const fetchAndProcess = useCallback(async () => {
         const fetchedSpecifications = await tranlatedSpecification();
 
+        console.log('========== API Response from spec_translation ==========');
         console.log('Fetched Specifications:', fetchedSpecifications);
+        console.log('Number of translations returned:', fetchedSpecifications?.length);
+
+        // Log each translation to see structure
+        fetchedSpecifications?.forEach((trans: transDataSet, idx: number) => {
+            console.log(`Translation ${idx}:`, {
+                specification_key_id: trans?.specification_key_id,
+                translations: trans?.translations,
+                translated_value: trans?.translations?.translated_value,
+                translated_key: trans?.translations?.translated_key,
+            });
+        });
+        console.log('=========================================================');
+
         if (specifications && specKeys) {
             const transSpec = specifications.map((item) => {
                 const keyValue = fetchedSpecifications?.find((trans: transDataSet) => {
@@ -109,22 +123,20 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     translated_key: keyValue?.translations?.translated_key || specKey?.specification_key || '',
                     // translated_value should be the translated value for this specification (empty if none)
                     translated_value: keyValue?.translations?.translated_value || '',
-                    // Keep the original English value as a read-only source hint
-                    source_value: item.value || '',
                 };
 
-                console.log(`Spec ${item.id} initialized:`, {
-                    id: spec.id,
-                    specification_key_id: spec.specification_key_id,
-                    translated_value: spec.translated_value,
-                    hasTranslation: !!keyValue?.translations?.translated_value,
-                });
+                if (spec.translated_value) {
+                    console.log(`✓ Spec ${item.id} HAS Bengali translation: "${spec.translated_value}"`);
+                } else {
+                    console.log(`✗ Spec ${item.id} has NO translation (showing placeholder: "${item.value}")`);
+                }
 
                 return spec;
             })
 
             console.log('Total specs to translate:', transSpec.length);
-            console.log('Empty translation count:', transSpec.filter(s => !s.translated_value).length);
+            console.log('Specs with translations:', transSpec.filter(s => s.translated_value).length);
+            console.log('Specs without translations:', transSpec.filter(s => !s.translated_value).length);
 
             setTranSpecifications(transSpec);
         }
@@ -334,39 +346,42 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
 
 
             {tranSpecifications && tranSpecifications.map((spec, index) => (
-                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-                    <div>
-
-                        <Select
-                            name="specification_id"
-                            value={specKeys && specKeys
-                                .map((key) => ({
-                                    value: key.id, // Keeping this as a number
+                <div key={index} className="space-y-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Specification Key</label>
+                            <Select
+                                name="specification_id"
+                                value={specKeys && specKeys
+                                    .map((key) => ({
+                                        value: key.id, // Keeping this as a number
+                                        label: key.specification_key,
+                                    }))
+                                    .find((option) => option.value === spec.specification_key_id) || null}  // Comparing numbers
+                                // onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
+                                options={specKeys && specKeys.map((key) => ({
+                                    value: key.id,  // Keeping id as a number
                                     label: key.specification_key,
-                                }))
-                                .find((option) => option.value === spec.specification_key_id) || null}  // Comparing numbers
-                            // onChange={(selectedOption) => handleSelectChange(index, selectedOption)}  // Passing the full selectedOption object
-                            options={specKeys && specKeys.map((key) => ({
-                                value: key.id,  // Keeping id as a number
-                                label: key.specification_key,
-                            }))}
-                            className="mt-1 block w-full"
-                            placeholder="Search and select a specification key"
-                            isSearchable
-                            required
-                            isDisabled={true} // Make the Select unchangeable
-                        />
-                    </div>
+                                }))}
+                                className="mt-1 block w-full"
+                                placeholder="Search and select a specification key"
+                                isSearchable
+                                required
+                                isDisabled={true} // Make the Select unchangeable
+                            />
+                        </div>
 
-                    <div>
-                        <input
-                            type="text"
-                            name="translated_value"
-                            value={spec.translated_value || ''}
-                            onChange={(event) => handleInputChange(index, event)}
-                            placeholder={spec.source_value || 'Enter translated value'}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
+                        <div>
+                            <label className="block text-sm font-semibold text-blue-600 mb-1">Bangla ({selectedLocale.toUpperCase()})</label>
+                            <input
+                                type="text"
+                                name="translated_value"
+                                value={spec.translated_value || ''}
+                                onChange={(event) => handleInputChange(index, event)}
+                                placeholder={`Enter Bengali translation`}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            />
+                        </div>
                     </div>
                 </div>
             ))}

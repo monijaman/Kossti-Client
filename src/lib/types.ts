@@ -231,7 +231,6 @@ export interface SpecKeyTranslation {
   translated_key: string;
   TranslatedKey?: string;
   translated_value?: string;
-  source_value?: string;
 }
 
 export interface SpecificationKey {
