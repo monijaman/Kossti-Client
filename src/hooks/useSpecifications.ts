@@ -132,9 +132,9 @@ export const useSpecifications = () => {
       const apiEndpoint = `spec_translation/${id}?locale=${locale}`;
       const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
-      // Retry configuration
+      // Retry configuration with longer timeouts
       const maxRetries = 3;
-      const retryDelay = 1000; // 1 second
+      const retryDelay = 2000; // 2 seconds
       let lastError;
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -144,19 +144,39 @@ export const useSpecifications = () => {
           );
 
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+          // Longer timeout for slower connections/busy servers
+          const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
           const response = await fetch(fullUrl, {
             cache: "no-store",
             signal: controller.signal,
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
           });
 
           clearTimeout(timeoutId);
 
           if (!response.ok) {
             const errorText = await response.text();
+            const statusCode = response.status;
+
+            // Log detailed error info
+            console.error(
+              `HTTP ${statusCode} Error:`,
+              errorText || response.statusText,
+            );
+
+            // Don't retry on client errors (4xx)
+            if (statusCode >= 400 && statusCode < 500) {
+              throw new Error(
+                `HTTP ${statusCode}: ${errorText || response.statusText}`,
+              );
+            }
+
             throw new Error(
-              `HTTP ${response.status}: ${errorText || response.statusText}`,
+              `HTTP ${statusCode}: ${errorText || response.statusText}`,
             );
           }
 
@@ -164,55 +184,83 @@ export const useSpecifications = () => {
 
           if (dataset?.dataset) {
             console.log(
-              `Successfully fetched spec translations for product ${id}, locale: ${locale}`,
+              `✓ Successfully fetched spec translations for product ${id}, locale: ${locale}`,
               dataset.dataset,
             );
             return dataset.dataset;
           }
 
-          console.warn("Unexpected response format - missing dataset field");
+          console.warn(
+            "⚠️ Unexpected response format - missing dataset field",
+            dataset,
+          );
           return [];
         } catch (error) {
           lastError = error;
           const errorMessage =
             error instanceof Error ? error.message : String(error);
 
+          console.error(
+            `[Attempt ${attempt}/${maxRetries}] Error: ${errorMessage}`,
+            error,
+          );
+
           if (
             errorMessage.includes("NetworkError") ||
-            errorMessage.includes("Failed to fetch")
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("Network request failed")
           ) {
             console.warn(
-              `[Attempt ${attempt}/${maxRetries}] Network error: ${errorMessage}`,
+              `[Attempt ${attempt}/${maxRetries}] Network error (recoverable): ${errorMessage}`,
             );
 
             if (attempt < maxRetries) {
               const waitTime = retryDelay * attempt; // Exponential backoff
               console.log(
-                `Retrying in ${waitTime}ms... (attempt ${attempt + 1}/${maxRetries})`,
+                `⏳ Retrying in ${waitTime}ms... (attempt ${attempt + 1}/${maxRetries})`,
               );
               await new Promise((resolve) => setTimeout(resolve, waitTime));
               continue;
             }
-          } else if (errorMessage.includes("AbortError")) {
-            console.error(`[Attempt ${attempt}/${maxRetries}] Request timeout`);
+          } else if (
+            errorMessage.includes("AbortError") ||
+            errorMessage.includes("timeout")
+          ) {
+            console.warn(`[Attempt ${attempt}/${maxRetries}] Request timeout`);
 
             if (attempt < maxRetries) {
-              console.log(`Retrying after timeout...`);
+              console.log(`⏳ Retrying after timeout...`);
               await new Promise((resolve) =>
                 setTimeout(resolve, retryDelay * attempt),
               );
               continue;
             }
+          } else if (errorMessage.includes("HTTP 5")) {
+            // Retry on server errors (5xx)
+            console.warn(
+              `[Attempt ${attempt}/${maxRetries}] Server error (retryable): ${errorMessage}`,
+            );
+
+            if (attempt < maxRetries) {
+              const waitTime = retryDelay * attempt;
+              console.log(
+                `⏳ Retrying in ${waitTime}ms... (attempt ${attempt + 1}/${maxRetries})`,
+              );
+              await new Promise((resolve) => setTimeout(resolve, waitTime));
+              continue;
+            }
           } else {
-            // For non-network errors, don't retry
-            console.error(`Error fetching spec translations: ${errorMessage}`);
+            // For client errors, don't retry
+            console.error(
+              `❌ Error fetching spec translations: ${errorMessage}`,
+            );
             break;
           }
         }
       }
 
       console.error(
-        `Failed to fetch spec translations after ${maxRetries} attempts:`,
+        `❌ Failed to fetch spec translations after ${maxRetries} attempts:`,
         lastError,
       );
       return [];
@@ -418,6 +466,7 @@ export const useSpecifications = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: { specifications: specs },
+        signal: 120000, // 120 second timeout for bulk operations with many specs
       });
       const duration = Date.now() - start;
       console.log(`Bulk upsert completed in ${duration}ms`, response);
