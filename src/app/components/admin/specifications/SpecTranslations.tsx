@@ -48,6 +48,10 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     const tranlatedSpecification = async () => {
         if (productId) {
             try {
+                setTranslationLoading(true);
+                console.log(
+                    `Fetching spec translations for product ${productId}, locale: ${selectedLocale}`
+                );
                 const response = await getSpecTranslations(productId, selectedLocale);
 
                 console.log('getSpecTranslations response:', response); // Debug log
@@ -62,18 +66,21 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     dataset = response;
                 } else {
                     console.warn('No data received from getSpecTranslations');
+                    setFormStatus('⚠️ No translations found for this product and locale');
                     dataset = [];
                 }
 
-                // Set translated specifications - removed this since we don't need the state
-                // setTranslatedSpecifications(dataset);
                 console.log('Processed dataset:', dataset);
 
                 // Return the dataset so we can use it immediately
                 return dataset;
             } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
                 console.error('Error in tranlatedSpecification:', error);
+                setFormStatus(`❌ Error fetching translations: ${errorMessage}`);
                 return [];
+            } finally {
+                setTranslationLoading(false);
             }
         }
         return [];

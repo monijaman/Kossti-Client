@@ -82,105 +82,110 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold">Admin Dashboard</h2>
+        <div className="min-h-screen bg-gray-50">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Admin Dashboard</h2>
                 <button
                     onClick={handleLogout}
                     disabled={isLoading}
-                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors touch-friendly"
                 >
                     {isLoading ? 'Logging out...' : 'Logout'}
                 </button>
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white shadow rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-2">Total Reviews</h3>
-                    <p className="text-4xl font-bold">{reviewStats.total}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-10">
+                <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Total Reviews</h3>
+                    <p className="text-3xl sm:text-4xl font-bold text-blue-600">{reviewStats.total}</p>
                 </div>
-                <div className="bg-white shadow rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-2">Pending Reviews</h3>
-                    <p className="text-4xl font-bold">{reviewStats.pending}</p>
+                <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Pending Reviews</h3>
+                    <p className="text-3xl sm:text-4xl font-bold text-yellow-600">{reviewStats.pending}</p>
                 </div>
-                <div className="bg-white shadow rounded-lg p-6">
-                    <h3 className="text-xl font-semibold mb-2">Approved Reviews</h3>
-                    <p className="text-4xl font-bold">{reviewStats.approved}</p>
+                <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-700">Approved Reviews</h3>
+                    <p className="text-3xl sm:text-4xl font-bold text-green-600">{reviewStats.approved}</p>
                 </div>
             </div>
 
             {/* Latest Reviews Section */}
-            <div className="bg-white shadow rounded-lg p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-semibold">Latest Reviews</h3>
+            <div className="bg-white shadow rounded-lg p-4 sm:p-6 mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4">
+                    <h3 className="text-lg sm:text-2xl font-semibold text-gray-800">Latest Reviews</h3>
                     <button
                         onClick={() => router.push('/admin/reviews')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors touch-friendly"
                     >
                         View All Reviews
                     </button>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white">
+
+                {/* Responsive Table Wrapper */}
+                <div className="overflow-x-auto -mx-4 sm:mx-0">
+                    <table className="w-full bg-white text-sm sm:text-base">
                         <thead>
-                            <tr className="bg-gray-50">
-                                <th className="py-3 px-4 border-b text-left">User</th>
-                                <th className="py-3 px-4 border-b text-left">Review</th>
-                                <th className="py-3 px-4 border-b text-center">Rating</th>
-                                <th className="py-3 px-4 border-b text-center">Status</th>
-                                <th className="py-3 px-4 border-b text-center">Actions</th>
+                            <tr className="bg-gray-50 border-b">
+                                <th className="py-2 sm:py-3 px-3 sm:px-4 text-left font-semibold text-gray-700">User</th>
+                                <th className="py-2 sm:py-3 px-3 sm:px-4 text-left font-semibold text-gray-700 hidden sm:table-cell">Review</th>
+                                <th className="py-2 sm:py-3 px-3 sm:px-4 text-center font-semibold text-gray-700">Rating</th>
+                                <th className="py-2 sm:py-3 px-3 sm:px-4 text-center font-semibold text-gray-700">Status</th>
+                                <th className="py-2 sm:py-3 px-3 sm:px-4 text-center font-semibold text-gray-700">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {latestReviews.length > 0 ? (
                                 latestReviews.map((review) => (
-                                    <tr key={review.id} className="hover:bg-gray-50">
-                                        <td className="py-3 px-4 border-b">
-                                            <div className="font-medium">{review.user}</div>
+                                    <tr key={review.id} className="border-b hover:bg-gray-50 transition-colors">
+                                        <td className="py-2 sm:py-3 px-3 sm:px-4">
+                                            <div className="font-medium text-gray-900 truncate">{review.user}</div>
                                             {review.product_name && (
-                                                <div className="text-sm text-gray-500">{review.product_name}</div>
+                                                <div className="text-xs sm:text-sm text-gray-500 truncate">{review.product_name}</div>
                                             )}
                                         </td>
-                                        <td className="py-3 px-4 border-b">
-                                            <div className="max-w-md truncate">
+                                        <td className="py-2 sm:py-3 px-3 sm:px-4 hidden sm:table-cell">
+                                            <div className="max-w-xs truncate text-gray-700">
                                                 {review.review}
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 border-b text-center">
-                                            <div className="flex justify-center">
+                                        <td className="py-2 sm:py-3 px-3 sm:px-4 text-center">
+                                            <div className="flex justify-center gap-0.5">
                                                 {[...Array(5)].map((_, i) => (
                                                     <span
                                                         key={i}
-                                                        className={i < review.rating ? 'text-yellow-400' : 'text-gray-300'}
+                                                        className={i < review.rating ? 'text-yellow-400 text-sm sm:text-base' : 'text-gray-300 text-sm sm:text-base'}
                                                     >
                                                         ⭐
                                                     </span>
                                                 ))}
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4 border-b text-center">
+                                        <td className="py-2 sm:py-3 px-3 sm:px-4 text-center">
                                             <span
-                                                className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${review.status === 'Approved'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : review.status === 'Pending'
-                                                            ? 'bg-yellow-100 text-yellow-800'
-                                                            : 'bg-red-100 text-red-800'
+                                                className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${review.status === 'Approved'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : review.status === 'Pending'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : 'bg-red-100 text-red-800'
                                                     }`}
                                             >
                                                 {review.status}
                                             </span>
                                         </td>
-                                        <td className="py-3 px-4 border-b text-center">
-                                            <button
-                                                onClick={() => router.push(`/admin/reviews/${review.id}`)}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm mr-2"
-                                            >
-                                                View
-                                            </button>
-                                            <button className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">
-                                                Edit
-                                            </button>
+                                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-center">
+                                            <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 justify-center">
+                                                <button
+                                                    onClick={() => router.push(`/admin/reviews/${review.id}`)}
+                                                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm transition-colors"
+                                                >
+                                                    View
+                                                </button>
+                                                <button className="bg-gray-500 hover:bg-gray-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm transition-colors">
+                                                    Edit
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -197,7 +202,7 @@ const Dashboard = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 <div className="bg-white shadow rounded-lg p-6">
                     <h3 className="text-xl font-semibold mb-4">Review Distribution</h3>
                     <div className="space-y-3">

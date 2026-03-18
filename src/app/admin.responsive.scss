@@ -1,0 +1,146 @@
+/* Admin Panel Mobile Responsive Styles */
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-form {
+        padding: 0.75rem;
+    }
+
+    .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-table {
+        font-size: 0.875rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .button-group button {
+        width: 100%;
+    }
+
+    .modal {
+        width: 91.666667%;
+        max-height: 24rem;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-form {
+        padding: 0.5rem;
+    }
+
+    .form-grid {
+        gap: 0.5rem;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+
+    /* Extra small screens */
+    .admin-form {
+        @apply p-2;
+    }
+
+    .form-grid {
+        @apply gap-2;
+    }
+
+    /* Stack form elements */
+    .form-row {
+        @apply flex-col;
+    }
+
+    .form-col {
+        @apply w-full;
+    }
+
+    /* Responsive tables - convert to card layout on very small screens */
+    .table-responsive {
+        @apply block overflow-x-auto;
+    }
+
+    .admin-table {
+        @apply w-full;
+    }
+
+    /* Better spacing for inputs */
+    input,
+    select,
+    textarea {
+        @apply text-base;
+        /* Prevents autofocus zoom on iOS */
+    }
+
+    /* Adjust header padding */
+    header {
+        @apply p-2;
+    }
+
+    /* Make buttons full width */
+    .btn-primary,
+    .btn-secondary {
+        @apply w-full;
+    }
+
+    /* Padding adjustments */
+    .p-safe {
+        @apply p-2 sm: p-3 md:p-4;
+    }
+}
+
+/* Utility classes for mobile-first layouts */
+.responsive-grid {
+    @apply grid grid-cols-1 sm: grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6;
+}
+
+.responsive-grid-2 {
+    @apply grid grid-cols-1 sm: grid-cols-2 gap-3 sm:gap-4 md:gap-6;
+}
+
+.mobile-hide {
+    @apply hidden sm: block;
+}
+
+.mobile-show {
+    @apply sm: hidden;
+}
+
+.touch-friendly {
+    @apply p-3 min-h-12;
+}
+
+/* Scrollable container for tables on mobile */
+.table-scrollable {
+    @apply overflow-x-auto -mx-4 sm: mx-0;
+}
+
+.table-scrollable table {
+    @apply min-w-full;
+}

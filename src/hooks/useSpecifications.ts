@@ -120,30 +120,104 @@ export const useSpecifications = () => {
   const getSpecTranslations = useCallback(
     async (id: number, locale: string) => {
       if (!id) {
-        return;
+        console.warn("Product ID is required");
+        return [];
       }
 
       if (!apiUrl) {
         console.error("API URL is not defined in environment variables");
-        return;
+        return [];
       }
 
       const apiEndpoint = `spec_translation/${id}?locale=${locale}`;
       const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
-      try {
-        const response = await fetch(fullUrl, {
-          cache: "no-store",
-        });
-        const dataset = await response.json();
+      // Retry configuration
+      const maxRetries = 3;
+      const retryDelay = 1000; // 1 second
+      let lastError;
 
-        return dataset.dataset; // Go API returns data in 'dataset' field
-      } catch (error) {
-        console.error("Error fetching spec translations:", error);
-        return [];
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(
+            `[Attempt ${attempt}/${maxRetries}] Fetching spec translations from: ${fullUrl}`,
+          );
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+          const response = await fetch(fullUrl, {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              `HTTP ${response.status}: ${errorText || response.statusText}`,
+            );
+          }
+
+          const dataset = await response.json();
+
+          if (dataset?.dataset) {
+            console.log(
+              `Successfully fetched spec translations for product ${id}, locale: ${locale}`,
+              dataset.dataset,
+            );
+            return dataset.dataset;
+          }
+
+          console.warn("Unexpected response format - missing dataset field");
+          return [];
+        } catch (error) {
+          lastError = error;
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+
+          if (
+            errorMessage.includes("NetworkError") ||
+            errorMessage.includes("Failed to fetch")
+          ) {
+            console.warn(
+              `[Attempt ${attempt}/${maxRetries}] Network error: ${errorMessage}`,
+            );
+
+            if (attempt < maxRetries) {
+              const waitTime = retryDelay * attempt; // Exponential backoff
+              console.log(
+                `Retrying in ${waitTime}ms... (attempt ${attempt + 1}/${maxRetries})`,
+              );
+              await new Promise((resolve) => setTimeout(resolve, waitTime));
+              continue;
+            }
+          } else if (errorMessage.includes("AbortError")) {
+            console.error(`[Attempt ${attempt}/${maxRetries}] Request timeout`);
+
+            if (attempt < maxRetries) {
+              console.log(`Retrying after timeout...`);
+              await new Promise((resolve) =>
+                setTimeout(resolve, retryDelay * attempt),
+              );
+              continue;
+            }
+          } else {
+            // For non-network errors, don't retry
+            console.error(`Error fetching spec translations: ${errorMessage}`);
+            break;
+          }
+        }
       }
+
+      console.error(
+        `Failed to fetch spec translations after ${maxRetries} attempts:`,
+        lastError,
+      );
+      return [];
     },
-    [],
+    [apiUrl],
   );
 
   // Submit form
