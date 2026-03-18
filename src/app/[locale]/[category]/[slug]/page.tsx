@@ -224,11 +224,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
       />
 
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-      <h3 className="font-semibold py-4">
-        {dataset.translated_name || dataset.name}
-        {dataset.brand && ` - ${dataset.brand_slug}`}
-        {dataset.category && ` - ${dataset.category.name}`}
-      </h3>
 
       {/* SEO-Critical Components - Keep Synchronous */}
       <ProducDetails product={dataset} countryCode={countryCode} />

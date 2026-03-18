@@ -51,7 +51,7 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
       </div>
 
       <footer className="bg-gray-800 text-white p-4 text-center">
-        <p>&copy; 2026 Kosti. All rights reserved.</p>
+        <p>&copy; 2026 Kosti. All rights reserved by <Link href={"https://portfolio-three-theta-ephz9pve2c.vercel.app/"}>Monir</Link> </p>
       </footer>
     </div>
   );
