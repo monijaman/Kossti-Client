@@ -20,7 +20,7 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   return (
     <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
-      <header className="bg-gray-100 text-white p-1 flex items-center justify-between">
+      <header className="bg-gray-100 text-white pl-2 pr-4 py-1 flex items-center justify-between">
         <Link href="/" suppressHydrationWarning>
           <Image
             src="/logo.png"

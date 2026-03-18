@@ -14,7 +14,9 @@ export const useBrands = () => {
   // get all categories
   const getBrands = async () => {
     try {
-      const dataset = await fetchApi(apiEndpoints.getBrands);
+      const dataset = await fetchApi(apiEndpoints.getBrands, {
+        next: { revalidate: 600, tags: ["brands"] },
+      });
 
       // Type the response to handle Go server structure
       const responseData = dataset.data as {
@@ -34,7 +36,9 @@ export const useBrands = () => {
 
   const getPublicBrands = async () => {
     try {
-      const dataset = await fetchApi(apiEndpoints.getPublicBrands);
+      const dataset = await fetchApi(apiEndpoints.getPublicBrands, {
+        next: { revalidate: 600, tags: ["brands"] },
+      });
 
       return {
         success: true,
@@ -60,7 +64,7 @@ export const useBrands = () => {
     try {
       // Fetch data from the API using fetchApi
       const dataset = await fetchApi(
-        `${apiEndpoints.getBrands}?${queryParams.toString()}`
+        `${apiEndpoints.getBrands}?${queryParams.toString()}`,
       );
 
       // Return success with parsed body (dataset.data contains parsed JSON)
@@ -121,7 +125,7 @@ export const useBrands = () => {
   // Submit form
   const submitBrands = async (
     categoryId: number,
-    brands: Brand[]
+    brands: Brand[],
   ): Promise<unknown> => {
     try {
       // Prepare the payload
@@ -171,9 +175,15 @@ export const useBrands = () => {
     }
 
     try {
-      // Fetch data from the API using fetchApi
+      // Fetch data from the API using fetchApi with 10-minute cache
       const dataset = await fetchApi(
-        `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`
+        `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`,
+        {
+          next: {
+            revalidate: 600,
+            tags: [`brands-${category_slug || category_id}`],
+          },
+        },
       );
 
       // Return success with data
@@ -230,7 +240,7 @@ export const useBrands = () => {
 
     try {
       const dataset = await fetchApi(
-        `${apiEndpoints.getBrands}?${queryParams.toString()}`
+        `${apiEndpoints.getBrands}?${queryParams.toString()}`,
       );
 
       return {
