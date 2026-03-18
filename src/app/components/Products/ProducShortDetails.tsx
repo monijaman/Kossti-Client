@@ -12,12 +12,9 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
 
-  // Prefer translated_name (from API) then translations array, then English name
+  // Prefer translated_name (from API) - no need for translations array
   const displayName =
     product.translated_name ||
-    (countryCode !== 'en'
-      ? product.translations?.find((t) => t.locale === countryCode)?.translated_name
-      : undefined) ||
     product.name;
 
   // Get translated brand name
@@ -66,8 +63,8 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
               <span
                 key={i}
                 className={`text-lg transition-transform group-hover:scale-110 ${product.average_rating && i < Math.round(product.average_rating)
-                    ? 'text-amber-400 drop-shadow-sm'
-                    : 'text-gray-200'
+                  ? 'text-amber-400 drop-shadow-sm'
+                  : 'text-gray-200'
                   }`}
               >
                 ★

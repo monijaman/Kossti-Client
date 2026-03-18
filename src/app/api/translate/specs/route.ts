@@ -15,7 +15,7 @@ interface TranslationResult {
 
 async function translateChunk(
   client: OpenAI,
-  specs: SpecInput[]
+  specs: SpecInput[],
 ): Promise<TranslationResult[]> {
   const specsText = specs
     .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
@@ -60,7 +60,7 @@ Rules:
   // Check if response was truncated
   if (response.choices[0].finish_reason === "length") {
     console.warn(
-      "[translate/specs] Response was truncated by token limit, will retry with smaller batch"
+      "[translate/specs] Response was truncated by token limit, will retry with smaller batch",
     );
     throw new Error("TRUNCATED");
   }
@@ -92,33 +92,30 @@ export async function POST(request: NextRequest) {
     if (!specifications || !specifications.length) {
       return NextResponse.json(
         { error: "No specifications provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const apiKey =
-      process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       console.error("[translate/specs] No OpenAI API key found");
       return NextResponse.json(
         { error: "OpenAI API key not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const client = new OpenAI({ apiKey });
 
     console.log(
-      `[translate/specs] Translating ${specifications.length} specifications to Bengali`
+      `[translate/specs] Translating ${specifications.length} specifications to Bengali`,
     );
 
     // Process in chunks to avoid token limit truncation
     const allTranslations: TranslationResult[] = [];
     const chunkSize =
-      specifications.length <= CHUNK_SIZE
-        ? specifications.length
-        : CHUNK_SIZE;
+      specifications.length <= CHUNK_SIZE ? specifications.length : CHUNK_SIZE;
 
     for (let i = 0; i < specifications.length; i += chunkSize) {
       const chunk = specifications.slice(i, i + chunkSize);
@@ -126,7 +123,7 @@ export async function POST(request: NextRequest) {
       const totalChunks = Math.ceil(specifications.length / chunkSize);
 
       console.log(
-        `[translate/specs] Processing chunk ${chunkNum}/${totalChunks} (${chunk.length} specs)`
+        `[translate/specs] Processing chunk ${chunkNum}/${totalChunks} (${chunk.length} specs)`,
       );
 
       try {
@@ -134,12 +131,9 @@ export async function POST(request: NextRequest) {
         allTranslations.push(...translations);
       } catch (chunkError) {
         // If truncated, retry with smaller sub-chunks
-        if (
-          chunkError instanceof Error &&
-          chunkError.message === "TRUNCATED"
-        ) {
+        if (chunkError instanceof Error && chunkError.message === "TRUNCATED") {
           console.log(
-            `[translate/specs] Retrying chunk ${chunkNum} with smaller sub-chunks`
+            `[translate/specs] Retrying chunk ${chunkNum} with smaller sub-chunks`,
           );
           const halfSize = Math.ceil(chunk.length / 2);
           for (let j = 0; j < chunk.length; j += halfSize) {
@@ -157,12 +151,11 @@ export async function POST(request: NextRequest) {
     const translatedSpecs = specifications.map((spec, index) => ({
       ...spec,
       translatedKey: allTranslations[index]?.translatedKey || spec.key,
-      translatedValue:
-        allTranslations[index]?.translatedValue || spec.value,
+      translatedValue: allTranslations[index]?.translatedValue || spec.value,
     }));
 
     console.log(
-      `[translate/specs] Successfully translated ${translatedSpecs.length} specifications`
+      `[translate/specs] Successfully translated ${translatedSpecs.length} specifications`,
     );
 
     return NextResponse.json({
@@ -184,17 +177,16 @@ export async function POST(request: NextRequest) {
           error:
             "OpenAI API key is invalid or expired. Please update your API key.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     if (errorMessage.includes("429")) {
       return NextResponse.json(
         {
-          error:
-            "OpenAI rate limit exceeded. Please try again in a moment.",
+          error: "OpenAI rate limit exceeded. Please try again in a moment.",
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -203,13 +195,13 @@ export async function POST(request: NextRequest) {
         {
           error: "OpenAI API quota exceeded. Please check your billing.",
         },
-        { status: 402 }
+        { status: 402 },
       );
     }
 
     return NextResponse.json(
       { error: `Translation failed: ${errorMessage}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

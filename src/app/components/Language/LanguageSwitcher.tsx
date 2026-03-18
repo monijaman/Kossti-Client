@@ -1,11 +1,9 @@
 "use client";
 import { DEFAULT_LOCALE, LOCALES } from '@/lib/constants';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const LanguageSwitcher = () => {
     const [locale, setLocale] = useState<string>(DEFAULT_LOCALE); // Default locale
-    const router = useRouter();
 
     // Load the locale from local storage or cookies when the component mounts
     useEffect(() => {
@@ -20,19 +18,10 @@ const LanguageSwitcher = () => {
             if (countryCookie) {
                 const activeLocale = countryCookie.toLowerCase();
 
-
                 // Set locale in localStorage, update state, and set cookie
                 localStorage.setItem('locale', activeLocale);
                 setLocale(activeLocale);
-                document.cookie = `locale-preference=${activeLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`; // Set cookie with path for the entire site
-
-
-                // Use a slight delay to allow the server to read the cookie
-                setTimeout(() => {
-                    router.refresh();
-                }, 100); // Delay by 100ms
-
-
+                document.cookie = `locale-preference=${activeLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
             }
         } else {
             setLocale(storedLocale); // Use the stored locale if available
@@ -48,7 +37,8 @@ const LanguageSwitcher = () => {
         // Update the cookie (use the same name that middleware expects)
         document.cookie = `locale-preference=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
 
-        // Use window.location to manage the URL dynamically
+        // Use window.location.href instead of router.push for a full page reload
+        // This ensures middleware re-reads the cookie and updates locale properly
         const currentUrl = window.location.pathname;
         const pathSegments = currentUrl.split("/");
 
@@ -63,7 +53,8 @@ const LanguageSwitcher = () => {
         }
 
         const newPath = pathSegments.join("/");
-        router.push(newPath); // Navigate to the updated path
+        // Full page reload to ensure middleware processes the new locale cookie
+        window.location.href = newPath;
     };
 
     return (

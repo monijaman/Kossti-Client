@@ -4,12 +4,12 @@ import OpenAI from "openai";
 const getOpenAIClient = () => {
   const apiKey =
     typeof window !== "undefined"
-      ? process.env.NEXT_PUBLIC_OPENAI_API_KEY || ""
-      : process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+      ? process.env.OPENAI_API_KEY || ""
+      : process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     throw new Error(
-      "OpenAI API key not found. Please add NEXT_PUBLIC_OPENAI_API_KEY to your .env.local file",
+      "OpenAI API key not found. Please add OPENAI_API_KEY to your .env.local file",
     );
   }
 

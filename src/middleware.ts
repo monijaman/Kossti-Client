@@ -67,11 +67,13 @@ function getPreferredLocale(req: RequestWithGeo): string {
     country?.toLowerCase() === "bangladesh" ||
     acceptLanguage.includes("bn")
   ) {
+    console.log("User detected from Bangladesh, using Bengali locale");
     return "bn";
   }
 
-  // Default to Bangla if we can't detect location (assuming most users are from Bangladesh)
-  return "bn";
+  // Smart default: Use English for users outside Bangladesh
+  console.log("User detected outside Bangladesh, using English locale");
+  return "en";
 }
 
 function internationalization(req: RequestWithGeo, res: NextResponse) {
