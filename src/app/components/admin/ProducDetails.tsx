@@ -59,12 +59,14 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
                 <td className="py-4 px-6 space-x-2">
                   <Link
                     href={`reviews/${product.id}`}
+                    target='_blank'
                     className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded"
                   >
                     Review
                   </Link>
                   <Link
                     href={`products/${product.id}`}
+                    target='_blank'
                     className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded"
                   >
                     View
@@ -77,6 +79,7 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
                   </Link>
                   <Link
                     href={`specifications/${product.id}`}
+                    target='_blank'
                     className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-3 py-1 rounded"
                   >
                     Specs

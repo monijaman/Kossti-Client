@@ -1,23 +1,5 @@
-import OpenAI from "openai";
-
-// Initialize OpenAI client - API key comes from environment
-const getOpenAIClient = () => {
-  const apiKey =
-    typeof window !== "undefined"
-      ? process.env.OPENAI_API_KEY || ""
-      : process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "OpenAI API key not found. Please add OPENAI_API_KEY to your .env.local file",
-    );
-  }
-
-  return new OpenAI({
-    apiKey,
-    dangerouslyAllowBrowser: true, // Allow browser usage (for development/demo)
-  });
-};
+// Note: OpenAI client is now instantiated on the server side via API route
+// Client-side code calls /api/ai/generate-review instead of directly using OpenAI
 
 export type ReviewStyle =
   | "aesops-fable" // Storytelling with parables and morals
@@ -2328,43 +2310,39 @@ RULES FOR AESOP'S FABLE REVIEWS:
     }
   };
 
-  const systemPrompt = getSystemPrompt();
-
   const userPrompt = customPrompt
     ? `Write the complete HTML review for the ${productName}${productCategory ? ` (${productCategory})` : ""}. Write every section in full — no outlines, no placeholders, no summaries. Fill in all sections with real content now.\n\nADDITIONAL CONTEXT: ${customPrompt}`
     : `Write the complete HTML review for the ${productName}${productCategory ? ` (${productCategory})` : ""}. Write every section in full with real sentences — no outlines, no placeholders, no summaries. Every section must have fully written paragraphs and list items.`;
 
   try {
-    const client = getOpenAIClient();
-
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-
-      max_tokens: 16000,
-      temperature: 0.75,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
+    // Call the server-side API route
+    const response = await fetch("/api/ai/generate-review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productName,
+        productCategory,
+        customPrompt,
+        style,
+      }),
     });
 
-    // Extract text from response
-    if (response.choices[0].message.content) {
-      let content = response.choices[0].message.content;
-
-      // Remove markdown code blocks if present
-      content = content.replace(/```html\n?/g, "").replace(/```\n?/g, "");
-
-      return content;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.details || errorData.error || "Failed to generate review",
+      );
     }
 
-    throw new Error("Unexpected response format from OpenAI");
+    const data = await response.json();
+
+    if (data.success && data.data) {
+      return data.data;
+    }
+
+    throw new Error("Unexpected response format from API");
   } catch (error) {
     console.error("Error generating AI review:", error);
     throw error;
@@ -2412,32 +2390,31 @@ STRICT RULES — follow every rule exactly:
 ${englishText}`;
 
   try {
-    const client = getOpenAIClient();
-
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 16000,
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
+    // Call the server-side API route
+    const response = await fetch("/api/ai/translate-bengali", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: englishText,
+      }),
     });
 
-    if (response.choices[0].message.content) {
-      let content = response.choices[0].message.content;
-      // Remove markdown code blocks if present
-      content = content.replace(/```html\n?/g, "").replace(/```\n?/g, "");
-      return content;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.details || errorData.error || "Failed to translate text",
+      );
     }
 
-    throw new Error("Unexpected response format from OpenAI");
+    const data = await response.json();
+
+    if (data.success && data.data) {
+      return data.data;
+    }
+
+    throw new Error("Unexpected response format from API");
   } catch (error) {
     console.error("Error translating to Bengali:", error);
     throw error;
@@ -2478,96 +2455,34 @@ export interface AIComment {
 export async function generateProductComments(
   productName: string,
 ): Promise<AIComment[]> {
-  const client = getOpenAIClient();
-
-  const prompt = `Generate 25 to 40 realistic product comments/reviews for: "${productName}"
-
-Each comment should include:
-1. A realistic username (first name or nickname)
-2. A location (city, country)
-3. A genuine-sounding comment (1-3 sentences, max 150 chars)
-4. A source URL from one of these platforms: https://www.amazon.com, https://www.reddit.com, https://www.facebook.com, https://www.trustpilot.com, https://www.youtube.com, https://www.productreview.com.au
-
-The comments should be:
-- Varied in sentiment (positive, neutral, some critical)
-- Realistic and authentic sounding
-- About different aspects of the product
-- Include specific details (not generic praise)
-
-Return ONLY a valid JSON array with this structure:
-[
-  {
-    "username": "John",
-    "location": "New York, USA",
-    "comment": "Great quality, arrived fast. Exactly what I needed.",
-    "sourceUrl": "https://www.amazon.com"
-  },
-  {
-    "username": "Sarah",
-    "location": "London, UK",
-    "comment": "Good product but shipping took longer than expected.",
-    "sourceUrl": "https://www.reddit.com"
-  },
-  {
-    "username": "Mike",
-    "location": "Toronto, Canada",
-    "comment": "Love it! Recommended to all my friends.",
-    "sourceUrl": "https://www.facebook.com"
-  }
-]
-
-IMPORTANT: Return ONLY valid JSON array, nothing else.`;
-
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 3000,
-      temperature: 0.8,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a data generator that creates realistic product comments. Use only the base URLs provided (amazon.com, reddit.com, facebook.com, trustpilot.com, youtube.com, productreview.com.au). Return ONLY valid JSON, no markdown, no explanations.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    // Call the server-side API route
+    const response = await fetch("/api/ai/generate-comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productName,
+      }),
     });
 
-    if (!response.choices[0].message.content) {
-      throw new Error("No response from OpenAI");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.details || errorData.error || "Failed to generate comments",
+      );
     }
 
-    let content = response.choices[0].message.content.trim();
+    const data = await response.json();
 
-    // Remove markdown code blocks if present
-    content = content
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    // Parse JSON response
-    let comments: AIComment[] = JSON.parse(content);
-
-    if (!Array.isArray(comments) || comments.length === 0) {
-      throw new Error("Invalid comments format");
+    if (data.success && Array.isArray(data.data)) {
+      return data.data;
     }
 
-    // Post-process: Validate URLs - keep only valid ones, empty out invalid ones
-    comments = comments.map((comment) => {
-      // Check if URL is valid (starts with http/https)
-      if (comment.sourceUrl && !comment.sourceUrl.startsWith("http")) {
-        // Invalid URL, set to empty
-        comment.sourceUrl = "";
-      }
-      return comment;
-    });
-
-    return comments;
+    throw new Error("Unexpected response format from API");
   } catch (error) {
-    console.error("Error generating comments:", error);
+    console.error("Error generating product comments:", error);
     throw error;
   }
 }
@@ -2584,80 +2499,43 @@ export async function generateProductSpecifications(
     throw new Error("Product name and specification keys are required");
   }
 
-  const client = getOpenAIClient();
-
-  const prompt = `Generate realistic specifications for the product: "${productName}"
-
-Based on these specification categories: ${specKeys.join(", ")}
-
-For each category, provide a real value that would be typical for this type of product. Be specific and accurate.
-
-Return ONLY a valid JSON object with specification keys as properties and their values as strings:
-{
-  "Display Size": "6.5 inches",
-  "Battery Capacity": "5000 mAh",
-  "Processor": "Qualcomm Snapdragon 8 Gen 2",
-  "RAM": "8GB",
-  "Storage": "128GB",
-  "Camera": "64MP main + 12MP ultra-wide",
-  "Operating System": "Android 13",
-  "Weight": "180 grams"
-}
-
-IMPORTANT: 
-- Return ONLY valid, verified data only. 
-- get verified data only. keep empty if anything not found
-- Use the exact specification key names provided
-- Values should be realistic and specific, not generic
-- Values should be strings`;
-
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 2000,
-      temperature: 0.6,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    // Call the server-side API route
+    const response = await fetch("/api/ai/generate-specifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productName,
+        specKeys,
+      }),
     });
 
-    if (!response.choices[0].message.content) {
-      throw new Error("No response from OpenAI");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.details ||
+          errorData.error ||
+          "Failed to generate specifications",
+      );
     }
 
-    let content = response.choices[0].message.content.trim();
+    const data = await response.json();
 
-    // Remove markdown code blocks if present
-    content = content
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    // Parse JSON response
-    const specs: Record<string, string> = JSON.parse(content);
-
-    if (typeof specs !== "object" || specs === null) {
-      throw new Error("Invalid specifications format");
+    if (data.success && typeof data.data === "object") {
+      return data.data;
     }
 
-    return specs;
+    throw new Error("Unexpected response format from API");
   } catch (error) {
-    console.error("Error generating specifications:", error);
+    console.error("Error generating product specifications:", error);
     throw error;
   }
 }
 
 /**
- * Translate specification values to Bengali
- * Takes an array of specification objects and returns them with Bengali translations
+ * Translate specification values to Bengali via server API
  */
 export async function translateSpecificationsToBengali(
   specifications: Array<{ key: string; value: string }>,
@@ -2673,157 +2551,72 @@ export async function translateSpecificationsToBengali(
     throw new Error("No specifications to translate");
   }
 
-  const client = getOpenAIClient();
-
-  // Create a formatted list of specifications to translate
-  const specsText = specifications
-    .map((spec, index) => `${index + 1}. ${spec.key}: ${spec.value}`)
-    .join("\n");
-
-  const prompt = `Translate these product specifications from English to Bengali. Keep the format and structure intact.
-
-English specifications:
-${specsText}
-
-Return ONLY a valid JSON array where each object has the translated key and value.
-Format: [{"translatedKey": "translated key name", "translatedValue": "translated value"}, ...]
-
-IMPORTANT: 
-- Return ONLY valid JSON array
-- Translate both the specification key names and their values
-- Maintain technical accuracy for specs like dimensions, capacity, etc.
-- Keep the same number of items as input`;
-
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 2000,
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a translator specializing in technical product specifications. Translate from English to Bengali accurately.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const response = await fetch("/api/ai/translate-specifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        specifications,
+      }),
     });
 
-    if (!response.choices[0].message.content) {
-      throw new Error("No response from OpenAI");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.details ||
+          errorData.error ||
+          "Failed to translate specifications",
+      );
     }
 
-    let content = response.choices[0].message.content.trim();
+    const data = await response.json();
 
-    // Remove markdown code blocks if present
-    content = content
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    // Parse JSON response
-    const translations: Array<{
-      translatedKey: string;
-      translatedValue: string;
-    }> = JSON.parse(content);
-
-    if (
-      !Array.isArray(translations) ||
-      translations.length !== specifications.length
-    ) {
-      throw new Error("Invalid translations format or length mismatch");
+    if (data.success && Array.isArray(data.data)) {
+      return data.data;
     }
 
-    // Attach translations to original specifications
-    const translatedSpecs = specifications.map((spec, index) => ({
-      ...spec,
-      translatedKey: translations[index]?.translatedKey || spec.key,
-      translatedValue: translations[index]?.translatedValue || spec.value,
-    }));
-
-    return translatedSpecs;
+    throw new Error("Unexpected response format from API");
   } catch (error) {
     console.error("Error translating specifications to Bengali:", error);
-    // Return original specs with empty translations if translation fails
-    return specifications.map((spec) => ({
-      ...spec,
-      translatedKey: spec.key,
-      translatedValue: spec.value,
-    }));
+    // Return specifications without translation if translation fails
+    return specifications;
   }
 }
 
 /**
- * Translate product comments to Bengali
- * Takes an array of English comments and returns them with Bengali translations
+ * Translate product comments to Bengali via server API
  */
 export async function translateCommentsTobengali(
   comments: AIComment[],
 ): Promise<AIComment[]> {
-  const client = getOpenAIClient();
-
-  const commentTexts = comments.map((c) => c.comment).join("\n---\n");
-
-  const prompt = `Translate these English product comments to Bengali. Keep the translation natural and authentic.
-
-English comments:
-${commentTexts}
-
-Return ONLY a valid JSON array where each object has the translated Bengali comment text.
-Format: ["Bengali comment 1", "Bengali comment 2", ...]
-
-IMPORTANT: Return ONLY valid JSON array of strings, nothing else.`;
+  if (!comments.length) {
+    return comments;
+  }
 
   try {
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 3000,
-      temperature: 0.7,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a translator. Translate product comments to Bengali. Return ONLY valid JSON array of strings.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const response = await fetch("/api/ai/translate-comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        comments,
+      }),
     });
 
-    if (!response.choices[0].message.content) {
-      throw new Error("No response from OpenAI");
+    if (!response.ok) {
+      throw new Error("Failed to translate comments");
     }
 
-    let content = response.choices[0].message.content.trim();
+    const data = await response.json();
 
-    // Remove markdown code blocks if present
-    content = content
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-
-    // Parse JSON response
-    const bengaliTranslations: string[] = JSON.parse(content);
-
-    if (
-      !Array.isArray(bengaliTranslations) ||
-      bengaliTranslations.length === 0
-    ) {
-      throw new Error("Invalid translations format");
+    if (data.success && Array.isArray(data.data)) {
+      return data.data;
     }
 
-    // Attach Bengali translations to comments
-    const translatedComments = comments.map((comment, index) => ({
-      ...comment,
-      commentBn: bengaliTranslations[index] || comment.comment,
-    }));
-
-    return translatedComments;
+    return comments;
   } catch (error) {
     console.error("Error translating comments to Bengali:", error);
     // Return comments without Bengali translation if translation fails

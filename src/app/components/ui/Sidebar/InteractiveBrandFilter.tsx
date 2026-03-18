@@ -62,24 +62,26 @@ const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm, countryCo
     return (
         <>
             <div className="mb-4">
-                {dataset && dataset.map((brand: Brand) => (
-                    <div
-                        key={brand.id}
-                        className={`flex items-center mb-2 p-2 rounded-md cursor-pointer 
+                {dataset && dataset
+                    .filter((brand: Brand) => brand.total && brand.total > 0)
+                    .map((brand: Brand) => (
+                        <div
+                            key={brand.id}
+                            className={`flex items-center mb-2 p-2 rounded-md cursor-pointer 
                         ${selected.includes(brand.slug || '') ? 'bg-gray-300 text-gray-800' : 'bg-white text-gray-700'}
                         hover:bg-gray-200 transition duration-300`}
-                        onClick={() => handleBrandChange(!selected.includes(brand.slug ?? ''), brand.slug ?? '')}
-                    >
-                        {/* Circle with a more subtle background color when selected */}
-                        <div
-                            className={`w-5 h-5 rounded-full ${selected.includes(brand.slug || '') ? 'bg-gray-300' : 'border-2 border-gray-400'}`}
+                            onClick={() => handleBrandChange(!selected.includes(brand.slug ?? ''), brand.slug ?? '')}
+                        >
+                            {/* Circle with a more subtle background color when selected */}
+                            <div
+                                className={`w-5 h-5 rounded-full ${selected.includes(brand.slug || '') ? 'bg-gray-300' : 'border-2 border-gray-400'}`}
 
-                        />
-                        <span className="ml-2">{brand.translated_name || brand.name || 'Unknown Brand'} ({brand.total})</span>
-                    </div>
+                            />
+                            <span className="ml-2">{brand.translated_name || brand.name || 'Unknown Brand'} ({brand.total})</span>
+                        </div>
 
 
-                ))}
+                    ))}
             </div>
 
             <Link href={`/${countryCode}`} className="text-blue-500 hover:underline mb-4 block">
