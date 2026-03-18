@@ -2,8 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import KOSSTI Design System */
+@import "@/styles/design-system.css";
+
 /* Import Quill styles */
-@import "quill/dist/quill.snow.css";
+@import "react-quill-new/dist/quill.snow.css";
 
 /* Custom ReactQuill wrapper styles */
 .react-quill-wrapper {

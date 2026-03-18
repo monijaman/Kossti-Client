@@ -1,7 +1,6 @@
 // src/app/products/page.tsx
 import MainLayout from '@/app/components/layout/MainLayout';
 import Pagination from '@/app/components/Pagination/index';
-import CategoryBrands from '@/app/components/Products/CategoryBrands';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
@@ -223,10 +222,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
 
-      <Suspense fallback={<CategoryBrandsSkeleton />}>
-        <CategoryBrands categorySlug={activeCategory} countryCode={countryCode} />
-      </Suspense>
-
       <ProductReview products={products} countryCode={countryCode} />
 
       <Suspense fallback={<PopularProductsSkeleton />}>
@@ -236,23 +231,13 @@ const Page = async ({ searchParams, params }: PageProps) => {
       <Pagination
         currentPage={page}
         totalPages={totalPages}
+        countryCode={countryCode}
       />
     </MainLayout>
   );
 };
 
 // Loading skeletons (memoized for better performance)
-const CategoryBrandsSkeleton = () => (
-  <div className="category-brands-section my-6 animate-pulse" aria-label="Loading brands">
-    <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-      {Array.from({ length: 8 }, (_, i) => (
-        <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
-      ))}
-    </div>
-  </div>
-);
-
 const PopularProductsSkeleton = () => (
   <div className="my-8 animate-pulse" aria-label="Loading popular products">
     <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>

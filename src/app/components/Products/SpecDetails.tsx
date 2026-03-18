@@ -59,21 +59,40 @@ const SpecDetails = ({ productId, countryCode = DEFAULT_LOCALE }: PopularProduct
   return (
     <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
       {dataset && dataset.length > 0 ? (
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full divide-y divide-gray-200">
           <tbody className="divide-y divide-gray-200">
-            {dataset.map((spec, index) => (
-              <tr
-                key={spec.specification_key_id}
-                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}
-              >
-                <td className="py-4 px-6 text-sm font-semibold text-gray-700 w-1/3">
-                  {spec.translated_key}
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-900">
-                  {spec.translated_value}
-                </td>
-              </tr>
-            ))}
+            {Array.from({ length: Math.ceil(dataset.length / 2) }).map((_, rowIndex) => {
+              const leftSpec = dataset[rowIndex * 2];
+              const rightSpec = dataset[rowIndex * 2 + 1];
+              return (
+                <tr key={rowIndex} className="divide-x divide-gray-200">
+                  <td className="py-4 px-6 w-1/2 bg-white hover:bg-blue-50 transition-colors">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-sm font-semibold text-gray-700">
+                        {leftSpec.translated_key}
+                      </span>
+                      <span className="text-sm text-gray-900 text-right">
+                        {leftSpec.translated_value}
+                      </span>
+                    </div>
+                  </td>
+                  {rightSpec ? (
+                    <td className="py-4 px-6 w-1/2 bg-gray-50 hover:bg-blue-50 transition-colors">
+                      <div className="flex justify-between items-center gap-4">
+                        <span className="text-sm font-semibold text-gray-700">
+                          {rightSpec.translated_key}
+                        </span>
+                        <span className="text-sm text-gray-900 text-right">
+                          {rightSpec.translated_value}
+                        </span>
+                      </div>
+                    </td>
+                  ) : (
+                    <td className="py-4 px-6 w-1/2 bg-gray-50"></td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       ) : (

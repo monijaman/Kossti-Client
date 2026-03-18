@@ -83,36 +83,45 @@ const ReviewForm = ({ params }: PageProps) => {
                 const data = transResponse.data as Record<string, unknown>;
                 const translationsArray: Array<Record<string, unknown>> = [];
 
+                // First, add the English translation from baseResponse
+                if (baseResponse?.success && baseResponse?.data) {
+                    const baseData = baseResponse.data as Record<string, unknown>;
+                    const baseReviews = baseData['reviews'];
+                    if (baseReviews && Array.isArray(baseReviews) && baseReviews.length > 0) {
+                        const baseReviewItem = baseReviews[0] as Record<string, unknown>;
+                        const reviewData = baseReviewItem['review'] as Record<string, unknown>;
+
+                        translationsArray.push({
+                            id: reviewData['id'],
+                            product_review_id: reviewData['id'],
+                            locale: 'en',
+                            rating: reviewData['rating'] ?? 0,
+                            review: reviewData['reviews'] ?? reviewData['review'],
+                            additional_details: reviewData['additional_details'] ?? [],
+                            created_at: reviewData['created_at'],
+                            updated_at: reviewData['updated_at'],
+                        });
+                    }
+                }
+
+                // Now add the Bangla translation from transResponse
+                // When ?locale=bn is specified, the API returns: { reviews: [{ review: {...} }] }
                 const maybeReviews = data['reviews'];
                 if (maybeReviews && Array.isArray(maybeReviews) && maybeReviews.length > 0) {
                     const firstReviewItem = maybeReviews[0] as Record<string, unknown>;
                     const reviewData = firstReviewItem['review'] as Record<string, unknown>;
 
-                    // Add the base review as English translation
-                    translationsArray.push({
-                        id: reviewData['id'],
-                        product_review_id: reviewData['id'],
-                        locale: 'en',
-                        rating: reviewData['rating'] ?? 0,
-                        review: reviewData['reviews'] ?? reviewData['review'],
-                        additional_details: reviewData['additional_details'] ?? [],
-                        created_at: reviewData['created_at'],
-                        updated_at: reviewData['updated_at'],
-                    });
-
-                    // Add translation if present
-                    const translationVal = firstReviewItem['translation'];
-                    if (translationVal && typeof translationVal === 'object') {
-                        const t = translationVal as Record<string, unknown>;
+                    if (reviewData) {
+                        // The API returns Bengali translation directly in the reviews field when ?locale=bn
                         translationsArray.push({
-                            id: t['id'],
-                            product_review_id: t['product_review_id'],
-                            locale: t['locale'],
-                            rating: t['rating'] ?? reviewData['rating'] ?? 0,
-                            review: t['translated_review'],
-                            additional_details: t['additional_details'] ?? [],
-                            created_at: t['created_at'],
-                            updated_at: t['updated_at'],
+                            id: reviewData['id'],
+                            product_review_id: reviewData['product_id'],
+                            locale: 'bn',
+                            rating: reviewData['rating'] ?? 0,
+                            review: reviewData['reviews'] as string, // This contains the Bengali translation
+                            additional_details: reviewData['additional_details'] ?? [],
+                            created_at: reviewData['created_at'],
+                            updated_at: reviewData['updated_at'],
                         });
                     }
                 }
@@ -661,8 +670,8 @@ const ReviewForm = ({ params }: PageProps) => {
                             <button
                                 onClick={() => setActiveStyleTab('entertainment')}
                                 className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'entertainment'
-                                        ? 'border-b-2 border-blue-500 text-blue-600'
-                                        : 'text-gray-600 hover:text-gray-800'
+                                    ? 'border-b-2 border-blue-500 text-blue-600'
+                                    : 'text-gray-600 hover:text-gray-800'
                                     }`}
                             >
                                 🎭 Entertainment
@@ -670,8 +679,8 @@ const ReviewForm = ({ params }: PageProps) => {
                             <button
                                 onClick={() => setActiveStyleTab('tech')}
                                 className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'tech'
-                                        ? 'border-b-2 border-blue-500 text-blue-600'
-                                        : 'text-gray-600 hover:text-gray-800'
+                                    ? 'border-b-2 border-blue-500 text-blue-600'
+                                    : 'text-gray-600 hover:text-gray-800'
                                     }`}
                             >
                                 💻 Tech & Products
@@ -679,8 +688,8 @@ const ReviewForm = ({ params }: PageProps) => {
                             <button
                                 onClick={() => setActiveStyleTab('automotive')}
                                 className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'automotive'
-                                        ? 'border-b-2 border-blue-500 text-blue-600'
-                                        : 'text-gray-600 hover:text-gray-800'
+                                    ? 'border-b-2 border-blue-500 text-blue-600'
+                                    : 'text-gray-600 hover:text-gray-800'
                                     }`}
                             >
                                 🚗 Automotive

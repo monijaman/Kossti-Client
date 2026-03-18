@@ -41,6 +41,8 @@ export interface Product {
   price: number;
   start_price?: number;
   end_price?: number;
+
+  average_rating?: number; // Average rating from reviews
   category_id?: number;
   brand_id?: number;
   category_slug?: string;
@@ -61,6 +63,7 @@ export interface Product {
     id: number;
     name: string;
     slug: string;
+    translated_name?: string;
   };
 
   photo?: string;

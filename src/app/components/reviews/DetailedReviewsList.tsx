@@ -9,7 +9,7 @@ interface DetailedReviewsListProps {
 const DetailedReviewsList = ({ reviews, productId }: DetailedReviewsListProps) => {
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900">Detailed Reviews</h3>
+            <h3 className="font-display text-xl font-bold text-gray-900 tracking-tight">Detailed Reviews</h3>
             {reviews.map((review, index) => (
                 <div key={review.id || index} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">

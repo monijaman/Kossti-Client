@@ -49,7 +49,7 @@ const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
             'header',
             'bold', 'italic', 'underline', 'strike',
             'color', 'background',
-            'list', 'bullet',
+            'list',
             'align',
             'link', 'image',
             ...(formats || [])

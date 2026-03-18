@@ -86,7 +86,7 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
         </nav>
 
         {/* Product Header */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">{displayName}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">{countryCode === 'bn' && product.translated_name ? product.translated_name : displayName}</h1>
 
         {/* Product Info Section - Now at Top */}
 
@@ -211,21 +211,26 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
 
         {/* Reviews Section - Shows all reviews with ratings and details */}
 
-        {/* Specifications Table */}
-        <div className="mt-12">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-            <p className="text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
+        {/* Two Column Layout for Specifications and Reviews */}
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Reviews Section */}
+          <div className="lg:col-span-2">
+            <ProductReviewsSection productId={product.id} countryCode={countryCode} />
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t.label_specifications || 'Specifications'}</h2>
-          <SpecDetails productId={product.id} countryCode={countryCode} />
+          {/* Specifications Table */}
+          <div className="lg:col-span-3">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <p className="text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
+            </div>
+
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t.label_specifications || 'Specifications'}</h2>
+            <SpecDetails productId={product.id} countryCode={countryCode} />
+          </div>
         </div>
 
       </div>
 
-      <div className="w-full px-4">
-        <ProductReviewsSection productId={product.id} countryCode={countryCode} />
-      </div>
     </>
   );
 };

@@ -9,11 +9,11 @@ const Breadcrumbs: React.FC = () => {
     const t = useTranslation(locale);
 
     return (
-        <nav className="bg-gray-200 px-4 py-1 border-t-1 border-gray-800">
+        <nav className="bg-kossti-cream px-4 py-2 border-t-2 border-kossti-tan">
             <ol className="flex space-x-2">
-                <li><Link href={`/${locale}`} className="text-blue-600 hover:underline">{t.nav_home || 'Home'}</Link></li>
-                <li>&gt;</li>
-                <li className="text-gray-600">Current Page</li>
+                <li><Link href={`/${locale}`} className="text-kossti-dark hover:text-kossti-brown font-medium transition-colors">{t.nav_home || 'Home'}</Link></li>
+                <li className="text-kossti-tan">&gt;</li>
+                <li className="text-kossti-brown">Current Page</li>
             </ol>
         </nav>
     );

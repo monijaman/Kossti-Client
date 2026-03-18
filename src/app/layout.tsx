@@ -1,10 +1,15 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Poppins } from 'next/font/google';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
+const poppins = Poppins({
+  weight: ['400', '500', '600', '700', '800', '900'],
+  subsets: ['latin'],
+  variable: '--font-poppins',
+})
 
 export const metadata: Metadata = {
   title: 'Kossti - Honest Product Reviews & Comparisons',
@@ -24,7 +29,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{
+      // @ts-ignore
+      '--font-poppins': poppins.style.fontFamily
+    } as React.CSSProperties}>
       <body className={inter.className}>
         <ClientProvider>
           {children}

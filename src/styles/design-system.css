@@ -1,0 +1,138 @@
+/* KOSSTI Design System - Color-based utilities */
+
+/* Primary Button */
+.btn-primary {
+  @apply bg-kossti-dark hover:bg-kossti-dark-light text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+.btn-primary-outline {
+  @apply border-2 border-kossti-dark text-kossti-dark hover:bg-kossti-dark hover:text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  @apply bg-kossti-brown hover:bg-kossti-brown-light text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+/* Accent Button */
+.btn-accent {
+  @apply bg-kossti-tan hover:bg-kossti-tan-light text-kossti-dark font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+/* Cards & Containers */
+.card {
+  @apply bg-white border border-kossti-cream rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200;
+}
+
+.card-header {
+  @apply bg-kossti-cream border-b border-kossti-tan px-6 py-4;
+}
+
+.card-footer {
+  @apply bg-kossti-cream-light border-t border-kossti-tan px-6 py-4;
+}
+
+/* Headers */
+.header-main {
+  @apply text-kossti-dark font-bold;
+}
+
+.header-h1 {
+  @apply text-3xl font-bold text-kossti-dark mb-4;
+}
+
+.header-h2 {
+  @apply text-2xl font-bold text-kossti-dark mb-3;
+}
+
+.header-h3 {
+  @apply text-xl font-bold text-kossti-brown mb-2;
+}
+
+/* Text Styles */
+.text-primary {
+  @apply text-kossti-dark;
+}
+
+.text-secondary {
+  @apply text-kossti-brown;
+}
+
+.text-accent {
+  @apply text-kossti-gold;
+}
+
+.text-muted {
+  @apply text-gray-600;
+}
+
+/* Background Sections */
+.section-primary {
+  @apply bg-kossti-cream-light;
+}
+
+.section-secondary {
+  @apply bg-kossti-cream;
+}
+
+.section-accent {
+  @apply bg-kossti-tan-light;
+}
+
+/* Badges & Labels */
+.badge-primary {
+  @apply inline-block bg-kossti-dark text-white text-xs font-semibold px-3 py-1 rounded-full;
+}
+
+.badge-secondary {
+  @apply inline-block bg-kossti-brown text-white text-xs font-semibold px-3 py-1 rounded-full;
+}
+
+.badge-accent {
+  @apply inline-block bg-kossti-gold text-kossti-dark text-xs font-semibold px-3 py-1 rounded-full;
+}
+
+/* Links */
+.link-primary {
+  @apply text-kossti-dark hover:text-kossti-brown underline transition-colors duration-200;
+}
+
+.link-nav {
+  @apply text-kossti-dark hover:text-kossti-brown font-medium transition-colors duration-200;
+}
+
+/* Input Fields */
+.input-kossti {
+  @apply border border-kossti-tan focus:border-kossti-brown focus:ring-2 focus:ring-kossti-tan-light outline-none transition-all duration-200;
+}
+
+/* Dividers */
+.divider-primary {
+  @apply border-t-2 border-kossti-dark;
+}
+
+.divider-secondary {
+  @apply border-t border-kossti-tan;
+}
+
+/* Alerts & Notifications */
+.alert-success {
+  @apply bg-kossti-cream border-l-4 border-kossti-gold text-kossti-dark p-4 rounded;
+}
+
+.alert-warning {
+  @apply bg-kossti-tan-light border-l-4 border-kossti-brown text-kossti-dark p-4 rounded;
+}
+
+.alert-info {
+  @apply bg-kossti-tan border-l-4 border-kossti-dark text-kossti-dark p-4 rounded;
+}
+
+/* Hover Effects */
+.hover-lift {
+  @apply hover:shadow-lg hover:scale-105 transition-all duration-200;
+}
+
+.hover-accent {
+  @apply hover:text-kossti-gold transition-colors duration-200;
+}

@@ -264,10 +264,15 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
         const product_id = productId;
 
         try {
+            // Convert Bengali/Devanagari rating to English before sending
+            const englishRating = selectedLocale === 'bn'
+                ? String(convertToEnglishNumber(ratingInput))
+                : ratingInput;
+
             // Prepare the data to be submitted - send rating as string
             const response = await addReviewTranslation(
                 product_id,
-                ratingInput, // Send the ratingInput string directly
+                englishRating, // Send English numerals
                 selectedTranslation.review,
                 selectedLocale,
                 additionalDetails

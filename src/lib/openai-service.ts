@@ -1264,59 +1264,9 @@ Your review philosophy: Ground every claim in hands-on testing. Speak to people 
   </section>
 
   <section class="comparison">
-    <h2>How It Compares to Main Rivals</h2>
     
-    <p class="comparison-intro">Direct side-by-side comparison of key features and performance:</p>
     
-    <table class="comparison-table">
-      <thead>
-        <tr class="table-header-row table-header-row--dark">
-          <th class="table-header-cell">Feature</th>
-          <th class="table-header-cell">${productName}</th>
-          <th class="table-header-cell">Competitor A</th>
-          <th class="table-header-cell table-header-cell--last">Competitor B</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="table-row table-row--alt">
-          <td class="table-cell table-cell--header">Price</td>
-          <td><strong>$[Price]</strong></td>
-          <td>$[Price]</td>
-          <td>$[Price]</td>
-        </tr>
-        <tr class="table-row">
-          <td class="table-cell table-cell--header">Key Strength</td>
-          <td>[Main tested advantage]</td>
-          <td>[What it does best]</td>
-          <td>[What it does best]</td>
-        </tr>
-        <tr class="table-row table-row--alt">
-          <td class="table-cell table-cell--header">Performance in Testing</td>
-          <td>[Tested result with data]</td>
-          <td>[Tested result with data]</td>
-          <td>[Tested result with data]</td>
-        </tr>
-        <tr class="table-row">
-          <td class="table-cell table-cell--header">Design &amp; Build</td>
-          <td>[Quality assessment and materials]</td>
-          <td>[Quality assessment and materials]</td>
-          <td>[Quality assessment and materials]</td>
-        </tr>
-        <tr class="table-row table-row--alt">
-          <td class="table-cell table-cell--header">Warranty/Support</td>
-          <td>[Coverage &amp; quality]</td>
-          <td>[Coverage &amp; quality]</td>
-          <td>[Coverage &amp; quality]</td>
-        </tr>
-        <tr class="table-row">
-          <td class="table-cell table-cell--header">Value for Money</td>
-          <td class="table-cell--score table-cell--score-green">Best choice</td>
-          <td class="table-cell--score table-cell--score-blue">Good value</td>
-          <td class="table-cell--score table-cell--score-yellow">Budget option</td>
-        </tr>
-      </tbody>
-    </table>
-
+    
     <div class="verdict-box verdict-box--dark">
       <h3 class="verdict-title">Our Tester's Verdict</h3>
       <p class="verdict-intro">Based on hands-on testing, here's how they stack up:</p>
@@ -2388,7 +2338,7 @@ RULES FOR AESOP'S FABLE REVIEWS:
     const client = getOpenAIClient();
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
 
       max_tokens: 16000,
       temperature: 0.75,
@@ -2465,7 +2415,7 @@ ${englishText}`;
     const client = getOpenAIClient();
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       max_tokens: 16000,
       temperature: 0.3,
       messages: [

@@ -1,5 +1,5 @@
 "use client"
-import { useSearchParams, usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 /**
  * PaginationProps interface defines the configuration options for the Pagination component
@@ -19,6 +19,9 @@ interface PaginationProps {
 
   /** Additional URL parameters to always include in pagination links */
   additionalParams?: Record<string, string>;
+
+  /** Country/locale code for language (e.g., 'en', 'bn') */
+  countryCode?: string;
 }
 
 /**
@@ -65,9 +68,24 @@ const Pagination = ({
   baseUrl,
   excludeParams = [],
   additionalParams = {},
+  countryCode = 'en',
 }: PaginationProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  // Language translations
+  const translations = {
+    en: {
+      prev: '« Prev',
+      next: 'Next »',
+    },
+    bn: {
+      prev: '« আগে',
+      next: 'পরবর্তী »',
+    },
+  };
+
+  const t = translations[countryCode as keyof typeof translations] || translations.en;
 
   // Ensure currentPage and totalPages are always numbers and at least 1
   // This prevents errors from invalid props and provides sensible defaults
@@ -184,13 +202,13 @@ const Pagination = ({
       <a
         href={buildUrl(safeCurrentPage - 1)}
         className={`px-3 py-2 rounded-md border transition-colors duration-150 ${safeCurrentPage === 1
-          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600'
+          ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
+          : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}
         aria-disabled={safeCurrentPage === 1}
         tabIndex={safeCurrentPage === 1 ? -1 : 0}
       >
-        « Prev
+        {t.prev}
       </a>
 
       {/* Page Numbers - Dynamic list with ellipsis for large page counts */}
@@ -201,15 +219,15 @@ const Pagination = ({
             <a
               href={buildUrl(page)}
               className={`px-3 py-2 rounded-md border transition-colors duration-150 mx-0.5 ${safeCurrentPage === page
-                ? 'bg-blue-600 text-white border-blue-600 font-bold shadow' // Active page styling
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600' // Inactive page styling
+                ? 'bg-kossti-dark text-white border-kossti-dark font-bold shadow'
+                : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
                 }`}
             >
               {String(page)}
             </a>
           ) : (
             // Ellipsis indicator for skipped pages
-            <span className="px-3 py-2 text-gray-400 select-none">…</span>
+            <span className="px-3 py-2 text-kossti-tan select-none">…</span>
           )}
         </span>
       ))}
@@ -218,13 +236,13 @@ const Pagination = ({
       <a
         href={buildUrl(safeCurrentPage + 1)}
         className={`px-3 py-2 rounded-md border transition-colors duration-150 ${safeCurrentPage === safeTotalPages
-          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-          : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600'
+          ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
+          : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}
         aria-disabled={safeCurrentPage === safeTotalPages}
         tabIndex={safeCurrentPage === safeTotalPages ? -1 : 0}
       >
-        Next »
+        {t.next}
       </a>
     </div>
   );
