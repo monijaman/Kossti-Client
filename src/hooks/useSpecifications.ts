@@ -1,6 +1,6 @@
+import { getApiUrl } from "@/lib/apiUrl";
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { getApiUrl } from "@/lib/apiUrl";
 
 import {
   ApiResponse,
@@ -109,11 +109,7 @@ export const useSpecifications = () => {
         return [];
       }
 
-      if (!apiUrl) {
-        console.error("API URL is not defined in environment variables");
-        return [];
-      }
-
+      const apiUrl = getApiUrl();
       const apiEndpoint = `spec_translation/${id}?locale=${locale}`;
       const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
@@ -246,7 +242,7 @@ export const useSpecifications = () => {
       );
       return [];
     },
-    [apiUrl],
+    [],
   );
 
   // Submit form
@@ -331,12 +327,7 @@ export const useSpecifications = () => {
     );
     console.log("Product ID:", productId);
 
-    if (!apiUrl) {
-      return {
-        success: false,
-        error: "API URL is not defined in environment variables",
-      };
-    }
+    const apiUrl = getApiUrl();
 
     try {
       // Check if specifications array is empty or invalid
@@ -479,12 +470,7 @@ export const useSpecifications = () => {
     console.log("Product ID:", productId);
     console.log("Specifications:", JSON.stringify(specifications, null, 2));
 
-    if (!apiUrl) {
-      return {
-        success: false,
-        error: "API URL is not defined in environment variables",
-      };
-    }
+    const apiUrl = getApiUrl();
 
     try {
       if (!specifications || specifications.length === 0) {
@@ -583,12 +569,7 @@ export const useSpecifications = () => {
     );
     console.log("Product ID:", productId);
 
-    if (!apiUrl) {
-      return {
-        success: false,
-        error: "API URL is not defined in environment variables",
-      };
-    }
+    const apiUrl = getApiUrl();
 
     try {
       // Check if specifications array is empty or invalid
@@ -677,12 +658,8 @@ export const useSpecifications = () => {
   };
 
   const getPublicSpecs = async (productId: number, locale: string) => {
+    const apiUrl = getApiUrl();
     const apiEndpoint = `get-public-spec/${productId}?locale=${locale}`;
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 

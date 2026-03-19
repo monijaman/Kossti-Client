@@ -1,6 +1,6 @@
+import { getApiUrl } from "@/lib/apiUrl";
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { getApiUrl } from "@/lib/apiUrl";
 
 export const useProducts = () => {
   const getProducts = async (
@@ -192,9 +192,8 @@ export const useProducts = () => {
       );
 
       // Use Go server API URL for product translations
-      const goApiUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const url = `${goApiUrl}/products/${id}/translation`; // Note: singular "translation" for POST
+      const apiUrl = getApiUrl();
+      const url = `${apiUrl}/products/${id}/translation`; // Note: singular "translation" for POST
 
       const response = await fetch(url, {
         method: "POST",
@@ -235,11 +234,10 @@ export const useProducts = () => {
       console.log(`Getting translations for product ${productId}`);
 
       // Use Go server API URL for product translations
-      const goApiUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = getApiUrl();
       const url = locale
-        ? `${goApiUrl}/products/${productId}/translations?locale=${locale}`
-        : `${goApiUrl}/products/${productId}/translations`;
+        ? `${apiUrl}/products/${productId}/translations?locale=${locale}`
+        : `${apiUrl}/products/${productId}/translations`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -270,6 +268,7 @@ export const useProducts = () => {
   };
 
   const getPhotosByProductId = async (productId: number) => {
+    const apiUrl = getApiUrl();
     const fullUrl = `${apiUrl}/productimages/${productId}`;
 
     try {
@@ -287,6 +286,7 @@ export const useProducts = () => {
   };
 
   const getVideosByProductId = async (productId: number) => {
+    const apiUrl = getApiUrl();
     const fullUrl = `${apiUrl}/product-videos/${productId}`;
 
     try {
@@ -305,6 +305,7 @@ export const useProducts = () => {
 
   const incrementViews = async (productId: number) => {
     try {
+      const apiUrl = getApiUrl();
       const fullUrl = `${apiUrl}/products/${productId}/increment-views`; // Assuming this is the API route
 
       // Append apiUrl to productData

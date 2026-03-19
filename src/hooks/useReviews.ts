@@ -1,5 +1,5 @@
-import { AdditionalDetails } from "@/lib/types";
 import { getApiUrl } from "@/lib/apiUrl";
+import { AdditionalDetails } from "@/lib/types";
 import { useCallback } from "react";
 
 export const useReviews = () => {
@@ -10,7 +10,7 @@ export const useReviews = () => {
     brands?: string,
     priceRange?: string,
     searchTerm?: string,
-    locale?: string
+    locale?: string,
   ) => {
     const apiUrl = getApiUrl();
     const params: Record<string, string> = {
@@ -58,12 +58,12 @@ export const useReviews = () => {
 
     // Use the new /product-reviews endpoint to fetch reviews by product_id
     // Append locale parameter if provided
-    const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ''}`;
+    const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ""}`;
 
     try {
       const response = await fetch(fullUrl);
       const dataset = await response.json();
- 
+
       // The API returns { product_id: <id>, count: <n>, reviews: [...] }
       // Return the whole dataset as `data` so callers can access reviews
       return {
@@ -100,7 +100,7 @@ export const useReviews = () => {
     product_id: number | null = null,
     rating: number | null = null,
     reviews: string = "",
-    additional_details: AdditionalDetails[] = [] // Change here
+    additional_details: AdditionalDetails[] = [], // Change here
   ) => {
     try {
       const apiUrl = getApiUrl();
@@ -112,8 +112,8 @@ export const useReviews = () => {
       }
 
       // Ensure additional_details is an array and filter out empty entries
-      const cleanedDetails = Array.isArray(additional_details) 
-        ? additional_details.filter(detail => {
+      const cleanedDetails = Array.isArray(additional_details)
+        ? additional_details.filter((detail) => {
             const youtubeUrl = (detail as any).youtubeUrl?.trim();
             const sourceUrl = (detail as any).sourceUrl?.trim();
             const phone = (detail as any).phone?.trim();
@@ -161,7 +161,7 @@ export const useReviews = () => {
     rating: string | null = null, // Changed to string to accept Bangla numerals
     review: string = "",
     locale: string = "",
-    additional_details: AdditionalDetails[] = [] // Change here
+    additional_details: AdditionalDetails[] = [], // Change here
   ) => {
     try {
       const apiUrl = getApiUrl();
@@ -199,7 +199,7 @@ export const useReviews = () => {
       if (!response.ok) {
         const text = await response.text();
         throw new Error(
-          `Failed to submit translation: ${response.status} ${text}`
+          `Failed to submit translation: ${response.status} ${text}`,
         );
       }
 
@@ -211,55 +211,58 @@ export const useReviews = () => {
     }
   };
 
-  const getReviews = useCallback(async (
-    page: number,
-    limit: number,
-    searchTerm?: string,
-    category?: number | null
-  ) => {
-    const params: Record<string, string> = {
-      page: page.toString(),
-      limit: limit.toString(),
-    };
+  const getReviews = useCallback(
+    async (
+      page: number,
+      limit: number,
+      searchTerm?: string,
+      category?: number | null,
+    ) => {
+      const params: Record<string, string> = {
+        page: page.toString(),
+        limit: limit.toString(),
+      };
 
-    // Add optional parameters only if they are defined
-    if (searchTerm) params.searchterm = searchTerm;
-    if (category) params.category = category.toString();
+      // Add optional parameters only if they are defined
+      if (searchTerm) params.searchterm = searchTerm;
+      if (category) params.category = category.toString();
 
-    // Build the query string
-    const queryString = new URLSearchParams(params).toString();
+      // Build the query string
+      const queryString = new URLSearchParams(params).toString();
 
-    const apiEndpoint = `/api/get?action=reviews&${queryString}`;
+      const apiEndpoint = `/api/get?action=reviews&${queryString}`;
 
-    try {
-      const response = await fetch(apiEndpoint, { cache: "no-store" });
+      try {
+        const response = await fetch(apiEndpoint, { cache: "no-store" });
 
-      // Log the response for debugging
+        // Log the response for debugging
 
-      if (!response.ok) {
-        // Attempt to parse the error message from the response
-        const errorMessage = await response.text();
-        throw new Error(`Failed to fetch reviews: ${errorMessage}`);
+        if (!response.ok) {
+          // Attempt to parse the error message from the response
+          const errorMessage = await response.text();
+          throw new Error(`Failed to fetch reviews: ${errorMessage}`);
+        }
+
+        const dataset = await response.json();
+        return dataset;
+      } catch (error) {
+        if (error instanceof Error) {
+          // Handle error if it's an instance of Error
+          console.error("Error fetching reviews:", error.message);
+          return { success: false, message: error.message, data: [] };
+        } else {
+          // Handle unexpected error types
+          console.error("Unknown error fetching reviews:", error);
+          return {
+            success: false,
+            message: "An unknown error occurred",
+            data: [],
+          };
+        }
       }
-
-      const dataset = await response.json();
-      return dataset;
-    } catch (error) {
-      if (error instanceof Error) {
-        // Handle error if it's an instance of Error
-        console.error("Error fetching reviews:", error.message);
-        return { success: false, message: error.message, data: [] };
-      } else {
-        // Handle unexpected error types
-        console.error("Unknown error fetching reviews:", error);
-        return {
-          success: false,
-          message: "An unknown error occurred",
-          data: [],
-        };
-      }
-    }
-  }, []);
+    },
+    [],
+  );
 
   const getPublicReviewsByProductId = async (id: number, locale?: string) => {
     const apiUrl = getApiUrl();
@@ -294,7 +297,7 @@ export const useReviews = () => {
     review_id: number | null,
     rating: number | null,
     reviewsStr: string,
-    additional_details: AdditionalDetails[]
+    additional_details: AdditionalDetails[],
   ) {
     if (!apiUrlVal)
       throw new Error("API URL is not defined in environment variables");
@@ -308,8 +311,8 @@ export const useReviews = () => {
     }
 
     // Ensure additional_details is an array and filter out empty entries
-    const cleanedDetails = Array.isArray(additional_details) 
-      ? additional_details.filter(detail => {
+    const cleanedDetails = Array.isArray(additional_details)
+      ? additional_details.filter((detail) => {
           const youtubeUrl = (detail as any).youtubeUrl?.trim();
           const sourceUrl = (detail as any).sourceUrl?.trim();
           const phone = (detail as any).phone?.trim();
@@ -351,7 +354,7 @@ export const useReviews = () => {
     review_id: number | null = null,
     rating: number | null = null,
     reviews: string = "",
-    additional_details: AdditionalDetails[] = []
+    additional_details: AdditionalDetails[] = [],
   ) => {
     try {
       const apiUrl = getApiUrl();
@@ -361,7 +364,7 @@ export const useReviews = () => {
         review_id,
         rating,
         reviews,
-        additional_details
+        additional_details,
       );
     } catch (error) {
       console.error("Error updating review:", error);
