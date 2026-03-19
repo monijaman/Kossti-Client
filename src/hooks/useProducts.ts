@@ -1,7 +1,6 @@
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import { getApiUrl } from "@/lib/apiUrl";
 
 export const useProducts = () => {
   const getProducts = async (
@@ -14,6 +13,7 @@ export const useProducts = () => {
     locale?: string,
     sortby?: string,
   ) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {
       page: page.toString(),
       limit: limit.toString(),
@@ -31,13 +31,6 @@ export const useProducts = () => {
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
 
@@ -64,6 +57,7 @@ export const useProducts = () => {
   };
 
   const getAProductBySlug = async (slug: string, locale?: string) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {};
 
     // Add optional parameters only if they are defined
@@ -71,13 +65,6 @@ export const useProducts = () => {
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/products/${slug}?${queryString}`;
 
@@ -96,6 +83,7 @@ export const useProducts = () => {
     }
   };
   const getAProductById = async (id: number) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {
       // Add any additional query parameters if necessary
       // e.g. 'filter': 'someFilterValue'
@@ -106,13 +94,6 @@ export const useProducts = () => {
     const fullUrl = queryString
       ? `${apiUrl}/products/${id}?${queryString}&type=public`
       : `${apiUrl}/products/${id}?type=public`;
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     try {
       const response = await fetch(fullUrl, { cache: "no-store" });

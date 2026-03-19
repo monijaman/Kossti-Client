@@ -1,5 +1,5 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 import { AdditionalDetails } from "@/lib/types";
+import { getApiUrl } from "@/lib/apiUrl";
 import { useCallback } from "react";
 
 export const useReviews = () => {
@@ -12,6 +12,7 @@ export const useReviews = () => {
     searchTerm?: string,
     locale?: string
   ) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {
       page: page.toString(),
       limit: limit.toString(),
@@ -27,13 +28,6 @@ export const useReviews = () => {
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
 
     const fullUrl = `${apiUrl}/products?${queryString}`;
 
@@ -53,6 +47,7 @@ export const useReviews = () => {
   };
 
   const getReviewByProductId = async (id: number, locale?: string) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {};
 
     // Add optional parameters only if they are defined
@@ -61,13 +56,6 @@ export const useReviews = () => {
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
 
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
-    
     // Use the new /product-reviews endpoint to fetch reviews by product_id
     // Append locale parameter if provided
     const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ''}`;
@@ -89,12 +77,7 @@ export const useReviews = () => {
   };
 
   const getImagesByProductId = async (id: number) => {
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
+    const apiUrl = getApiUrl();
 
     const fullUrl = `${apiUrl}/productimages/${id}/`;
 
@@ -120,10 +103,7 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Ensure API base URL is available
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
+      const apiUrl = getApiUrl();
 
       // Validate rating is a number
       const numRating = rating ? Number(rating) : null;
@@ -184,10 +164,7 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = [] // Change here
   ) => {
     try {
-      // Ensure API base URL is available
-      if (!apiUrl) {
-        throw new Error("API URL is not defined in environment variables");
-      }
+      const apiUrl = getApiUrl();
 
       // Serialize additional_details as JSON
       let serializedDetails: string | null = null;
@@ -285,6 +262,7 @@ export const useReviews = () => {
   }, []);
 
   const getPublicReviewsByProductId = async (id: number, locale?: string) => {
+    const apiUrl = getApiUrl();
     const params: Record<string, string> = {};
 
     // Add optional parameters only if they are defined
@@ -292,13 +270,6 @@ export const useReviews = () => {
 
     // Build the query string
     const queryString = new URLSearchParams(params).toString();
-
-    // Ensure API URL is defined
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables")
-      );
-    }
 
     // const fullUrl = `${apiUrl}/products/${id}/reviews?${queryString}`;
     const fullUrl = `${apiUrl}/public-reviews/${id}/?${queryString}`;
@@ -383,6 +354,7 @@ export const useReviews = () => {
     additional_details: AdditionalDetails[] = []
   ) => {
     try {
+      const apiUrl = getApiUrl();
       return await updateReviewInternal(
         apiUrl,
         product_id,

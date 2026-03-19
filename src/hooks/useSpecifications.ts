@@ -1,5 +1,6 @@
 import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
+import { getApiUrl } from "@/lib/apiUrl";
 
 import {
   ApiResponse,
@@ -8,22 +9,16 @@ import {
   SpecKeyTranslation,
 } from "@/lib/types";
 import { useCallback } from "react";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const useSpecifications = () => {
   const getSpecificationsKeys = useCallback(async (searchTerm = "") => {
+    const apiUrl = getApiUrl();
     // Use the correct endpoint for getting specification keys with a high limit to get all
     const apiEndpoint = `speckey${
       searchTerm
         ? `?search=${encodeURIComponent(searchTerm)}&limit=1000`
         : "?limit=1000"
     }`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
@@ -42,13 +37,8 @@ export const useSpecifications = () => {
   }, []);
 
   const getSpecifications = useCallback(async (id: number) => {
+    const apiUrl = getApiUrl();
     const apiEndpoint = `get-specifications/${id}`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 
@@ -79,13 +69,8 @@ export const useSpecifications = () => {
   }, []);
 
   const getSpecificationsByCategory = async (categoryId: number) => {
+    const apiUrl = getApiUrl();
     const apiEndpoint = `catgory-specs/${categoryId}`;
-
-    if (!apiUrl) {
-      return Promise.reject(
-        new Error("API URL is not defined in environment variables"),
-      );
-    }
 
     const fullUrl = `${apiUrl}/${apiEndpoint}`;
 

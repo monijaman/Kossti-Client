@@ -27,11 +27,11 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
             alt="Kosti"
             style={{
               width: "auto",
-              height: "auto",
+              height: "80px",
             }}
             width={500}
             height={170}
-            className="rounded h-10 sm:h-12 md:h-16 lg:h-20 w-auto"
+            className="rounded w-auto"
           />
         </Link>
         <div className="w-full md:w-auto md:ml-auto flex flex-row items-center justify-end gap-2 md:gap-4 relative z-50 overflow-visible">
