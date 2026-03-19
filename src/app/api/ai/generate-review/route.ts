@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // Review style type
 type ReviewStyle =
   | "aesops-fable"
@@ -48,6 +43,10 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
   try {
     const body: GenerateReviewRequest = await request.json();

@@ -8,12 +8,12 @@ interface CommentData {
   date: string;
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const { productName, productCategory } = await request.json();
 
     if (!productName || !productCategory) {
