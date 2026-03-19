@@ -79,7 +79,7 @@ Make the comments helpful, relevant to ${productName}, and authentic-sounding.`;
     const comments: CommentData[] = JSON.parse(content);
 
     if (!Array.isArray(comments)) {
-      throw new Error("Invalid comments format - expected array");
+      throw new Error("Invalid comments format - expected array.");
     }
 
     return NextResponse.json({
