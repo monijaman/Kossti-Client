@@ -183,10 +183,6 @@ export const useSpecifications = () => {
           const dataset = await response.json();
 
           if (dataset?.dataset) {
-            console.log(
-              `✓ Successfully fetched spec translations for product ${id}, locale: ${locale}`,
-              dataset.dataset,
-            );
             return dataset.dataset;
           }
 
@@ -570,6 +566,7 @@ export const useSpecifications = () => {
             "Content-Type": "application/json",
           },
           body: payload,
+          signal: 60000, // 60 s — bulk upserts on Railway can be slow
         },
       );
 
