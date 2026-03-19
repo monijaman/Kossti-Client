@@ -18,28 +18,15 @@ type NextFetchRequestConfig = {
 };
 
 const getBaseUrl = () => {
+  // Try to get URL from environment variables
   let url = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-
-  // Fallback for production deployments
-  if (!url && typeof window !== "undefined") {
-    // If running in browser, try to use backend from origin or default production URL
-    url = "https://gocritserver-production.up.railway.app";
-  }
-
-  if (!url && typeof window === "undefined") {
-    // Server-side but no URL set - use default for builds
-    url = "https://gocritserver-production.up.railway.app";
-  }
-
+  
+  // Always fallback to production backend if not defined
   if (!url) {
-    const errorMsg = `API URL is not defined in env variables.
-    NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || "undefined"}
-    API_URL: ${process.env.API_URL || "undefined"}
-    NODE_ENV: ${process.env.NODE_ENV || "undefined"}`;
-    console.error(errorMsg);
-    throw new Error(errorMsg);
+    url = "https://gocritserver-production.up.railway.app";
   }
-
+  
+  console.log("Using API URL:", url);
   return url;
 };
 
