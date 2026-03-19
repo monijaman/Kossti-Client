@@ -197,11 +197,11 @@ const Pagination = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="flex justify-center items-center gap-2 mt-6">
+    <div className="flex flex-wrap justify-center items-center gap-1 md:gap-2 mt-4 md:mt-6 px-2">
       {/* Previous Button - Disabled when on first page */}
       <a
         href={buildUrl(safeCurrentPage - 1)}
-        className={`px-3 py-2 rounded-md border transition-colors duration-150 ${safeCurrentPage === 1
+        className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 ${safeCurrentPage === 1
           ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
           : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}
@@ -218,7 +218,7 @@ const Pagination = ({
             // Clickable page number
             <a
               href={buildUrl(page)}
-              className={`px-3 py-2 rounded-md border transition-colors duration-150 mx-0.5 ${safeCurrentPage === page
+              className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 mx-0.5 ${safeCurrentPage === page
                 ? 'bg-kossti-dark text-white border-kossti-dark font-bold shadow'
                 : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
                 }`}
@@ -227,7 +227,7 @@ const Pagination = ({
             </a>
           ) : (
             // Ellipsis indicator for skipped pages
-            <span className="px-3 py-2 text-kossti-tan select-none">…</span>
+            <span className="px-1 md:px-2 py-1 md:py-2 text-kossti-tan select-none text-xs md:text-sm">…</span>
           )}
         </span>
       ))}
@@ -235,7 +235,7 @@ const Pagination = ({
       {/* Next Button - Disabled when on last page */}
       <a
         href={buildUrl(safeCurrentPage + 1)}
-        className={`px-3 py-2 rounded-md border transition-colors duration-150 ${safeCurrentPage === safeTotalPages
+        className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 ${safeCurrentPage === safeTotalPages
           ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
           : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}

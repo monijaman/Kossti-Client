@@ -75,25 +75,25 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
 
   return (
     <>
-      <div className=" mx-auto px-4 py-6">
+      <div className="mx-auto px-2 md:px-4 py-3 md:py-6">
         {/* Breadcrumb */}
-        <nav className="text-sm mb-6 text-gray-600">
+        <nav className="text-xs md:text-sm mb-3 md:mb-6 text-gray-600 overflow-x-auto">
           <span>{t.nav_home || 'Home'}</span>
-          <span className="mx-2">›</span>
+          <span className="mx-1 md:mx-2">›</span>
           <span>{countryCode === 'bn' && product.brand?.translated_name ? product.brand.translated_name : product.brand?.name}</span>
-          <span className="mx-2">›</span>
+          <span className="mx-1 md:mx-2">›</span>
           <span className="text-gray-900 font-medium">{displayName}</span>
         </nav>
 
         {/* Product Header */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">{countryCode === 'bn' && product.translated_name ? product.translated_name : displayName}</h1>
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight">{countryCode === 'bn' && product.translated_name ? product.translated_name : displayName}</h1>
 
         {/* Product Info Section - Now at Top */}
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-8 md:mb-12">
           {/* Left: Product Images */}
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4">
             {/* Main Image */}
             <div className="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 rounded-2xl p-8 aspect-[4/3] relative overflow-hidden">
               <Image
@@ -126,10 +126,10 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
             </div>
           </div>
 
-          <div className="flex flex-col gap-5 border border-gray-200 rounded-2xl p-6 bg-white">
+          <div className="flex flex-col gap-3 md:gap-5 border border-gray-200 rounded-xl md:rounded-2xl p-4 md:p-6 bg-white">
 
             {/* Meta grid */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div className="grid grid-cols-2 gap-x-3 md:gap-x-6 gap-y-3 text-xs md:text-sm">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">{t.label_brand || 'Brand'}</p>
                 <p className="font-semibold text-gray-900">{product.brand?.name || '—'}</p>
@@ -212,7 +212,7 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
         {/* Reviews Section - Shows all reviews with ratings and details */}
 
         {/* Two Column Layout for Specifications and Reviews */}
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="mt-8 md:mt-12 grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
           {/* Reviews Section */}
           <div className="lg:col-span-2">
             <ProductReviewsSection productId={product.id} countryCode={countryCode} />
@@ -220,11 +220,11 @@ const ProducDetails = ({ product, countryCode = 'en' }: PopularProductsProps) =>
 
           {/* Specifications Table */}
           <div className="lg:col-span-3">
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-              <p className="text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 md:mb-6">
+              <p className="text-xs md:text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t.label_specifications || 'Specifications'}</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t.label_specifications || 'Specifications'}</h2>
             <SpecDetails productId={product.id} countryCode={countryCode} />
           </div>
         </div>

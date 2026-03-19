@@ -114,17 +114,17 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="text-white bg-blue-600 px-4 py-2 rounded-md focus:outline-none"
+        className="text-white bg-blue-600 px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm rounded-md focus:outline-none"
       >
         Account
       </button>
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 bg-white text-gray-900 shadow-lg rounded-md"
-          style={{ top: '100%', zIndex: 10 }}
+          className="absolute right-0 mt-2 w-40 md:w-48 bg-white text-gray-900 shadow-lg rounded-md"
+          style={{ top: '100%', zIndex: 50 }}
         >
           {!isUserAuthenticated ? (
             <>

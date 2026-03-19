@@ -62,7 +62,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
 
 
   return (
-    <aside className="w-[300px] bg-gray-100 p-4">
+    <aside className="w-full md:w-[300px] bg-gray-100 p-3 md:p-4 border-b md:border-b-0 md:border-r border-gray-300">
       <Categories
         categories={categories}
         activeCategory={activeCategory}

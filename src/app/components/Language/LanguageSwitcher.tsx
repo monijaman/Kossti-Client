@@ -58,13 +58,13 @@ const LanguageSwitcher = () => {
     };
 
     return (
-        <div className="flex items-center">
+        <div className="flex items-center relative z-50 overflow-visible">
 
             <select
                 id="language-select"
                 value={locale}
                 onChange={handleLanguageChange}
-                className="border border-gray-300 rounded-md p-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out"
+                className="border border-gray-300 rounded-md p-1 md:p-2 text-xs md:text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out z-50 w-14 md:w-auto"
             >
                 {LOCALES.map((translation) => (
                     <option key={translation} value={translation}>

@@ -20,21 +20,21 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
   const countryCode = cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   return (
     <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
-      <header className="bg-gray-100 text-white pl-2 pr-4 py-1 flex items-center justify-between">
-        <Link href="/" suppressHydrationWarning>
+      <header className="bg-gray-100 text-white px-2 md:px-4 py-2 md:py-3 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2 md:gap-4 relative z-40 overflow-visible">
+        <Link href="/" suppressHydrationWarning className="flex-shrink-0">
           <Image
             src="/logo.png"
             alt="Kosti"
             style={{
               width: "auto",
-              height: "120px",
+              height: "auto",
             }}
             width={500}
             height={170}
-            className="rounded"
+            className="rounded h-12 sm:h-14 md:h-20 lg:h-24 w-auto"
           />
         </Link>
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="w-full md:w-auto md:ml-auto flex flex-row items-center justify-end gap-2 md:gap-4 relative z-50 overflow-visible">
 
           <AccountDropdown isAuthenticated={!!accessToken} />
           <LanguageSwitcher />
@@ -42,10 +42,10 @@ const MainLayout = async ({ children, sidebarProps }: MainLayoutProps) => {
       </header>
 
       <Breadcrumbs />
-      <div className="flex flex-grow">
+      <div className="flex flex-col md:flex-row flex-grow">
         <Sidebar {...sidebarProps} />
 
-        <main className="flex-1 bg-white p-4">
+        <main className="flex-1 bg-white p-3 md:p-4 lg:p-6">
           {children}
         </main>
       </div>

@@ -38,6 +38,7 @@ interface PageProps {
 
 const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) => {
     const [formStatus, setFormStatus] = useState("");
+    const [subbmitStatus, setSubbmitStatus] = useState("Submit");
     const [selectedLocale, setSelectedLocale] = useState('bn');
     const { submitSpecTranslationValues, getSpecTranslations } = useSpecifications();
     // Removed unused translatedSpecifications state
@@ -126,22 +127,23 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
     // Function to handle form submission
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
+        setSubbmitStatus("Submitting...")
         if (!productId) {
             setFormStatus('Product ID is required');
             return;
         }
 
-        // Validate that all translations have required fields
-        const invalidTranslations = tranSpecifications.filter(spec =>
-            !spec.specification_key_id ||
-            !spec.locale ||
-            (!spec.translated_key && !spec.translated_value)
+        // Filter to only specs with non-empty translated_value
+        // (the hook will also filter these, but check here for early feedback)
+        const specsWithTranslations = tranSpecifications.filter(spec =>
+            spec.specification_key_id &&
+            spec.locale &&
+            spec.translated_value &&
+            spec.translated_value.trim() !== ''
         );
 
-        if (invalidTranslations.length > 0) {
-            console.error('Invalid translations found:', invalidTranslations);
-            setFormStatus('Please fill in all required fields');
+        if (specsWithTranslations.length === 0) {
+            setFormStatus('Please enter at least one translation before submitting');
             return;
         }
 
@@ -151,6 +153,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
         });
 
         try {
+            setSubbmitStatus("Submitted")
             const response = await submitSpecTranslationValues(productId, tranSpecifications) as SubmitSpecResponse;
 
             console.log('Translation response:', response);
@@ -369,7 +372,7 @@ const SpecTranslations = ({ productId, specKeys, specifications }: PageProps) =>
                     type="submit"
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
-                    Submit
+                    {subbmitStatus}
                 </button>
             </div>
 
