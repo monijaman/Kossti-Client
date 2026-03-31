@@ -2378,12 +2378,19 @@ export async function translateToBengali(englishText: string): Promise<string> {
 STRICT RULES — follow every rule exactly:
 1. OUTPUT must be valid HTML that is IDENTICAL in structure to the input HTML.
 2. Keep EVERY HTML tag exactly as-is: <article>, <section>, <div>, <h1>, <h2>, <h3>, <p>, <ul>, <li>, <header>, <strong>, <em>, <span>, <br> — all tags, all attributes, all class names, all IDs.
-3. Translate ONLY the visible text content inside tags. Never translate or modify tag names, class names, id attributes, or any HTML attribute values.
-4. Convert English numerals (0-9) inside translated text to Bengali numerals (০-৯) where they appear as ratings, measurements, or counts. Keep numerals in code-like contexts (e.g. inside class names) in English.
-5. Preserve all whitespace, indentation, and line breaks exactly.
-6. Do NOT add, remove, merge, or reorder any HTML elements.
-7. Do NOT wrap the output in a markdown code block — return raw HTML only.
-8. The output HTML must have the EXACT same number of tags and nesting depth as the input.`;
+3. Transliterate EVERY word of brand names, product names, and model names into Bengali script — no English word in a product name may remain in the Latin alphabet. Examples:
+   "Tecno CAMON 30S" → "টেকনো ক্যামন ৩০এস"
+   "Samsung Galaxy S25 Ultra" → "স্যামসাং গ্যালাক্সি এস২৫ আল্ট্রা"
+   "iPhone 16 Pro Max" → "আইফোন ১৬ প্রো ম্যাক্স"
+   "Xiaomi Redmi Note 13 Pro" → "শাওমি রেডমি নোট ১৩ প্রো"
+   "OnePlus Nord CE 4" → "ওয়ানপ্লাস নর্ড সিই ৪"
+   Never translate or modify tag names, class names, id attributes, or any HTML attribute values.
+4. Technical acronyms and spec units stay in English as they are universally recognised in Bengali tech content: RAM, ROM, CPU, GPU, SoC, OLED, AMOLED, LCD, USB-C, 5G, 4G, LTE, NFC, Wi-Fi, Bluetooth, IP68, mAh, Hz, GHz, MP, fps, HDR, HDR10+, Dolby Atmos, OIS, EIS, UFS, LPDDR, IMX, AI.
+5. Convert English numerals (0-9) inside translated descriptive text to Bengali numerals (০-৯) where they appear as ratings or counts. Keep numerals inside class names, id values, or spec abbreviations in English.
+6. Preserve all whitespace, indentation, and line breaks exactly.
+7. Do NOT add, remove, merge, or reorder any HTML elements.
+8. Do NOT wrap the output in a markdown code block — return raw HTML only.
+9. The output HTML must have the EXACT same number of tags and nesting depth as the input.`;
 
   const userPrompt = `Translate every text node in the following HTML from English to Bengali. Return the complete HTML with identical structure — same tags, same classes, same nesting — only the text content translated:
 

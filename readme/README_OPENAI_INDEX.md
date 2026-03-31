@@ -193,14 +193,14 @@ crit_client/
 2. Visualize: UI_VISUAL_GUIDE.md
 3. Deep dive: AI_REVIEW_INTEGRATION.md
 4. Reference: ReviewTransForm.tsx code
-5. Verify: IMPLEMENTATION_CHECKLIST.md
+5. Test: IMPLEMENTATION_CHECKLIST.md
 
 ---
 
 ## 🔗 Cross-References
 
 ### Setup & Configuration
-- **Where to add API key?** → OPENAI_SETUP_QUICK_START.md → "Setup (One-time)"
+- **Where to add API key?** → OPENAI_SETUP_QUICK_START.md → "Quick Start"
 - **What environment variable?** → AI_REVIEW_INTEGRATION.md → "Environment Setup"
 - **How to verify setup?** → setup-ai-review.sh
 
@@ -237,7 +237,7 @@ crit_client/
   - Updated UI with button group
 
 ### Configuration Needed
-```bash
+```
 NEXT_PUBLIC_OPENAI_API_KEY=sk-...
 ```
 

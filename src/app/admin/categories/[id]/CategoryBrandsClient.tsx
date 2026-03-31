@@ -31,7 +31,7 @@ export default function CategoryBrandsClient({ categoriesFromServer, numericCate
     // use console.debug so we can inspect values during hydration/client runtime
     console.debug('[CategoryBrands] numericCategoryId:', numericCategoryId, 'propNumericCategoryId:', propNumericCategoryId);
     const { getCategories, getCategoryRelBrands } = useCategory();
-    const { getAllBrands, submitBrands } = useBrands();
+    const { getAllBrands, submitBrands, getWideBrands } = useBrands();
 
     const [brands, setBrands] = useState<Brand[]>([]);
     const [activeBrands, setActiveBrands] = useState<CategoryBrand[]>([]);
@@ -83,21 +83,36 @@ export default function CategoryBrandsClient({ categoriesFromServer, numericCate
     // Fetch brands
     const fetchBrands = useCallback(async () => {
         try {
-            const response = await getAllBrands();
+            // Pull an unpaginated list first so all brands (e.g. BYD) are available for relations.
+            const response = await getAllBrands({ paginate: false, per_page: '5000' });
             const dataset = response?.data;
-            const arr = normalizeList<Brand>(dataset);
+            let arr = normalizeList<Brand>(dataset);
+
+            // Fallback to wide-brands endpoint if primary endpoint returns an unexpected shape.
+            if (!Array.isArray(arr) || arr.length === 0) {
+                const wideResponse = await getWideBrands({
+                    limit: 5000,
+                    paginate: false,
+                    locale: 'en',
+                    brandId: '',
+                    status: null,
+                    page: null,
+                });
+                arr = normalizeList<Brand>(wideResponse?.data);
+            }
+
             setBrands(arr);
         } catch (error) {
             console.error("Error fetching brands:", error);
             setBrands([]);
         }
-    }, [normalizeList]);
+    }, []);
 
     // Fetch active brands for selected category
     const fetchActiveBrands = useCallback(async () => {
         if (!selectedCategory) return;
         try {
-            const response = await getCategoryRelBrands({ category_id: selectedCategory });
+            const response = await getCategoryRelBrands({ category_id: selectedCategory, cacheBust: true });
             const dataset = response?.data;
 
             // normalize possible shapes into an array of records
@@ -204,16 +219,49 @@ export default function CategoryBrandsClient({ categoriesFromServer, numericCate
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         setLoading(true);
         event.preventDefault();
-        const brandsToSubmit = Array.isArray(activeBrands)
-            ? activeBrands.map(cb => ({ id: cb.brand_id, name: cb.name || '' }))
-            : [];
-        const response = await submitBrands(selectedCategory ?? 0, brandsToSubmit);
-        if (response && typeof response === 'object' && 'success' in response && response.success) {
-            setFormStatus("Brand added successfully");
-        } else {
-            setFormStatus("Failed to submit data");
+        try {
+            if (!selectedCategory) {
+                setFormStatus('Please select a category first');
+                return;
+            }
+
+            const uniqueBrandIds = Array.from(
+                new Set(
+                    (Array.isArray(activeBrands) ? activeBrands : [])
+                        .map((cb) => Number(cb.brand_id))
+                        .filter((id) => Number.isInteger(id) && id > 0),
+                ),
+            );
+
+            if (uniqueBrandIds.length === 0) {
+                setFormStatus('Please select at least one valid brand');
+                return;
+            }
+
+            const brandsToSubmit = uniqueBrandIds.map((id) => ({ id, name: '' }));
+            const response = await submitBrands(selectedCategory, brandsToSubmit) as {
+                success?: boolean;
+                error?: string;
+                status?: number;
+                data?: { message?: string } | null;
+            };
+
+            if (response?.success) {
+                const message =
+                    (response.data && typeof response.data === 'object' && 'message' in response.data
+                        ? response.data.message
+                        : null) || 'Brand relations saved successfully';
+                setFormStatus(message);
+                await fetchActiveBrands();
+            } else {
+                setFormStatus(response?.error || 'Failed to save category-brand relations');
+            }
+        } catch (error) {
+            console.error('Error submitting category-brand relations:', error);
+            setFormStatus(error instanceof Error ? error.message : 'Failed to save category-brand relations');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     // compute category options and brand select options

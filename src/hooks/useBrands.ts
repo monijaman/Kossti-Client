@@ -144,6 +144,8 @@ export const useBrands = () => {
       const response = await fetchApi(apiEndpoints.createCategoryBrands, {
         method: "POST",
         body: payload,
+        // Category relation replace-mode can be slow on production DB.
+        signal: 60000,
       });
 
       // Return the response
@@ -159,8 +161,9 @@ export const useBrands = () => {
     category_id?: number;
     category_slug?: string;
     locale?: string;
+    cacheBust?: boolean;
   }) => {
-    const { category_id, category_slug, locale } = options;
+    const { category_id, category_slug, locale, cacheBust } = options;
 
     // Build query string based on optional parameters
     const queryParams = new URLSearchParams();
@@ -173,23 +176,21 @@ export const useBrands = () => {
     if (locale) {
       queryParams.append("locale", locale);
     }
+    if (cacheBust) {
+      queryParams.append("_", Date.now().toString());
+    }
 
     try {
-      // Fetch data from the API using fetchApi with 10-minute cache
+      // Fetch fresh relation data so updates appear immediately after save.
       const dataset = await fetchApi(
         `${apiEndpoints.getCategoryBrands}?${queryParams.toString()}`,
-        {
-          next: {
-            revalidate: 600,
-            tags: [`brands-${category_slug || category_id}`],
-          },
-        },
       );
 
       // Return success with data
       return {
-        success: true,
-        data: dataset,
+        success: Boolean(dataset?.success),
+        data: dataset?.data,
+        error: dataset?.error,
       };
     } catch (error: unknown) {
       console.error("Error fetching category:", error);
@@ -244,8 +245,9 @@ export const useBrands = () => {
       );
 
       return {
-        success: true,
-        data: dataset,
+        success: Boolean(dataset?.success),
+        data: dataset?.data,
+        error: dataset?.error,
       };
     } catch (error) {
       console.error("Error fetching category:", error);

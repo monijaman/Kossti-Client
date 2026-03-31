@@ -214,8 +214,9 @@ export const useCategory = () => {
   const getCategoryRelBrands = async (options: {
     category_id: number;
     locale?: string;
+    cacheBust?: boolean;
   }) => {
-    const { category_id, locale } = options;
+    const { category_id, locale, cacheBust } = options;
 
     // Build query string based on optional parameters
     const queryParams = new URLSearchParams();
@@ -224,6 +225,9 @@ export const useCategory = () => {
     }
     if (locale) {
       queryParams.append("locale", locale);
+    }
+    if (cacheBust) {
+      queryParams.append("_", Date.now().toString());
     }
 
     try {

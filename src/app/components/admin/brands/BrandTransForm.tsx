@@ -1,5 +1,4 @@
 "use client";
-import { useBrands } from "@/hooks/useBrands";
 import { apiEndpoints, LOCALES } from '@/lib/constants';
 import fetchApi from "@/lib/fetchApi";
 import { Brand, BrandTranslation } from '@/lib/types'; // Assuming you have a Product type
@@ -11,7 +10,6 @@ interface PageProps {
 const BrandTransForm = ({ brandData }: PageProps) => {
 
     const [brandName, setBrandName] = useState('');
-    const { submitBrandTranslation } = useBrands();
     const [submitStatus, setSubmitStatus] = useState('');
     const [selectedTranslation, setSelectedTranslation] = useState('bn');
     const [brandTranslation, setBrandTranslation] = useState<BrandTranslation | null>(null);
@@ -51,6 +49,7 @@ const BrandTransForm = ({ brandData }: PageProps) => {
                     setBrandName(apiResponse.data.translated_name || ""); // Set the brand name from the translation
                 } else {
                     setBrandTranslation(null);
+                    setBrandName('');
                 }
 
 
@@ -86,24 +85,25 @@ const BrandTransForm = ({ brandData }: PageProps) => {
             return; // Handle this error case appropriately
         }
 
-        const payload = {
-            locale: selectedTranslation,
-            translated_name: brandName
-        };
-
         try {
             console.log('Brand Translation:', brandTranslation);
-            if (!brandTranslation?.id) {
-                console.error('Product ID is undefined');
-                return; // Handle this error case appropriately
-            }
-            let method = "POST";
-            // If brandTranslation is null, we are creating a new translation
-            if (brandTranslation.brand_id) {
-                method = "PUT";
-            }
+            const isUpdate = Boolean(brandTranslation?.id);
+            const method = isUpdate ? "PUT" : "POST";
 
-            const fetchUrl = apiEndpoints.brandTranslation(brandTranslation.brand_id);
+            const payload = isUpdate
+                ? {
+                    locale: selectedTranslation,
+                    translated_name: brandName
+                }
+                : {
+                    brand_id: brandData.id,
+                    locale: selectedTranslation,
+                    translated_name: brandName
+                };
+
+            const fetchUrl = isUpdate
+                ? apiEndpoints.brandTranslation(brandTranslation!.id)
+                : apiEndpoints.brandTrans();
 
             setSubmitStatus('Submitting...');
 
@@ -117,7 +117,10 @@ const BrandTransForm = ({ brandData }: PageProps) => {
 
             if (response.success && response.data) {
                 // Type assertion for the response data structure
-                const responseData = response.data as { message?: string };
+                const responseData = response.data as { message?: string; data?: BrandTranslation };
+                if (responseData.data) {
+                    setBrandTranslation(responseData.data);
+                }
                 setSubmitStatus(responseData.message || 'Form Submitted successfully');
             } else {
                 setSubmitStatus(response.error || 'Error submitting form');
