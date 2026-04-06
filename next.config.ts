@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   
   // Optimize production builds
-  compress: true, // Enable gzip compression
+  compress: true,
+  poweredByHeader: false,
   
-  // Add performance headers
+  // Add performance and security headers
   async headers() {
     return [
       {
@@ -33,6 +34,19 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
           },
         ],
       },
@@ -88,28 +102,6 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Optimize for common devices
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Icon sizes
     minimumCacheTTL: 86400, // Cache images for 24 hours (product images rarely change)
-  },
-  // Performance optimizations
-  compress: true,
-  poweredByHeader: false,
-
-  // Add security and performance headers
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-        ],
-      },
-    ];
   },
 
   // Reduce bundle size
