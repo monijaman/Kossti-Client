@@ -138,7 +138,10 @@ export async function generateMetadata(props: {
       alternates: {
         canonical: `${SITE_URL}/${locale}/${product.category_slug || 'products'}/${slug}`,
         languages: {
+          'x-default': `${SITE_URL}/en/${product.category_slug || 'products'}/${slug}`,
+          'en-US': `${SITE_URL}/en/${product.category_slug || 'products'}/${slug}`,
           'en': `${SITE_URL}/en/${product.category_slug || 'products'}/${slug}`,
+          'bn-BD': `${SITE_URL}/bn/${product.category_slug || 'products'}/${slug}`,
           'bn': `${SITE_URL}/bn/${product.category_slug || 'products'}/${slug}`,
         },
       },

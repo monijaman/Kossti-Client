@@ -30,6 +30,16 @@ export const metadata: Metadata = {
       },
     },
   }),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'x-default': '/',
+      'en-US': '/en',
+      'en': '/en',
+      'bn-BD': '/bn',
+      'bn': '/bn',
+    },
+  },
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',

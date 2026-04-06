@@ -2,11 +2,50 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  
+  // Optimize production builds
+  compress: true, // Enable gzip compression
+  
+  // Add performance headers
+  async headers() {
+    return [
+      {
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|avif)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+  
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb", // Increase to 10MB for file uploads
     },
+    optimizePackageImports: ['@mui/icons-material', 'lucide-react'], // Tree-shake large icon libraries
   },
+  
   images: {
     unoptimized: true,
     remotePatterns: [

@@ -19,10 +19,18 @@ export async function generateMetadata(props: {
   params: Promise<{
     locale: string;
   }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { locale } = await props.params;
+  const searchParams = await props.searchParams;
 
   const isEn = locale === 'en';
+  
+  // Build canonical URL - use base URL for homepage, ignore filter params
+  const baseCanonical = `${SITE_URL}/${locale}`;
+  const page = searchParams.page ? parseInt(searchParams.page as string, 10) : 1;
+  // Only add page to canonical if it's not page 1
+  const canonicalUrl = page > 1 ? `${baseCanonical}?page=${page}` : baseCanonical;
 
   return {
     title: isEn
@@ -88,9 +96,12 @@ export async function generateMetadata(props: {
     },
     robots: 'index, follow',
     alternates: {
-      canonical: `${SITE_URL}/${locale}`,
+      canonical: canonicalUrl,
       languages: {
+        'x-default': `${SITE_URL}/`,
+        'en-US': `${SITE_URL}/en`,
         'en': `${SITE_URL}/en`,
+        'bn-BD': `${SITE_URL}/bn`,
         'bn': `${SITE_URL}/bn`,
       },
     },
