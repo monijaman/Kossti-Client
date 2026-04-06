@@ -222,6 +222,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - admin (admin routes - no internationalization)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next|favicon.ico|.*\\.).*)",
   ],
 };

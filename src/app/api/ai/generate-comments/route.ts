@@ -26,35 +26,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `Generate realistic customer reviews for a ${productCategory} product called "${productName}".
+    const prompt = `Generate REAL, EMOTIONAL customer reviews for a ${productCategory} product called "${productName}".
 
-Create 5 representative customer comments that:
-- Are realistic and detailed
-- Include various perspectives (positive, negative, neutral)
-- Include ratings (1-5 stars)
-- Include realistic dates
+Create 5 authentic-sounding customer comments from different perspectives. These should sound like REAL PEOPLE with REAL EMOTIONS:
+
+- Include frustration and disappointment: "I'm so annoyed that...", "This really let me down when...", "Honestly disappointed with..."
+- Show excitement and satisfaction: "I'm genuinely happy with...", "This exceeded my expectations when...", "I love how..."
+- Express specific complaints: battery dying at bad times, features not working as advertised, quality issues, price concerns
+- Share personal stories: real usage scenarios, moments of failure or success
+- Use conversational language like real reviews: "tbh", "honestly", "I regret...", "totally worth it", "waste of money"
+- Vary the tone: some angry (1-2 stars), some mixed (3 stars), some satisfied (4-5 stars)
+- Be specific about what frustrated or delighted them
 
 Return ONLY a valid JSON array with this structure:
 [
   {
-    "author": "User Name",
-    "rating": 4,
-    "comment": "Detailed comment text...",
+    "author": "Real-sounding Name",
+    "rating": 1-5,
+    "comment": "Emotional, specific comment with personal experience...",
     "date": "2024-01-15"
   }
 ]
 
-Make the comments helpful, relevant to ${productName}, and authentic-sounding.`;
+Make them sound like HUMANS who actually used this product and have FEELINGS about it - both positive AND negative.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       max_tokens: 2000,
-      temperature: 0.7,
+      temperature: 0.85, // Higher temperature for more human-like variation
       messages: [
         {
           role: "system",
           content:
-            "You are a product review generator. Generate realistic customer reviews. Return ONLY valid JSON array.",
+            "You are generating realistic customer reviews that sound like REAL PEOPLE - emotional, specific, sometimes frustrated, sometimes delighted. Mix complaints with praise. Be authentic and conversational. Return ONLY valid JSON array.",
         },
         {
           role: "user",

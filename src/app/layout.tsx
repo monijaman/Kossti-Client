@@ -11,10 +11,25 @@ const poppins = Poppins({
   variable: '--font-poppins',
 })
 
+const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
+
 export const metadata: Metadata = {
   title: 'Kossti - Honest Product Reviews & Comparisons',
   description: 'Read honest, unbiased product reviews and expert comparisons. Find the best products with detailed analysis, ratings, and user feedback.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com'),
+  // Block indexing on develop branch
+  ...((!allowIndexing) && {
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    },
+  }),
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
