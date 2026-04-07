@@ -85,7 +85,7 @@ export default function RootLayout({
         <ClientProvider>
           {children}
         </ClientProvider>
-        <Analytics />
+        {allowIndexing && <Analytics />}
       </body>
     </html>
   )
