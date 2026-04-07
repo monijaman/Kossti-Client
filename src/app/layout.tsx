@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
-
+import { Analytics } from "@vercel/analytics/next"
 const inter = Inter({ subsets: ['latin'] });
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800', '900'],
@@ -85,6 +85,7 @@ export default function RootLayout({
         <ClientProvider>
           {children}
         </ClientProvider>
+        <Analytics />
       </body>
     </html>
   )
