@@ -146,7 +146,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
 
 
             {tranSpecifications && tranSpecifications.map((spec, index) => (
-                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-1">
                     <div>
                         <Select
                             name="specification_id"

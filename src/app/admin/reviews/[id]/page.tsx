@@ -44,7 +44,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
     const [aiReviewStyle, setAiReviewStyle] = useState<ReviewStyle>('aesops-fable');
-    const [activeStyleTab, setActiveStyleTab] = useState<'entertainment' | 'tech' | 'automotive'>('entertainment');
+    const [activeStyleTab, setActiveStyleTab] = useState<'entertainment' | 'tech' | 'lifestyle'>('entertainment');
     const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
@@ -686,13 +686,13 @@ const ReviewForm = ({ params }: PageProps) => {
                                 💻 Tech & Products
                             </button>
                             <button
-                                onClick={() => setActiveStyleTab('automotive')}
-                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'automotive'
+                                onClick={() => setActiveStyleTab('lifestyle')}
+                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'lifestyle'
                                     ? 'border-b-2 border-blue-500 text-blue-600'
                                     : 'text-gray-600 hover:text-gray-800'
                                     }`}
                             >
-                                🚗 Automotive
+                                🎯 Lifestyle & Use Cases
                             </button>
                         </div>
 
@@ -744,16 +744,16 @@ const ReviewForm = ({ params }: PageProps) => {
                                 </button>
                             ))}
 
-                            {activeStyleTab === 'automotive' && ([
+                            {activeStyleTab === 'lifestyle' && ([
                                 { value: 'luxury-premium', label: '💎 Luxury Premium', desc: 'Aspirational, premium experience' },
                                 { value: 'budget-practical', label: '💡 Budget Practical', desc: 'Value-focused, smart spending' },
-                                { value: 'family-safe', label: '👨‍👩‍👧 Family Safe', desc: 'Safety, space & child-friendliness' },
-                                { value: 'performance-enthusiast', label: '🏆 Performance', desc: 'Track-ready, 0-100, driver thrills' },
-                                { value: 'eco-conscious', label: '🌿 Eco Conscious', desc: 'Emissions, efficiency & sustainability' },
-                                { value: 'urban-commuter', label: '🏙️ Urban Commuter', desc: 'City parking, stop-go & congestion' },
-                                { value: 'edmunds', label: '🚗 Edmunds', desc: "Automotive buyer's guide & value focus" },
-                                { value: 'car-and-driver', label: '🏎️ Car and Driver', desc: 'Performance, dynamics & driving passion' },
-                                { value: 'motor-trend', label: '📸 Motor Trend', desc: 'Professional automotive journalism' },
+                                { value: 'family-safe', label: '👨‍👩‍👧 Family Friendly', desc: 'Safety, reliability & family needs' },
+                                { value: 'performance-enthusiast', label: '🏆 Performance', desc: 'High-performance & enthusiast focus' },
+                                { value: 'eco-conscious', label: '🌿 Eco Conscious', desc: 'Sustainability & environmental impact' },
+                                { value: 'urban-commuter', label: '🏙️ Daily User', desc: 'Everyday practicality & convenience' },
+                                { value: 'edmunds', label: '📋 Buyer Guide', desc: "Comprehensive buyer's guide & value" },
+                                { value: 'car-and-driver', label: '🎖️ Expert Review', desc: 'In-depth expert analysis & testing' },
+                                { value: 'motor-trend', label: '📸 Professional', desc: 'Professional journalism standards' },
                             ] as { value: ReviewStyle; label: string; desc: string }[]).map(({ value, label, desc }) => (
                                 <button
                                     key={value}

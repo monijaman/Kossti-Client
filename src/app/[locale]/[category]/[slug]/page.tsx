@@ -1,6 +1,7 @@
 import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import SearchBox from '@/app/components/Search';
+import { InArticleAd } from '@/app/components/Ads/AdUnit';
 import { DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
@@ -231,10 +232,16 @@ const Page = async ({ params, searchParams }: PageProps) => {
       {/* SEO-Critical Components - Keep Synchronous */}
       <ProducDetails product={dataset} countryCode={countryCode} />
 
+      {/* In-article ad between content sections */}
+      <InArticleAd />
+
       {/* Non-Critical Components - Lazy Load */}
       <Suspense fallback={<ProductVideosSkeleton />}>
         <ProductVideos productId={dataset.id} />
       </Suspense>
+
+      {/* In-article ad before similar products */}
+      <InArticleAd />
 
       <Suspense fallback={<SimilarProductsSkeleton />}>
         <SimilarProducts countryCode={countryCode} slug={slug} />

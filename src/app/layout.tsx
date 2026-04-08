@@ -1,6 +1,7 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
+import Script from 'next/script';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
 import { Analytics } from "@vercel/analytics/next"
@@ -86,6 +87,14 @@ export default function RootLayout({
           {children}
         </ClientProvider>
         {allowIndexing && <Analytics />}
+        {allowIndexing && (
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8172172530139900"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   )

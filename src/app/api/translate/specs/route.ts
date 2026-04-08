@@ -36,6 +36,7 @@ Rules:
 - Keep technical acronyms/spec terms in English: RAM, ROM, CPU, GPU, SoC, OLED, AMOLED, LCD, USB-C, 5G, 4G, LTE, NFC, Wi-Fi, Bluetooth, IP68, mAh, Hz, GHz, MP, fps, HDR, OIS, EIS, UFS, LPDDR, IMX, AI
 - Convert numerals to Bengali numerals
 - Return exactly ${specs.length} items
+- NO trailing commas - ensure valid JSON syntax
 - Return ONLY valid JSON, no markdown, no explanation`;
 
   const response = await client.chat.completions.create({
@@ -46,7 +47,7 @@ Rules:
       {
         role: "system",
         content:
-          "You are a translator for mobile product specifications. Translate English to Bengali and transliterate brand/product/model names fully into Bengali script. Keep technical acronyms (RAM, ROM, CPU, GPU, OLED, USB-C, 5G, mAh, Hz, MP, etc.) in English. Return ONLY a valid JSON array. Never truncate the response.",
+          "You are a translator for mobile product specifications. Translate English to Bengali and transliterate brand/product/model names fully into Bengali script. Keep technical acronyms (RAM, ROM, CPU, GPU, OLED, USB-C, 5G, mAh, Hz, MP, etc.) in English. Return ONLY a valid JSON array with NO trailing commas. Never truncate the response.",
       },
       {
         role: "user",
@@ -75,9 +76,24 @@ Rules:
     .replace(/```\n?/g, "")
     .trim();
 
-  const translations: TranslationResult[] = JSON.parse(content);
+  // Fix common JSON formatting issues
+  // Remove trailing commas before closing brackets/braces
+  content = content
+    .replace(/,(\s*[\]}])/g, "$1")  // Remove trailing commas
+    .trim();
+
+  let translations: TranslationResult[];
+  
+  try {
+    translations = JSON.parse(content);
+  } catch (parseError) {
+    console.error("[translate/specs] JSON parse error:", parseError);
+    console.error("[translate/specs] Invalid JSON content:", content);
+    throw new Error(`Failed to parse translation response: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+  }
 
   if (!Array.isArray(translations)) {
+    console.error("[translate/specs] Response is not an array:", translations);
     throw new Error("Response is not a JSON array");
   }
 

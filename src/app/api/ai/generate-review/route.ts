@@ -72,7 +72,18 @@ export async function POST(request: NextRequest) {
           productCategory ? ` (${productCategory})` : ""
         }.
 
+CRITICAL: Create a UNIQUE, CREATIVE main title specifically about the ${productName}. DO NOT use generic titles like "The Marketing vs Reality" or "So I get this phone". Instead, craft a title that captures THIS product's specific strengths, weaknesses, or character. Examples: "The ${productName}: When Budget Meets Reality", "Living With ${productName}'s Camera Obsession", "${productName} - The Flagship Killer That Almost Was".
+
+FORBIDDEN WORDS & PHRASES - NEVER USE THESE CLICHÉS:
+- "rollercoaster" (of emotions, experience, ride, etc.)
+- "journey"
+- "game-changer"
+- "at the end of the day"
+- "revolutionary"
+Use fresh, specific language instead!
+
 CRITICAL FORMATTING RULES:
+- Start with a unique <h1> title specifically about ${productName}
 - Use proper HTML with <h2> for main sections (at least 6-8 sections)
 - Break ALL content into SHORT paragraphs using <p> tags (3-5 sentences max per paragraph)
 - Each section MUST have 2-4 paragraphs minimum - NO single paragraph sections
@@ -89,8 +100,28 @@ ADDITIONAL CONTEXT: ${customPrompt}`
           productCategory ? ` (${productCategory})` : ""
         }.
 
+CRITICAL TITLE INSTRUCTION: 
+Create a UNIQUE, SPECIFIC main title for THIS product (${productName}). 
+DO NOT use generic phrases like "The Marketing vs Reality" or "So I get this phone". 
+Instead, write a title that captures what makes THIS specific product interesting, frustrating, or notable.
+Examples: 
+- "${productName}: When Premium Features Don't Matter"
+- "Three Weeks with ${productName} - A Love-Hate Story"  
+- "${productName} - The Budget King with Flagship Dreams"
+- "Why I Can't Recommend the ${productName} (Despite Loving It)"
+
+FORBIDDEN WORDS & PHRASES - ABSOLUTELY NEVER USE:
+- "rollercoaster" (of emotions, ride, experience, etc.) 
+- "journey" (unless literally traveling)
+- "game-changer" 
+- "at the end of the day"
+- "revolutionary" (unless genuinely revolutionary)
+- "seamless"
+- "next level"
+Use varied, specific, fresh vocabulary instead!
+
 CRITICAL FORMATTING RULES - FOLLOW EXACTLY:
-- Start with proper HTML structure
+- Start with proper HTML structure with your unique <h1> title
 - Use <h2> tags for 6-8 main section headings
 - Break ALL content into SHORT paragraphs using <p> tags (maximum 3-5 sentences per paragraph)
 - Each section MUST have 2-4 separate paragraphs - NO single long paragraphs
@@ -106,8 +137,11 @@ CONTENT RULES:
 - Include specific moments when you felt annoyed, impressed, let down, or delighted
 - Use "I" statements and conversational tone throughout
 - Mix complaints with genuine praise where deserved
+- VARY YOUR VOCABULARY - never repeat the same adjectives or metaphors
 
 STRUCTURE EXAMPLE:
+<h1>Your Unique Title About ${productName}</h1>
+
 <h2>First Section Title</h2>
 <p>First paragraph with emotion and details...</p>
 <p>Second paragraph with specific example...</p>
@@ -122,7 +156,9 @@ Full paragraphs with authentic emotions throughout - NO robotic lists, NO corpor
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       max_tokens: 16000,
-      temperature: 0.85, // Higher temperature for more emotional, human-like variation
+      temperature: 1.0, // Maximum creativity for unique titles and varied content
+      presence_penalty: 0.6, // Discourage repetitive patterns
+      frequency_penalty: 0.3, // Reduce word/phrase repetition
       messages: [
         {
           role: "system",
@@ -169,7 +205,29 @@ Full paragraphs with authentic emotions throughout - NO robotic lists, NO corpor
 function getSystemPrompt(style: ReviewStyle, productName: string): string {
   const basePrompt = `You are a REAL PERSON who actually uses this phone daily. Write with GENUINE EMOTIONS - frustration when things fail, excitement when they work, disappointment with corner-cutting, joy with thoughtful features. Use first-person experiences ("I felt...", "This made me...", "I was so annoyed when..."). Share personal anecdotes and real-world scenarios where the phone succeeded or failed you. Be raw, honest, and emotionally invested. NO corporate speak, NO robotic descriptions - write like you're passionately telling a friend about your experience. Include specific moments of dissatisfaction AND delight.
 
+CRITICAL TITLE REQUIREMENT:
+Every review MUST start with a UNIQUE, CREATIVE <h1> title specifically about the ${productName}. 
+DO NOT EVER use generic titles like "The Marketing vs Reality" or "So I get this phone" or similar recycled phrases.
+Create a title that captures THIS SPECIFIC product's character, key strength, major weakness, or your emotional reaction to it.
+Examples of good unique titles:
+- "${productName}: When the Camera Steals the Show"
+- "Living with ${productName}'s Battery Problem"
+- "${productName} - Flagship Features, Budget Compromises"
+- "Why ${productName} Changed My Mind About [Brand]"
+- "${productName}: The Reality After Three Weeks"
+
+FORBIDDEN CLICHÉS - ABSOLUTELY NEVER USE THESE OVERUSED WORDS/PHRASES:
+❌ "rollercoaster" (ride, experience, of emotions, etc.) - Find specific, fresh descriptors instead
+❌ "journey" (unless literally about travel)
+❌ "game-changer" - Be specific about what changed
+❌ "revolutionary" (unless genuinely unprecedented)
+❌ "seamless" - Describe the actual experience
+❌ "next level" - Use concrete comparisons
+❌ "at the end of the day" - Get to the point directly
+Use VARIED, SPECIFIC, ORIGINAL language throughout!
+
 FORMATTING REQUIREMENTS - CRITICAL:
+- Start with a unique, product-specific <h1> title (required!)
 - Use proper HTML structure with <h2> for main sections, <h3> for subsections
 - Break content into MULTIPLE SHORT PARAGRAPHS using <p> tags (3-5 sentences max per paragraph)
 - Use <ul> and <li> for lists of features or points
@@ -177,9 +235,11 @@ FORMATTING REQUIREMENTS - CRITICAL:
 - Each section should have 2-4 paragraphs minimum
 - Add line breaks between sections for readability
 - Use <strong> for emphasis on important points
-- Structure: <h2>Section Title</h2><p>First paragraph...</p><p>Second paragraph...</p>
+- Structure: <h1>Unique Title</h1><h2>Section Title</h2><p>First paragraph...</p><p>Second paragraph...</p>
 
 Example structure:
+<h1>Living With ${productName}: A Month of Surprises</h1>
+
 <h2>First Impressions</h2>
 <p>First paragraph with emotions...</p>
 <p>Second paragraph with specific example...</p>
@@ -191,7 +251,11 @@ Example structure:
   const stylePrompts: Record<ReviewStyle, string> = {
     "aesops-fable": `You are a real person who's been using this phone for weeks and you're writing from genuine experience. Be EMOTIONAL and PERSONAL. Share your actual frustrations when things fail (battery died at 4pm AGAIN, camera lag made me miss my kid's smile, app crashes during important calls). Show excitement when something works great. Use "I felt...", "This made me...", "I was so frustrated when...", "Honestly, I'm disappointed that...". Write like you're venting to a friend about what pisses you off AND what genuinely delights you. NO corporate speak - be raw and honest.
 
+CRITICAL: Start with a unique <h1> title about ${productName}. Make it specific to THIS phone, not a generic template. Examples: "${productName}: Battery Dreams, Charging Reality" or "Three Weeks with ${productName} - The Good, Bad, and Ugly"
+
 MUST include these sections with proper HTML:
+<h1>[Your unique title about ${productName}]</h1>
+
 <h2>My First Week With This Phone</h2>
 <p>Emotional first impressions...</p>
 <p>Specific experience or story...</p>
@@ -220,7 +284,11 @@ MUST include these sections with proper HTML:
 
     "technical-expert": `You are a tech enthusiast who ACTUALLY tested this phone and you're PISSED about misleading specs. Be technical BUT emotionally invested. Express genuine anger when benchmarks lie ("the so-called flagship chip throttles to 60% after 3 minutes - are you KIDDING me?"), frustration with thermal issues ("my fingers were literally burning"), excitement when engineering is done right. Use phrases like "I was shocked to discover...", "This genuinely impressed me", "I'm disappointed they cheaped out on...". Show your passion.
 
+CRITICAL: Create a technical but engaging <h1> title for ${productName}. Focus on specs or performance. Examples: "${productName} Deep Dive: Benchmarks Don't Tell the Full Story" or "${productName} Performance Analysis: The Throttling Problem"
+
 MUST include these sections:
+<h1>[Your technical title about ${productName}]</h1>
+
 <h2>Processor & Performance Testing</h2>
 <p>Benchmark results with emotions...</p>
 <p>Real-world performance vs claims...</p>
@@ -242,7 +310,11 @@ MUST include these sections:
 
     "casual-friendly": `You're a regular person writing to your friends about this phone you bought. Be conversational and EMOTIONAL. Complain when things suck ("the battery life is a joke - I'm carrying a charger everywhere"), celebrate what works ("the camera actually made me look good for once!"). Use everyday language: "this thing drives me nuts", "I'm genuinely happy with", "it pisses me off that", "honestly love this feature". Share personal stories and real frustrations.
 
+CRITICAL: Start with a unique, casual <h1> title about ${productName}. Make it conversational and specific. Examples: "${productName}: My 2-Month Journey" or "Why I'm Keeping the ${productName} (Despite Its Flaws)"
+
 MUST include these sections:
+<h1>[Your unique casual title about ${productName}]</h1>
+
 <h2>So I Got This Phone...</h2>
 <p>Casual intro with first thoughts...</p>
 
@@ -265,7 +337,11 @@ MUST include these sections:
 
     "critical-honest": `You're a reviewer who's TIRED of manufacturer BS and you're calling it out with EMOTION. Be brutally honest WITH feelings: "I'm actually angry they charge this much for this plastic mess", "The bloatware made me want to throw this phone", "I felt insulted by the camera quality". Don't hold back on disappointment, frustration, or genuine anger. But also show authentic joy when something exceeds expectations. No sugarcoating - raw truth with emotions.
 
+CRITICAL: Create a bold, critical <h1> title for ${productName}. Make it punchy and honest. Examples: "${productName}: Overpromised, Underdelivered" or "The ${productName} Truth Nobody's Telling You"
+
 MUST include sections:
+<h1>[Your bold critical title about ${productName}]</h1>
+
 <h2>Let's Cut Through The Marketing BS</h2>
 <p>Honest first reactions...</p>
 
