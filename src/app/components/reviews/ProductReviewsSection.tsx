@@ -3,7 +3,6 @@
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Review } from '@/lib/types';
-import { useCallback, useEffect, useState } from 'react';
 import styles from './reviews.module.css';
 
 interface ProductReviewsSectionProps {
@@ -15,65 +14,32 @@ interface ReviewWrapper {
     review: Review;
 }
 
-const ProductReviewsSection = ({ productId, countryCode = 'en' }: ProductReviewsSectionProps) => {
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchProductReviews = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            // Use fetchApi helper for consistent API calls (backend exposes /public-reviews)
-            const endpoint = apiEndpoints.productReviews(productId, countryCode);
-            const response = await fetchApi(endpoint);
-            console.log(response)
-            // Handle nested response shapes similar to getProducts
-            let dataset: Review[] = [];
-            if (response.success && response.data) {
-                // If API returns { data: { reviews: [...] } }
-                if (typeof response.data === 'object' && 'reviews' in response.data) {
-                    const reviewsArray = response.data.reviews;
-                    // Check if reviews contain nested 'review' objects
-                    if (Array.isArray(reviewsArray) && reviewsArray.length > 0 && 'review' in reviewsArray[0]) {
-                        dataset = (reviewsArray as ReviewWrapper[]).map((item) => item.review);
-                    } else {
-                        dataset = Array.isArray(reviewsArray) ? reviewsArray : [];
-                    }
-                } else if (Array.isArray(response.data)) {
-                    // If API returns array directly
-                    dataset = response.data as Review[];
-                } else if (typeof response.data === 'object' && 'data' in response.data) {
-                    // Some endpoints wrap payload in data
-                    const inner = response.data.data as Record<string, unknown>;
-                    dataset = Array.isArray(inner) ? inner : Array.isArray(inner?.reviews) ? (inner.reviews as Review[]) : [];
+const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductReviewsSectionProps) => {
+    // Fetch reviews at the top level
+    let reviews: Review[] = [];
+    let error: string | null = null;
+    try {
+        const endpoint = apiEndpoints.productReviews(productId, countryCode);
+        const response = await fetchApi(endpoint);
+        // Handle nested response shapes similar to getProducts
+        if (response.success && response.data) {
+            if (typeof response.data === 'object' && 'reviews' in response.data) {
+                const reviewsArray = response.data.reviews;
+                if (Array.isArray(reviewsArray) && reviewsArray.length > 0 && 'review' in reviewsArray[0]) {
+                    reviews = (reviewsArray as ReviewWrapper[]).map((item) => item.review);
+                } else {
+                    reviews = Array.isArray(reviewsArray) ? reviewsArray : [];
                 }
+            } else if (Array.isArray(response.data)) {
+                reviews = response.data as Review[];
+            } else if (typeof response.data === 'object' && 'data' in response.data) {
+                const inner = response.data.data as Record<string, unknown>;
+                reviews = Array.isArray(inner) ? inner : Array.isArray(inner?.reviews) ? (inner.reviews as Review[]) : [];
             }
-
-            setReviews(dataset);
-        } catch (err) {
-            console.error('Error fetching product reviews:', err);
-            setError(err instanceof Error ? err.message : 'Failed to load reviews');
-            setReviews([]);
-        } finally {
-            setLoading(false);
         }
-    }, [productId, countryCode]);
-
-    useEffect(() => {
-        fetchProductReviews();
-    }, [fetchProductReviews]);
-
-    if (loading) {
-        return (
-            <div className="my-12 p-8 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                </div>
-                <p className="text-center text-gray-600 mt-4">Loading reviews...</p>
-            </div>
-        );
+    } catch (err: any) {
+        error = err instanceof Error ? err.message : 'Failed to load reviews';
+        reviews = [];
     }
 
     if (error) {
@@ -103,7 +69,6 @@ const ProductReviewsSection = ({ productId, countryCode = 'en' }: ProductReviews
     return (
         <div className="my-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Reviews</h2>
-
             <div className="flex flex-col gap-3">
                 {reviews.map((review, index) => (
                     <div key={index} className={styles.reviewCard}>
