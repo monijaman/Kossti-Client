@@ -1,4 +1,5 @@
 import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
+import { InArticleAd } from '@/app/components/Ads/AdUnit';
 import { useTranslation } from '@/hooks/useLocale';
 import { SidebarParams } from '@/lib/types';
 import { cookies } from 'next/headers';
@@ -70,6 +71,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
         heading={t.categories_heading || 'Categories'}
         clearCategoryText={t.clear_Category}
       />
+      <InArticleAd className="my-4" />
       <BrandsListClient
         selectedBrands={selectedBrands}
         activeCategory={activeCategory}
