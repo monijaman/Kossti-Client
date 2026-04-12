@@ -285,9 +285,18 @@ export const useProducts = () => {
     }
   };
 
-  const getVideosByProductId = async (productId: number) => {
+  const getVideosByProductId = async (productId: number, locale?: string) => {
     const apiUrl = getApiUrl();
-    const fullUrl = `${apiUrl}/product-videos/${productId}`;
+    
+    // Build URL with locale parameter if provided
+    const params = new URLSearchParams();
+    if (locale) {
+      params.set('locale', locale);
+    }
+    const queryString = params.toString();
+    const fullUrl = queryString 
+      ? `${apiUrl}/product-videos/${productId}?${queryString}`
+      : `${apiUrl}/product-videos/${productId}`;
 
     try {
       const response = await fetch(fullUrl);

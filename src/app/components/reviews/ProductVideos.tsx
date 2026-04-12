@@ -5,36 +5,54 @@ import { useEffect, useState } from 'react';
 
 interface ProductVideosProps {
     productId: number;
+    locale?: string;
 }
 
-const ProductVideos = ({ productId }: ProductVideosProps) => {
+const ProductVideos = ({ productId, locale = 'en' }: ProductVideosProps) => {
     const { getVideosByProductId } = useProducts();
     const [videos, setVideos] = useState<VideoItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const fetchVideos = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await getVideosByProductId(productId);
-
-            if (response?.data) {
-                setVideos(Array.isArray(response.data) ? response.data : []);
-            }
-        } catch (err) {
-            console.error('Error fetching videos:', err);
-            setError('Failed to load videos');
-        } finally {
-            setLoading(false);
-        }
-    };
+    
+    // Debug: Log the locale being received
+    console.log(`[ProductVideos] Component rendered with productId=${productId}, locale=${locale}`);
+    
     useEffect(() => {
+        const fetchVideos = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                                
+                // Fetch videos based on locale
+                let response = await getVideosByProductId(productId, locale);
 
+                // ONLY fallback from bn → en, never from en → bn
+                if (locale === 'bn' && (!response?.data || response.data.length === 0)) {
+                    response = await getVideosByProductId(productId, 'en');
+                }
+
+                if (response?.data) {
+                    const videosData = Array.isArray(response.data) ? response.data : [];
+                    // Deduplicate videos by ID to prevent duplicate keys
+                    const uniqueVideos = videosData.filter((video, index, self) =>
+                        index === self.findIndex((v) => v.id === video.id)
+                    );
+                    setVideos(uniqueVideos);
+                } else {
+                    setVideos([]);
+                }
+            } catch (err) {
+                console.error('Error fetching videos:', err);
+                setError('Failed to load videos');
+            } finally {
+                setLoading(false);
+            }
+        };
 
         if (productId) {
             fetchVideos();
         }
-    }, [productId]);
+    }, [locale]);
 
     if (loading) {
         return (
@@ -55,14 +73,17 @@ const ProductVideos = ({ productId }: ProductVideosProps) => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Videos</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos.map((video) => {
+                {videos.map((video, index) => {
                     const youtubeUrl = video.youtubeUrl || video.url;
+                    
+                    if (!youtubeUrl) return null;
+                    
                     const videoId = extractYoutubeId(youtubeUrl);
 
                     if (!videoId) return null;
 
                     return (
-                        <div key={video.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div key={`video-${video.id}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             {/* Video Thumbnail */}
                             <div className="relative w-full bg-black aspect-video">
                                 <iframe

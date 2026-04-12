@@ -198,7 +198,7 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
       {/* Reviews Section - Shows all reviews with ratings and details */}
 
       {/* Two Column Layout for Specifications and Reviews */}
-      <div className="mt-8 md:mt-12 grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
+      <div className="mt-8 md:mt-12 ">
         {/* Reviews Section */}
         <div className="lg:col-span-2">
           <Suspense fallback={<div>Loading reviews...</div>}>

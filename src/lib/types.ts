@@ -283,7 +283,7 @@ export type LocaleKeys = "en" | "bn";
 
 export interface VideoItem {
   id: number;
-  url: string;
+  url?: string | null;
   title: string;
   youtubeUrl?: string; // Optional property to resolve the issue
 }
