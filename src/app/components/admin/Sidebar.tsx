@@ -80,6 +80,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                             </Link>
                         </li>
                         <li>
+                            <Link
+                                href="/admin/contacts"
+                                className="block px-3 py-2 rounded hover:bg-gray-800 transition-colors"
+                                onClick={handleLinkClick}
+                            >
+                                Contacts
+                            </Link>
+                        </li>
+                        <li>
                             <button
                                 onClick={toggleSpecifications}
                                 className="w-full text-left px-3 py-2 rounded hover:bg-gray-800 transition-colors flex items-center justify-between"
