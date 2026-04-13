@@ -2,8 +2,12 @@
 import { DEFAULT_LOCALE, LOCALES } from '@/lib/constants';
 import React, { useEffect, useState } from 'react';
 
-const LanguageSwitcher = () => {
-    const [locale, setLocale] = useState<string>(DEFAULT_LOCALE); // Default locale
+interface LanguageSwitcherProps {
+    currentLocale?: string;
+}
+
+const LanguageSwitcher = ({ currentLocale }: LanguageSwitcherProps) => {
+    const [locale, setLocale] = useState<string>(currentLocale || DEFAULT_LOCALE);
 
     // Load the locale from local storage or cookies when the component mounts
     useEffect(() => {
@@ -22,11 +26,18 @@ const LanguageSwitcher = () => {
                 localStorage.setItem('locale', activeLocale);
                 setLocale(activeLocale);
                 document.cookie = `locale-preference=${activeLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+                document.cookie = `country-code=${activeLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
             }
         } else {
             setLocale(storedLocale); // Use the stored locale if available
         }
     }, []);
+
+    useEffect(() => {
+        if (currentLocale && LOCALES.includes(currentLocale)) {
+            setLocale(currentLocale);
+        }
+    }, [currentLocale]);
 
 
     const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -36,25 +47,19 @@ const LanguageSwitcher = () => {
 
         // Update the cookie (use the same name that middleware expects)
         document.cookie = `locale-preference=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
+        document.cookie = `country-code=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
 
-        // Use window.location.href instead of router.push for a full page reload
-        // This ensures middleware re-reads the cookie and updates locale properly
-        const currentUrl = window.location.pathname;
-        const pathSegments = currentUrl.split("/");
-
-        // Detect if the first path segment is a valid locale
-        const isValidLocale = LOCALES.includes(pathSegments[1]);
-
-        // Replace or prepend the locale in the URL
-        if (isValidLocale) {
-            pathSegments[1] = newLocale; // Replace the current locale
+        // Rebuild URL safely, preserving current route and query string
+        const segments = window.location.pathname.split('/').filter(Boolean);
+        if (segments.length > 0 && LOCALES.includes(segments[0])) {
+            segments[0] = newLocale;
         } else {
-            pathSegments.unshift(newLocale); // Add the new locale as the first segment
+            segments.unshift(newLocale);
         }
 
-        const newPath = pathSegments.join("/");
-        // Full page reload to ensure middleware processes the new locale cookie
-        window.location.href = newPath;
+        const newPath = `/${segments.join('/')}`;
+        const query = window.location.search || '';
+        window.location.href = `${newPath}${query}`;
     };
 
     return (

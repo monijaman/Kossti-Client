@@ -14,10 +14,13 @@ interface MainLayoutProps {
 }
 
 const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLayoutProps) => {
+  const locale = sidebarProps?.countryCode || 'bn';
+  const withLocale = (path: string) => `/${locale}${path}`;
+
   return (
     <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
       <header className="bg-gray-100 text-white px-2 md:px-4 py-2 md:py-3 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2 md:gap-4 relative z-40 overflow-visible">
-        <Link href="/" suppressHydrationWarning className="flex-shrink-0">
+        <Link href={withLocale('')} suppressHydrationWarning className="flex-shrink-0">
           <Image
             src="/logo.png"
             alt="Kosti"
@@ -33,7 +36,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
         <div className="w-full md:w-auto md:ml-auto flex flex-row items-center justify-end gap-2 md:gap-4 relative z-50 overflow-visible">
 
           <AccountDropdown isAuthenticated={isAuthenticated} />
-          <LanguageSwitcher />
+          <LanguageSwitcher currentLocale={locale} />
         </div>
       </header>
 
@@ -89,7 +92,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -97,7 +100,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('/about')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -105,7 +108,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('/contact')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -113,7 +116,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
                   </Link>
                 </li>
                 <li>
-                  <Link href="/disclaimer" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('/disclaimer')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -131,7 +134,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/privacy-policy" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('/privacy-policy')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -139,7 +142,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
+                  <Link href={withLocale('/terms')} className="text-gray-300 hover:text-blue-400 transition-colors text-sm flex items-center group">
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

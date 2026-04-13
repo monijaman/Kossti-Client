@@ -2,6 +2,7 @@
 
 import MainLayout from '@/app/components/layout/MainLayout';
 import { getApiUrl } from '@/lib/apiUrl';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
@@ -171,7 +172,7 @@ export default function ContactPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} method="POST" action="#" className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                   Your Name *
@@ -257,7 +258,7 @@ export default function ContactPage() {
               </button>
 
               <p className="text-xs text-gray-500 text-center">
-                By submitting this form, you agree to our <a href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                By submitting this form, you agree to our <Link href={`/${locale}/privacy-policy`} className="text-blue-600 hover:underline">Privacy Policy</Link>.
               </p>
             </form>
           </div>

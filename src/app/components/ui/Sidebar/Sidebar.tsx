@@ -1,63 +1,74 @@
+"use client";
+
 import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
 import { InArticleAd } from '@/app/components/Ads/AdUnit';
 import { useTranslation } from '@/hooks/useLocale';
-import { SidebarParams } from '@/lib/types';
+import { categoryInt, SidebarParams } from '@/lib/types';
+import { useEffect, useState } from 'react';
 import Categories from './Categories';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
+const Sidebar = ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
   // Use provided countryCode or fallback to 'bn'
   const locale = countryCode || 'bn';
   const t = useTranslation(locale);
+  const [categories, setCategories] = useState<categoryInt[]>([]);
 
 
-  async function fetchCategories(countryCode: string) {
-    if (!API_BASE_URL) {
-      return [];
-    }
+  useEffect(() => {
+    let cancelled = false;
 
-    try {
-      const queryParams = new URLSearchParams({
-        per_page: '100',
-        search: '',
-        paginate: 'false',
-        locale: countryCode,
-        category_id: '',
-        status: '1',
-        page: ''
-      });
-
-      const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
-      // Cache for 10 minutes (600 seconds) - revalidate after that time
-      const response = await fetch(fullUrl, {
-        next: { revalidate: 600, tags: ['categories'] }
-      });
-
-      if (!response.ok) {
-        // Try with /api prefix as fallback
-        console.log('Trying /wide-categories...');
-        const altResponse = await fetch(`${API_BASE_URL}/wide-categories?locale=${countryCode}`, {
-          next: { revalidate: 600, tags: ['categories'] }
-        });
-        if (altResponse.ok) {
-          const data = await altResponse.json();
-          return data.categories || [];
-        }
-        throw new Error(`Both endpoints failed. Status: ${response.status}`);
+    const fetchCategories = async () => {
+      if (!API_BASE_URL) {
+        setCategories([]);
+        return;
       }
 
-      const data = await response.json();
-      return data.categories || [];
-    } catch (error) {
-      console.error('Categories fetch error:', error);
-      return [];
-    }
-  }
+      try {
+        const queryParams = new URLSearchParams({
+          per_page: '100',
+          search: '',
+          paginate: 'false',
+          locale,
+          category_id: '',
+          status: '1',
+          page: ''
+        });
 
-  // Fetch categories data
-  const categories = await fetchCategories(locale);
+        const fullUrl = `${API_BASE_URL}/wide-categories?${queryParams.toString()}`;
+        const response = await fetch(fullUrl);
+
+        if (!response.ok) {
+          const altResponse = await fetch(`${API_BASE_URL}/wide-categories?locale=${locale}`);
+          if (altResponse.ok) {
+            const data = await altResponse.json();
+            if (!cancelled) {
+              setCategories(data.categories || []);
+            }
+            return;
+          }
+          throw new Error(`Both endpoints failed. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!cancelled) {
+          setCategories(data.categories || []);
+        }
+      } catch (error) {
+        console.error('Categories fetch error:', error);
+        if (!cancelled) {
+          setCategories([]);
+        }
+      }
+    };
+
+    fetchCategories();
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
 
 
   return (
