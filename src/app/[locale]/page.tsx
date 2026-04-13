@@ -144,7 +144,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const { locale } = await params;
 
   const page = parseInt(resolvedSearchParams.page as string, 10) || 1;
-  const limit = 20;
+  const limit = 16; // Match Popular Products limit for consistent pagination
   const activeCategory = resolvedSearchParams.category || '';
   const activeBrands = resolvedSearchParams.brand || '';
   const activePriceRange = resolvedSearchParams.price || '';
@@ -153,6 +153,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
   // Use URL locale as primary source — cookie is only a fallback for non-localised routes
   const countryCode = locale || cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
+
+  console.log('[Frontend] Sending request with limit:', limit);
 
   // Fetch all data in parallel for better performance
   const [productData] = await Promise.all([
@@ -178,7 +180,10 @@ const Page = async ({ searchParams, params }: PageProps) => {
   if (!productData.success) {
     console.error('[Page Error] Failed to fetch products:', productData.error);
     return (
-      <MainLayout sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm, countryCode }}>
+      <MainLayout 
+        sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm, countryCode }}
+        isAuthenticated={!!token}
+      >
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load products</h2>
           <p className="text-gray-600 mb-4">{productData.error || 'The backend service is temporarily unavailable. Please try again later.'}</p>
@@ -192,7 +197,16 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
   const products = productData.data?.data ?? [];
   const totalProducts = productData.data?.meta?.total ?? 0;
-  const totalPages = Math.ceil(totalProducts / limit);
+  // Use backend's calculated last_page to ensure consistency
+  const totalPages = productData.data?.meta?.last_page ?? Math.ceil(totalProducts / limit);
+
+  console.log('[Frontend] Received response:', {
+    productsCount: products.length,
+    totalProducts,
+    totalPages,
+    perPage: productData.data?.meta?.per_page,
+    limit,
+  });
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -204,7 +218,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   };
 
   return (
-    <MainLayout sidebarProps={sidebarProps}>
+    <MainLayout sidebarProps={sidebarProps} isAuthenticated={!!token}>
       {/* JSON-LD for website */}
       <script
         type="application/ld+json"

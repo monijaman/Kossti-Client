@@ -1,0 +1,24 @@
+# robots.txt for Kossti
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /tmp/
+
+# Allow Google AdSense crawler
+User-agent: Mediapartners-Google
+Allow: /
+
+# Allow Google AdSense verification bot
+User-agent: AdsBot-Google
+Allow: /
+
+# Crawl delay for well-behaved bots
+Crawl-delay: 10
+
+# Sitemap location (update with your actual sitemap URL when generated)
+Sitemap: https://kossti.com/sitemap.xml

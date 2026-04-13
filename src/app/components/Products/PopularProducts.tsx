@@ -22,7 +22,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
   const translation = useTranslation(countryCode);
   const limit = 16;
 
-  // Fetch data on the server
+  // Fetch popular products for the current page with limit=16
   const response = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
     method: 'GET',
     queryParams: {

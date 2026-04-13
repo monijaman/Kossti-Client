@@ -2,17 +2,15 @@ import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
 import { InArticleAd } from '@/app/components/Ads/AdUnit';
 import { useTranslation } from '@/hooks/useLocale';
 import { SidebarParams } from '@/lib/types';
-import { cookies } from 'next/headers';
 import Categories from './Categories';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode: propCountryCode }: SidebarParams) => {
-  const cookieCode = (await cookies()).get('country-code')?.value;
-  // Props from URL locale take priority over the cookie
-  const countryCode = propCountryCode || cookieCode || 'bn';
-  const t = useTranslation(countryCode);
+const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
+  // Use provided countryCode or fallback to 'bn'
+  const locale = countryCode || 'bn';
+  const t = useTranslation(locale);
 
 
   async function fetchCategories(countryCode: string) {
@@ -59,7 +57,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
   }
 
   // Fetch categories data
-  const categories = await fetchCategories(countryCode);
+  const categories = await fetchCategories(locale);
 
 
   return (
@@ -67,7 +65,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
       <Categories
         categories={categories}
         activeCategory={activeCategory}
-        locale={countryCode}
+        locale={locale}
         heading={t.categories_heading || 'Categories'}
         clearCategoryText={t.clear_Category}
       />
@@ -76,7 +74,7 @@ const Sidebar = async ({ activeCategory, selectedBrands, searchTerm, countryCode
         selectedBrands={selectedBrands}
         activeCategory={activeCategory}
         searchTerm={searchTerm}
-        countryCode={countryCode}
+        countryCode={locale}
         brandsHeading={t.brands_heading || 'Brands'}
       />
     </aside>

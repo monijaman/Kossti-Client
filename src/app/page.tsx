@@ -68,7 +68,7 @@ const Page = async ({ searchParams }: PageProps) => {
   };
 
   return (
-    <MainLayout sidebarProps={sidebarProps}>
+    <MainLayout sidebarProps={sidebarProps} isAuthenticated={!!token}>
       {/* <SearchBox initialSearchTerm={searchTerm} /> */}
       <ProductReview products={dataset?.products ?? []} countryCode={countryCode} />
       <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />

@@ -7,7 +7,7 @@ const Navigation = () => (
       <li><Link href="/admin/reviews" className="hover:text-gray-300">Products</Link></li>
       <li><Link href="/admin/specifications" className="hover:text-gray-300">Specifications</Link></li>
       <li><Link href="/admin/keys" className="hover:text-gray-300">Keys</Link></li>
-      <li><Link href="#" className="hover:text-gray-300">Contact</Link></li>
+      <li><Link href="/admin/contacts" className="hover:text-gray-300">Contacts</Link></li>
     </ul>
   </nav>
 );
