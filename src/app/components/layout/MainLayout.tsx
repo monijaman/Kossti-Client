@@ -42,7 +42,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
       <div className="flex flex-col md:flex-row flex-grow">
         <Sidebar {...sidebarProps} />
 
-        <main className="flex-1 bg-red-100 p-3 md:p-4 lg:p-6">
+        <main className="flex-1 bg-transparent p-3 md:p-4 lg:p-6">
           {children}
         </main>
       </div>
