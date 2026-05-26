@@ -3,6 +3,8 @@ import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Product } from "@/lib/types";
 import ProducShortDetails from "./ProducShortDetails";
+import SectionHeader from "../Home/SectionHeader";
+import { TrendingUp } from "lucide-react";
 
 interface pageProps {
   countryCode: string;
@@ -44,36 +46,38 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
   if (!response.success) {
     console.error('[PopularProducts Error] Failed to fetch popular products:', response.error);
     return (
-      <>
-        <h2 className="page-title text-2xl font-bold text-gray-800 mb-6 mt-8">
-          {translation.popupar_product}
-        </h2>
-        <div className="text-center py-8 text-gray-600">
-          <p>Unable to load popular products. Please try again later.</p>
+      <section className="mb-12">
+        <SectionHeader
+          title={translation.popupar_product}
+          icon={TrendingUp}
+          gradientColor="from-purple-600 to-pink-600"
+        />
+        <div className="text-center py-12 bg-purple-50 rounded-2xl">
+          <p className="text-gray-600">
+            {countryCode === 'en' ? 'Unable to load popular products. Please try again later.' : 'জনপ্রিয় পণ্য লোড করতে অক্ষম। পরে আবার চেষ্টা করুন।'}
+          </p>
         </div>
-      </>
+      </section>
     );
   }
 
   const dataset = response.data?.data ?? [];
 
   return (
-    <>
-      <h2 className="page-title text-2xl font-bold text-gray-800 mb-6 mt-8">
-        {translation.popupar_product}
-        {activeCategory && (
-          <span className="text-base font-normal text-gray-600 block mt-2">
-            Category: {activeCategory}
-          </span>
-        )}
-      </h2>
+    <section className="mb-12">
+      <SectionHeader
+        title={translation.popupar_product}
+        subtitle={countryCode === 'en' ? 'Most viewed and highly rated products' : 'সর্বাধিক দেখা এবং উচ্চ রেটযুক্ত পণ্য'}
+        icon={TrendingUp}
+        gradientColor="from-purple-600 to-pink-600"
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {dataset.map((product) => (
           <ProducShortDetails key={product.id} product={product} countryCode={countryCode} />
         ))}
       </div>
-    </>
+    </section>
   );
 };
 

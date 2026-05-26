@@ -3,6 +3,8 @@
 import { useTranslation } from "@/hooks/useLocale";
 import { Product } from '@/lib/types';
 import ProducShortDetails from './ProducShortDetails';
+import SectionHeader from '../Home/SectionHeader';
+import { Clock } from 'lucide-react';
 
 interface pageProps {
   products: Product[];
@@ -10,19 +12,21 @@ interface pageProps {
 }
 
 const ProductReview = ({ products, countryCode }: pageProps) => {
-  // Retrieve the 'country-code' cookie directly in a server component
-
   const translation = useTranslation(countryCode);
 
   // Show only first 8 products for Latest Reviews section
   const latestProducts = products.slice(0, 8);
 
   return (
-    <>
-      <h2 className="page-title font-display text-lg md:text-xl lg:text-2xl font-bold text-gray-800 mb-4 md:mb-6 tracking-tight">
-        {translation.latest_review}</h2>
+    <section className="mb-12">
+      <SectionHeader
+        title={translation.latest_review}
+        subtitle={countryCode === 'en' ? 'Fresh reviews from our expert team' : 'আমাদের বিশেষজ্ঞ টিম থেকে নতুন রিভিউ'}
+        icon={Clock}
+        gradientColor="from-blue-600 to-cyan-600"
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-6 md:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
         {latestProducts.map((product, i) => (
           <ProducShortDetails
             key={product.id + i}
@@ -32,7 +36,7 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
           />
         ))}
       </div>
-    </>
+    </section>
   );
 };
 

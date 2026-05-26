@@ -4,6 +4,9 @@ import Pagination from '@/app/components/Pagination/index';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
+import HeroSection from '@/app/components/Home/HeroSection';
+import CategoryNavigation from '@/app/components/Home/CategoryNavigation';
+import TrustSection from '@/app/components/Home/TrustSection';
 import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
@@ -237,18 +240,30 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
 
-      {/* H1 for SEO */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+      {/* Hero Section */}
+      <HeroSection countryCode={countryCode} />
+
+      {/* H1 for SEO - Hidden visually but accessible */}
+      <h1 className="sr-only">
         {countryCode === 'en'
           ? 'Product Reviews & Comparisons in Bangladesh'
           : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
         }
       </h1>
 
+      {/* Category Navigation */}
+      <CategoryNavigation countryCode={countryCode} />
+
+      {/* Search Box */}
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
 
+      {/* Latest Reviews Section */}
       <ProductReview products={products} countryCode={countryCode} />
 
+      {/* Trust Section */}
+      <TrustSection countryCode={countryCode} />
+
+      {/* Popular Products Section */}
       <Suspense fallback={<PopularProductsSkeleton />}>
         <PopularProducts 
           countryCode={countryCode} 
@@ -258,6 +273,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         />
       </Suspense>
 
+      {/* Pagination */}
       <Pagination
         currentPage={page}
         totalPages={totalPages}

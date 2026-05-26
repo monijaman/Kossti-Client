@@ -2454,6 +2454,11 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+lucide-react@^1.16.0:
+  version "1.16.0"
+  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-1.16.0.tgz"
+  integrity sha512-dYwyPzb4MEKpGUmNYk3WKWPnMrHs3FKM+q94kAnJrcDIqqn1hq2xY8scaS2ovsOCM5D51ey2gaRG3PBb1vgoYQ==
+
 math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz"
@@ -2999,7 +3004,7 @@ react-transition-group@^4.3.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-"react@^16 || ^17 || ^18 || ^19", "react@^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18 || ^19 || ^19.0.0-rc", "react@^18.0 || ^19", "react@^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", react@^19.1.1, "react@>= 16.8.0", "react@>= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0", "react@>= 17.0.2", react@>=16.6.0, react@>=16.8.0:
+"react@^16 || ^17 || ^18 || ^19", "react@^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.9.0 || ^17.0.0 || ^18 || ^19", "react@^18 || ^19 || ^19.0.0-rc", "react@^18.0 || ^19", "react@^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0", react@^19.1.1, "react@>= 16.8.0", "react@>= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0", "react@>= 17.0.2", react@>=16.6.0, react@>=16.8.0:
   version "19.1.1"
   resolved "https://registry.npmjs.org/react/-/react-19.1.1.tgz"
   integrity sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==

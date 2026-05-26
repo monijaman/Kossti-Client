@@ -37,3 +37,32 @@
   color: #6c757d;
   font-size: 14px;
 }
+
+/* Animation delays for blob animations */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Grid background pattern */
+.bg-grid-slate-100 {
+  background-image: linear-gradient(to right, rgb(241 245 249 / 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(241 245 249 / 0.2) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Screen reader only utility (for hidden H1) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
