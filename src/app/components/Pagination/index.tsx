@@ -203,7 +203,7 @@ const Pagination = ({
         href={buildUrl(safeCurrentPage - 1)}
         className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 ${safeCurrentPage === 1
           ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
-          : 'bg-transparent text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
+          : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}
         aria-disabled={safeCurrentPage === 1}
         tabIndex={safeCurrentPage === 1 ? -1 : 0}
@@ -220,7 +220,7 @@ const Pagination = ({
               href={buildUrl(page)}
               className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 mx-0.5 ${safeCurrentPage === page
                 ? 'bg-kossti-dark text-white border-kossti-dark font-bold shadow'
-                : 'bg-transparent text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
+                : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
                 }`}
             >
               {String(page)}
@@ -237,7 +237,7 @@ const Pagination = ({
         href={buildUrl(safeCurrentPage + 1)}
         className={`px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm rounded-md border transition-colors duration-150 ${safeCurrentPage === safeTotalPages
           ? 'bg-kossti-cream text-gray-400 border-kossti-tan cursor-not-allowed'
-          : 'bg-transparent text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
+          : 'bg-white text-kossti-dark border-kossti-tan hover:bg-kossti-cream-light hover:text-kossti-brown'
           }`}
         aria-disabled={safeCurrentPage === safeTotalPages}
         tabIndex={safeCurrentPage === safeTotalPages ? -1 : 0}

@@ -91,7 +91,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'Search for products, brands, categories...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
-                    className="w-full pl-12 pr-12 py-4 md:py-5 text-base md:text-lg border-2 border-gray-200 rounded-2xl bg-transparent focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-md"
+                    className="w-full pl-12 pr-12 py-4 md:py-5 text-base md:text-lg border-2 border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-md"
                 />
 
                 {/* Clear Button */}
