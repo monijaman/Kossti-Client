@@ -262,16 +262,21 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
 
-      <div id="productSearchBar" className="w-full relative md:w-1/2 md:min-w-[400px] md:max-w-[700px]">
-        {/* H1 for SEO - Visible */}
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+      {/* Hero Search Section */}
+      <div className="w-full flex flex-col items-center text-center py-10 px-4 mb-6">
+        <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
           {countryCode === "en"
             ? "Product Reviews & Comparisons in Bangladesh"
             : "বাংলাদেশে পণ্য রিভিউ এবং তুলনা"}
         </h1>
-
-        {/* Search Box */}
-        <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+        <p className="text-gray-500 text-base md:text-lg mb-8 max-w-xl">
+          {countryCode === "en"
+            ? "Find honest reviews and compare the best products."
+            : "সেরা পণ্য খুঁজুন এবং তুলনা করুন।"}
+        </p>
+        <div className="w-full max-w-2xl">
+          <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+        </div>
       </div>
 
       {/* Latest Reviews Section */}
