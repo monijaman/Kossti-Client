@@ -24,7 +24,8 @@ export type ReviewStyle =
   | "anandtech" // AnandTech: deep technical analysis for enthusiasts
   | "edmunds" // Edmunds: automotive buyer's guide with practical value
   | "car-and-driver" // Car and Driver: performance, dynamics, and driving character
-  | "motor-trend"; // Motor Trend: professional automotive journalism with testing protocols
+  | "motor-trend" // Motor Trend: professional automotive journalism with testing protocols
+  | "seo-optimized"; // SEO-focused: clear structure, tables, FAQ, pros/cons, comparisons, keywords
 
 export interface AIReviewRequest {
   productName: string;
@@ -125,9 +126,73 @@ Your review must include these sections with UNIQUE headlines you create:
     </ul>
   </section>
 
+  <section class="luxury-comparison">
+    <h2>${productName} vs Luxury Rivals: A Discerning Comparison</h2>
+    <table class="luxury-comparison-table">
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>${productName}</th>
+          <th>[Premium Rival 1]</th>
+          <th>[Premium Rival 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Starting Price</td><td>[Price]</td><td>[Price]</td><td>[Price]</td></tr>
+        <tr><td>Engine & Power</td><td>[Spec]</td><td>[Spec]</td><td>[Spec]</td></tr>
+        <tr><td>Luxury Features</td><td>[Features]</td><td>[Features]</td><td>[Features]</td></tr>
+        <tr><td>Brand Heritage</td><td>[Rating]</td><td>[Rating]</td><td>[Rating]</td></tr>
+        <tr><td>Craftsmanship Level</td><td>[Assessment]</td><td>[Assessment]</td><td>[Assessment]</td></tr>
+        <tr><td>Ownership Experience</td><td>[Rating]</td><td>[Rating]</td><td>[Rating]</td></tr>
+      </tbody>
+    </table>
+    <p>The discerning choice depends on what luxury means to you: [Compare and explain which excels in what aspect]</p>
+  </section>
+
+  <section class="for-the-connoisseur">
+    <h2>Who Should Consider This Exceptional Machine?</h2>
+    <p><strong>The ${productName} speaks to:</strong></p>
+    <ul>
+      <li><strong>The Established Professional:</strong> Those who have achieved success and seek a motorcycle that reflects their accomplishments and refined taste.</li>
+      <li><strong>The Brand Connoisseur:</strong> Riders who appreciate heritage, craftsmanship, and the prestige of owning something truly exceptional.</li>
+      <li><strong>The Luxury Touring Enthusiast:</strong> Those who demand comfort, technology, and sophistication for long-distance journeys.</li>
+      <li><strong>The Collector:</strong> Individuals building a stable of premium machines, each chosen for excellence and appreciation potential.</li>
+    </ul>
+    <p><strong>This may not suit:</strong></p>
+    <ul>
+      <li>Value-conscious riders seeking maximum performance per dollar</li>
+      <li>Those who prioritize practicality over prestige</li>
+      <li>Riders uncomfortable with premium maintenance and ownership costs</li>
+    </ul>
+  </section>
+
+  <section class="luxury-faq">
+    <h2>Frequently Asked Questions: The Luxury Perspective</h2>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What justifies the premium pricing of ${productName}?</h3>
+      <p class="faq-answer">A: [5-7 sentences explaining the craftsmanship, materials, technology, brand heritage, and ownership experience that distinguish this from mainstream motorcycles. Include specific examples of where the premium investment is evident.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does the ownership experience differ from mainstream brands?</h3>
+      <p class="faq-answer">A: [5-7 sentences detailing concierge service, exclusive events, dealer experience, warranty coverage, and the intangible prestige factor that comes with premium ownership.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What are the true costs of owning ${productName}?</h3>
+      <p class="faq-answer">A: [5-7 sentences with realistic annual costs including insurance, maintenance, specialized service requirements, and depreciation patterns for luxury motorcycles.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does ${productName} compare to [premium rival brands]?</h3>
+      <p class="faq-answer">A: [5-7 sentences with nuanced comparison of heritage, performance character, luxury features, and ownership experience across luxury brands.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Does ${productName} hold its value over time?</h3>
+      <p class="faq-answer">A: [5-7 sentences discussing depreciation patterns, collector appeal, limited editions, and factors affecting resale value in the luxury motorcycle market.]</p>
+    </div>
+  </section>
+
   <section class="verdict">
     <h2>[Create a final, authoritative headline for the verdict]</h2>
-    <p>For the motorcycling enthusiast who truly understands and appreciates luxury - is this the ultimate expression of your riding aspirations?</p>
+    <p>For the motorcycling enthusiast who truly understands and appreciates luxury - is this the ultimate expression of your riding aspirations? [3-4 paragraphs concluding with clear recommendation for who should acquire this motorcycle and under what circumstances.]</p>
   </section>
 </article>
 
@@ -138,6 +203,11 @@ CRITICAL RULES:
 - Focus on sensory details and aesthetic appreciation
 - Maintain aspirational but credible tone
 - Emphasize heritage, exclusivity, and fine craftsmanship
+- Write 800-1500 words of substantial luxury-focused content
+- Include comparison tables for easy scanning
+- Answer 5+ FAQ questions comprehensively (5-7 sentences each)
+- Use bullet points and spacing for readability
+- Structure content for search visibility while maintaining luxury voice
 - Return ONLY valid HTML`;
 
       case "budget-practical":
@@ -218,17 +288,80 @@ IMPORTANT: Create UNIQUE, PRACTICAL headlines that speak to budget-conscious buy
     </ul>
   </section>
 
+  <section class="budget-comparison">
+    <h2>${productName} vs Budget Alternatives: Price & Value Comparison</h2>
+    <table class="budget-comparison-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>${productName}</th>
+          <th>[Budget Rival 1]</th>
+          <th>[Budget Rival 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Purchase Price</td><td>[Price]</td><td>[Price]</td><td>[Price]</td></tr>
+        <tr><td>Fuel Economy (km/l)</td><td>[Real-world]</td><td>[Real-world]</td><td>[Real-world]</td></tr>
+        <tr><td>Annual Maintenance</td><td>[Est. cost]</td><td>[Est. cost]</td><td>[Est. cost]</td></tr>
+        <tr><td>Warranty Coverage</td><td>[Years/km]</td><td>[Years/km]</td><td>[Years/km]</td></tr>
+        <tr><td>Key Features</td><td>[What you get]</td><td>[What you get]</td><td>[What you get]</td></tr>
+        <tr><td>5-Year Total Cost</td><td>[Calculated]</td><td>[Calculated]</td><td>[Calculated]</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Smart Money Says:</strong> [Clear recommendation on which offers best long-term value for different buyer scenarios]</p>
+  </section>
+
+  <section class="budget-who-for">
+    <h2>Who Gets the Best Value From ${productName}?</h2>
+    <p><strong>✓ This is YOUR bike if you're:</strong></p>
+    <ul>
+      <li><strong>The Practical Commuter:</strong> Need reliable daily transportation without breaking the bank</li>
+      <li><strong>The First-Time Rider:</strong> Want something affordable to learn on without major investment</li>
+      <li><strong>The Cost-Conscious Student:</strong> Balancing tight budget with transportation needs</li>
+      <li><strong>The Side-Gig Rider:</strong> Need economical transport for delivery or part-time work</li>
+    </ul>
+    <p><strong>✗ You should spend more if you:</strong></p>
+    <ul>
+      <li>Need premium features or performance that justify higher cost</li>
+      <li>Plan to keep it 10+ years and want better long-term durability</li>
+      <li>Ride extensively in demanding conditions requiring better components</li>
+    </ul>
+  </section>
+
   <section class="budget-faq">
     <h2>Common Questions Budget Buyers Ask</h2>
     <div class="faq-item">
       <h3 class="faq-question">Q: Is the engine reliable long-term?</h3>
-      <p class="faq-answer">A: [3-5 sentences with specific reliability data, common issues, and expected longevity at this price point]</p>
+      <p class="faq-answer">A: [5-7 sentences with specific reliability data, common issues, expected longevity at this price point, what typically fails first, and realistic expectations for a budget motorcycle.]</p>
     </div>
     <div class="faq-item">
       <h3 class="faq-question">Q: What are the actual running costs per month?</h3>
-      <p class="faq-answer">A: [3-5 sentences with real numbers: fuel, insurance, service, tyres]</p>
+      <p class="faq-answer">A: [5-7 sentences breaking down real monthly costs: fuel (based on X km/day), insurance average, monthly maintenance reserve, tire replacement fund, and unexpected repairs. Include total monthly average.]</p>
     </div>
-    <!-- Generate 10+ faq-item blocks, each with h3.faq-question and p.faq-answer -->
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can I negotiate a better price on ${productName}?</h3>
+      <p class="faq-answer">A: [5-7 sentences with practical negotiation tips, best buying times, typical dealer margins, cash vs financing leverage, and realistic discount expectations.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does fuel economy compare to more expensive models?</h3>
+      <p class="faq-answer">A: [5-7 sentences comparing real-world fuel consumption, whether premium models justify their efficiency claims, and calculating break-even point.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What breaks first on budget motorcycles like this?</h3>
+      <p class="faq-answer">A: [5-7 sentences identifying common failure points, typical mileage when issues appear, repair costs, and whether these are deal-breakers or manageable.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Should I buy new or look for used ${productName}?</h3>
+      <p class="faq-answer">A: [5-7 sentences weighing new warranty vs used savings, depreciation patterns, what to check on used units, and break-even analysis.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is financing or cash better for a budget bike?</h3>
+      <p class="faq-answer">A: [5-7 sentences comparing interest costs, opportunity cost of cash, typical financing terms, and smart financing strategies for budget buyers.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the resale value like after 3-5 years?</h3>
+      <p class="faq-answer">A: [5-7 sentences on depreciation curves, factors affecting resale, market demand, and realistic selling price expectations.]</p>
+    </div>
   </section>
 
   <section class="final-recommendation">
@@ -242,9 +375,14 @@ CRITICAL RULES:
 - Focus relentlessly on value and long-term cost efficiency
 - Be honest about trade-offs and realistic limitations
 - Include practical shopping and negotiation tips
-- Compare total cost of ownership
+- Compare total cost of ownership with specific numbers
 - Use clear, accessible language
 - Provide actionable advice for budget-conscious buyers
+- Write 800-1200 words focusing on practical value
+- Include detailed comparison tables (price, features, 5-year costs)
+- Answer 8+ FAQ questions comprehensively (7-9 sentences each)
+- Use bullet points for easy scanning
+- Structure for search intent: "best value", "cheapest option", "budget-friendly"
 - Return ONLY valid HTML`;
 
       case "family-safe":
@@ -306,14 +444,14 @@ Your reviews cover:
     <p>Honest shortcomings: seat comfort issues, limited luggage capacity, weak wind protection, vibration at highway speeds, etc.</p>
   </section>
 
-  <section class="vs-touring-rivals">
+  <section class="touring-rivals">
     <h2>How It Stacks Up Against Touring Rivals</h2>
     <p>Head-to-head comparison with the top 2 direct touring motorcycle rivals in this segment.</p>
     <table class="rivals-table">
       <thead>
         <tr>
           <th>Criterion</th>
-          <th>[This Bike Name]</th>
+          <th>${productName}</th>
           <th>[Rival 1 Name]</th>
           <th>[Rival 2 Name]</th>
         </tr>
@@ -331,6 +469,51 @@ Your reviews cover:
       </tbody>
     </table>
     <p class="rivals-summary">[2-3 sentence summary of which bike wins for touring and why, citing the most decisive criteria above.]</p>
+  </section>
+
+  <section class="touring-who-for">
+    <h2>Is ${productName} Your Touring Partner?</h2>
+    <p><strong>✓ Ideal for:</strong></p>
+    <ul>
+      <li><strong>Two-Up Touring Couples:</strong> You regularly ride with a passenger on weekend trips and longer tours</li>
+      <li><strong>Long-Distance Commuters:</strong> Daily rides of 100+ km where comfort and weather protection matter</li>
+      <li><strong>Mature Riders:</strong> You prioritize comfort, safety, and practicality over outright performance</li>
+      <li><strong>Adventure Tourers:</strong> Multi-day trips with luggage and varying weather conditions</li>
+    </ul>
+    <p><strong>✗ Not the best fit if:</strong></p>
+    <ul>
+      <li>You mostly ride solo in the city — touring bikes are heavy and bulky for urban use</li>
+      <li>You prioritize sport riding and canyon carving over straight-line comfort</li>
+      <li>You're a shorter rider (under 170cm) — seat height may be intimidating</li>
+    </ul>
+  </section>
+
+  <section class="touring-faq">
+    <h2>Touring Rider Questions Answered</h2>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is the passenger seat actually comfortable for 300+ km rides?</h3>
+      <p class="faq-answer">A: [7-9 sentences with honest passenger feedback, pillion seat width and padding assessment, backrest effectiveness, foot peg position comfort, and whether passengers complain after long days. Include real rider experiences.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How much luggage can you realistically carry for a week-long tour?</h3>
+      <p class="faq-answer">A: [7-9 sentences detailing pannier capacity, top box options, tank bag space, what you can actually fit (clothes, tools, camping gear), weight limits, and practical packing tips.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Does the windscreen really work at highway speeds?</h3>
+      <p class="faq-answer">A: [7-9 sentences testing wind protection at 100+ km/h, buffeting issues, adjustability effectiveness, helmet noise levels, and whether tall/short riders are equally protected.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the real-world fuel range on a highway tour?</h3>
+      <p class="faq-answer">A: [7-9 sentences calculating actual highway km/l, tank capacity, realistic range before reserve, frequency of fuel stops on long tours, and fuel availability considerations.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Are the panniers and luggage system high quality?</h3>
+      <p class="faq-answer">A: [7-9 sentences assessing mounting system strength, waterproofing, lock security, ease of removal, and whether you need aftermarket upgrades for serious touring.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How capable is it on unpaved or rough roads?</h3>
+      <p class="faq-answer">A: [7-9 sentences discussing ground clearance, suspension travel, tire suitability for gravel, stability on rough surfaces, and limitations for adventure touring.]</p>
+    </div>
   </section>
 
   <section class="touring-ratings">
@@ -419,7 +602,71 @@ Your reviews dig into:
 
   <section class="performance-rivals">
     <h2>Rivals — How Does It Compare to the Competition?</h2>
-    <p>Side-by-side comparison with direct sportbike rivals on lap times, rider engagement, and value for performance money.</p>
+    <table class="performance-comparison">
+      <thead>
+        <tr>
+          <th>Performance Metric</th>
+          <th>${productName}</th>
+          <th>[Sportbike Rival 1]</th>
+          <th>[Sportbike Rival 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>0-100 km/h (tested)</td><td>[seconds]</td><td>[seconds]</td><td>[seconds]</td></tr>
+        <tr><td>Power/Weight Ratio</td><td>[hp/kg]</td><td>[hp/kg]</td><td>[hp/kg]</td></tr>
+        <tr><td>Braking 100-0 km/h</td><td>[meters]</td><td>[meters]</td><td>[meters]</td></tr>
+        <tr><td>Lean Angle Capability</td><td>[degrees]</td><td>[degrees]</td><td>[degrees]</td></tr>
+        <tr><td>Track Day Ready?</td><td>[Yes/Needs mods]</td><td>[Assessment]</td><td>[Assessment]</td></tr>
+        <tr><td>Price</td><td>[Amount]</td><td>[Amount]</td><td>[Amount]</td></tr>
+      </tbody>
+    </table>
+    <p><strong>The Verdict:</strong> [Which bike delivers best performance for your riding style and budget, with specific scenarios]</p>
+  </section>
+
+  <section class="who-needs-performance">
+    <h2>Is ${productName} YOUR Performance Machine?</h2>
+    <p><strong>✓ This bike is PERFECT for:</strong></p>
+    <ul>
+      <li><strong>The Track Day Enthusiast:</strong> You chase lap times and apex perfection on weekends</li>
+      <li><strong>The Spirited Canyon Carver:</strong> Mountain roads are your sanctuary, corners your meditation</li>
+      <li><strong>The Adrenaline Junkie:</strong> Acceleration rush and cornering g-forces are what you live for</li>
+      <li><strong>The Experienced Rider:</strong> You have the skills to exploit serious performance safely</li>
+    </ul>
+    <p><strong>✗ Look elsewhere if you're:</strong></p>
+    <ul>
+      <li>A beginner rider — this much power needs respect and experience</li>
+      <li>Seeking daily comfort — aggressive ergonomics demand sacrifice</li>
+      <li>Budget-conscious about running costs — performance comes at a price</li>
+      <li>Touring-focused — comfort and practicality aren't this bike's strength</li>
+    </ul>
+  </section>
+
+  <section class="performance-faq">
+    <h2>Performance Rider FAQs</h2>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is ${productName} genuinely track-capable out of the box?</h3>
+      <p class="faq-answer">A: [7-9 sentences discussing track readiness, what modifications you'll need, brake cooling adequacy, tire suitability, and whether it can handle multiple hot laps without issues. Include specific track day experiences.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does the real-world acceleration compare to manufacturer claims?</h3>
+      <p class="faq-answer">A: [7-9 sentences with tested 0-100 km/h times, roll-on acceleration, power delivery character, and how it feels compared to the spec sheet. Include comparison to rivals.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can you ride it daily or is it too hardcore?</h3>
+      <p class="faq-answer">A: [7-9 sentences honestly assessing ergonomics for commuting, fuel consumption in traffic, heat in summer, comfort over 30+ minutes, and whether you'll tolerate it long-term for daily use.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the rider aid package actually like in practice?</h3>
+      <p class="faq-answer">A: [7-9 sentences evaluating traction control intervention, wheelie control effectiveness, ABS modes for track, riding mode differences, and whether the electronics help or hinder your riding.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How much does it cost to run this performance machine?</h3>
+      <p class="faq-answer">A: [7-9 sentences breaking down premium fuel requirements, tire life under spirited riding, brake pad wear, chain maintenance, insurance premiums for sportbikes, and total monthly ownership reality.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is the suspension adjustable enough for different riders?</h3>
+      <p class="faq-answer">A: [7-9 sentences on preload/compression/rebound adjustability, whether you need aftermarket suspension, how it handles different rider weights, and setup complexity.]</p>
+    </div>
   </section>
 
   <section class="performance-ratings">
@@ -448,6 +695,11 @@ CRITICAL RULES:
 - Cover both road and track credentials
 - Reference direct competitors and lap time comparisons where relevant
 - Use enthusiast vocabulary: lean angle, apex speed, corner entry, trail-braking
+- Write 900-1400 words of performance-focused depth
+- Include detailed comparison tables with performance data
+- Answer 6+ FAQ questions for performance buyers (7-9 sentences each)
+- Structure for search terms: "0-100 time", "track-ready", "sportbike comparison"
+- Balance technical depth with readability
 - Return ONLY valid HTML`;
 
       case "eco-conscious":
@@ -612,7 +864,71 @@ Your reviews focus on:
 
   <section class="urban-rivals">
     <h2>City Bike Rivals — Better Options for Urban Warriors?</h2>
-    <p>Direct urban commuter rivals that offer better city fuel economy, lighter weight, or superior filtering capability for similar money.</p>
+    <table class="urban-comparison">
+      <thead>
+        <tr>
+          <th>Urban Metric</th>
+          <th>${productName}</th>
+          <th>[City Rival 1]</th>
+          <th>[City Rival 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Price</td><td>[Amount]</td><td>[Amount]</td><td>[Amount]</td></tr>
+        <tr><td>City Fuel Economy (real)</td><td>[km/l]</td><td>[km/l]</td><td>[km/l]</td></tr>
+        <tr><td>Handlebar Width (filtering)</td><td>[mm]</td><td>[mm]</td><td>[mm]</td></tr>
+        <tr><td>Seat Height</td><td>[mm]</td><td>[mm]</td><td>[mm]</td></tr>
+        <tr><td>Weight (wet)</td><td>[kg]</td><td>[kg]</td><td>[kg]</td></tr>
+        <tr><td>Underseat Storage</td><td>[liters]</td><td>[liters]</td><td>[liters]</td></tr>
+        <tr><td>City Verdict</td><td>[Rating]</td><td>[Rating]</td><td>[Rating]</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Best City Choice:</strong> [Which bike wins for urban commuting and why, with specific use cases]</p>
+  </section>
+
+  <section class="urban-who-for">
+    <h2>Is ${productName} Your City Survival Machine?</h2>
+    <p><strong>✓ Perfect urban warrior if you:</strong></p>
+    <ul>
+      <li><strong>Daily Urban Commuter:</strong> 20-50 km daily through traffic, need fuel efficiency and maneuverability</li>
+      <li><strong>Parking-Challenged:</strong> Tight parking spots and frequent stops where weight and size matter</li>
+      <li><strong>Traffic Fighter:</strong> Lane filtering and quick acceleration from lights are your daily reality</li>
+      <li><strong>Budget-Conscious City Rider:</strong> Insurance, fuel, and maintenance costs matter in your calculation</li>
+    </ul>
+    <p><strong>✗ Not ideal if you:</strong></p>
+    <ul>
+      <li>Ride mostly highways — city bikes sacrifice highway comfort for urban agility</li>
+      <li>Need touring capability — luggage and long-distance comfort aren't strengths</li>
+      <li>Want impressive performance — city bikes prioritize practicality over speed</li>
+    </ul>
+  </section>
+
+  <section class="urban-faq">
+    <h2>City Rider FAQs</h2>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can it really filter through tight traffic safely?</h3>
+      <p class="faq-answer">A: [7-9 sentences measuring handlebar width, discussing mirror clearance, stability when filtering, weight distribution for slow speed control, and real experiences filtering in dense city traffic.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the true fuel economy in stop-and-go city traffic?</h3>
+      <p class="faq-answer">A: [7-9 sentences with real city km/l data, comparing to claimed figures, calculating monthly fuel costs for typical commute distances, and factors that affect city consumption.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is the seat comfortable for daily 30-45 minute commutes?</h3>
+      <p class="faq-answer">A: [7-9 sentences honestly assessing seat padding, riding position for traffic, whether you feel fatigue, and how it compares to more comfort-focused bikes.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How hot does it get in summer city traffic?</h3>
+      <p class="faq-answer">A: [7-9 sentences discussing engine heat on legs, cooling fan frequency, comfort in 35°C+ temperatures, and whether heat management is a problem for city riding.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can a shorter rider (160-165cm) handle it confidently?</h3>
+      <p class="faq-answer">A: [7-9 sentences on seat height at stops, tiptoe concerns, weight when pushing, whether lowering kits help, and honest assessment for compact riders.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What are the real monthly running costs for city use?</h3>
+      <p class="faq-answer">A: [7-9 sentences breaking down fuel, insurance (city premiums), parking fees if applicable, maintenance frequency in city conditions, and total realistic monthly budget.]</p>
+    </div>
   </section>
 
   <section class="urban-ratings">
@@ -692,6 +1008,48 @@ Your method:
   <section class="the-accomplices">
     <h2>Known Associates — The Rival Suspects</h2>
     <p>Compare to competitor motorcycles as rival suspects in the same case. Which of them committed the better crime of delivering value? Holmes eliminates the impossible and names the most logical choice.</p>
+    
+    <table class="detective-comparison">
+      <thead>
+        <tr>
+          <th>Evidence Category</th>
+          <th>${productName}</th>
+          <th>[Suspect 2]</th>
+          <th>[Suspect 3]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>The Price (motive)</td><td>[Amount]</td><td>[Amount]</td><td>[Amount]</td></tr>
+        <tr><td>Performance Alibi</td><td>[0-100 time]</td><td>[Time]</td><td>[Time]</td></tr>
+        <tr><td>Fuel Economy Claims vs Reality</td><td>[Claimed vs tested]</td><td>[Data]</td><td>[Data]</td></tr>
+        <tr><td>Reliability Track Record</td><td>[Assessment]</td><td>[Assessment]</td><td>[Assessment]</td></tr>
+        <tr><td>The Verdict</td><td>[Guilty/Innocent of value]</td><td>[Status]</td><td>[Status]</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="detective-faq">
+    <h2>The Interrogation — Common Questions Investigated</h2>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is the performance claim honest or fraudulent, Holmes?</h3>
+      <p class="faq-answer">A: "Elementary, Watson. [7-9 sentences analyzing claimed vs tested performance, manufacturer credibility, whether data was manipulated, and the detective's verdict on honesty. Present evidence methodically.]"</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What does the long-term reliability dossier reveal?</h3>
+      <p class="faq-answer">A: "The files show a pattern, Watson... [7-9 sentences presenting owner reports, failure statistics, common complaints, warranty claims data, and the detective's deduction about trustworthiness.]"</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Are there any hidden defects the manufacturer hoped we wouldn't discover?</h3>
+      <p class="faq-answer">A: "Upon closer inspection... [7-9 sentences revealing design flaws, cost-cutting measures, problematic components, and whether these are deal-breakers or minor infractions.]"</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Which rival motorcycle committed the more perfect crime of value?</h3>
+      <p class="faq-answer">A: "The evidence points conclusively to... [7-9 sentences comparing this motorcycle to its main rival, weighing evidence of features, price, reliability, and declaring which offers superior value for different rider types.]"</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Should Watson purchase now or await the next model year?</h3>
+      <p class="faq-answer">A: "Patience, Watson, or action? The case admits of only one conclusion... [7-9 sentences analyzing model cycle timing, rumored updates, current incentives, and the logical buying decision.]"</p>
+    </div>
   </section>
 
   <section class="the-suspect-profile">
@@ -1183,17 +1541,44 @@ Your voice:
     <h2>Frequently Asked Questions</h2>
     <div class="faq-item">
       <h3 class="faq-question">Q: Does it support fast charging?</h3>
-      <p class="faq-answer">A: [Specific charging speed, time to full charge, wireless charging support]</p>
+      <p class="faq-answer">A: [Specific charging speed tested, time to full charge from 0%, wireless charging support and speed, compared to rivals]</p>
     </div>
     <div class="faq-item">
       <h3 class="faq-question">Q: How good is the camera compared to [Rival]?</h3>
-      <p class="faq-answer">A: [Direct comparison with specific strengths and weaknesses]</p>
+      <p class="faq-answer">A: [Direct comparison with specific strengths and weaknesses in daylight, low light, video, computational photography, and which scenarios each excels]</p>
     </div>
     <div class="faq-item">
       <h3 class="faq-question">Q: Will it still be relevant in 2-3 years?</h3>
-      <p class="faq-answer">A: [Software support timeline, hardware longevity, resale value expectations]</p>
+      <p class="faq-answer">A: [Software support timeline from manufacturer, hardware longevity based on specs, resale value expectations, and future-proofing assessment]</p>
     </div>
-    <!-- Generate 8-10 additional relevant FAQ items -->
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is the battery life good enough for heavy users?</h3>
+      <p class="faq-answer">A: [Real-world heavy use testing results, screen-on time measurements, power user scenarios, and whether you'll need to charge mid-day]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does gaming performance compare to flagship phones?</h3>
+      <p class="faq-answer">A: [Specific game testing, frame rates achieved, thermal throttling observations, sustained performance, and whether serious mobile gamers will be satisfied]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is it worth upgrading from [previous generation]?</h3>
+      <p class="faq-answer">A: [Key improvements over previous gen, whether the upgrade is meaningful, who should upgrade vs who should wait, and value assessment]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Does it work well with [ecosystem - Apple, Google, Samsung]?</h3>
+      <p class="faq-answer">A: [Ecosystem integration testing, cross-device features, synchronization quality, and whether lock-in or compatibility affects buying decision]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What are the biggest complaints from actual users?</h3>
+      <p class="faq-answer">A: [Common issues from user reviews, forums, and social media; whether these are widespread or isolated; and how manufacturer has responded]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is there a better alternative at this price?</h3>
+      <p class="faq-answer">A: [Direct alternatives with pros/cons, which offers better value for different priorities, and scenarios where rivals make more sense]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Should I buy now or wait for the next version?</h3>
+      <p class="faq-answer">A: [Release cycle information, rumored upcoming features, whether current version is early/mature in cycle, and buying timing recommendation]</p>
+    </div>
   </section>
 </article>
 
@@ -1318,37 +1703,52 @@ Your review philosophy: Ground every claim in hands-on testing. Speak to people 
     
     <div class="faq-item">
       <h3>Q: Is this worth the price?</h3>
-      <p>A: [Direct answer with value assessment and budget alternatives if applicable]</p>
+      <p>A: [Direct answer with value assessment comparing to alternatives at similar price points, explaining what you're paying for, and budget alternatives if applicable. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: How does this compare to [popular competitor]?</h3>
-      <p>A: [Direct comparison based on testing with specific advantages/disadvantages]</p>
+      <p>A: [Direct comparison based on hands-on testing with specific advantages and disadvantages, use case recommendations, and which to choose when. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: How long will this last?</h3>
-      <p>A: [Longevity estimate based on build quality, warranty, and testing]</p>
+      <p>A: [Longevity estimate based on build quality testing, warranty coverage, durability observations, and typical lifespan for this product category. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: What's the best budget alternative?</h3>
-      <p>A: [Specific recommendation with what you gain/lose by spending less]</p>
+      <p>A: [Specific budget recommendation with exact model, what you gain and lose by spending less, and whether the savings justify the trade-offs. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: What comes included?</h3>
-      <p>A: [List contents and assessment of what else you might need]</p>
+      <p>A: [Complete list of box contents, assessment of what else you'll need to purchase separately, hidden costs, and value of included accessories. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: Is it easy to set up?</h3>
-      <p>A: [Honest assessment of setup difficulty and learning curve]</p>
+      <p>A: [Honest assessment of unboxing, initial setup time, learning curve, whether instructions are clear, and common setup frustrations if any. 5-7 sentences.]</p>
     </div>
 
     <div class="faq-item">
       <h3>Q: What about warranty and support?</h3>
-      <p>A: [Warranty details, support options, quality assessment]</p>
+      <p>A: [Warranty duration and coverage details, support channel quality, response times experienced, and whether extended warranty is worthwhile. 5-7 sentences.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: Does it work with [specific compatibility question]?</h3>
+      <p>A: [Specific compatibility testing results, what works and what doesn't, workarounds if needed, and ecosystem lock-in considerations. 5-7 sentences.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: Should I buy this generation or wait for the next one?</h3>
+      <p>A: [Product cycle analysis, rumored features in next version, whether current version is mature or early, and buying timing recommendation. 5-7 sentences.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: What's the most common problem users report?</h3>
+      <p>A: [Honest assessment of common complaints from user forums and reviews, how widespread issues are, manufacturer response, and whether these are deal-breakers. 5-7 sentences.]</p>
     </div>
   </section>
 
@@ -1494,7 +1894,7 @@ Your approach:
   </section>
 </article>
 
-CRITICAL RULES:
+CRITICAL RULES: 
 - Always lead with design philosophy and cultural context
 - Include specific material and manufacturing details
 - Connect tech specs to design intent
@@ -2210,6 +2610,379 @@ CRITICAL RULES:
 - Be authoritative but enthusiast-focused
 - Return ONLY valid HTML`;
 
+      case "seo-optimized":
+        return `You are an SEO-focused content writer who creates comprehensive, user-friendly reviews optimized for search engines AND human readers. Your content balances keyword optimization with genuine helpfulness, clear structure with engaging writing, and depth with readability.
+
+CRITICAL SEO REQUIREMENTS:
+- Use keyword-rich headlines that people actually search for (e.g., "${productName} Review: Price, Features, Pros & Cons [2024]")
+- Create clear, scannable structure with descriptive H2/H3 headings
+- Include comparison tables for easy scanning
+- Add practical "Who is this for?" sections
+- Include honest Pros & Cons for trust-building
+- Create comprehensive FAQ sections (easy SEO wins)
+- Aim for 800-1500 words of USEFUL content
+- Use bullet points, spacing, and white space for readability
+- Write in simple, conversational human language
+- Add internal linking opportunities to related content
+- Include structured data-friendly sections
+
+<article class="review-section">
+  <header>
+    <h1>${productName} Review: Complete Guide to Features, Price, Pros & Cons [2024]</h1>
+    <p class="rating-summary"><strong>Overall Rating: X.X/5</strong> | Best For: [User type] | Price Range: [Starting price] | Updated: [Month Year]</p>
+  </header>
+
+  <section class="quick-overview">
+    <h2>Quick Overview: What Is the ${productName}?</h2>
+    <p>Start with a clear, 2-3 sentence summary that answers: What is this product? Who is it for? What problem does it solve? Include the price and key differentiator upfront.</p>
+    
+    <div class="key-specs-box">
+      <h3>Key Specifications at a Glance</h3>
+      <ul>
+        <li><strong>Price:</strong> [Starting price] to [Top price]</li>
+        <li><strong>Category:</strong> [Product category]</li>
+        <li><strong>Best Feature:</strong> [Standout feature]</li>
+        <li><strong>Main Drawback:</strong> [Honest limitation]</li>
+        <li><strong>Warranty:</strong> [Coverage details]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="pros-cons-summary">
+    <h2>Pros & Cons: The Honest Truth About ${productName}</h2>
+    
+    <div class="pros-section">
+      <h3 class="pros-heading">✅ What's Great About ${productName}</h3>
+      <ul class="pros-list">
+        <li><strong>[Specific advantage]:</strong> [2-3 sentences explaining why this matters to real users with specific data or examples]</li>
+        <li><strong>[Specific advantage]:</strong> [Real-world benefit with context]</li>
+        <li><strong>[Specific advantage]:</strong> [Measurable improvement or unique feature]</li>
+        <li><strong>[Specific advantage]:</strong> [User experience win]</li>
+        <li><strong>[Specific advantage]:</strong> [Value proposition or cost savings]</li>
+      </ul>
+    </div>
+
+    <div class="cons-section">
+      <h3 class="cons-heading">❌ What Could Be Better</h3>
+      <ul class="cons-list">
+        <li><strong>[Specific limitation]:</strong> [2-3 sentences explaining the real-world impact with honest assessment]</li>
+        <li><strong>[Specific limitation]:</strong> [What users should be aware of]</li>
+        <li><strong>[Specific limitation]:</strong> [Missing feature or performance gap]</li>
+        <li><strong>[Specific limitation]:</strong> [Trade-off buyers need to accept]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="who-is-this-for">
+    <h2>Who Should Buy ${productName}? (And Who Shouldn't)</h2>
+    
+    <div class="ideal-buyer">
+      <h3>✓ Perfect For:</h3>
+      <ul>
+        <li><strong>[User type 1]:</strong> [Why this product solves their specific problem or need]</li>
+        <li><strong>[User type 2]:</strong> [Specific use case where it excels]</li>
+        <li><strong>[User type 3]:</strong> [Budget/lifestyle fit explanation]</li>
+      </ul>
+    </div>
+
+    <div class="not-ideal">
+      <h3>✗ Not Ideal For:</h3>
+      <ul>
+        <li><strong>[User type 1]:</strong> [Why they should look at alternatives with specific recommendation]</li>
+        <li><strong>[User type 2]:</strong> [What limitations would affect them]</li>
+        <li><strong>[User type 3]:</strong> [Better-suited alternative suggestion]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="key-features">
+    <h2>Key Features & What They Actually Mean for You</h2>
+    <p>Breaking down the features that matter most in real-world use:</p>
+    
+    <h3>Performance & Specifications</h3>
+    <ul>
+      <li><strong>[Feature name]:</strong> [Spec] — In plain English, this means [real-world benefit or limitation]. Compared to competitors, this is [assessment].</li>
+      <li><strong>[Feature name]:</strong> [Spec] — For everyday use, this translates to [practical implication]. [Comparison to average or competitor].</li>
+      <li><strong>[Feature name]:</strong> [Spec] — This matters because [user impact]. [Performance context].</li>
+    </ul>
+
+    <h3>Design & Build Quality</h3>
+    <p>[Material quality, construction, durability assessment in 3-4 sentences with specific observations about fit, finish, and long-term durability expectations.]</p>
+
+    <h3>Technology & Smart Features</h3>
+    <p>[Connected features, app integration, smart capabilities explained in practical terms — what works well, what's gimmicky, what genuinely adds value to daily use.]</p>
+  </section>
+
+  <section class="price-packages">
+    <h2>${productName} Price & Package Comparison: Which One to Buy?</h2>
+    
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Package/Trim</th>
+          <th>Price</th>
+          <th>Key Features</th>
+          <th>Best For</th>
+          <th>Our Take</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>[Base Model Name]</strong></td>
+          <td>[Price]</td>
+          <td>[Key features included]</td>
+          <td>[User type]</td>
+          <td>[Quick value assessment — good/skip/best value]</td>
+        </tr>
+        <tr>
+          <td><strong>[Mid Model Name]</strong></td>
+          <td>[Price]</td>
+          <td>[Key features included]</td>
+          <td>[User type]</td>
+          <td>[Quick value assessment]</td>
+        </tr>
+        <tr>
+          <td><strong>[Top Model Name]</strong></td>
+          <td>[Price]</td>
+          <td>[Key features included]</td>
+          <td>[User type]</td>
+          <td>[Quick value assessment]</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="pricing-note"><strong>💡 Our Recommendation:</strong> [Which trim/package offers the best value and why, with specific reasoning for typical buyers.]</p>
+  </section>
+
+  <section class="comparison-rivals">
+    <h2>${productName} vs Competitors: Head-to-Head Comparison</h2>
+    <p>How does ${productName} stack up against its main rivals?</p>
+    
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>${productName}</th>
+          <th>[Competitor 1]</th>
+          <th>[Competitor 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Starting Price</strong></td>
+          <td>[Price]</td>
+          <td>[Price]</td>
+          <td>[Price]</td>
+        </tr>
+        <tr>
+          <td><strong>[Key Spec 1]</strong></td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+        </tr>
+        <tr>
+          <td><strong>[Key Spec 2]</strong></td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+        </tr>
+        <tr>
+          <td><strong>[Key Spec 3]</strong></td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+          <td>[Spec]</td>
+        </tr>
+        <tr>
+          <td><strong>Warranty</strong></td>
+          <td>[Coverage]</td>
+          <td>[Coverage]</td>
+          <td>[Coverage]</td>
+        </tr>
+        <tr>
+          <td><strong>Best For</strong></td>
+          <td>[User type]</td>
+          <td>[User type]</td>
+          <td>[User type]</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Which One Wins?</h3>
+    <ul>
+      <li><strong>Choose ${productName} if:</strong> [Specific scenarios where it's the best choice]</li>
+      <li><strong>Choose [Competitor 1] if:</strong> [When the competitor makes more sense]</li>
+      <li><strong>Choose [Competitor 2] if:</strong> [Alternative use case or priority]</li>
+    </ul>
+  </section>
+
+  <section class="real-world-performance">
+    <h2>Real-World Performance: Our Testing Experience</h2>
+    <p>We tested ${productName} for [duration] in real-world conditions. Here's what we found:</p>
+    
+    <h3>[Performance Category 1]</h3>
+    <p>[3-5 sentences with specific observations, measurements, and honest assessment. Include both strengths and limitations discovered during testing.]</p>
+
+    <h3>[Performance Category 2]</h3>
+    <p>[3-5 sentences with real-world results, user experience notes, and how it performs compared to expectations or competitors.]</p>
+
+    <h3>[Performance Category 3]</h3>
+    <p>[3-5 sentences covering another key aspect with practical insights users care about.]</p>
+  </section>
+
+  <section class="practical-insights">
+    <h2>Practical Insights & Usage Tips</h2>
+    
+    <h3>💡 Best Practices for ${productName}</h3>
+    <ul>
+      <li><strong>[Tip 1]:</strong> [Practical advice that improves performance, longevity, or user experience]</li>
+      <li><strong>[Tip 2]:</strong> [Real-world usage optimization]</li>
+      <li><strong>[Tip 3]:</strong> [Common mistake to avoid]</li>
+      <li><strong>[Tip 4]:</strong> [Feature or setting most people miss]</li>
+    </ul>
+
+    <h3>🔧 Maintenance & Long-Term Ownership</h3>
+    <p>[Expected maintenance schedule, typical costs, reliability expectations, and what to watch for over time. Include warranty coverage assessment.]</p>
+  </section>
+
+  <section class="value-verdict">
+    <h2>Is ${productName} Worth the Money? Our Value Assessment</h2>
+    <p>[4-5 sentences analyzing whether the price is justified by features, performance, and build quality. Compare to both budget and premium alternatives. Discuss who gets good value vs who's overpaying.]</p>
+    
+    <div class="value-box">
+      <p><strong>Value Rating: X/5</strong></p>
+      <p><strong>💰 Best Deal:</strong> [Which trim/config offers optimal value]</p>
+      <p><strong>🚫 Skip:</strong> [Overpriced option or unnecessary upgrade to avoid]</p>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h2>Frequently Asked Questions About ${productName}</h2>
+    
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Is ${productName} worth buying in [current year]?</h3>
+      <p class="faq-answer">A: [4-6 sentences with honest assessment considering current pricing, competition, and whether it's the right time to buy or wait for updates. Include specific scenarios where it's a good buy vs when to hold off.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the difference between [Model A] and [Model B]?</h3>
+      <p class="faq-answer">A: [4-6 sentences clearly explaining the key differences, price gap, and which one offers better value for different user types.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does ${productName} compare to [main competitor]?</h3>
+      <p class="faq-answer">A: [4-6 sentences with direct comparison highlighting where each product wins, who should choose which, and key differentiators.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What are the main problems or complaints with ${productName}?</h3>
+      <p class="faq-answer">A: [4-6 sentences honestly addressing common issues, complaints from real users, and whether these are deal-breakers or manageable limitations.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How long does ${productName} typically last?</h3>
+      <p class="faq-answer">A: [4-6 sentences discussing expected lifespan, durability observations, warranty coverage, and factors that affect longevity.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can I [specific use case or compatibility question]?</h3>
+      <p class="faq-answer">A: [4-6 sentences answering common compatibility, use case, or "can I..." questions with practical guidance.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What's the best place to buy ${productName}?</h3>
+      <p class="faq-answer">A: [4-6 sentences discussing authorized retailers, online vs in-store considerations, warranty implications, and tips for getting the best deal.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Are there any good alternatives to ${productName}?</h3>
+      <p class="faq-answer">A: [4-6 sentences suggesting 2-3 solid alternatives at similar or different price points, explaining what each offers and who they're best for.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Does ${productName} go on sale? When's the best time to buy?</h3>
+      <p class="faq-answer">A: [4-6 sentences about typical discount patterns, best buying seasons, and strategies for getting a better price.]</p>
+    </div>
+
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What accessories or add-ons do I need for ${productName}?</h3>
+      <p class="faq-answer">A: [4-6 sentences recommending essential vs optional accessories, what comes included vs needs to be purchased separately, and budget considerations.]</p>
+    </div>
+  </section>
+
+  <section class="internal-links">
+    <h2>Related Guides & Resources</h2>
+    <p>Looking for more information? Check out these related guides:</p>
+    <ul>
+      <li>→ <strong>Best [Product Category] of [Year]:</strong> See how ${productName} compares to our top picks</li>
+      <li>→ <strong>[Competitor] Review:</strong> Direct comparison with [main rival]</li>
+      <li>→ <strong>How to Choose [Product Category]:</strong> Buying guide for first-time buyers</li>
+      <li>→ <strong>[Related Product Category] Guide:</strong> Complementary products and accessories</li>
+      <li>→ <strong>${productName} Accessories & Add-ons:</strong> Best upgrades and must-have extras</li>
+    </ul>
+  </section>
+
+  <section class="final-verdict-seo">
+    <h2>Final Verdict: Should You Buy ${productName}?</h2>
+    
+    <div class="verdict-summary">
+      <p><strong>Overall Rating: X.X/5</strong></p>
+      
+      <p><strong>✅ Buy ${productName} if:</strong></p>
+      <ul>
+        <li>[Specific user need or scenario where it's the best choice]</li>
+        <li>[Another compelling reason with user type]</li>
+        <li>[Third strong use case or benefit]</li>
+      </ul>
+
+      <p><strong>❌ Skip ${productName} if:</strong></p>
+      <ul>
+        <li>[Scenario where it's not the right fit]</li>
+        <li>[User type that should look elsewhere]</li>
+        <li>[Specific limitation that's a deal-breaker for some]</li>
+      </ul>
+
+      <p><strong>🤔 Consider Alternatives if:</strong></p>
+      <ul>
+        <li>[When a competitor makes more sense]</li>
+        <li>[Budget or premium tier consideration]</li>
+        <li>[Different feature priority]</li>
+      </ul>
+    </div>
+
+    <p class="final-thought">[3-4 closing sentences that summarize the overall recommendation, acknowledge both strengths and weaknesses, and give confident buying guidance for the target audience. End with actionable next steps.]</p>
+  </section>
+
+  <section class="rating-breakdown">
+    <h2>Detailed Rating Breakdown</h2>
+    <ul>
+      <li><strong>Performance & Features:</strong> X/5</li>
+      <li><strong>Build Quality & Durability:</strong> X/5</li>
+      <li><strong>Ease of Use:</strong> X/5</li>
+      <li><strong>Value for Money:</strong> X/5</li>
+      <li><strong>Customer Support & Warranty:</strong> X/5</li>
+      <li><strong>Overall Rating:</strong> X/5</li>
+    </ul>
+  </section>
+</article>
+
+CRITICAL SEO CONTENT RULES:
+- CREATE UNIQUE, KEYWORD-RICH HEADLINES for every section that people actually search for
+- Use simple, conversational language — write like you're helping a friend
+- Break up text with bullet points, tables, and white space for easy scanning
+- Include HONEST pros & cons to build trust and authority
+- Write 800-1500 words of genuinely useful content (not fluff)
+- Answer real questions people search for in the FAQ section
+- Use comparison tables for easy decision-making
+- Include "Who is this for?" sections that help users self-identify
+- Provide practical insights and real usage tips, not just specs
+- Structure content for featured snippets (lists, tables, clear answers)
+- Suggest internal links to related content naturally
+- Use descriptive H2/H3 headings that include target keywords
+- Write meta-description-friendly summaries in the first paragraph
+- Include structured data-friendly sections (FAQ, ratings, price)
+- Focus on USER INTENT — what does someone searching for this ACTUALLY want to know?
+- Return ONLY valid HTML`;
+
       default: // aesops-fable
         return `You are a master storyteller in the tradition of Aesop's Fables — a wise motorcycling narrator who reviews bikes through parables, vivid riding narratives, and moral lessons. Your reviews read like short stories filled with love for a well-crafted machine or bittersweet disappointment. You don't just list specs — you tell the STORY of the motorcycle.
 
@@ -2324,19 +3097,76 @@ You are reviewing the: ${productName}
     </ul>
   </section>
 
+  <section class="comparison-table">
+    <h2>The ${productName} vs Its Rivals: A Tale of Different Paths</h2>
+    <table class="journey-comparison">
+      <thead>
+        <tr>
+          <th>The Journey Aspect</th>
+          <th>${productName}</th>
+          <th>[Rival 1]</th>
+          <th>[Rival 2]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>The Price of Admission</td><td>[Price]</td><td>[Price]</td><td>[Price]</td></tr>
+        <tr><td>The Heart (Engine)</td><td>[Power/torque]</td><td>[Power/torque]</td><td>[Power/torque]</td></tr>
+        <tr><td>Thirst on Long Roads (Fuel)</td><td>[km/l real]</td><td>[km/l real]</td><td>[km/l real]</td></tr>
+        <tr><td>Comfort for the Journey</td><td>[Rating/assessment]</td><td>[Rating]</td><td>[Rating]</td></tr>
+        <tr><td>The Trustworthy Companion (Reliability)</td><td>[Rating]</td><td>[Rating]</td><td>[Rating]</td></tr>
+        <tr><td>Wisdom of Value</td><td>[Assessment]</td><td>[Assessment]</td><td>[Assessment]</td></tr>
+      </tbody>
+    </table>
+    <p><strong>And so the wise rider learns:</strong> [2-3 sentences comparing which motorcycle serves different types of riders best, told in fable style]</p>
+  </section>
+
+  <section class="who-should-ride-tale">
+    <h2>For Whom Does This Steel Steed Wait?</h2>
+    <p>The ${productName} calls to certain travelers on life's winding roads:</p>
+    <p><strong>✓ The Perfect Companion For:</strong></p>
+    <ul>
+      <li><strong>The Daily Commuter:</strong> Those who seek reliable transport that won't demand a king's ransom, asking only regular care in return</li>
+      <li><strong>The Weekend Wanderer:</strong> Riders who escape city walls on Saturdays, needing comfort and trustworthiness on country lanes</li>
+      <li><strong>The Practical Soul:</strong> Those who value substance over flashy badges, seeking honest capability at honest prices</li>
+      <li><strong>The Learning Rider:</strong> New travelers on two wheels, needing a forgiving teacher that builds confidence</li>
+    </ul>
+    <p><strong>✗ This Path May Not Suit:</strong></p>
+    <ul>
+      <li>The Speed Seeker chasing horizon at breakneck pace</li>
+      <li>The Prestige Hunter seeking admiring glances at traffic lights</li>
+      <li>The Touring Nomad planning months-long transcontinental adventures</li>
+    </ul>
+  </section>
+
   <section class="traveler-faq">
     <h2>[Create a unique headline for the FAQ section using travel/journey metaphors]</h2>
     <div class="faq-item">
       <h3 class="faq-question">Q: Will it carry me reliably for 100,000 km?</h3>
-      <p class="faq-answer">A: [Write 5-7 sentences in storytelling style with reliability wisdom, real data, typical failure points, and warranty implications. Be specific about what breaks and when.]</p>
+      <p class="faq-answer">A: [Write 7-9 sentences in storytelling style with reliability wisdom, real data, typical failure points, warranty implications. Be specific about what breaks and when, told like a wise elder sharing knowledge.]</p>
     </div>
     <div class="faq-item">
       <h3 class="faq-question">Q: Is it truly fuel efficient on a long journey?</h3>
-      <p class="faq-answer">A: [Write 5-7 sentences comparing claimed vs real-world figures in narrative voice. Include highway vs city differences, eco-mode effectiveness, and cost-per-km analysis.]</p>
+      <p class="faq-answer">A: [Write 7-9 sentences comparing claimed vs real-world figures in narrative voice. Include highway vs city differences, eco-mode effectiveness, cost-per-km analysis, told as a traveler's account.]</p>
     </div>
     <div class="faq-item">
       <h3 class="faq-question">Q: How does it compare to [competitor motorcycle models]?</h3>
-      <p class="faq-answer">A: [Write 5-7 sentences positioning this bike versus specific rivals. Discuss which bike is faster, more efficient, more comfortable, more reliable, better value.]</p>
+      <p class="faq-answer">A: [Write 7-9 sentences positioning this bike versus specific rivals. Discuss which bike is faster, more efficient, more comfortable, more reliable, better value — told as comparing different steeds.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: What are the hidden costs of this journey?</h3>
+      <p class="faq-answer">A: [Write 7-9 sentences revealing insurance, maintenance, tire replacement, and depreciation costs in fable style — the tolls along the road.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Can a shorter rider confidently mount this steed?</h3>
+      <p class="faq-answer">A: [Write 7-9 sentences about seat height, weight, balance, and whether compact riders can manage it, told with empathy and practical wisdom.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: How does it fare in monsoon rains and summer heat?</h3>
+      <p class="faq-answer">A: [Write 7-9 sentences about weather performance, wet handling, heat management, and seasonal riding considerations in vivid sensory language.]</p>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-question">Q: Should I buy new or seek a previous owner's well-kept steed?</h3>
+      <p class="faq-answer">A: [Write 7-9 sentences weighing new warranty protection against used savings, what to inspect, and the wisdom of each path.]</p>
     </div>
   </section>
 
@@ -2353,7 +3183,7 @@ RULES FOR AESOP'S FABLE REVIEWS:
 - Every advantage section: 12-15 fully written items, each 4-6 sentences with sensory details
 - Every weakness section: 12-15 fully written items, each 4-6 sentences with specific examples
 - Every body paragraph: at least 5-8 sentences of real motorcycling storytelling
-- Each FAQ answer: at least 8-10 full sentences — write minimum 5 FAQs
+- Each FAQ answer: at least 7-9 full sentences — write minimum 7 FAQs
 - Include a MORAL at the end of every major section ("And so the wise rider learns...")
 - Name competing models directly with specific comparisons: "The Honda CB300R offers..." "Yamaha MT-03 falls short because..."
 - Use realistic motorcycle data: realistic horsepower, torque, 0-100 times, fuel consumption, seat height, weight
@@ -2361,6 +3191,11 @@ RULES FOR AESOP'S FABLE REVIEWS:
 - Ground emotional language in technical reality: explain suspension, power delivery, and handling feel in detail
 - Include full cost analysis: fuel costs, service intervals, insurance, depreciation over 1/3/5 years
 - End with detailed buying guidance (3+ paragraphs): who should buy, who should look elsewhere, and which alternatives to consider
+- Write 1000-1600 words of story-rich, substantive content
+- Include comparison table for easy scanning alongside narrative
+- Structure for search terms: "review", "honest opinion", "long-term ownership", "should I buy"
+- Answer 7+ FAQ questions with narrative style (7-9 sentences each)
+- Use bullet points within story sections for better readability
 - Return ONLY valid HTML — no markdown, no code blocks, no preamble text`;
     }
   };

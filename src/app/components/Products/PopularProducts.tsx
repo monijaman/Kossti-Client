@@ -8,6 +8,7 @@ interface pageProps {
   countryCode: string;
   activeCategory?: string;
   currentPage?: number;
+  excludeProductIds?: number[];
 }
 
 type ProductApiResponse = {
@@ -18,7 +19,7 @@ type ProductApiResponse = {
 };
 
 // Server Component - fetches data on the server
-const PopularProducts = async ({ countryCode, activeCategory = '', currentPage = 1 }: pageProps) => {
+const PopularProducts = async ({ countryCode, activeCategory = '', currentPage = 1, excludeProductIds = [] }: pageProps) => {
   const translation = useTranslation(countryCode);
   const limit = 16;
 
@@ -34,6 +35,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
       priceRange: '',
       search: '',
       sortby: 'popular',
+      exclude: excludeProductIds.join(','), // Exclude Latest Reviews products
     },
     next: { revalidate: 0 }, // Always fresh so priority order is up to date
   });

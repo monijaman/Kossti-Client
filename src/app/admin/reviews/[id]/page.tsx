@@ -194,6 +194,13 @@ const ReviewForm = ({ params }: PageProps) => {
 
                     reviewData['translations'] = translations;
                     setReviewData(reviewData);
+                    // Only update the English entry; preserve the existing BN translation so
+                    // the translation form doesn't lose Bangla content after a review save.
+                    setTranslations((prev) => {
+                        const enEntry = translations[0] as unknown as import('@/lib/types').ReviewTranslation;
+                        const existingBn = prev.find((t) => t.locale !== 'en');
+                        return existingBn ? [enEntry, existingBn] : [enEntry];
+                    });
                     setReviews(reviewData.reviews)
                     setRating(reviewData.rating)
                     setAdditionalDetails(reviewData.additional_details ?? [])

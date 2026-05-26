@@ -56,7 +56,20 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
     // Ensure we update transData when translations prop changes
     useEffect(() => {
         if (translations && translations.length > 0) {
-            setTransData(translations);
+            // Normalize incoming translation objects to a consistent shape
+            const normalized = translations.map((t: any) => ({
+                id: t.id,
+                product_review_id: t.product_review_id ?? t.product_id ?? t.productId,
+                locale: (t.locale || t.lang || '').toString(),
+                rating: t.rating ?? t.ratings ?? 0,
+                // Accept multiple possible fields for the translated text
+                review: t.review ?? t.reviews ?? t.translated_review ?? t.translatedReview ?? '',
+                additional_details: t.additional_details ?? t.additionalDetails ?? [],
+                created_at: t.created_at,
+                updated_at: t.updated_at,
+            }));
+
+            setTransData(normalized as ReviewTranslation[]);
         } else {
             resetForm();
         }
@@ -278,8 +291,25 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 additionalDetails
             );
 
-            if (response && response.success) {
-                const details = response.data.translation || response.data.review;
+            // The server returns { message, translation } (no top-level `success` flag).
+            // Detect success by the presence of `translation` or `message` without an `error`.
+            const isSuccess = response && !response.error && (response.translation || response.message);
+
+            if (isSuccess) {
+                // Normalise the saved translation so the `review` field is always populated
+                // (server returns `translated_review`, not `review`).
+                const rawDetails = response.translation || response.review || {};
+                const details: ReviewTranslation = {
+                    id: rawDetails.id,
+                    product_review_id: rawDetails.product_review_id,
+                    locale: rawDetails.locale ?? selectedLocale,
+                    rating: rawDetails.rating ?? 0,
+                    review: rawDetails.review ?? rawDetails.translated_review ?? rawDetails.reviews ?? selectedTranslation.review ?? '',
+                    additional_details: rawDetails.additional_details ?? additionalDetails,
+                    created_at: rawDetails.created_at,
+                    updated_at: rawDetails.updated_at,
+                };
+
                 const updatedTransData = transData.map((dataset) => {
                     if (dataset.locale === selectedLocale) {
                         return { ...dataset, ...details };
@@ -290,17 +320,17 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 setTransData(updatedTransData);
 
                 // Update ratingInput to show the newly saved rating (preserve Bengali format)
-                if (details && details.rating) {
+                if (details.rating) {
                     const savedRating = selectedLocale === 'bn'
                         ? convertTobengaliNumerals(String(details.rating))
                         : String(details.rating);
                     setRatingInput(savedRating);
                 }
 
-                // Force reload the translation to ensure fresh data from server
+                // Update the editor with the normalised details so it never goes blank
                 setSelectedTranslation(details);
 
-                const msg = response.data.message || 'Review submitted successfully';
+                const msg = response.message || 'Review submitted successfully';
                 setFormStatus(msg);
 
                 // Show transient success message below the submit button
@@ -316,8 +346,8 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 // Handle error case
                 let err = 'Failed to submit translation';
                 try {
-                    if (response && response.data && (response.data.error || response.data.message)) {
-                        err = String(response.data.error || response.data.message);
+                    if (response && response.error) {
+                        err = String(response.error);
                     } else if (response && response.message) {
                         err = String(response.message);
                     }

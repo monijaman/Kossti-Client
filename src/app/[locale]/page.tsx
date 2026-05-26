@@ -250,7 +250,12 @@ const Page = async ({ searchParams, params }: PageProps) => {
       <ProductReview products={products} countryCode={countryCode} />
 
       <Suspense fallback={<PopularProductsSkeleton />}>
-        <PopularProducts countryCode={countryCode} activeCategory={activeCategory} currentPage={page} />
+        <PopularProducts 
+          countryCode={countryCode} 
+          activeCategory={activeCategory} 
+          currentPage={page}
+          excludeProductIds={products.slice(0, 8).map(p => p.id)}
+        />
       </Suspense>
 
       <Pagination
