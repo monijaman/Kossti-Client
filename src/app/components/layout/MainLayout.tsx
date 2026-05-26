@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import LanguageSwitcher from '../Language/LanguageSwitcher';
 import AccountDropdown from '../ui/AccountDropdown';
-import Breadcrumbs from '../ui/Breadcrumbs';
 import Sidebar from '../ui/Sidebar/Sidebar';
 
 interface MainLayoutProps {
@@ -40,7 +39,6 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
         </div>
       </header>
 
-      <Breadcrumbs />
       <div className="flex flex-col md:flex-row flex-grow">
         <Sidebar {...sidebarProps} />
 
