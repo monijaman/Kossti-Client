@@ -82,7 +82,6 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
             <label
                 htmlFor="search-input"
                 className="flex items-center rounded-xl bg-white shadow-md cursor-text overflow-hidden"
-                style={{ display: 'flex', alignItems: 'center' }}
             >
                 <input
                     id="search-input"
@@ -91,7 +90,6 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'I am looking for...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
                     className="flex-1 px-5 py-4 md:py-5 text-base md:text-lg bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
-                    style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none' }}
                 />
 
                 {searchTerm && (
@@ -102,8 +100,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                             setShowSuggestions(false);
                             setSuggestions([]);
                         }}
-                        className="px-3 text-gray-400 hover:text-gray-600 transition-colors"
-                        style={{ flexShrink: 0 }}
+                        className="px-3 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -111,9 +108,11 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
 
                 <button
                     type="button"
-                    onClick={() => { /* search on click */ }}
-                    className="transition-colors px-5 py-4 md:py-5 flex items-center justify-center" style={{ background: '#3d2817' }} onMouseEnter={e => (e.currentTarget.style.background='#5a3d2e')} onMouseLeave={e => (e.currentTarget.style.background='#3d2817')}
-                    style={{ flexShrink: 0 }}
+                    onClick={() => {}}
+                    className="shrink-0 px-5 py-4 md:py-5 flex items-center justify-center transition-colors"
+                    style={{ backgroundColor: '#3d2817' }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#5a3d2e')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#3d2817')}
                 >
                     <Search className="w-5 h-5 text-white" />
                 </button>
