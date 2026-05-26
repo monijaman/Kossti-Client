@@ -120,20 +120,20 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
 
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute z-50 mt-3 w-full overflow-hidden rounded-2xl border border-kossti-cream bg-white shadow-2xl">
+                <div className="absolute z-50 mt-3 w-full overflow-hidden rounded-[22px] border border-kossti-cream bg-white shadow-[0_24px_60px_rgba(61,40,23,0.14)]">
                     {/* Header */}
-                    <div className="border-b border-kossti-cream bg-kossti-cream-light px-4 py-3">
+                    <div className="border-b border-kossti-cream bg-kossti-cream-light px-4 py-3 md:px-5">
                         <div className="flex items-center gap-2 text-sm font-semibold text-kossti-dark">
                             <TrendingUp className="w-4 h-4" />
                             <span>{countryCode === 'en' ? 'Suggested Products' : 'প্রস্তাবিত পণ্য'}</span>
                         </div>
                     </div>
 
-                    <ul className="max-h-96 overflow-y-auto">
+                    <ul className="max-h-[420px] overflow-y-auto">
                         {suggestions.map((product) => (
                             <li
                                 key={product.id}
-                                className="group flex cursor-pointer items-center border-b border-gray-100 p-4 transition-colors last:border-b-0 hover:bg-kossti-cream-light"
+                                className="border-b border-gray-100 last:border-b-0"
                             >
                                 <Link
                                     href={
@@ -141,27 +141,27 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                             ? `/${locale}/${searchUrl}/${product.id}`
                                             : `/${locale}/${product.category_slug || 'products'}/${product.slug || `product-${product.id}`}`
                                     }
-                                    className="flex items-center gap-4 w-full"
+                                    className="group flex w-full items-start gap-4 px-4 py-4 transition-colors hover:bg-kossti-cream-light/70 md:px-5"
                                     onClick={() => {
                                         setShowSuggestions(false);
                                     }}
                                 >
                                     {/* Image */}
-                                    <div className="relative w-14 h-14 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden">
+                                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-kossti-cream bg-kossti-cream-light">
                                         <Image
                                             src={product.photo || '/noimage.webp'}
                                             alt={product.name}
                                             fill
-                                            className="object-contain p-1"
+                                            className="object-contain p-2"
                                         />
                                     </div>
 
                                     {/* Text */}
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-gray-900 font-semibold block truncate group-hover:text-purple-600 transition-colors">
+                                    <div className="min-w-0 flex-1">
+                                        <span className="block truncate text-base font-semibold text-kossti-dark transition-colors group-hover:text-kossti-brown">
                                             {product.translated_name || product.name}
                                         </span>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">
                                             {product.brand?.name && (
                                                 <>
                                                     <span className="truncate">{product.brand.translated_name || product.brand.name}</span>
@@ -173,14 +173,19 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                     </div>
 
                                     {/* Rating */}
-                                    {product.average_rating && (
-                                        <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
-                                            <span className="text-amber-500 text-sm">★</span>
-                                            <span className="text-sm font-semibold text-gray-700">
-                                                {product.average_rating.toFixed(1)}
-                                            </span>
-                                        </div>
-                                    )}
+                                    <div className="flex flex-shrink-0 flex-col items-end gap-2">
+                                        {product.average_rating && (
+                                            <div className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-amber-700">
+                                                <span className="text-sm">★</span>
+                                                <span className="text-sm font-semibold">
+                                                    {product.average_rating.toFixed(1)}
+                                                </span>
+                                            </div>
+                                        )}
+                                        <span className="text-xs font-medium uppercase tracking-wide text-kossti-brown">
+                                            {countryCode === 'en' ? 'View Review' : 'রিভিউ দেখুন'}
+                                        </span>
+                                    </div>
                                 </Link>
                             </li>
                         ))}
