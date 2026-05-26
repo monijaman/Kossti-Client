@@ -10,9 +10,10 @@ interface MainLayoutProps {
   children: ReactNode;
   sidebarProps?: SidebarParams;
   isAuthenticated?: boolean;
+  heroContent?: ReactNode;
 }
 
-const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLayoutProps) => {
+const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroContent }: MainLayoutProps) => {
   const locale = sidebarProps?.countryCode || 'bn';
   const withLocale = (path: string) => `/${locale}${path}`;
 
@@ -38,6 +39,10 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
           <LanguageSwitcher currentLocale={locale} />
         </div>
       </header>
+
+      {heroContent && (
+        <div className="w-full">{heroContent}</div>
+      )}
 
       <div className="flex flex-col md:flex-row flex-grow bg-transparent">
         <Sidebar {...sidebarProps} />
