@@ -81,7 +81,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
             {/* Search Input Container */}
             <div className="relative">
                 {/* Search Icon */}
-                <div className="absolute left-5 inset-y-0 flex items-center text-gray-400 pointer-events-none">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                     <Search className="w-5 h-5" />
                 </div>
 
@@ -102,7 +102,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                             setShowSuggestions(false);
                             setSuggestions([]);
                         }}
-                        className="absolute right-4 inset-y-0 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>
