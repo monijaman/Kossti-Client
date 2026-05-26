@@ -73,8 +73,13 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {dataset.map((product) => (
-          <ProducShortDetails key={product.id} product={product} countryCode={countryCode} />
+        {dataset.map((product, i) => (
+          <ProducShortDetails 
+            key={product.id} 
+            product={product} 
+            countryCode={countryCode}
+            index={i} // Pass index for varied backgrounds
+          />
         ))}
       </div>
     </section>

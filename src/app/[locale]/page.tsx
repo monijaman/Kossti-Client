@@ -4,7 +4,6 @@ import Pagination from '@/app/components/Pagination/index';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
-import TrustSection from '@/app/components/Home/TrustSection';
 import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
@@ -251,9 +250,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
       {/* Latest Reviews Section */}
       <ProductReview products={products} countryCode={countryCode} />
-
-      {/* Trust Section */}
-      <TrustSection countryCode={countryCode} />
 
       {/* Popular Products Section */}
       <Suspense fallback={<PopularProductsSkeleton />}>

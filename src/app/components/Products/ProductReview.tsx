@@ -33,6 +33,7 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
             product={product}
             countryCode={countryCode}
             priority={i < 4} // Prioritize first 4 images (above the fold)
+            index={i} // Pass index for varied backgrounds
           />
         ))}
       </div>

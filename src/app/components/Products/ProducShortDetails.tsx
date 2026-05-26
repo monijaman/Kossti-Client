@@ -1,13 +1,15 @@
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
+
 interface PopularProductsProps {
   product: Product;
   countryCode: string;
   priority?: boolean; // For LCP optimization
+  index?: number; // For varied background colors
 }
 
-const ProducShortDetails = ({ product, countryCode, priority = false }: PopularProductsProps) => {
+const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 }: PopularProductsProps) => {
   // Fallback to product ID if slug is missing
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
@@ -23,14 +25,52 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
     product.brand?.name ||
     '';
 
+  // Array of different background color schemes
+  const backgroundSchemes = [
+    'from-white to-blue-50 border-blue-100 hover:border-blue-300',
+    'from-white to-purple-50 border-purple-100 hover:border-purple-300',
+    'from-white to-pink-50 border-pink-100 hover:border-pink-300',
+    'from-white to-green-50 border-green-100 hover:border-green-300',
+    'from-white to-orange-50 border-orange-100 hover:border-orange-300',
+    'from-white to-cyan-50 border-cyan-100 hover:border-cyan-300',
+    'from-white to-indigo-50 border-indigo-100 hover:border-indigo-300',
+    'from-white to-yellow-50 border-yellow-100 hover:border-yellow-300',
+  ];
+
+  const imageBackgrounds = [
+    'from-blue-100 via-purple-100 to-pink-100',
+    'from-purple-100 via-pink-100 to-orange-100',
+    'from-green-100 via-cyan-100 to-blue-100',
+    'from-orange-100 via-yellow-100 to-red-100',
+    'from-cyan-100 via-blue-100 to-indigo-100',
+    'from-pink-100 via-purple-100 to-blue-100',
+    'from-yellow-100 via-orange-100 to-pink-100',
+    'from-indigo-100 via-purple-100 to-pink-100',
+  ];
+
+  const detailsBackgrounds = [
+    'from-white to-blue-50',
+    'from-white to-purple-50',
+    'from-white to-pink-50',
+    'from-white to-green-50',
+    'from-white to-orange-50',
+    'from-white to-cyan-50',
+    'from-white to-indigo-50',
+    'from-white to-yellow-50',
+  ];
+
+  const selectedScheme = backgroundSchemes[index % backgroundSchemes.length];
+  const selectedImageBg = imageBackgrounds[index % imageBackgrounds.length];
+  const selectedDetailsBg = detailsBackgrounds[index % detailsBackgrounds.length];
+
   return (
     <Link
       key={product.id}
       href={`/${countryCode}/${categorySlug}/${productSlug}`}
-      className="group block bg-gradient-to-br from-white to-blue-50 rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-blue-100 hover:border-blue-300"
+      className={`group block bg-gradient-to-br ${selectedScheme} rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border`}
     >
       {/* Product Image Container */}
-      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-amber-100 via-purple-100 to-pink-100 overflow-hidden">
+      <div className={`relative w-full aspect-[4/3] bg-gradient-to-br ${selectedImageBg} overflow-hidden`}>
         {product.review && (
           <div className="absolute top-2 md:top-4 left-2 md:left-4 z-10">
             <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-semibold px-2 md:px-3 py-1 rounded-full shadow-lg">✓ Review</span>
@@ -48,7 +88,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false }: PopularP
       </div>
 
       {/* Product Details */}
-      <div className="p-3 md:p-5 space-y-2 md:space-y-3 bg-gradient-to-b from-white to-blue-50">
+      <div className={`p-3 md:p-5 space-y-2 md:space-y-3 bg-gradient-to-b ${selectedDetailsBg}`}>
         <h3 className="text-base md:text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight line-clamp-2 group-hover:from-purple-600 group-hover:to-pink-600 transition-all">
           {displayName}
         </h3>
