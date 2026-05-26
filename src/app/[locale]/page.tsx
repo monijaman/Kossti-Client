@@ -243,7 +243,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   };
 
   const heroSection = (
-    <section className="relative w-full overflow-hidden border-y border-kossti-cream bg-kossti-cream-light">
+    <section className="relative z-10 w-full border-y border-kossti-cream bg-kossti-cream-light">
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden="true"
@@ -253,7 +253,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
       <div className="relative mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <div className="mx-auto flex   flex-col items-center rounded-[28px] border border-kossti-cream bg-white/80 px-6 py-8 text-center shadow-[0_20px_60px_rgba(61,40,23,0.08)] backdrop-blur-sm md:px-10 md:py-10">
+        <div className="relative mx-auto flex flex-col items-center rounded-[28px] border border-kossti-cream bg-white/80 px-6 py-8 text-center shadow-[0_20px_60px_rgba(61,40,23,0.08)] backdrop-blur-sm md:px-10 md:py-10">
           <div className="inline-flex items-center rounded-full border border-kossti-tan/40 bg-kossti-cream px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-kossti-brown">
             {countryCode === "en" ? "Discover Better Products" : "সেরা পণ্য খুঁজুন"}
           </div>

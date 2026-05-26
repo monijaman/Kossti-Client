@@ -9,6 +9,27 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Search, X, TrendingUp } from 'lucide-react';
 
+const SuggestionThumbnail = ({ src, alt }: { src?: string; alt: string }) => {
+    const [imageSrc, setImageSrc] = useState(src && src.trim() ? src : '/noimage.webp');
+
+    useEffect(() => {
+        setImageSrc(src && src.trim() ? src : '/noimage.webp');
+    }, [src]);
+
+    return (
+        <div className="relative h-[72px] w-[72px] min-w-[72px] flex-shrink-0 overflow-hidden rounded-2xl border border-kossti-cream bg-kossti-cream-light shadow-sm">
+            <Image
+                src={imageSrc}
+                alt={alt}
+                fill
+                unoptimized
+                onError={() => setImageSrc('/noimage.webp')}
+                className="object-contain p-2.5"
+            />
+        </div>
+    );
+};
+
 const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAULT_LOCALE }: SearchBoxProps) => {
     const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
     const [suggestions, setSuggestions] = useState<Product[]>([]); // Suggestions for search
@@ -77,11 +98,11 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
     };
 
     return (
-        <div className="relative w-full search-container">
+        <div className="relative w-full search-container text-left">
             {/* Search Input Container */}
             <label
                 htmlFor="search-input"
-                className="flex items-center overflow-hidden rounded-2xl border border-kossti-cream bg-white shadow-[0_12px_30px_rgba(61,40,23,0.08)] transition-shadow focus-within:shadow-[0_16px_36px_rgba(61,40,23,0.12)] cursor-text"
+                className="flex min-h-[72px] items-center overflow-hidden rounded-2xl border border-kossti-cream bg-white text-left shadow-[0_12px_30px_rgba(61,40,23,0.08)] transition-shadow focus-within:shadow-[0_16px_36px_rgba(61,40,23,0.12)] cursor-text"
             >
                 <input
                     id="search-input"
@@ -89,7 +110,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'I am looking for...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
-                    className="flex-1 px-5 py-4 md:px-6 md:py-5 text-base md:text-lg bg-transparent text-gray-700 placeholder:text-gray-400 focus:outline-none"
+                    className="flex-1 self-stretch px-5 py-4 text-left text-base leading-6 text-gray-700 placeholder:text-gray-400 focus:outline-none md:px-6 md:py-5 md:text-lg"
                 />
 
                 {searchTerm && (
@@ -122,7 +143,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
             {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute z-50 mt-3 w-full overflow-hidden rounded-[22px] border border-kossti-cream bg-white shadow-[0_24px_60px_rgba(61,40,23,0.14)]">
                     {/* Header */}
-                    <div className="border-b border-kossti-cream bg-kossti-cream-light px-4 py-3 md:px-5">
+                    <div className="border-b border-kossti-cream bg-kossti-cream-light px-4 py-3 text-left md:px-5">
                         <div className="flex items-center gap-2 text-sm font-semibold text-kossti-dark">
                             <TrendingUp className="w-4 h-4" />
                             <span>{countryCode === 'en' ? 'Suggested Products' : 'প্রস্তাবিত পণ্য'}</span>
@@ -141,23 +162,19 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                                             ? `/${locale}/${searchUrl}/${product.id}`
                                             : `/${locale}/${product.category_slug || 'products'}/${product.slug || `product-${product.id}`}`
                                     }
-                                    className="group flex w-full items-start gap-4 px-4 py-4 transition-colors hover:bg-kossti-cream-light/70 md:px-5"
+                                    className="group flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-kossti-cream-light/70 md:px-5"
                                     onClick={() => {
                                         setShowSuggestions(false);
                                     }}
                                 >
                                     {/* Image */}
-                                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl border border-kossti-cream bg-kossti-cream-light">
-                                        <Image
-                                            src={product.photo || '/noimage.webp'}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-2"
-                                        />
-                                    </div>
+                                    <SuggestionThumbnail
+                                        src={product.photo}
+                                        alt={product.name}
+                                    />
 
                                     {/* Text */}
-                                    <div className="min-w-0 flex-1">
+                                    <div className="min-w-0 flex-1 text-left">
                                         <span className="block truncate text-base font-semibold text-kossti-dark transition-colors group-hover:text-kossti-brown">
                                             {product.translated_name || product.name}
                                         </span>
