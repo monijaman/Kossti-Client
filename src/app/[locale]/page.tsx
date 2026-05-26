@@ -1,18 +1,24 @@
 // src/app/products/page.tsx
-import MainLayout from '@/app/components/layout/MainLayout';
-import Pagination from '@/app/components/Pagination/index';
-import PopularProducts from '@/app/components/Products/PopularProducts';
-import ProductReview from '@/app/components/Products/ProductReview';
-import SearchBox from '@/app/components/Search';
-import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
-import fetchApi from '@/lib/fetchApi';
-import { Product, SearchParams } from '@/lib/types';
-import { Metadata } from 'next';
-import { cookies } from 'next/headers';
-import { Suspense } from 'react';
+import MainLayout from "@/app/components/layout/MainLayout";
+import Pagination from "@/app/components/Pagination/index";
+import PopularProducts from "@/app/components/Products/PopularProducts";
+import ProductReview from "@/app/components/Products/ProductReview";
+import SearchBox from "@/app/components/Search";
+import {
+  apiEndpoints,
+  DEFAULT_LOCALE,
+  OG_IMAGE_URL,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/constants";
+import fetchApi from "@/lib/fetchApi";
+import { Product, SearchParams } from "@/lib/types";
+import { Metadata } from "next";
+import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 // Always fetch fresh data so priority changes reflect immediately
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
@@ -24,91 +30,94 @@ export async function generateMetadata(props: {
   const { locale } = await props.params;
   const searchParams = await props.searchParams;
 
-  const isEn = locale === 'en';
-  
+  const isEn = locale === "en";
+
   // Build canonical URL - use base URL for homepage, ignore filter params
   const baseCanonical = `${SITE_URL}/${locale}`;
-  const page = searchParams.page ? parseInt(searchParams.page as string, 10) : 1;
+  const page = searchParams.page
+    ? parseInt(searchParams.page as string, 10)
+    : 1;
   // Only add page to canonical if it's not page 1
-  const canonicalUrl = page > 1 ? `${baseCanonical}?page=${page}` : baseCanonical;
+  const canonicalUrl =
+    page > 1 ? `${baseCanonical}?page=${page}` : baseCanonical;
 
   return {
     title: isEn
       ? `${SITE_NAME} - Best Product Reviews & Comparisons in Bangladesh`
       : `${SITE_NAME} - বাংলাদেশে সেরা পণ্য রিভিউ এবং তুলনা`,
     description: isEn
-      ? 'Read honest, detailed product reviews and comparisons for motorcycles, phones, electronics and more in Bangladesh. Find the best products with expert ratings and user feedback.'
-      : 'বাংলাদেশে মোটরসাইকেল, ফোন, ইলেকট্রনিক্স এবং আরও অনেক পণ্যের সৎ এবং বিস্তারিত রিভিউ এবং তুলনা পড়ুন। বিশেষজ্ঞ রেটিং এবং ব্যবহারকারীর প্রতিক্রিয়া সহ সেরা পণ্য খুঁজে নিন।',
+      ? "Read honest, detailed product reviews and comparisons for motorcycles, phones, electronics and more in Bangladesh. Find the best products with expert ratings and user feedback."
+      : "বাংলাদেশে মোটরসাইকেল, ফোন, ইলেকট্রনিক্স এবং আরও অনেক পণ্যের সৎ এবং বিস্তারিত রিভিউ এবং তুলনা পড়ুন। বিশেষজ্ঞ রেটিং এবং ব্যবহারকারীর প্রতিক্রিয়া সহ সেরা পণ্য খুঁজে নিন।",
     keywords: isEn
       ? [
-        'product reviews',
-        'product comparison',
-        'best products',
-        'motorcycle reviews',
-        'phone reviews',
-        'electronics reviews',
-        'Bangladesh products',
-        'product ratings',
-        'customer reviews',
-        'product guide',
-      ]
+          "product reviews",
+          "product comparison",
+          "best products",
+          "motorcycle reviews",
+          "phone reviews",
+          "electronics reviews",
+          "Bangladesh products",
+          "product ratings",
+          "customer reviews",
+          "product guide",
+        ]
       : [
-        'পণ্য রিভিউ',
-        'পণ্য তুলনা',
-        'সেরা পণ্য',
-        'মোটরসাইকেল রিভিউ',
-        'ফোন রিভিউ',
-        'ইলেকট্রনিক্স রিভিউ',
-        'বাংলাদেশের পণ্য',
-        'পণ্য রেটিং',
-        'গ্রাহক রিভিউ',
-        'পণ্য গাইড',
-      ],
+          "পণ্য রিভিউ",
+          "পণ্য তুলনা",
+          "সেরা পণ্য",
+          "মোটরসাইকেল রিভিউ",
+          "ফোন রিভিউ",
+          "ইলেকট্রনিক্স রিভিউ",
+          "বাংলাদেশের পণ্য",
+          "পণ্য রেটিং",
+          "গ্রাহক রিভিউ",
+          "পণ্য গাইড",
+        ],
     openGraph: {
       title: isEn
         ? `${SITE_NAME} - Best Product Reviews & Comparisons`
         : `${SITE_NAME} - সেরা পণ্য রিভিউ এবং তুলনা`,
       description: isEn
-        ? 'Read honest product reviews and comparisons for Bangladesh'
-        : 'বাংলাদেশের জন্য নির্ভরযোগ্য পণ্য রিভিউ এবং তুলনা পড়ুন',
+        ? "Read honest product reviews and comparisons for Bangladesh"
+        : "বাংলাদেশের জন্য নির্ভরযোগ্য পণ্য রিভিউ এবং তুলনা পড়ুন",
       url: `${SITE_URL}/${locale}`,
       siteName: SITE_NAME,
-      type: 'website',
-      locale: isEn ? 'en_US' : 'bn_BD',
+      type: "website",
+      locale: isEn ? "en_US" : "bn_BD",
       images: [
         {
           url: OG_IMAGE_URL,
           width: 1200,
           height: 630,
-          alt: isEn ? `${SITE_NAME} - Product Reviews` : `${SITE_NAME} - পণ্য রিভিউ`,
+          alt: isEn
+            ? `${SITE_NAME} - Product Reviews`
+            : `${SITE_NAME} - পণ্য রিভিউ`,
         },
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: isEn
         ? `${SITE_NAME} - Best Product Reviews & Comparisons`
         : `${SITE_NAME} - সেরা পণ্য রিভিউ এবং তুলনা`,
       description: isEn
-        ? 'Read honest product reviews and comparisons'
-        : 'সৎ পণ্য রিভিউ এবং তুলনা পড়ুন',
+        ? "Read honest product reviews and comparisons"
+        : "সৎ পণ্য রিভিউ এবং তুলনা পড়ুন",
       images: [OG_IMAGE_URL],
     },
-    robots: 'index, follow',
+    robots: "index, follow",
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'x-default': `${SITE_URL}/`,
-        'en-US': `${SITE_URL}/en`,
-        'en': `${SITE_URL}/en`,
-        'bn-BD': `${SITE_URL}/bn`,
-        'bn': `${SITE_URL}/bn`,
+        "x-default": `${SITE_URL}/`,
+        "en-US": `${SITE_URL}/en`,
+        en: `${SITE_URL}/en`,
+        "bn-BD": `${SITE_URL}/bn`,
+        bn: `${SITE_URL}/bn`,
       },
     },
   };
 }
-
-
 
 type ProductApiResponse = {
   data: Product[];
@@ -145,22 +154,23 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
   const page = parseInt(resolvedSearchParams.page as string, 10) || 1;
   const limit = 16; // Match Popular Products limit for consistent pagination
-  const activeCategory = resolvedSearchParams.category || '';
-  const activeBrands = resolvedSearchParams.brand || '';
-  const activePriceRange = resolvedSearchParams.price || '';
-  const searchTerm = resolvedSearchParams.searchterm || '';
+  const activeCategory = resolvedSearchParams.category || "";
+  const activeBrands = resolvedSearchParams.brand || "";
+  const activePriceRange = resolvedSearchParams.price || "";
+  const searchTerm = resolvedSearchParams.searchterm || "";
   const cookieStore = await cookies();
   // Use URL locale as primary source — cookie is only a fallback for non-localised routes
-  const countryCode = locale || cookieStore.get('country-code')?.value || DEFAULT_LOCALE;
+  const countryCode =
+    locale || cookieStore.get("country-code")?.value || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
 
-  console.log('[Frontend] Sending request with limit:', limit);
+  console.log("[Frontend] Sending request with limit:", limit);
 
   // Fetch all data in parallel for better performance
   const [productData] = await Promise.all([
     // Main products fetch with ISR caching
     fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
-      method: 'GET',
+      method: "GET",
       accessToken: token,
       queryParams: {
         locale: countryCode,
@@ -170,7 +180,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         brand: activeBrands,
         priceRange: activePriceRange,
         search: searchTerm,
-        sortby: 'priority',
+        sortby: "priority",
       },
       next: { revalidate: 0 }, // No cache - always fresh
     }),
@@ -178,16 +188,30 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
   // Handle API errors gracefully
   if (!productData.success) {
-    console.error('[Page Error] Failed to fetch products:', productData.error);
+    console.error("[Page Error] Failed to fetch products:", productData.error);
     return (
-      <MainLayout 
-        sidebarProps={{ activeCategory, selectedBrands: activeBrands, activePriceRange, searchTerm, countryCode }}
+      <MainLayout
+        sidebarProps={{
+          activeCategory,
+          selectedBrands: activeBrands,
+          activePriceRange,
+          searchTerm,
+          countryCode,
+        }}
         isAuthenticated={!!token}
       >
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to load products</h2>
-          <p className="text-gray-600 mb-4">{productData.error || 'The backend service is temporarily unavailable. Please try again later.'}</p>
-          <a href={`/${locale}`} className="text-blue-600 hover:text-blue-800 font-medium">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Unable to load products
+          </h2>
+          <p className="text-gray-600 mb-4">
+            {productData.error ||
+              "The backend service is temporarily unavailable. Please try again later."}
+          </p>
+          <a
+            href={`/${locale}`}
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
             Go back to home
           </a>
         </div>
@@ -198,9 +222,10 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const products = productData.data?.data ?? [];
   const totalProducts = productData.data?.meta?.total ?? 0;
   // Use backend's calculated last_page to ensure consistency
-  const totalPages = productData.data?.meta?.last_page ?? Math.ceil(totalProducts / limit);
+  const totalPages =
+    productData.data?.meta?.last_page ?? Math.ceil(totalProducts / limit);
 
-  console.log('[Frontend] Received response:', {
+  console.log("[Frontend] Received response:", {
     productsCount: products.length,
     totalProducts,
     totalPages,
@@ -224,43 +249,41 @@ const Page = async ({ searchParams, params }: PageProps) => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
+            "@context": "https://schema.org",
+            "@type": "WebSite",
             name: SITE_NAME,
             url: SITE_URL,
             potentialAction: {
-              '@type': 'SearchAction',
+              "@type": "SearchAction",
               target: `${SITE_URL}/${countryCode}?searchterm={search_term_string}`,
-              'query-input': 'required name=search_term_string',
+              "query-input": "required name=search_term_string",
             },
           }),
         }}
       />
 
-<div className="w-full md:w-1/2 md:min-w-[400px] md:max-w-[700px]">
+      <div className="w-full relative md:w-1/2 md:min-w-[400px] md:max-w-[700px]">
+        {/* H1 for SEO - Visible */}
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          {countryCode === "en"
+            ? "Product Reviews & Comparisons in Bangladesh"
+            : "বাংলাদেশে পণ্য রিভিউ এবং তুলনা"}
+        </h1>
 
-      {/* H1 for SEO - Visible */}
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-        {countryCode === 'en'
-          ? 'Product Reviews & Comparisons in Bangladesh'
-          : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
-        }
-      </h1>
-
-      {/* Search Box */}
-      <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-</div>
+        {/* Search Box */}
+        <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+      </div>
 
       {/* Latest Reviews Section */}
       <ProductReview products={products} countryCode={countryCode} />
 
       {/* Popular Products Section */}
       <Suspense fallback={<PopularProductsSkeleton />}>
-        <PopularProducts 
-          countryCode={countryCode} 
-          activeCategory={activeCategory} 
+        <PopularProducts
+          countryCode={countryCode}
+          activeCategory={activeCategory}
           currentPage={page}
-          excludeProductIds={products.slice(0, 8).map(p => p.id)}
+          excludeProductIds={products.slice(0, 8).map((p) => p.id)}
         />
       </Suspense>
 
