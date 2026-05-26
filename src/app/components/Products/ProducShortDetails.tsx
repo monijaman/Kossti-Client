@@ -25,52 +25,28 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
     product.brand?.name ||
     '';
 
-  // Array of different background color schemes
-  const backgroundSchemes = [
-    'from-white to-blue-50 border-blue-100 hover:border-blue-300',
-    'from-white to-purple-50 border-purple-100 hover:border-purple-300',
-    'from-white to-pink-50 border-pink-100 hover:border-pink-300',
-    'from-white to-green-50 border-green-100 hover:border-green-300',
-    'from-white to-orange-50 border-orange-100 hover:border-orange-300',
-    'from-white to-cyan-50 border-cyan-100 hover:border-cyan-300',
-    'from-white to-indigo-50 border-indigo-100 hover:border-indigo-300',
-    'from-white to-yellow-50 border-yellow-100 hover:border-yellow-300',
+  // Array of subtle accent colors for borders
+  const accentColors = [
+    'border-blue-200 hover:border-blue-400',
+    'border-purple-200 hover:border-purple-400',
+    'border-pink-200 hover:border-pink-400',
+    'border-green-200 hover:border-green-400',
+    'border-orange-200 hover:border-orange-400',
+    'border-cyan-200 hover:border-cyan-400',
+    'border-indigo-200 hover:border-indigo-400',
+    'border-rose-200 hover:border-rose-400',
   ];
 
-  const imageBackgrounds = [
-    'from-blue-100 via-purple-100 to-pink-100',
-    'from-purple-100 via-pink-100 to-orange-100',
-    'from-green-100 via-cyan-100 to-blue-100',
-    'from-orange-100 via-yellow-100 to-red-100',
-    'from-cyan-100 via-blue-100 to-indigo-100',
-    'from-pink-100 via-purple-100 to-blue-100',
-    'from-yellow-100 via-orange-100 to-pink-100',
-    'from-indigo-100 via-purple-100 to-pink-100',
-  ];
-
-  const detailsBackgrounds = [
-    'from-white to-blue-50',
-    'from-white to-purple-50',
-    'from-white to-pink-50',
-    'from-white to-green-50',
-    'from-white to-orange-50',
-    'from-white to-cyan-50',
-    'from-white to-indigo-50',
-    'from-white to-yellow-50',
-  ];
-
-  const selectedScheme = backgroundSchemes[index % backgroundSchemes.length];
-  const selectedImageBg = imageBackgrounds[index % imageBackgrounds.length];
-  const selectedDetailsBg = detailsBackgrounds[index % detailsBackgrounds.length];
+  const selectedAccent = accentColors[index % accentColors.length];
 
   return (
     <Link
       key={product.id}
       href={`/${countryCode}/${categorySlug}/${productSlug}`}
-      className={`group block bg-gradient-to-br ${selectedScheme} rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border`}
+      className={`group block bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${selectedAccent}`}
     >
       {/* Product Image Container */}
-      <div className={`relative w-full aspect-[4/3] bg-gradient-to-br ${selectedImageBg} overflow-hidden`}>
+      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         {product.review && (
           <div className="absolute top-2 md:top-4 left-2 md:left-4 z-10">
             <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-semibold px-2 md:px-3 py-1 rounded-full shadow-lg">✓ Review</span>
@@ -112,8 +88,8 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
             ))}
           </div>
 
-          {/* Price */}
-          {product.start_price !== undefined &&
+          {/* Price *"p-3 md:p-5 space-y-2 md:space-y-3 bg-white">
+        <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors
             product.start_price !== null &&
             product.start_price > 0 && (
               <div className="text-right">
