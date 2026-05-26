@@ -238,17 +238,15 @@ const Page = async ({ searchParams, params }: PageProps) => {
       />
 
       {/* H1 for SEO - Visible */}
-      <div className="w-full md:w-1/2 md:min-w-[500px]">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-          {countryCode === 'en'
-            ? 'Product Reviews & Comparisons in Bangladesh'
-            : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
-          }
-        </h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+        {countryCode === 'en'
+          ? 'Product Reviews & Comparisons in Bangladesh'
+          : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
+        }
+      </h1>
 
-        {/* Search Box */}
-        <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
-      </div>
+      {/* Search Box */}
+      <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
 
       {/* Latest Reviews Section */}
       <ProductReview products={products} countryCode={countryCode} />
