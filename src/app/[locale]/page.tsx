@@ -4,7 +4,6 @@ import Pagination from '@/app/components/Pagination/index';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
-import HeroSection from '@/app/components/Home/HeroSection';
 import CategoryNavigation from '@/app/components/Home/CategoryNavigation';
 import TrustSection from '@/app/components/Home/TrustSection';
 import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
@@ -240,11 +239,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
 
-      {/* Hero Section */}
-      <HeroSection countryCode={countryCode} />
-
-      {/* H1 for SEO - Hidden visually but accessible */}
-      <h1 className="sr-only">
+      {/* H1 for SEO - Visible */}
+      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
         {countryCode === 'en'
           ? 'Product Reviews & Comparisons in Bangladesh'
           : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
