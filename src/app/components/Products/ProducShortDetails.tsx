@@ -64,12 +64,10 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
       </div>
 
       {/* Product Details */}
-      <div className={`p-3 md:p-5 space-y-2 md:space-y-3 bg-gradient-to-b ${selectedDetailsBg}`}>
-        <h3 className="text-base md:text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight line-clamp-2 group-hover:from-purple-600 group-hover:to-pink-600 transition-all">
+      <div className="p-3 md:p-5 space-y-2 md:space-y-3 bg-white">
+        <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
           {displayName}
         </h3>
-
-
 
         {/* Rating and Price Row */}
         <div className="flex items-center justify-between pt-1 md:pt-2 pb-1 md:pb-2 border-t border-gray-100">
@@ -88,8 +86,8 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
             ))}
           </div>
 
-          {/* Price *"p-3 md:p-5 space-y-2 md:space-y-3 bg-white">
-        <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors
+          {/* Price */}
+          {product.start_price !== undefined &&
             product.start_price !== null &&
             product.start_price > 0 && (
               <div className="text-right">
@@ -121,4 +119,3 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
 };
 
 export default ProducShortDetails;
-
