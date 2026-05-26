@@ -112,7 +112,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                 <button
                     type="button"
                     onClick={() => { /* search on click */ }}
-                    className="bg-green-500 hover:bg-green-600 transition-colors px-5 py-4 md:py-5 flex items-center justify-center"
+                    className="transition-colors px-5 py-4 md:py-5 flex items-center justify-center" style={{ background: '#3d2817' }} onMouseEnter={e => (e.currentTarget.style.background='#5a3d2e')} onMouseLeave={e => (e.currentTarget.style.background='#3d2817')}
                     style={{ flexShrink: 0 }}
                 >
                     <Search className="w-5 h-5 text-white" />

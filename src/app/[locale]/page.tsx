@@ -263,13 +263,13 @@ const Page = async ({ searchParams, params }: PageProps) => {
       />
 
       {/* Hero Search Section */}
-      <div className="w-full -mx-3 md:-mx-4 lg:-mx-6 mb-8 bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-14 flex flex-col items-center text-center">
+      <div className="w-full -mx-3 md:-mx-4 lg:-mx-6 mb-8 px-4 py-14 flex flex-col items-center text-center" style={{ background: 'linear-gradient(135deg, #3d2817 0%, #8b6f47 60%, #d4a574 100%)' }}>
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
           {countryCode === "en"
             ? "What are you looking for?"
             : "আপনি কী খুঁজছেন?"}
         </h1>
-        <p className="text-green-100 text-sm md:text-base mb-8">
+        <p className="text-amber-100 text-sm md:text-base mb-8">
           {countryCode === "en"
             ? "Product Reviews & Comparisons in Bangladesh"
             : "বাংলাদেশে পণ্য রিভিউ এবং তুলনা"}
