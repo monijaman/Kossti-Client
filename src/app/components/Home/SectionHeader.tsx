@@ -37,7 +37,7 @@ const SectionHeader = ({
           </div>
           
           {subtitle && (
-            <p className="text-sm md:text-base text-gray-600 mt-1.5 md:mt-2 ml-0 md:ml-13">
+            <p className="text-sm md:text-base text-gray-600 mt-1.5 md:mt-2">
               {subtitle}
             </p>
           )}
