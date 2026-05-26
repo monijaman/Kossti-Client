@@ -4,7 +4,6 @@ import Pagination from '@/app/components/Pagination/index';
 import PopularProducts from '@/app/components/Products/PopularProducts';
 import ProductReview from '@/app/components/Products/ProductReview';
 import SearchBox from '@/app/components/Search';
-import CategoryNavigation from '@/app/components/Home/CategoryNavigation';
 import TrustSection from '@/app/components/Home/TrustSection';
 import { apiEndpoints, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
@@ -246,9 +245,6 @@ const Page = async ({ searchParams, params }: PageProps) => {
           : 'বাংলাদেশে পণ্য রিভিউ এবং তুলনা'
         }
       </h1>
-
-      {/* Category Navigation */}
-      <CategoryNavigation countryCode={countryCode} />
 
       {/* Search Box */}
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
