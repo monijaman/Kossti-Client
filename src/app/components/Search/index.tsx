@@ -81,7 +81,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
             {/* Search Input Container */}
             <div className="relative">
                 {/* Search Icon */}
-                <div className="absolute left-5 inset-y-0 flex items-center text-gray-400 pointer-events-none">
+                <div className="absolute left-4 inset-y-0 flex items-center text-gray-400 pointer-events-none">
                     <Search className="w-5 h-5" />
                 </div>
 
