@@ -237,6 +237,8 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
 
+<div className="w-full md:w-1/2 md:min-w-[400px] md:max-w-[700px]">
+
       {/* H1 for SEO - Visible */}
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
         {countryCode === 'en'
@@ -247,6 +249,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
 
       {/* Search Box */}
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+</div>
 
       {/* Latest Reviews Section */}
       <ProductReview products={products} countryCode={countryCode} />
