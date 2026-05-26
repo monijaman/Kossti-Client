@@ -72,7 +72,7 @@ const Sidebar = ({ activeCategory, selectedBrands, searchTerm, countryCode }: Si
 
 
   return (
-    <aside className="w-full md:w-[300px] bg-transparent p-3 md:p-4 border-b md:border-b-0 md:border-r border-gray-300">
+    <aside className="w-full md:w-[300px] bg-gray-100 p-3 md:p-4 border-b md:border-b-0  ">
       <Categories
         categories={categories}
         activeCategory={activeCategory}
