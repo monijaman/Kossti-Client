@@ -43,7 +43,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
     <Link
       key={product.id}
       href={`/${countryCode}/${categorySlug}/${productSlug}`}
-      className={`group block bg-transparent rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${selectedAccent}`}
+      className={`group block bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${selectedAccent}`}
     >
       {/* Product Image Container */}
       <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
@@ -64,7 +64,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
       </div>
 
       {/* Product Details */}
-      <div className="p-3 md:p-5 space-y-2 md:space-y-3 bg-transparent">
+      <div className="p-3 md:p-5 space-y-2 md:space-y-3 bg-white">
         <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
           {displayName}
         </h3>
