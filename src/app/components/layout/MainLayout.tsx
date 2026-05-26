@@ -17,7 +17,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false }: MainLay
   const withLocale = (path: string) => `/${locale}${path}`;
 
   return (
-    <div className="min-h-screen flex flex-col mx-auto bg-gray-50" suppressHydrationWarning>
+    <div className="min-h-screen flex flex-col mx-auto" suppressHydrationWarning>
       <header className="bg-gray-100 text-white px-2 md:px-4 py-2 md:py-3 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2 md:gap-4 relative z-40 overflow-visible">
         <Link href={withLocale('')} suppressHydrationWarning className="flex-shrink-0">
           <Image
