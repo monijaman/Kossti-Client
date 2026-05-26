@@ -79,30 +79,38 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
     return (
         <div className="relative w-full search-container mb-8">
             {/* Search Input Container */}
-            <div className="flex flex-row items-center gap-3 px-4 border-2 border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md focus-within:ring-4 focus-within:ring-purple-100 focus-within:border-purple-500 transition-all duration-300" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Search className="w-5 h-5 text-gray-400 shrink-0" style={{ display: 'block' }} />
+            <label
+                htmlFor="search-input"
+                className="flex items-center gap-3 px-4 border-2 border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md focus-within:ring-4 focus-within:ring-purple-100 focus-within:border-purple-500 transition-all duration-300 cursor-text"
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '0 16px' }}
+            >
+                <Search className="w-5 h-5 text-gray-400" style={{ flexShrink: 0 }} />
 
                 <input
+                    id="search-input"
                     type="text"
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'Search for products, brands, categories...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
                     className="flex-1 py-4 md:py-5 text-base md:text-lg bg-transparent focus:outline-none"
+                    style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none' }}
                 />
 
                 {searchTerm && (
                     <button
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.preventDefault();
                             setSearchTerm('');
                             setShowSuggestions(false);
                             setSuggestions([]);
                         }}
-                        className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        style={{ flexShrink: 0 }}
                     >
                         <X className="w-5 h-5" />
                     </button>
                 )}
-            </div>
+            </label>
 
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
