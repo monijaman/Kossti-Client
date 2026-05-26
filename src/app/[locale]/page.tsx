@@ -243,21 +243,36 @@ const Page = async ({ searchParams, params }: PageProps) => {
   };
 
   const heroSection = (
-    <div className="w-full px-6 py-10 flex flex-col items-center text-center" style={{ backgroundColor: '#faf7f2' }}>
-      <h1 className="text-3xl md:text-4xl font-bold mb-2 tracking-tight" style={{ color: '#3d2817' }}>
-        {countryCode === "en"
-          ? "What are you looking for?"
-          : "আপনি কী খুঁজছেন?"}
-      </h1>
-      <p className="text-sm md:text-base mb-6" style={{ color: '#8b6f47' }}>
-        {countryCode === "en"
-          ? "Product Reviews & Comparisons in Bangladesh"
-          : "বাংলাদেশে পণ্য রিভিউ এবং তুলনা"}
-      </p>
-      <div className="w-full max-w-2xl">
-        <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+    <section className="relative w-full overflow-hidden border-y border-kossti-cream bg-kossti-cream-light">
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          background:
+            "radial-gradient(circle at top left, rgba(212,165,116,0.16), transparent 28%), radial-gradient(circle at top right, rgba(139,111,71,0.10), transparent 24%)",
+        }}
+      />
+      <div className="relative mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14">
+        <div className="mx-auto flex max-w-3xl flex-col items-center rounded-[28px] border border-kossti-cream bg-white/80 px-6 py-8 text-center shadow-[0_20px_60px_rgba(61,40,23,0.08)] backdrop-blur-sm md:px-10 md:py-10">
+          <div className="inline-flex items-center rounded-full border border-kossti-tan/40 bg-kossti-cream px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-kossti-brown">
+            {countryCode === "en" ? "Discover Better Products" : "সেরা পণ্য খুঁজুন"}
+          </div>
+          <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-kossti-dark md:text-5xl">
+            {countryCode === "en"
+              ? "What are you looking for?"
+              : "আপনি কী খুঁজছেন?"}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-kossti-brown md:text-base">
+            {countryCode === "en"
+              ? "Search trusted reviews, compare products, and find the right choice faster."
+              : "বিশ্বস্ত রিভিউ খুঁজুন, পণ্য তুলনা করুন, এবং দ্রুত সঠিক সিদ্ধান্ত নিন।"}
+          </p>
+          <div className="mt-6 w-full max-w-2xl">
+            <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 
   return (

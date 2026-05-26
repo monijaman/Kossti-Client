@@ -77,11 +77,11 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
     };
 
     return (
-        <div className="relative w-full search-container mb-8">
+        <div className="relative w-full search-container">
             {/* Search Input Container */}
             <label
                 htmlFor="search-input"
-                className="flex items-center rounded-xl bg-white shadow-md cursor-text overflow-hidden"
+                className="flex items-center overflow-hidden rounded-2xl border border-kossti-cream bg-white shadow-[0_12px_30px_rgba(61,40,23,0.08)] transition-shadow focus-within:shadow-[0_16px_36px_rgba(61,40,23,0.12)] cursor-text"
             >
                 <input
                     id="search-input"
@@ -89,7 +89,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'I am looking for...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
-                    className="flex-1 px-5 py-4 md:py-5 text-base md:text-lg bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
+                    className="flex-1 px-5 py-4 md:px-6 md:py-5 text-base md:text-lg bg-transparent text-gray-700 placeholder:text-gray-400 focus:outline-none"
                 />
 
                 {searchTerm && (
@@ -100,7 +100,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                             setShowSuggestions(false);
                             setSuggestions([]);
                         }}
-                        className="px-3 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                        className="px-3 text-gray-400 hover:text-kossti-dark transition-colors shrink-0"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -109,7 +109,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                 <button
                     type="button"
                     onClick={() => {}}
-                    className="shrink-0 px-5 py-4 md:py-5 flex items-center justify-center transition-colors"
+                    className="flex shrink-0 items-center justify-center self-stretch border-l border-kossti-cream px-5 py-4 transition-colors md:px-6 md:py-5"
                     style={{ backgroundColor: '#3d2817' }}
                     onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#5a3d2e')}
                     onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#3d2817')}
@@ -120,10 +120,10 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
 
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute z-50 bg-white border-2 border-purple-100 rounded-2xl w-full mt-2 shadow-2xl overflow-hidden">
+                <div className="absolute z-50 mt-3 w-full overflow-hidden rounded-2xl border border-kossti-cream bg-white shadow-2xl">
                     {/* Header */}
-                    <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-purple-700">
+                    <div className="border-b border-kossti-cream bg-kossti-cream-light px-4 py-3">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-kossti-dark">
                             <TrendingUp className="w-4 h-4" />
                             <span>{countryCode === 'en' ? 'Suggested Products' : 'প্রস্তাবিত পণ্য'}</span>
                         </div>
@@ -133,7 +133,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                         {suggestions.map((product) => (
                             <li
                                 key={product.id}
-                                className="flex items-center p-4 hover:bg-purple-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors group"
+                                className="group flex cursor-pointer items-center border-b border-gray-100 p-4 transition-colors last:border-b-0 hover:bg-kossti-cream-light"
                             >
                                 <Link
                                     href={
