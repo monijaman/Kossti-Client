@@ -79,11 +79,9 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
     return (
         <div className="relative w-full search-container mb-8">
             {/* Search Input Container */}
-            <div className="relative">
+            <div className="flex items-center border-2 border-gray-200 rounded-2xl bg-white shadow-sm hover:shadow-md focus-within:ring-4 focus-within:ring-purple-100 focus-within:border-purple-500 transition-all duration-300 px-4">
                 {/* Search Icon */}
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                    <Search className="w-5 h-5" />
-                </div>
+                <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
 
                 {/* Input Field */}
                 <input
@@ -91,7 +89,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'Search for products, brands, categories...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
-                    className="w-full pl-12 pr-12 py-4 md:py-5 text-base md:text-lg border-2 border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-md"
+                    className="flex-1 px-3 py-4 md:py-5 text-base md:text-lg bg-transparent focus:outline-none"
                 />
 
                 {/* Clear Button */}
@@ -102,7 +100,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                             setShowSuggestions(false);
                             setSuggestions([]);
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
                     >
                         <X className="w-5 h-5" />
                     </button>
