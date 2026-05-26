@@ -1,5 +1,5 @@
 export const LOCALES = ["en", "bn"];
-export const DEFAULT_LOCALE = "bn"; // Changed to Bangla as default
+export const DEFAULT_LOCALE = "en"; // English as default
 
 // Site Configuration
 export const SITE_URL =
