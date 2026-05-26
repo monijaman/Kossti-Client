@@ -263,16 +263,16 @@ const Page = async ({ searchParams, params }: PageProps) => {
       />
 
       {/* Hero Search Section */}
-      <div className="w-full flex flex-col items-center text-center py-10 px-4 mb-6">
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+      <div className="w-full -mx-3 md:-mx-4 lg:-mx-6 mb-8 bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-14 flex flex-col items-center text-center">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+          {countryCode === "en"
+            ? "What are you looking for?"
+            : "আপনি কী খুঁজছেন?"}
+        </h1>
+        <p className="text-green-100 text-sm md:text-base mb-8">
           {countryCode === "en"
             ? "Product Reviews & Comparisons in Bangladesh"
             : "বাংলাদেশে পণ্য রিভিউ এবং তুলনা"}
-        </h1>
-        <p className="text-gray-500 text-base md:text-lg mb-8 max-w-xl">
-          {countryCode === "en"
-            ? "Find honest reviews and compare the best products."
-            : "সেরা পণ্য খুঁজুন এবং তুলনা করুন।"}
         </p>
         <div className="w-full max-w-2xl">
           <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
