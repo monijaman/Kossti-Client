@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Remove all backgrounds */
+@layer base {
+  html, body {
+    background: none;
+    background-color: transparent;
+  }
+}
+
 /* Import KOSSTI Design System */
 @import "@/styles/design-system.css";
 
