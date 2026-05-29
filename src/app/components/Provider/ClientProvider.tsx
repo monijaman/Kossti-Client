@@ -3,6 +3,7 @@
 import { store } from '@/redux/store';
 import { ReactNode, useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { ThemeProvider } from 'next-themes';
 
 interface ClientProviderProps {
     children: ReactNode;
@@ -36,5 +37,9 @@ export default function ClientProvider({ children }: ClientProviderProps) {
         }
     }, []);
 
-    return <Provider store={store}>{children}</Provider>;
+    return (
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            <Provider store={store}>{children}</Provider>
+        </ThemeProvider>
+    );
 }

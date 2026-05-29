@@ -3,7 +3,8 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { SpecificationInt, SpecificationKey } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, use, useCallback, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 
 import SpecTranslations from '@/app/components/admin/specifications/SpecTranslations';
 interface PageProps {
@@ -116,7 +117,7 @@ const Specification = ({ params }: PageProps) => {
                         {specifications.map((spec, index) => (
                             <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
-                                    <Select
+                                    <DarkSelect
                                         name="specification_key_id" // Match with SpecificationInt key
                                         value={specKeys
                                             .map((key) => ({

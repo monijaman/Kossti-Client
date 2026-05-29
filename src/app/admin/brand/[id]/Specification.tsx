@@ -5,7 +5,8 @@ import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Brand, Category } from '@/lib/types';
 import { FormEvent, use, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 
 
 type SubmitBrandResponse = {
@@ -145,7 +146,7 @@ export default function SpecificationPage({ params }: { params: Promise<{ id: st
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                         Select Category
                     </label>
-                    <Select
+                    <DarkSelect
                         name="category"
                         value={categories
                             .map((cat) => ({ value: cat.id, label: cat.name }))
@@ -162,7 +163,7 @@ export default function SpecificationPage({ params }: { params: Promise<{ id: st
                 {/* Brands List */}
                 {activeBrands.map((item, index) => (
                     <div key={index} className="flex gap-4 items-center">
-                        <Select
+                        <DarkSelect
                             value={brands
                                 .map((brand) => ({ value: brand.id!, label: brand.name || "" }))
                                 .find((option) => option.value === item.id) || null}

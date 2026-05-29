@@ -8,7 +8,8 @@ import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 
 const ManageReviews = () => {
     const searchParams = useSearchParams();
@@ -133,17 +134,17 @@ const ManageReviews = () => {
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder="Search products..."
-                    className="border border-gray-300 p-2 w-full rounded"
+                    className="border border-gray-300 dark:border-gray-600 p-2 w-full rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
             </div>
 
             <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Category
                 </label>
                 <div className="flex gap-2">
                     <div className="flex-1">
-                        <Select
+                        <DarkSelect
                             name="category"
                             value={Array.isArray(categories) && categories
                                 .filter((cat) => Number(cat.status) === 1) // Only show active categories

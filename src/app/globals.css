@@ -8,6 +8,63 @@
     background: none;
     background-color: transparent;
   }
+
+  /* Dark mode base */
+  html.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+
+  /* Dark mode header */
+  html.dark header {
+    background-color: #1f2937 !important;
+  }
+
+  /* Dark mode main content */
+  html.dark main {
+    background-color: #111827 !important;
+    color: #f9fafb;
+  }
+
+  /* Dark mode sidebar */
+  html.dark aside {
+    background-color: #1f2937 !important;
+    color: #f9fafb;
+  }
+
+  /* Dark mode cards / white boxes */
+  html.dark .bg-white {
+    background-color: #1f2937 !important;
+    color: #f9fafb;
+  }
+
+  html.dark .bg-gray-100 {
+    background-color: #111827 !important;
+  }
+
+  html.dark .bg-gray-200 {
+    background-color: #1f2937 !important;
+  }
+
+  html.dark .bg-gray-50 {
+    background-color: #1f2937 !important;
+  }
+
+  html.dark .text-gray-800,
+  html.dark .text-gray-900,
+  html.dark .text-gray-700 {
+    color: #e5e7eb !important;
+  }
+
+  html.dark .text-gray-500,
+  html.dark .text-gray-600 {
+    color: #9ca3af !important;
+  }
+
+  html.dark .border-gray-200,
+  html.dark .border-gray-300 {
+    border-color: #374151 !important;
+  }
 }
 
 /* Import KOSSTI Design System */

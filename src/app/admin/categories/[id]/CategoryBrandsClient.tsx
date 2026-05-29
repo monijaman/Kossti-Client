@@ -4,7 +4,8 @@ import { useBrands } from "@/hooks/useBrands";
 import { useCategory } from "@/hooks/useCategory";
 import { Brand, Category } from '@/lib/types';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 
 interface CategoryBrand {
     id: number | null;
@@ -293,7 +294,7 @@ export default function CategoryBrandsClient({ categoriesFromServer, numericCate
                     <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                         Select Category
                     </label>
-                    <Select
+                    <DarkSelect
                         name="category"
                         // ensure we pass the actual option object from the options list
                         value={
@@ -316,7 +317,7 @@ export default function CategoryBrandsClient({ categoriesFromServer, numericCate
                 {Array.isArray(activeBrands) && activeBrands.length > 0 ? (
                     activeBrands.map((item, index) => (
                         <div id="BrandItems" key={index} className="flex gap-4 items-center">
-                            <Select
+                            <DarkSelect
                                 value={
                                     selectOptions.find((o) => o.value === Number(item.brand_id)) ?? null
                                 }

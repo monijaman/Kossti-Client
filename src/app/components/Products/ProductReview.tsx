@@ -14,9 +14,6 @@ interface pageProps {
 const ProductReview = ({ products, countryCode }: pageProps) => {
   const translation = useTranslation(countryCode);
 
-  // Show only first 8 products for Latest Reviews section
-  const latestProducts = products.slice(0, 8);
-
   return (
     <section className="mb-12">
       <SectionHeader
@@ -27,7 +24,7 @@ const ProductReview = ({ products, countryCode }: pageProps) => {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
-        {latestProducts.map((product, i) => (
+        {products.map((product, i) => (
           <ProducShortDetails
             key={product.id + i}
             product={product}

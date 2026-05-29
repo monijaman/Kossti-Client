@@ -10,7 +10,7 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
   const translation = useTranslation(countryCode);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl md:rounded-3xl mb-8 md:mb-12">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-2xl md:rounded-3xl mb-8 md:mb-12">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
       
@@ -22,7 +22,7 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
       <div className="relative px-4 md:px-8 py-12 md:py-20">
         <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-purple-100">
+            <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-purple-100 dark:border-gray-600">
             <Sparkles className="w-4 h-4 text-purple-600" />
             <span className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               {countryCode === 'en' ? "Bangladesh's Most Trusted Review Platform" : "বাংলাদেশের সবচেয়ে বিশ্বস্ত রিভিউ প্ল্যাটফর্ম"}
@@ -41,7 +41,7 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
           </h2>
 
           {/* Subheading */}
-          <p className="text-base md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {countryCode === 'en' 
               ? 'Compare prices, read authentic reviews, and make informed decisions. Join 50,000+ smart shoppers in Bangladesh.'
               : 'দাম তুলনা করুন, সত্যিকারের রিভিউ পড়ুন, এবং সঠিক সিদ্ধান্ত নিন। বাংলাদেশের ৫০,০০০+ স্মার্ট ক্রেতাদের সাথে যোগ দিন।'
@@ -72,8 +72,8 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
               <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-3 shadow-lg">
                 <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-gray-900">2,000+</div>
-              <div className="text-xs md:text-sm text-gray-600">
+              <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">2,000+</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {countryCode === 'en' ? 'Products' : 'পণ্য'}
               </div>
             </div>
@@ -82,8 +82,8 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
               <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-3 shadow-lg">
                 <Users className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-gray-900">50K+</div>
-              <div className="text-xs md:text-sm text-gray-600">
+              <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">50K+</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {countryCode === 'en' ? 'Users' : 'ব্যবহারকারী'}
               </div>
             </div>
@@ -92,8 +92,8 @@ const HeroSection = ({ countryCode }: HeroSectionProps) => {
               <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl mb-3 shadow-lg">
                 <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-white" />
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-gray-900">5K+</div>
-              <div className="text-xs md:text-sm text-gray-600">
+              <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">5K+</div>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 {countryCode === 'en' ? 'Reviews' : 'রিভিউ'}
               </div>
             </div>

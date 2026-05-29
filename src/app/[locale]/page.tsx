@@ -167,7 +167,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   console.log("[Frontend] Sending request with limit:", limit);
 
   // Fetch all data in parallel for better performance
-  const [productData] = await Promise.all([
+  const [productData, latestReviewsData] = await Promise.all([
     // Main products fetch with ISR caching
     fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: "GET",
@@ -183,6 +183,18 @@ const Page = async ({ searchParams, params }: PageProps) => {
         sortby: "priority",
       },
       next: { revalidate: 0 }, // No cache - always fresh
+    }),
+    // Latest Reviews: always top 8 by high priority first, then updated date
+    // Independent of pagination so it consistently shows the most important products
+    fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+      method: "GET",
+      queryParams: {
+        locale: countryCode,
+        page: "1",
+        limit: "8",
+        sortby: "priority",
+      },
+      next: { revalidate: 0 },
     }),
   ]);
 
@@ -225,6 +237,9 @@ const Page = async ({ searchParams, params }: PageProps) => {
   const totalPages =
     productData.data?.meta?.last_page ?? Math.ceil(totalProducts / limit);
 
+  // Latest Reviews: top 8 by priority DESC, updated_at DESC (independent of main listing pagination)
+  const latestReviews = latestReviewsData.data?.data ?? [];
+
   console.log("[Frontend] Received response:", {
     productsCount: products.length,
     totalProducts,
@@ -243,7 +258,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
   };
 
   const heroSection = (
-    <section className="relative z-10 w-full border-y border-kossti-cream bg-kossti-cream-light">
+    <section className="relative z-10 w-full border-y border-kossti-cream dark:border-gray-700 bg-kossti-cream-light dark:bg-gray-900">
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden="true"
@@ -253,16 +268,16 @@ const Page = async ({ searchParams, params }: PageProps) => {
         }}
       />
       <div className="relative mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14">
-        <div className="relative mx-auto flex flex-col items-center rounded-[28px] border border-kossti-cream bg-white/80 px-6 py-8 text-center shadow-[0_20px_60px_rgba(61,40,23,0.08)] backdrop-blur-sm md:px-10 md:py-10">
-          <div className="inline-flex items-center rounded-full border border-kossti-tan/40 bg-kossti-cream px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-kossti-brown">
+          <div className="relative mx-auto flex flex-col items-center rounded-[28px] border border-kossti-cream dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(61,40,23,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)] backdrop-blur-sm md:px-10 md:py-10">
+          <div className="inline-flex items-center rounded-full border border-kossti-tan/40 dark:border-gray-600 bg-kossti-cream dark:bg-gray-700 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-kossti-brown dark:text-gray-300">
             {countryCode === "en" ? "Discover Better Products" : "সেরা পণ্য খুঁজুন"}
           </div>
-          <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-kossti-dark md:text-5xl">
+          <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-kossti-dark dark:text-white md:text-5xl">
             {countryCode === "en"
               ? "What are you looking for?"
               : "আপনি কী খুঁজছেন?"}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-kossti-brown md:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-kossti-brown dark:text-gray-400 md:text-base">
             {countryCode === "en"
               ? "Search trusted reviews, compare products, and find the right choice faster."
               : "বিশ্বস্ত রিভিউ খুঁজুন, পণ্য তুলনা করুন, এবং দ্রুত সঠিক সিদ্ধান্ত নিন।"}
@@ -296,7 +311,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
       />
 
       {/* Latest Reviews Section */}
-      <ProductReview products={products} countryCode={countryCode} />
+      <ProductReview products={latestReviews} countryCode={countryCode} />
 
       {/* Popular Products Section */}
       <Suspense fallback={<PopularProductsSkeleton />}>
@@ -304,7 +319,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
           countryCode={countryCode}
           activeCategory={activeCategory}
           currentPage={page}
-          excludeProductIds={products.slice(0, 8).map((p) => p.id)}
+          excludeProductIds={latestReviews.map((p) => p.id)}
         />
       </Suspense>
 

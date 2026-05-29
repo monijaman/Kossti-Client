@@ -20,7 +20,7 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
   if (productList.length === 0) {
     return (
       <div className="overflow-x-auto">
-        <div className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden p-6">
+        <div className="min-w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden p-6">
           <p className="text-center text-gray-500">No products found.</p>
         </div>
       </div>
@@ -29,23 +29,23 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="min-w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
 
         <h2>{countryCode}</h2>
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Brand</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {productList.map((product) => (
-              <tr key={product.id} className="hover:bg-gray-100 transition duration-300 ease-in-out">
+              <tr key={product.id} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-300 ease-in-out">
                 <td className="py-4 px-6">{product.id}</td>
                 <td className="py-4 px-6">{product.name}</td>
                 <td className="py-4 px-6">{product.brand?.name}</td>

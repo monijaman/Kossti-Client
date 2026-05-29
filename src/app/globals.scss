@@ -23,6 +23,204 @@
      border-radius: 0 0 4px 4px;
  }
 
+ /* ===== DARK MODE ===== */
+ html.dark {
+   body {
+     background-color: #111827;
+     color: #f9fafb;
+   }
+
+   header {
+     background-color: #1f2937 !important;
+   }
+
+   main {
+     background-color: #111827 !important;
+     color: #f9fafb;
+   }
+
+   aside {
+     background-color: #1f2937 !important;
+     color: #f9fafb;
+   }
+
+   .bg-white {
+     background-color: #1f2937 !important;
+     color: #f9fafb;
+   }
+
+   .bg-gray-100 {
+     background-color: #111827 !important;
+   }
+
+   .bg-gray-200 {
+     background-color: #1f2937 !important;
+   }
+
+   .bg-gray-50 {
+     background-color: #1f2937 !important;
+   }
+
+   .text-gray-800,
+   .text-gray-900,
+   .text-gray-700 {
+     color: #e5e7eb !important;
+   }
+
+   .text-gray-500,
+   .text-gray-600 {
+     color: #9ca3af !important;
+   }
+
+   .border-gray-200,
+   .border-gray-300 {
+     border-color: #374151 !important;
+   }
+
+   // Cards and panels
+   .rounded,
+   .rounded-lg,
+   .rounded-xl,
+   .rounded-2xl {
+     &.shadow,
+     &.shadow-md,
+     &.shadow-lg,
+     &.shadow-xl {
+       box-shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
+     }
+   }
+
+   // ReactQuill editor dark mode
+   .react-quill-wrapper .quill {
+     background: #1f2937;
+   }
+
+   .react-quill-wrapper .ql-toolbar {
+     background: #374151;
+     border-color: #4b5563;
+
+     .ql-stroke {
+       stroke: #d1d5db;
+     }
+
+     .ql-fill {
+       fill: #d1d5db;
+     }
+
+     .ql-picker {
+       color: #d1d5db;
+     }
+
+     .ql-picker-options {
+       background: #374151;
+       border-color: #4b5563;
+
+       .ql-picker-item {
+         color: #d1d5db;
+       }
+     }
+
+     button:hover .ql-stroke,
+     .ql-picker-label:hover .ql-stroke {
+       stroke: #f9fafb;
+     }
+
+     button:hover .ql-fill,
+     .ql-picker-label:hover .ql-fill {
+       fill: #f9fafb;
+     }
+   }
+
+   .react-quill-wrapper .ql-container {
+     border-color: #4b5563;
+     background: #1f2937;
+   }
+
+   .react-quill-wrapper .ql-editor {
+     color: #f9fafb;
+
+     &.ql-blank::before {
+       color: #9ca3af;
+     }
+   }
+
+   // Table row hover fix — Tailwind dark:hover variant can lose to specificity
+   table tbody tr:hover {
+     background-color: #374151 !important;
+   }
+
+   // react-select dark mode (targets classNamePrefix="rs" from DarkSelect component)
+   .rs__control {
+     background-color: #1f2937 !important;
+     border-color: #4b5563 !important;
+
+     &:hover {
+       border-color: #6b7280 !important;
+     }
+   }
+
+   .rs__single-value {
+     color: #f9fafb !important;
+   }
+
+   .rs__placeholder {
+     color: #9ca3af !important;
+   }
+
+   .rs__input-container {
+     color: #f9fafb !important;
+   }
+
+   .rs__menu {
+     background-color: #1f2937 !important;
+     border: 1px solid #4b5563;
+   }
+
+   .rs__menu-list {
+     background-color: #1f2937 !important;
+   }
+
+   .rs__option {
+     background-color: #1f2937 !important;
+     color: #f9fafb !important;
+
+     &:hover,
+     &.rs__option--is-focused {
+       background-color: #374151 !important;
+     }
+
+     &.rs__option--is-selected {
+       background-color: #3b82f6 !important;
+     }
+   }
+
+   .rs__indicator-separator {
+     background-color: #4b5563 !important;
+   }
+
+   .rs__dropdown-indicator,
+   .rs__clear-indicator {
+     color: #9ca3af !important;
+
+     &:hover {
+       color: #f9fafb !important;
+     }
+   }
+
+   .rs__multi-value {
+     background-color: #374151 !important;
+
+     .rs__multi-value__label {
+       color: #f9fafb !important;
+     }
+
+     .rs__multi-value__remove:hover {
+       background-color: #ef4444 !important;
+       color: #fff !important;
+     }
+   }
+ }
+
  /* Loading state styling */
  .react-quill-loading {
      display: flex;

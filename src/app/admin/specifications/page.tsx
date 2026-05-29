@@ -4,7 +4,8 @@ import { apiEndpoints } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
 import { Category, SpecificationKey } from '@/lib/types';
 import { FormEvent, useEffect, useState } from 'react';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 // import Specification from "../categories/[id]/Specification";
 interface SpecResponse {
     message: string;
@@ -183,7 +184,7 @@ const Specification = () => {
                             <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                                 Category
                             </label>
-                            <Select
+                            <DarkSelect
                                 name="category"
                                 value={Array.isArray(categories) && categories
                                     .map((cat) => ({
@@ -206,7 +207,7 @@ const Specification = () => {
                         {activeSpecifications && Array.isArray(activeSpecifications) && activeSpecifications.map((spec, index) => (
                             <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
-                                    <Select
+                                    <DarkSelect
                                         name="specification_key_id"
                                         value={activeSpecifications
                                             .map((key) => ({

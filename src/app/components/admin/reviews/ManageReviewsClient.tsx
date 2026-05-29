@@ -9,7 +9,8 @@ import fetchApi from '@/lib/fetchApi';
 import useDebounce from '@/lib/useDebounce';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Select, { SingleValue } from 'react-select';
+import { SingleValue } from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 
 interface ReviewData {
   id: number;
@@ -134,7 +135,7 @@ const ManageReviewsClient = ({ searchParams }: ManageReviewsClientProps) => {
                 </label>
                 <div className="flex gap-2">
                     <div className="flex-1">
-                        <Select
+                        <DarkSelect
                             name="category"
                             value={Array.isArray(categories) && categories
                                 .filter((cat) => Number(cat.status) === 1)

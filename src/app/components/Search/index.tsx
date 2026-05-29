@@ -102,7 +102,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
             {/* Search Input Container */}
             <label
                 htmlFor="search-input"
-                className="flex min-h-[72px] items-center overflow-hidden rounded-2xl border border-kossti-cream bg-white text-left shadow-[0_12px_30px_rgba(61,40,23,0.08)] transition-shadow focus-within:shadow-[0_16px_36px_rgba(61,40,23,0.12)] cursor-text"
+                className="flex min-h-[72px] items-center overflow-hidden rounded-2xl border-2 border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-left shadow-md transition-all focus-within:border-kossti-brown focus-within:shadow-[0_0_0_3px_rgba(139,111,71,0.15)] focus-within:bg-white dark:focus-within:bg-gray-600 cursor-text"
             >
                 <input
                     id="search-input"
@@ -110,7 +110,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                     value={searchTerm}
                     onChange={handleSearchChange}
                     placeholder={countryCode === 'en' ? 'I am looking for...' : 'পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন...'}
-                    className="flex-1 self-stretch px-5 py-4 text-left text-base leading-6 text-gray-700 placeholder:text-gray-400 focus:outline-none md:px-6 md:py-5 md:text-lg"
+                    className="flex-1 self-stretch px-5 py-4 text-left text-base leading-6 text-gray-700 placeholder:text-gray-500 bg-transparent focus:outline-none md:px-6 md:py-5 md:text-lg dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
 
                 {searchTerm && (
@@ -126,17 +126,7 @@ const SearchBox = ({ initialSearchTerm = '', searchUrl = '', countryCode = DEFAU
                         <X className="w-5 h-5" />
                     </button>
                 )}
-
-                <button
-                    type="button"
-                    onClick={() => {}}
-                    className="flex shrink-0 items-center justify-center self-stretch border-l border-kossti-cream px-5 py-4 transition-colors md:px-6 md:py-5"
-                    style={{ backgroundColor: '#3d2817' }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#5a3d2e')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#3d2817')}
-                >
-                    <Search className="w-5 h-5 text-white" />
-                </button>
+ 
             </label>
 
             {/* Suggestions Dropdown */}

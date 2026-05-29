@@ -78,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" style={{
+    <html lang="en" suppressHydrationWarning style={{
       // @ts-ignore
       '--font-poppins': poppins.style.fontFamily
     } as React.CSSProperties}>

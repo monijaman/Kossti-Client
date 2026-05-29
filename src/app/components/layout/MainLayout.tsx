@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import LanguageSwitcher from '../Language/LanguageSwitcher';
 import AccountDropdown from '../ui/AccountDropdown';
+import DarkModeToggle from '../ui/DarkModeToggle';
 import Sidebar from '../ui/Sidebar/Sidebar';
 
 interface MainLayoutProps {
@@ -20,7 +21,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
   return (
     <div className="min-h-screen flex flex-col mx-auto bg-transparent" suppressHydrationWarning>
       <header className="bg-gray-200 text-white px-2 md:px-4 py-2 md:py-3 flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2 md:gap-4 relative z-40 overflow-visible">
-        <Link href={withLocale('')} suppressHydrationWarning className="flex-shrink-0">
+        <Link href={withLocale('')} suppressHydrationWarning className="flex-shrink-0 dark:bg-white dark:rounded-lg dark:px-2 dark:py-1">
           <Image
             src="/logo.png"
             alt="Kosti"
@@ -36,6 +37,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
         <div className="w-full md:w-auto md:ml-auto flex flex-row items-center justify-end gap-2 md:gap-4 relative z-50 overflow-visible">
 
           <AccountDropdown isAuthenticated={isAuthenticated} />
+          <DarkModeToggle />
           <LanguageSwitcher currentLocale={locale} />
         </div>
       </header>

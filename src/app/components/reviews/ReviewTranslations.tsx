@@ -3,7 +3,7 @@ import { useSpecifications } from "@/hooks/useSpecifications";
 import { LOCALES } from '@/lib/constants';
 import { ReviewTranslation, SpecificationInt, SpecificationKey, SpecKeyTranslation } from '@/lib/types';
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import Select from 'react-select';
+import DarkSelect from '@/components/DarkSelect';
 type SubmitSpecResponse = {
     success: boolean;
     data: {
@@ -148,7 +148,7 @@ const ReviewTransForm = ({ productId, specKeys, specifications }: PageProps) => 
             {tranSpecifications && tranSpecifications.map((spec, index) => (
                 <div key={index} className="grid grid-cols-1 gap-6 sm:grid-cols-1">
                     <div>
-                        <Select
+                        <DarkSelect
                             name="specification_id"
                             value={specKeys && specKeys
                                 .map((key) => ({

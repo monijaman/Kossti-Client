@@ -23,7 +23,7 @@ const AdminLayoutClient = ({ children, accessToken }: AdminLayoutClientProps) =>
 
     // For all other admin pages, show full layout
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
+        <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
             <header className="bg-gray-800 text-white p-3 sm:p-4 flex items-center justify-between sticky top-0 z-40">
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -54,7 +54,7 @@ const AdminLayoutClient = ({ children, accessToken }: AdminLayoutClientProps) =>
                     />
                 )}
 
-                <main className="flex-1 overflow-auto bg-white">
+                <main className="flex-1 overflow-auto bg-white dark:bg-gray-900 dark:text-gray-100">
                     <div className="p-3 sm:p-4 md:p-6">
                         {children}
                     </div>

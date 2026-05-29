@@ -539,7 +539,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 onChange={setReviews}
                                                 className="mb-4"
                                                 id="reviews"
-                                                style={{ backgroundColor: '#f9f9f9', minHeight: '200px' }}
+                                                style={{ minHeight: '200px' }}
                                             />
                                             {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                                         </div>

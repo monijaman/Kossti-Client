@@ -154,3 +154,47 @@
         }
     }
 }
+
+/* Dark mode overrides */
+html.dark {
+    .drag-drop {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .document-uploader {
+        & .upload-box {
+            background-color: #111827;
+            border-color: #3b82f6;
+        }
+
+        .upload-info {
+            div p {
+                color: #d1d5db;
+            }
+        }
+
+        table {
+            border-bottom-color: #374151;
+
+            tr {
+                border-bottom-color: #374151;
+
+                td {
+                    color: #d1d5db;
+                }
+            }
+        }
+
+        .file-types {
+            h5, h6 {
+                color: #e5e7eb;
+            }
+        }
+
+        .browse-btn {
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+    }
+}
