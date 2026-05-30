@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getApiUrl } from "@/lib/apiUrl";
 
 async function proxyRegister(req: NextRequest, apiUrl: string) {
   try {
@@ -35,11 +36,6 @@ async function proxyRegister(req: NextRequest, apiUrl: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
-  if (!apiUrl)
-    return NextResponse.json(
-      { success: false, error: "API url not configured" },
-      { status: 500 }
-    );
+  const apiUrl = getApiUrl();
   return proxyRegister(req, apiUrl);
 }

@@ -1,4 +1,5 @@
 import CategoryBrandsClient from "./CategoryBrandsClient";
+import { getApiUrl } from "@/lib/apiUrl";
 
 interface Brand {
     id: number;
@@ -26,11 +27,7 @@ const CategoryBrands = async ({ categorySlug, countryCode }: CategoryBrandsProps
     let brands: Brand[] = [];
 
     try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-            console.error("[CategoryBrands] NEXT_PUBLIC_API_URL not configured");
-            return null;
-        }
+        const apiUrl = getApiUrl();
 
         const params = new URLSearchParams({ category_slug: categorySlug });
         if (countryCode) {

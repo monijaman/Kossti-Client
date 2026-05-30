@@ -6,8 +6,9 @@ import { useTranslation } from '@/hooks/useLocale';
 import { categoryInt, SidebarParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import Categories from './Categories';
+import { getApiUrl } from '@/lib/apiUrl';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = getApiUrl();
 
 
 const Sidebar = ({ activeCategory, selectedBrands, searchTerm, countryCode }: SidebarParams) => {
@@ -21,10 +22,6 @@ const Sidebar = ({ activeCategory, selectedBrands, searchTerm, countryCode }: Si
     let cancelled = false;
 
     const fetchCategories = async () => {
-      if (!API_BASE_URL) {
-        setCategories([]);
-        return;
-      }
 
       try {
         const queryParams = new URLSearchParams({

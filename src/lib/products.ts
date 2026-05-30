@@ -1,4 +1,6 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
+import { getApiUrl } from './apiUrl';
+
+const apiUrl = getApiUrl();
 
 export async function getAProductBySlug(slug: string, locale?: string) {
   const params: Record<string, string> = {};

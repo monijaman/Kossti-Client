@@ -1,6 +1,7 @@
 'use client'; // This directive makes this component a client component
 
 import Link from 'next/link';
+import { getApiUrl } from '@/lib/apiUrl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
@@ -75,7 +76,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
       if (token) {
         try {
           const serverLogoutResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/logout`,
+            `${getApiUrl()}/api/v1/logout`,
             {
               method: "POST",
               headers: {

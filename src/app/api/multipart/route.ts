@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getApiUrl } from "@/lib/apiUrl";
 
 async function handlePostRequest(req: NextRequest, apiUrl: string) {
   try {
@@ -107,16 +108,8 @@ async function handlePostRequest(req: NextRequest, apiUrl: string) {
 // Define the POST request handler for the API route
 export async function POST(req: NextRequest) {
   try {
-    // Get the API URL from environment variables
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
-
-    // Check for missing API URL in environment variables
-    if (!apiUrl) {
-      throw new Error("API URL is not defined in environment variables");
-    }
-
     // Call the common POST request handler function
-    return handlePostRequest(req, apiUrl);
+    return handlePostRequest(req, getApiUrl());
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown server error";

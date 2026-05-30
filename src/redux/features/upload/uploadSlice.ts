@@ -1,3 +1,4 @@
+import { getApiUrl } from "@/lib/apiUrl";
 import { ProductPhotos } from "@/lib/types";
 import { RootState } from "@/redux/store";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -148,7 +149,7 @@ export const removeMedia = createAsyncThunk<ApiResponse, removeMediaPayload>(
   async (payload) => {
     const { productId } = payload;
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";
+    const apiUrl = getApiUrl();
     const endpoint = `${apiUrl}/imageremove/${productId}`;
 
     const response = await fetch(endpoint, {

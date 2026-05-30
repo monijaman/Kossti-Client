@@ -1,7 +1,8 @@
 import { ClassValue, clsx } from "clsx";
 import { NextResponse } from "next/server";
+import { getApiUrl } from "./apiUrl";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL as string;
+const apiUrl = getApiUrl();
 
 export async function gettokenbyrefreshToken(
   refreshToken: string
