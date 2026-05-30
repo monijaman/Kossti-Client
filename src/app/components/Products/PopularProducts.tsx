@@ -9,6 +9,7 @@ import { TrendingUp } from "lucide-react";
 interface pageProps {
   countryCode: string;
   activeCategory?: string;
+  activeBrands?: string;
   currentPage?: number;
   excludeProductIds?: number[];
 }
@@ -21,7 +22,7 @@ type ProductApiResponse = {
 };
 
 // Server Component - fetches data on the server
-const PopularProducts = async ({ countryCode, activeCategory = '', currentPage = 1, excludeProductIds = [] }: pageProps) => {
+const PopularProducts = async ({ countryCode, activeCategory = '', activeBrands = '', currentPage = 1, excludeProductIds = [] }: pageProps) => {
   const translation = useTranslation(countryCode);
   const limit = 16;
 
@@ -33,7 +34,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', currentPage =
       page: currentPage.toString(),
       limit: limit.toString(),
       category: activeCategory,
-      brand: '',
+      brand: activeBrands,
       priceRange: '',
       search: '',
       sortby: 'popular',

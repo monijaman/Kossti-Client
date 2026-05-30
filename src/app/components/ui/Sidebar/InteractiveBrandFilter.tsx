@@ -9,9 +9,16 @@ interface InteractiveBrandFilterProps extends SidebarParams {
     countryCode?: string;
 }
 
-const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm, countryCode = 'bn' }: InteractiveBrandFilterProps) => {
-    const [selected, setSelected] = useState<string[]>([]);
+const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searchTerm, countryCode = 'bn' }: InteractiveBrandFilterProps) => {
+    const [selected, setSelected] = useState<string[]>(
+        selectedBrands ? selectedBrands.split(',').filter(Boolean) : []
+    );
     const router = useRouter();
+
+    // Sync selected brands when selectedBrands prop changes (e.g., category navigation clears brands)
+    useEffect(() => {
+        setSelected(selectedBrands ? selectedBrands.split(',').filter(Boolean) : []);
+    }, [selectedBrands]);
     // Update the URL whenever the selected brands change
     useEffect(() => {
         if (!searchTerm) {
@@ -47,17 +54,6 @@ const InteractiveBrandFilter = ({ dataset, activeCategory, searchTerm, countryCo
                 : prevSelected.filter((slug) => slug !== brandSlug)
         );
     };
-
-
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const brandQuery = params.get('brand'); // Get brand query parameter
-
-        if (brandQuery) {
-            setSelected(brandQuery.split(',')); // Set selected brands
-        }
-    }, []); // Run once on component mount
 
     return (
         <>

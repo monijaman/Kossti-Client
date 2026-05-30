@@ -184,14 +184,15 @@ const Page = async ({ searchParams, params }: PageProps) => {
       },
       next: { revalidate: 0 }, // No cache - always fresh
     }),
-    // Latest Reviews: always top 8 by high priority first, then updated date
-    // Independent of pagination so it consistently shows the most important products
+    // Latest Reviews: top 8 by priority DESC, filtered by active category/brand when selected
     fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: "GET",
       queryParams: {
         locale: countryCode,
         page: "1",
         limit: "8",
+        ...(activeCategory ? { category: activeCategory } : {}),
+        ...(activeBrands ? { brand: activeBrands } : {}),
         sortby: "priority",
       },
       next: { revalidate: 0 },
@@ -318,6 +319,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         <PopularProducts
           countryCode={countryCode}
           activeCategory={activeCategory}
+          activeBrands={activeBrands}
           currentPage={page}
           excludeProductIds={latestReviews.map((p) => p.id)}
         />
