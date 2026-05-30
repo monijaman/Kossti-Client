@@ -3,7 +3,7 @@
 import { Brand, SidebarParams } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // For pushing URL changes
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface InteractiveBrandFilterProps extends SidebarParams {
     countryCode?: string;
@@ -14,15 +14,20 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
         selectedBrands ? selectedBrands.split(',').filter(Boolean) : []
     );
     const router = useRouter();
+    // Track whether the change to `selected` came from a user interaction (checkbox click)
+    // vs. a prop-driven sync (category navigation). Only push URL changes for user interactions.
+    const userInteracted = useRef(false);
 
     // Sync selected brands when selectedBrands prop changes (e.g., category navigation clears brands)
     useEffect(() => {
+        userInteracted.current = false;
         setSelected(selectedBrands ? selectedBrands.split(',').filter(Boolean) : []);
     }, [selectedBrands]);
-    // Update the URL whenever the selected brands change
+
+    // Update the URL only when the user manually toggles a brand checkbox
     useEffect(() => {
-        if (!searchTerm) {
-            const currentParams = new URLSearchParams(window.location.search); // Get current query parameters
+        if (!searchTerm && userInteracted.current) {
+            const currentParams = new URLSearchParams(window.location.search);
 
             // Update or remove the category parameter
             if (activeCategory) {
@@ -37,17 +42,16 @@ const InteractiveBrandFilter = ({ dataset, selectedBrands, activeCategory, searc
             } else {
                 currentParams.delete('brand');
             }
-            // Generate the new query string
-            const newQueryString = `/${countryCode}?${currentParams.toString()}`;
 
-            // Only update the URL if there is a real change
+            const newQueryString = `/${countryCode}?${currentParams.toString()}`;
             if (newQueryString !== `/${countryCode}?${window.location.search.replace('?', '')}`) {
-                router.replace(newQueryString); // Use replace to avoid looping
+                router.replace(newQueryString);
             }
         }
-    }, [selected, activeCategory, router, searchTerm]);
+    }, [selected, activeCategory, router, searchTerm, countryCode]);
 
     const handleBrandChange = (isChecked: boolean, brandSlug: string) => {
+        userInteracted.current = true;
         setSelected((prevSelected) =>
             isChecked
                 ? [...prevSelected, brandSlug]
