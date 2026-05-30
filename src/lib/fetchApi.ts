@@ -18,16 +18,16 @@ type NextFetchRequestConfig = {
 };
 
 const getBaseUrl = () => {
-  // Try to get URL from environment variables
-  let url = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-
-  // Always fallback to production backend if not defined
-  if (!url) {
-    url = "https://gocritserver-production.up.railway.app";
+  const isServer = typeof window === "undefined";
+  if (isServer) {
+    return (
+      process.env.API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "https://gocritserver-production.up.railway.app"
+    );
   }
-
-  console.log("Using API URL:", url);
-  return url;
+  // Browser: proxy through /api/proxy — the route reads API_URL at runtime server-side
+  return "/api/proxy";
 };
 
 export default async function fetchApi<T>(
