@@ -16,10 +16,9 @@ interface PageProps {
 
 
 interface BrandList {
-    data: {
-        brands: brandInt[];
-        total: number;
-    };
+    brands: brandInt[];
+    total: number;
+    count?: number;
 }
 
 const BrandPage = ({ searchParams }: PageProps) => {
@@ -55,14 +54,31 @@ const BrandPage = ({ searchParams }: PageProps) => {
             });
 
             if (brandResponse.success && brandResponse.data) {
-                const dataObj = brandResponse.data as BrandList;
-                setBrands(dataObj.data.brands);
-                setTotalPages(Math.ceil(dataObj.data.total / limit));
-                setLoading(false);
-            }
+                const data = brandResponse.data as BrandList | brandInt[];
+                let resolvedBrands: brandInt[] = [];
+                let totalCount = 0;
 
+                if (Array.isArray(data)) {
+                    resolvedBrands = data;
+                    totalCount = data.length;
+                } else if (Array.isArray((data as BrandList).brands)) {
+                    resolvedBrands = (data as BrandList).brands;
+                    totalCount = (data as BrandList).total ?? (data as BrandList).count ?? resolvedBrands.length;
+                } else if (Array.isArray((data as any).data?.brands)) {
+                    resolvedBrands = (data as any).data.brands;
+                    totalCount = (data as any).data.total ?? (data as any).data.count ?? resolvedBrands.length;
+                }
+
+                setBrands(resolvedBrands);
+                setTotalPages(Math.ceil(totalCount / limit));
+            } else {
+                setBrands([]);
+                setTotalPages(0);
+            }
         } catch (error) {
             console.error('Error fetching brands:', error);
+            setBrands([]);
+            setTotalPages(0);
         } finally {
             setLoading(false);
         }
