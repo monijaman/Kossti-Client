@@ -44,7 +44,7 @@ const ListSpecifications = () => {
         try {
             const categoriesResponse = await getCategories({
                 perPage: 10,        // Number of items per page (optional)
-                search: searchTerm,   // Search term (optional)
+                search: debouncedSearchTerm,   // Search term (optional)
                 paginate: true,   // 'true' or 'false' to enable/disable pagination
                 locale: locale,        // Locale, e.g., 'en', 'bn', etc.
                 categoryId: '',      // Category ID (optional, can be empty)
@@ -69,17 +69,18 @@ const ListSpecifications = () => {
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
-    }, [searchTerm, page, locale, getCategories, sortBy, sortOrder, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedSearchTerm, page, locale, sortBy, sortOrder, status]);
 
     const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
-
-    useEffect(() => {
-        if (debouncedSearchTerm) fetchCategories();
-    }, [debouncedSearchTerm, fetchCategories]);
 
     const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     const handleSort = (sortBy: string, sortOrder: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -88,10 +89,6 @@ const ListSpecifications = () => {
         params.set('page', '1'); // Reset to first page when sorting
         router.push(`/admin/categories?${params.toString()}`);
     };
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
 
     return (
         <div className="container mx-auto p-6 bg-gray-100 min-h-screen">

@@ -1,26 +1,41 @@
 // BrandDetails.tsx (must be in /app directory or imported into a Server Component)
 import { updateBrandStatus } from '@/app/actions/updateBrandStatus';
-import { Brand } from '@/lib/types';
+import { Brand, Category } from '@/lib/types';
 import { MarketProduct } from '@/lib/types';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import Modal from '@/app/components/Modal/client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface PageProps {
   brands: Brand[];
 }
 
 const BrandDetails = ({ brands }: PageProps) => {
-  // Ensure brands is an array
-
   const [brandList, setBrandList] = useState<Brand[]>(Array.isArray(brands) ? brands : []);
+  const [activeBrand, setActiveBrand] = useState<Brand | null>(null);
   const [isMarketModalOpen, setIsMarketModalOpen] = useState(false);
   const [marketProducts, setMarketProducts] = useState<MarketProduct[]>([]);
   const [loadingMarket, setLoadingMarket] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Form state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [instructions, setInstructions] = useState<string>('');
 
   const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+
+  // Fetch categories once on mount
+  useEffect(() => {
+    fetchApi(`${apiEndpoints.getCategories}?limit=1000&offset=0`)
+      .then((res) => {
+        const raw = (res.data as any)?.categories ?? res.data;
+        setCategories(Array.isArray(raw) ? raw : []);
+      })
+      .catch(() => setCategories([]));
+  }, []);
 
   if (brandList.length === 0) {
     return (
@@ -30,67 +45,82 @@ const BrandDetails = ({ brands }: PageProps) => {
     );
   }
 
+  const openModal = (brand: Brand) => {
+    setActiveBrand(brand);
+    setMarketProducts([]);
+    setHasSearched(false);
+    setSelectedCategoryId('');
+    setInstructions('');
+    setIsMarketModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsMarketModalOpen(false);
+    setActiveBrand(null);
+    setMarketProducts([]);
+    setHasSearched(false);
+  };
+
   const brandStatusUpdate = async (brand_id: number, status: number) => {
     const response = await updateBrandStatus(brand_id, status);
-
     if (response?.success) {
-
-      // Update brand status in the state
       setBrandList((prevBrands) =>
         prevBrands.map((brand) =>
-          brand.id === brand_id
-            ? { ...brand, status: !!status } // Convert status to boolean
-            : brand
+          brand.id === brand_id ? { ...brand, status: !!status } : brand
         )
       );
     }
   };
 
-  const fetchMarketProducts = async (brand: Brand) => {
-    console.log('=== fetchMarketProducts called for brand ===', brand.name);
-    setIsMarketModalOpen(true); // Open modal immediately
+  const handleSearch = async () => {
+    if (!activeBrand) return;
     setLoadingMarket(true);
-    setMarketProducts([]); // Clear previous products
-    
+    setMarketProducts([]);
+    setHasSearched(true);
+
+    const selectedCategory = categories.find((c) => String(c.id) === selectedCategoryId);
+
     try {
-      console.log('Making API call to:', apiEndpoints.getMarketProducts);
       const response = await fetchApi<MarketProduct[]>(apiEndpoints.getMarketProducts, {
         queryParams: {
-          brand_id: brand.id,
-          brand_name: brand.name
-        }
+          brand_id: activeBrand.id,
+          brand_name: activeBrand.name,
+          ...(selectedCategory ? { category_name: selectedCategory.name, category_id: selectedCategory.id } : {}),
+          ...(instructions.trim() ? { instructions: instructions.trim() } : {}),
+        },
       });
-      console.log('API Response:', response);
-      
+
       if (response.success && response.data) {
-        // response.data is already the array of MarketProduct[]
-        const products = Array.isArray(response.data) ? response.data : [];
-        console.log('Setting products:', products);
+        const payload = response.data;
+        let products: MarketProduct[] = [];
+        if (Array.isArray(payload)) {
+          products = payload;
+        } else if (Array.isArray((payload as any).data)) {
+          products = (payload as any).data;
+        } else if (Array.isArray((payload as any).products)) {
+          products = (payload as any).products;
+        }
         setMarketProducts(products);
       } else {
-        console.error('API call failed:', response.error);
-        alert(`Failed to fetch market products: ${response.error || 'Unknown error'}`);
-        setMarketProducts([]); // Reset to empty array on error
-        setIsMarketModalOpen(false); // Close modal on error
+        setMarketProducts([]);
       }
     } catch (error) {
       console.error('Error fetching market products:', error);
-      alert('Error fetching market products. Please check if the server is running.');
-      setMarketProducts([]); // Reset to empty array on error
-      setIsMarketModalOpen(false); // Close modal on error
+      setMarketProducts([]);
     } finally {
       setLoadingMarket(false);
     }
   };
 
   const importProduct = async (product: MarketProduct) => {
+    const selectedCategory = categories.find((c) => String(c.id) === selectedCategoryId);
     try {
       const productData = {
         name: product.name,
         description: product.description,
         price: product.price || 99.99,
-        category_id: product.category_id || 1,
-        brand_id: 1, // Default brand, could be made dynamic
+        category_id: selectedCategory?.id || product.category_id || 1,
+        brand_id: activeBrand?.id || 1,
         status: true,
       };
 
@@ -101,7 +131,6 @@ const BrandDetails = ({ brands }: PageProps) => {
 
       if (response.success) {
         alert('Product imported successfully!');
-        // Optionally refresh the market products or remove the imported one
       } else {
         alert(`Failed to import product: ${response.error || 'Unknown error'}`);
       }
@@ -134,16 +163,15 @@ const BrandDetails = ({ brands }: PageProps) => {
                   {brand.status ? 'Active' : 'Inactive'}
                 </span>
               </td>
-              <td className="py-2 px-4">
+              <td className="py-2 px-4 flex flex-wrap gap-2 items-center">
                 {userType !== 'reviewer' && (
                   <Link
-                    className="bg-yellow-500 text-white px-3 py-2 rounded-md mr-2 hover:bg-yellow-600"
+                    className="bg-yellow-500 text-white px-3 py-2 rounded-md hover:bg-yellow-600"
                     href={`/admin/brand/manage/${brand.id}`}
                   >
                     Edit
                   </Link>
                 )}
-
                 {brand.id !== null && userType !== 'reviewer' && (
                   <button
                     className={`${brand.status ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-md hover:bg-opacity-80`}
@@ -152,14 +180,12 @@ const BrandDetails = ({ brands }: PageProps) => {
                     {brand.status ? 'Deactivate' : 'Activate'}
                   </button>
                 )}
-
                 {userType !== 'reviewer' && (
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 ml-2"
-                    onClick={() => fetchMarketProducts(brand)}
-                    disabled={loadingMarket}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    onClick={() => openModal(brand)}
                   >
-                    {loadingMarket ? 'Loading...' : 'Show New Products'}
+                    Get New Products
                   </button>
                 )}
               </td>
@@ -168,56 +194,101 @@ const BrandDetails = ({ brands }: PageProps) => {
         </tbody>
       </table>
 
-
-      {isMarketModalOpen && loadingMarket && (
-        <div className="mt-8 text-center">
-          <p className="text-lg text-gray-500">Loading market products...</p>
-        </div>
-      )}
-
-      {isMarketModalOpen && !loadingMarket && Array.isArray(marketProducts) && marketProducts.length === 0 && (
-        <div className="mt-8 text-center">
-          <p className="text-lg text-gray-500">No market products available.</p>
-        </div>
-      )}
-
-      <Modal isOpen={isMarketModalOpen} onClose={() => setIsMarketModalOpen(false)}>
+      <Modal isOpen={isMarketModalOpen} onClose={closeModal}>
         <div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">New Products Available in Market</h3>
-          
+          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">
+            New Products Available in Market
+          </h3>
+          {activeBrand && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Brand: <span className="font-semibold text-blue-600">{activeBrand.name}</span>
+            </p>
+          )}
+
+          {/* Search form */}
+          <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Category <span className="text-gray-400 font-normal">(optional — narrows AI results)</span>
+              </label>
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="w-full border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">— All categories —</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={String(cat.id)}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Extra instructions <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <textarea
+                rows={3}
+                value={instructions}
+                onChange={(e) => setInstructions(e.target.value)}
+                placeholder="e.g. Focus on budget smartphones released in 2024..."
+                className="w-full border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </div>
+
+            <button
+              onClick={handleSearch}
+              disabled={loadingMarket}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold py-2 px-4 rounded-md transition text-sm"
+            >
+              {loadingMarket ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Searching…
+                </span>
+              ) : (
+                '🔍 Search with AI'
+              )}
+            </button>
+          </div>
+
+          {/* Results */}
           {loadingMarket && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-              <p className="mt-3 text-gray-600 text-lg">Loading market products...</p>
+            <div className="text-center py-10">
+              <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
+              <p className="mt-3 text-gray-500 text-sm">AI is researching products…</p>
             </div>
           )}
-          
-          {!loadingMarket && Array.isArray(marketProducts) && marketProducts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">No market products available.</p>
+
+          {!loadingMarket && hasSearched && marketProducts.length === 0 && (
+            <div className="text-center py-10 text-gray-500 text-sm">
+              No products found. Try different instructions or category.
             </div>
           )}
-          
-          {!loadingMarket && Array.isArray(marketProducts) && marketProducts.length > 0 && (
+
+          {!loadingMarket && marketProducts.length > 0 && (
             <div className="overflow-x-auto">
-              <table className="w-full bg-white border-collapse">
-                <thead className="bg-gray-100 sticky top-0">
-                  <tr className="text-left border-b-2 border-gray-400">
-                    <th className="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Product Name</th>
-                    <th className="py-3 px-4 font-semibold text-gray-700">Description</th>
-                    <th className="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Category</th>
-                    <th className="py-3 px-4 font-semibold text-gray-700 text-center whitespace-nowrap">Action</th>
+              <p className="text-xs text-gray-400 mb-2">{marketProducts.length} result(s)</p>
+              <table className="w-full bg-white dark:bg-gray-800 border-collapse">
+                <thead className="bg-gray-100 dark:bg-gray-700 sticky top-0">
+                  <tr className="text-left border-b-2 border-gray-300 dark:border-gray-600">
+                    <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Product Name</th>
+                    <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Description</th>
+                    <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Type</th>
+                    <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 text-center whitespace-nowrap">Import</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Array.isArray(marketProducts) && marketProducts.map((product, index) => (
-                    <tr key={index} className="border-b border-gray-200 hover:bg-blue-50 transition">
-                      <td className="py-3 px-4 text-sm font-medium text-gray-800">{product.name}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600">{product.description}</td>
-                      <td className="py-3 px-4 text-sm text-gray-700">{product.type}</td>
+                  {marketProducts.map((product, index) => (
+                    <tr key={index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                      <td className="py-3 px-4 text-sm font-medium text-gray-800 dark:text-gray-200">{product.name}</td>
+                      <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{product.description}</td>
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">{product.type}</td>
                       <td className="py-3 px-4 text-center">
                         <button
-                          className="bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 transition text-sm whitespace-nowrap"
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md text-sm whitespace-nowrap"
                           onClick={() => importProduct(product)}
                         >
                           Import
