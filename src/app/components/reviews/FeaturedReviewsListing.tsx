@@ -76,15 +76,15 @@ const FeaturedReviewsListing = ({ reviews, countryCode = 'en' }: FeaturedReviews
                                         : 'Detailed review analysis'}
                                 </p>
 
-                                {/* Price Tag */}
-                                {review.price && (
+                                {/* Price Tag - hidden, activate when ready */}
+                                {/* {review.price && (
                                     <div className="mb-4 flex items-baseline gap-1">
                                         <span className="text-xs text-gray-500 font-medium">Price:</span>
                                         <span className="text-lg font-black text-green-600">
                                             ${review.price.toFixed(2)}
                                         </span>
                                     </div>
-                                )}
+                                )} */}
 
                                 {/* Divider */}
                                 <div className="h-px bg-gray-200 mb-4" />

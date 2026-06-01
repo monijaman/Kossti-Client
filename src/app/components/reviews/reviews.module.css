@@ -68,6 +68,69 @@
   border-color: #d1d5db;
 }
 
+:global(.dark) .reviewCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+:global(.dark) .reviewCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  border-color: #4b5563;
+}
+
+/* Dark mode text overrides */
+:global(.dark) .reviewContent {
+  color: #d1d5db;
+}
+
+:global(.dark) .reviewContent h2 {
+  color: #f3f4f6;
+  border-bottom-color: #374151;
+}
+
+:global(.dark) .reviewContent h3 {
+  color: #f3f4f6;
+}
+
+:global(.dark) .reviewContent strong {
+  color: #f9fafb;
+}
+
+:global(.dark) .reviewerName {
+  color: #f3f4f6;
+}
+
+:global(.dark) .reviewDate {
+  color: #9ca3af;
+}
+
+:global(.dark) .priceBadge {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+:global(.dark) .actionButtons {
+  border-top-color: #374151;
+  color: #9ca3af;
+}
+
+:global(.dark) .actionButton:hover {
+  background: #374151;
+}
+
+:global(.dark) .additionalDetails {
+  background: #111827;
+  color: #9ca3af;
+}
+
+:global(.dark) .additionalDetailsTitle {
+  color: #f3f4f6;
+}
+
+:global(.dark) .starEmpty {
+  color: #4b5563;
+}
+
 /* Review Header */
 .reviewHeader {
   display: flex;

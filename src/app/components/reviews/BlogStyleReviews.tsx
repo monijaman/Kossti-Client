@@ -55,15 +55,15 @@ const BlogStyleReviews = ({ reviews, countryCode = 'en' }: BlogStyleReviewsProps
                                         </span>
                                     </div>
 
-                                    {/* Price Display */}
-                                    {review.price && (
+                                    {/* Price Display - hidden, activate when ready */}
+                                    {/* {review.price && (
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-xs font-semibold text-gray-500 uppercase">Price</span>
                                             <span className="text-lg font-black text-green-600">
                                                 ${review.price.toFixed(2)}
                                             </span>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
 
                                 {/* Footer - Author Section */}

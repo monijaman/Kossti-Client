@@ -6,6 +6,8 @@ export interface brandInt {
   deleted_at: null;
   created_at: string;
   updated_at: string;
+  photo?: string;
+  logo?: string;
 }
 
 export type SubmitSpecResponse = {
@@ -64,6 +66,8 @@ export interface Product {
     name: string;
     slug: string;
     translated_name?: string;
+    photo?: string;
+    logo?: string;
   };
 
   photo?: string;
