@@ -56,7 +56,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
           src={product.photo || '/noimage.webp'}
           alt={product.name}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          sizes="(max-width: 740px) 100vw, (max-width: 1024px) 50vw, 25vw"
           loading={priority ? "eager" : "lazy"}
           priority={priority}
           className="object-contain p-2 md:p-4 group-hover:scale-105 transition-transform duration-300"
