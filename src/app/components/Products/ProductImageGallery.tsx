@@ -26,7 +26,7 @@ export default function ProductImageGallery({
         />
       </div>
 
-      {/* Right: Thumbnails — centered as a block, rows packed tight */}
+      {/* Right: Thumbnails — centered as a block, rows packed tight.. */}
       <div className="w-full md:w-[50%] flex items-center justify-center overflow-x-auto md:overflow-x-hidden md:overflow-y-auto" style={{ maxHeight: '800px' }}>
         <div className="flex flex-row flex-wrap justify-center content-start gap-0">
           {productImages.map((img, index) => (
