@@ -66,8 +66,8 @@ const ProfessionalReviewListing = ({ reviews, countryCode = 'en' }: Professional
                                         : 'No review content available'}
                                 </p>
 
-                                {/* Price Badge */}
-                                {review.price && (
+                                {/* Price Badge - hidden, activate when ready */}
+                                {/* {review.price && (
                                     <div className="mb-4 inline-block">
                                         <div className="bg-gradient-to-r from-green-100 to-emerald-100 px-3 py-2 rounded-lg border border-green-200">
                                             <span className="text-xs text-gray-600">Price: </span>
@@ -76,7 +76,7 @@ const ProfessionalReviewListing = ({ reviews, countryCode = 'en' }: Professional
                                             </span>
                                         </div>
                                     </div>
-                                )}
+                                )} */
 
                                 {/* Footer with Author and Date */}
                                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between">

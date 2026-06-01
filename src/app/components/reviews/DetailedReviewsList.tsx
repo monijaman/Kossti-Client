@@ -34,12 +34,13 @@ const DetailedReviewsList = ({ reviews, productId }: DetailedReviewsListProps) =
                         </div>
                     </div>
 
-                    {review.price && (
+                    {/* Price - hidden, activate when ready */}
+                    {/* {review.price && (
                         <div className="mb-4 inline-block bg-green-100 px-4 py-2 rounded-lg">
                             <span className="text-sm text-gray-600">Price: </span>
                             <span className="font-bold text-lg text-green-700">${review.price.toFixed(2)}</span>
                         </div>
-                    )}
+                    )} */
 
                     <div className="prose max-w-none">
                         <div className="text-gray-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: review.reviews }} />
