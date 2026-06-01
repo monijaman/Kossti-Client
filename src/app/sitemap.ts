@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // TODO: Fetch dynamic product/category pages from API
+  // TODO: Fetch dynamic product/category pages from API..
   // Example:
   // const products = await fetchProducts()
   // const productPages = products.flatMap(product =>
