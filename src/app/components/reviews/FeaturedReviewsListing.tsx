@@ -84,7 +84,7 @@ const FeaturedReviewsListing = ({ reviews, countryCode = 'en' }: FeaturedReviews
                                             ${review.price.toFixed(2)}
                                         </span>
                                     </div>
-                                )} */
+                                )} */}
 
                                 {/* Divider */}
                                 <div className="h-px bg-gray-200 mb-4" />

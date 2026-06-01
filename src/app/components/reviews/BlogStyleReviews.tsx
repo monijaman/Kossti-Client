@@ -63,7 +63,7 @@ const BlogStyleReviews = ({ reviews, countryCode = 'en' }: BlogStyleReviewsProps
                                                 ${review.price.toFixed(2)}
                                             </span>
                                         </div>
-                                    )} */
+                                    )} */}
                                 </div>
 
                                 {/* Footer - Author Section */}

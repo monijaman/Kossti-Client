@@ -76,7 +76,7 @@ const ProfessionalReviewListing = ({ reviews, countryCode = 'en' }: Professional
                                             </span>
                                         </div>
                                     </div>
-                                )} */
+                                )} */}
 
                                 {/* Footer with Author and Date */}
                                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
