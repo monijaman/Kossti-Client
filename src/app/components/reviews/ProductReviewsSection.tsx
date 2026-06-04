@@ -52,12 +52,18 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
 
     if (!reviews || reviews.length === 0) {
         return (
-            <div className="my-12 p-8 bg-gray-50 border border-gray-200 rounded-lg text-center">
-                <svg className="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                </svg>
-                <p className="text-gray-600 font-medium">No reviews available yet</p>
-            </div>
+            <section className="my-12" aria-label="Reviews">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">User Reviews</h2>
+                <div className="p-8 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-gray-700 font-medium mb-2">Be the first to review this product</p>
+                    <p className="text-gray-500 text-sm mb-4">
+                        Share your experience to help other buyers make an informed decision. Your review can cover build quality, performance, value for money, and anything else you found useful or lacking.
+                    </p>
+                    <p className="text-xs text-gray-400">
+                        Our editorial team also publishes in-depth professional reviews. Check back soon for a full verdict, pros &amp; cons, and buying advice.
+                    </p>
+                </div>
+            </section>
         );
     }
 

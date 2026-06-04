@@ -72,7 +72,14 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
       </nav>
 
       {/* Product Header */}
-      <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight">{countryCode === 'bn' && product.translated_name ? product.translated_name : displayName}</h1>
+      <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{countryCode === 'bn' && product.translated_name ? product.translated_name : displayName}</h1>
+
+      {/* Product Description — shown when available; omitted for thin pages */}
+      {product.description && product.description.trim().length > 0 && (
+        <p className="text-gray-700 text-base leading-relaxed mb-6 md:mb-8 max-w-3xl">
+          {(countryCode !== 'en' && product.translated_description) ? product.translated_description : product.description}
+        </p>
+      )}
 
       {/* Product Info Section - Now at Top */}
 
@@ -87,7 +94,11 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
       <div className="mt-8 md:mt-12 ">
         {/* Reviews Section */}
         <div className="lg:col-span-2">
-          <Suspense fallback={<div>Loading reviews...</div>}>
+          <Suspense fallback={
+            <div className="my-8 space-y-3" aria-hidden="true">
+              {[1,2,3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />)}
+            </div>
+          }>
             <ProductReviewsSection productId={product.id} countryCode={countryCode} />
           </Suspense>
         </div>
@@ -99,7 +110,11 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
           </div>
 
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t.label_specifications || 'Specifications'}</h2>
-          <Suspense fallback={<div>Loading specifications...</div>}>
+          <Suspense fallback={
+            <div className="space-y-2" aria-hidden="true">
+              {[1,2,3,4,5,6].map(i => <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />)}
+            </div>
+          }>
             <SpecDetails productId={product.id} countryCode={countryCode} />
           </Suspense>
         </div>

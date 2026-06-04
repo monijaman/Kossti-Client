@@ -146,6 +146,11 @@ export async function generateMetadata(props: {
           'bn': `${SITE_URL}/bn/${product.category_slug || 'products'}/${slug}`,
         },
       },
+      // Noindex thin pages: products with no meaningful description
+      // A real review or editorial page will have a description with enough content
+      ...(!product.description || product.description.trim().length < 100
+        ? { robots: { index: false, follow: true } }
+        : {}),
     };
   } catch (error) {
     console.error('Error generating metadata:', error);

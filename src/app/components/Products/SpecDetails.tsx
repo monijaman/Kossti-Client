@@ -1,7 +1,5 @@
-"use client"
 import { apiEndpoints, DEFAULT_LOCALE } from "@/lib/constants";
 import fetchApi from "@/lib/fetchApi";
-import { useEffect, useState } from "react";
 
 interface PopularProductsProps {
   productId: number;
@@ -17,43 +15,18 @@ type SpecsResponse = {
   dataset: SpecType[];
 };
 
-const SpecDetails = ({ productId, countryCode = DEFAULT_LOCALE }: PopularProductsProps) => {
-  const [dataset, setDataset] = useState<SpecType[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSpecifications = async (): Promise<void> => {
-      try {
-        setLoading(true);
-        console.log('Fetching specifications for product ID:', apiEndpoints.getPublicSpecs(productId));
-        const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(productId), {
-          queryParams: { locale: countryCode },
-        });
-
-        if (response.success && response.data?.dataset) {
-          setDataset(response.data.dataset);
-        } else {
-          setDataset([]);
-        }
-      } catch (error) {
-        console.error('Error fetching specifications:', error);
-        setDataset([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSpecifications();
-  }, [productId, countryCode]);
-
-  if (loading) {
-    return (
-      <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
-        <div className="text-center py-8 text-gray-500">
-          <p>Loading specifications...</p>
-        </div>
-      </div>
-    );
+const SpecDetails = async ({ productId, countryCode = DEFAULT_LOCALE }: PopularProductsProps) => {
+  let dataset: SpecType[] = [];
+  try {
+    const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(productId), {
+      queryParams: { locale: countryCode },
+      next: { revalidate: 60 },
+    });
+    if (response.success && response.data?.dataset) {
+      dataset = response.data.dataset;
+    }
+  } catch {
+    // ignore — render empty state below
   }
 
   return (

@@ -38,6 +38,7 @@ export interface Product {
   name: string;
   translated_name?: string; // Bengali (or other locale) name returned by API when locale != 'en'
   description?: string;
+  translated_description?: string; // Translated description returned by API when locale != 'en'
   slug: string;
   review: string;
   price: number;
@@ -81,6 +82,7 @@ export interface ProductTranslation {
   product_id: number;
   locale: string;
   translated_name: string; // Changed from 'name' to 'translated_name' to match Go API
+  translated_description?: string;
   start_price?: string; // Changed from number to string to match Go API
   end_price?: string; // Changed from number to string to match Go API
   created_at?: string;
