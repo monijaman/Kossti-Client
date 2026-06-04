@@ -10,6 +10,8 @@ const SKIP_HEADERS = new Set([
   "host",
   "connection",
   "transfer-encoding",
+  "content-encoding",
+  "content-length",
   "keep-alive",
   "te",
   "trailers",
