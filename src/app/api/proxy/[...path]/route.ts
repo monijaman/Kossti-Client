@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 // Read API_URL at runtime (server-side only, no NEXT_PUBLIC_ prefix needed)
 const BACKEND_URL =
   process.env.API_URL || "https://gocritserver-production.up.railway.app";
