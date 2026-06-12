@@ -581,7 +581,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         <span>✨</span>
-                                                        AI Review
+                                                        Human AI
                                                     </span>
                                                 )}
                                             </button>
@@ -667,10 +667,23 @@ const ReviewForm = ({ params }: PageProps) => {
                 onClose={() => setIsAIReviewModalOpen(false)}
             >
                 <div className="space-y-4">
-                    <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">✨ Human AI — Generate Comprehensive Review</h2>
+
+                    {/* Human AI — always visible at the top */}
+                    <button
+                        type="button"
+                        onClick={() => setAiReviewStyle('human-ai')}
+                        className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${aiReviewStyle === 'human-ai'
+                            ? 'border-purple-500 bg-purple-50 text-purple-900'
+                            : 'border-gray-200 hover:border-purple-300 text-gray-700'
+                            }`}
+                    >
+                        <div className="font-semibold">🤝 Human AI <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Recommended</span></div>
+                        <div className="text-xs text-gray-500 mt-0.5">Real-world experience + data-driven buying guide — reads like a human wrote it</div>
+                    </button>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Review Style</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Other Styles</label>
 
                         {/* Style Category Tabs */}
                         <div className="flex gap-2 mb-4 border-b border-gray-200">

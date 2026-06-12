@@ -25,7 +25,8 @@ export type ReviewStyle =
   | "edmunds" // Edmunds: automotive buyer's guide with practical value
   | "car-and-driver" // Car and Driver: performance, dynamics, and driving character
   | "motor-trend" // Motor Trend: professional automotive journalism with testing protocols
-  | "seo-optimized"; // SEO-focused: clear structure, tables, FAQ, pros/cons, comparisons, keywords
+  | "seo-optimized" // SEO-focused: clear structure, tables, FAQ, pros/cons, comparisons, keywords
+  | "human-ai"; // Human-style Bengali comprehensive review — experience + data-driven buying analysis
 
 export interface AIReviewRequest {
   productName: string;

@@ -138,7 +138,8 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             // Generate review using OpenAI
             const aiReviewContent = await generateAIReview({
                 productName,
-                locale: 'en', // For now, always generate in English
+                locale: 'en',
+                style: 'human-ai',
             });
 
             console.log('✅ AI review generated successfully');
@@ -508,7 +509,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         <span>✨</span>
-                                        AI Review
+                                        Human AI
                                     </span>
                                 )}
                             </button>

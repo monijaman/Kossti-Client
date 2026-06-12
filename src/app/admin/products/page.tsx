@@ -75,8 +75,11 @@ const ManageReviews = () => {
         fetchProductData();
     }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale]);
 
-    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', '1');
+        router.replace(`?${params.toString()}`);
     };
 
     // Fetch categories
@@ -176,6 +179,7 @@ const ManageReviews = () => {
             <Pagination
                 currentPage={page}
                 totalPages={totalPage}
+                additionalParams={debouncedSearchTerm?.trim() ? { search: debouncedSearchTerm.trim() } : {}}
             />
         </>
     );
