@@ -113,37 +113,21 @@ Use these HTML sections, adapting section names to fit the product type:
   <li>[Relevant criterion 4]: X/5</li>
   <li>[Relevant criterion 5]: X/5</li>
 </ul>
+For the FAQ section, output this exact HTML structure. Generate 5 to 7 faq-item blocks with REAL questions a buyer would ask about this specific product. Do not output placeholder text — write actual questions and answers.
+
 <section class="faq-section">
   <h2>Frequently Asked Questions</h2>
   <div class="faq-item">
-    <h3>[Question 1 relevant to this product?]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
+    <h3>Write a real question a buyer would ask about this product</h3>
+    <p>Write a real 2 to 4 sentence answer specific to this product. No placeholders.</p>
   </div>
   <div class="faq-item">
-    <h3>[Question 2 relevant to this product?]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
-  </div>
-  <div class="faq-item">
-    <h3>[Question 3 relevant to this product?]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
-  </div>
-  <div class="faq-item">
-    <h3>[Question 4 relevant to this product?]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
-  </div>
-  <div class="faq-item">
-    <h3>[Question 5 relevant to this product?]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
-  </div>
-  <div class="faq-item">
-    <h3>[Question 6 relevant to this product — optional]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
-  </div>
-  <div class="faq-item">
-    <h3>[Question 7 relevant to this product — optional]</h3>
-    <p>[Clear, direct answer in 2–4 sentences.]</p>
+    <h3>Write another real buyer question about this product</h3>
+    <p>Write a real 2 to 4 sentence answer specific to this product. No placeholders.</p>
   </div>
 </section>
+
+Generate 5 to 7 faq-item divs total. Each h3 must be an actual question relevant to THIS product. Each p must directly answer it in 2 to 4 sentences. No bracket placeholders, no example text — real content only.
 
 <h2>Final Verdict</h2>
 

@@ -44,7 +44,7 @@ const ReviewForm = ({ params }: PageProps) => {
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
     const [aiReviewStyle, setAiReviewStyle] = useState<ReviewStyle>('aesops-fable');
-    const [activeStyleTab, setActiveStyleTab] = useState<'entertainment' | 'tech' | 'lifestyle'>('entertainment');
+    const [activeStyleTab, setActiveStyleTab] = useState<'human-ai' | 'entertainment' | 'tech' | 'lifestyle'>('human-ai');
     const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
@@ -667,26 +667,22 @@ const ReviewForm = ({ params }: PageProps) => {
                 onClose={() => setIsAIReviewModalOpen(false)}
             >
                 <div className="space-y-4">
-                    <h2 className="text-lg font-semibold text-gray-900">✨ Human AI — Generate Comprehensive Review</h2>
-
-                    {/* Human AI — always visible at the top */}
-                    <button
-                        type="button"
-                        onClick={() => setAiReviewStyle('human-ai')}
-                        className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${aiReviewStyle === 'human-ai'
-                            ? 'border-purple-500 bg-purple-50 text-purple-900'
-                            : 'border-gray-200 hover:border-purple-300 text-gray-700'
-                            }`}
-                    >
-                        <div className="font-semibold">🤝 Human AI <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Recommended</span></div>
-                        <div className="text-xs text-gray-500 mt-0.5">Real-world experience + data-driven buying guide — reads like a human wrote it</div>
-                    </button>
+                    <h2 className="text-lg font-semibold text-gray-900">✨ Generate Comprehensive AI Review</h2>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Other Styles</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Review Style</label>
 
                         {/* Style Category Tabs */}
                         <div className="flex gap-2 mb-4 border-b border-gray-200">
+                            <button
+                                onClick={() => { setActiveStyleTab('human-ai'); setAiReviewStyle('human-ai'); }}
+                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'human-ai'
+                                    ? 'border-b-2 border-purple-500 text-purple-600'
+                                    : 'text-gray-600 hover:text-gray-800'
+                                    }`}
+                            >
+                                🤝 Human AI
+                            </button>
                             <button
                                 onClick={() => setActiveStyleTab('entertainment')}
                                 className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'entertainment'
@@ -718,6 +714,22 @@ const ReviewForm = ({ params }: PageProps) => {
 
                         {/* Styles Grid - Shows based on active tab */}
                         <div className="grid grid-cols-2 gap-2">
+                            {activeStyleTab === 'human-ai' && (
+                                <div className="col-span-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setAiReviewStyle('human-ai')}
+                                        className={`w-full text-left px-4 py-4 rounded-lg border-2 transition-colors ${aiReviewStyle === 'human-ai'
+                                            ? 'border-purple-500 bg-purple-50 text-purple-900'
+                                            : 'border-gray-200 hover:border-purple-300 text-gray-700'
+                                            }`}
+                                    >
+                                        <div className="font-semibold text-base">🤝 Human AI <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Recommended</span></div>
+                                        <div className="text-sm text-gray-500 mt-1">Generates a comprehensive, second-person review covering real-world usage, performance, build quality, pros/cons, FAQ, and a final verdict — reads like a human expert wrote it.</div>
+                                    </button>
+                                </div>
+                            )}
+
                             {activeStyleTab === 'entertainment' && ([
                                 { value: 'aesops-fable', label: "🦊 Aesop's Fable", desc: 'Storytelling with parables & morals' },
                                 { value: 'sherlock-detective', label: '🔎 Sherlock', desc: 'Deductive investigation, case & verdict' },
