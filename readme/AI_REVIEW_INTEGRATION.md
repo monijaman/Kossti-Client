@@ -13,4 +13,4 @@ Key features:
 - `formatReviewAsHTML()` - Wraps content in proper HTML structure (following template format)
 - `extractRatingFromReview()` - Automatically extracts rating from generated content
 - Support for both English (en) and Bengali (bn) locales
-- Uses the template structure from `review-template.go` as reference
+- Uses the template structure from `review-template.go` as reference..
