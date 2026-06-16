@@ -81,6 +81,7 @@ function internationalization(req: RequestWithGeo, res: NextResponse) {
   if (
     req.nextUrl.pathname.startsWith("/_next") ||
     req.nextUrl.pathname.includes("/api/") ||
+    req.nextUrl.pathname.startsWith("/sentry-example-page") ||
     PUBLIC_FILE.test(req.nextUrl.pathname)
   ) {
     return null; // No redirect if internal or public file
