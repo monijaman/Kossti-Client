@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Windows reserved device name (created by accidental >nul redirects)
 nul
+
+# Sentry Config File
+.env.sentry-build-plugin
