@@ -29,7 +29,7 @@ const BrandDetails = ({ brands }: PageProps) => {
 
   // Fetch categories once on mount
   useEffect(() => {
-    fetchApi(`${apiEndpoints.getCategories}?limit=1000&offset=0`)
+    fetchApi(`${apiEndpoints.getCategories}?limit=1000&offset=0&_t=${Date.now()}`)
       .then((res) => {
         const raw = (res.data as any)?.categories ?? res.data;
         setCategories(Array.isArray(raw) ? raw : []);
@@ -87,6 +87,7 @@ const BrandDetails = ({ brands }: PageProps) => {
           brand_name: activeBrand.name,
           ...(selectedCategory ? { category_name: selectedCategory.name, category_id: selectedCategory.id } : {}),
           ...(instructions.trim() ? { instructions: instructions.trim() } : {}),
+          _t: Date.now(),
         },
       });
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Read API_URL at runtime (server-side only, no NEXT_PUBLIC_ prefix needed)
 const BACKEND_URL =
