@@ -43,6 +43,7 @@ async function proxyRequest(
       method: req.method,
       headers,
       body: body ? Buffer.from(body) : undefined,
+      cache: "no-store",
     });
   } catch (err) {
     console.error("[proxy] Backend unreachable:", targetUrl, err);
@@ -60,6 +61,8 @@ async function proxyRequest(
       resHeaders.set(key, value);
     }
   });
+
+  resHeaders.set("Cache-Control", "no-store");
 
   return new NextResponse(resBody, {
     status: response.status,
