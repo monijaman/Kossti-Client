@@ -40,7 +40,7 @@ const PopularProducts = async ({ countryCode, activeCategory = '', activeBrands 
       sortby: 'popular',
       exclude: excludeProductIds.join(','), // Exclude Latest Reviews products
     },
-    next: { revalidate: 0 }, // Always fresh so priority order is up to date
+    next: { revalidate: 60 }, // Matches backend's Cache-Control: max-age=60 on /products
   });
 
   // Handle API errors gracefully

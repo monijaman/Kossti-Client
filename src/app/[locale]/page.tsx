@@ -17,8 +17,9 @@ import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 
-// Always fetch fresh data so priority changes reflect immediately
-export const dynamic = "force-dynamic";
+// Page is cached and revalidated in the background (matches backend's
+// `Cache-Control: public, max-age=60` on /products) instead of re-fetching
+// on every single request.
 
 // Generate metadata for the home page
 export async function generateMetadata(props: {
@@ -182,7 +183,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         search: searchTerm,
         sortby: "priority",
       },
-      next: { revalidate: 0 }, // No cache - always fresh
+      next: { revalidate: 60 },
     }),
     // Latest Reviews: top 8 by priority DESC, filtered by active category/brand when selected
     fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
@@ -195,7 +196,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         ...(activeBrands ? { brand: activeBrands } : {}),
         sortby: "priority",
       },
-      next: { revalidate: 0 },
+      next: { revalidate: 60 },
     }),
   ]);
 
