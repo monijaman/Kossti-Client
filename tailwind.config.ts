@@ -45,6 +45,7 @@ const config: Config = {
       },
       animation: {
         'blob': 'blob 7s infinite',
+        'top-loading-bar': 'top-loading-bar 1.1s ease-in-out infinite',
       },
       keyframes: {
         blob: {
@@ -60,6 +61,10 @@ const config: Config = {
           '100%': {
             transform: 'translate(0px, 0px) scale(1)',
           },
+        },
+        'top-loading-bar': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(300%)' },
         },
       },
     },
