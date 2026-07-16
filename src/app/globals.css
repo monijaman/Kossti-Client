@@ -53,13 +53,14 @@
   html.dark .text-gray-800,
   html.dark .text-gray-900,
   html.dark .text-gray-700 {
-    color: #e5e7eb !important;
+    color: #1d2025 !important;
   }
 
   html.dark .text-gray-500,
   html.dark .text-gray-600 {
     color: #9ca3af !important;
   }
+
 
   html.dark .border-gray-200,
   html.dark .border-gray-300 {
