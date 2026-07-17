@@ -88,6 +88,13 @@ The review must combine two things:
    - Resale value expectations (where relevant).
    - After-sales service network availability.
 
+CRITICAL — STAY ON-CATEGORY:
+- This product's category is: ${productCategory || "unspecified — infer it strictly from the product name"}.
+- Before writing, identify exactly what kind of product this is (e.g., motorcycle, car, phone, laptop, appliance) and ONLY discuss features that genuinely exist on that type of product.
+- If this is a motorcycle or car, do NOT mention cameras, smartphone-style apps, benchmark scores (Geekbench/AnTuTu), or other electronics-only features. Stick to real automotive/motorcycle technology: engine, ABS, riding modes, suspension, instrumentation/display, connectivity, lighting, brakes, etc.
+- If this is a phone, laptop, or gadget, do NOT mention engine specs, ABS, suspension, or fuel economy.
+- Never invent features the product doesn't actually have just to fill a section — skip or merge a section instead.
+
 Use these HTML sections, adapting section names to fit the product type:
 
 <h1>[Creative, product-specific title — not generic]</h1>
