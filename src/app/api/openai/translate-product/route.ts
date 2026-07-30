@@ -37,22 +37,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const hasStartPrice = !!startPrice;
+    const hasEndPrice = !!endPrice;
+
     // Build translation prompt
     let prompt = `You are a professional Bengali translator. Translate the following product name to Bengali.\n\nProduct Name (English): ${productName}`;
 
-    if (startPrice) {
+    if (hasStartPrice) {
       const formattedStart = formatPrice(startPrice);
       prompt += `\n\nStart Price (English): ${formattedStart}`;
     }
-    if (endPrice) {
+    if (hasEndPrice) {
       const formattedEnd = formatPrice(endPrice);
       prompt += `\n\nEnd Price (English): ${formattedEnd}`;
     }
 
+    const jsonFields = ['"translated_name": "Bengali translation of product name"'];
+    if (hasStartPrice) jsonFields.push('"start_price": "price in Bengali numerals with commas"');
+    if (hasEndPrice) jsonFields.push('"end_price": "price in Bengali numerals with commas"');
+
     prompt += `\n\nRespond ONLY with valid JSON (no markdown, no code blocks) in this exact format:`;
-    prompt += `\n{"translated_name": "Bengali translation of product name", "start_price": "price in Bengali numerals with commas", "end_price": "price in Bengali numerals with commas"}`;
-    prompt += `\n\nFor prices: Convert the numbers to Bengali numerals (০, १, २, ३, ४, ५, ६, ७, ८, ९) and add commas for thousands.`;
-    prompt += `\n\nExample: 100000 → १००,०००`;
+    prompt += `\n{${jsonFields.join(", ")}}`;
+    if (hasStartPrice || hasEndPrice) {
+      prompt += `\n\nFor prices: Convert the numbers to Bengali numerals (০, ১, ২, ৩, ৪, ৫, ৬, ৭, ৮, ৯) and add commas for thousands.`;
+      prompt += `\n\nExample: 100000 → ১০০,০০০`;
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -118,16 +127,21 @@ export async function POST(request: NextRequest) {
       success: true,
       translated_name: translation.translated_name || productName,
       // If OpenAI returns English numerals, convert to Bengali; if already Bengali, keep as-is
-      start_price: translation.start_price
-        ? /[0-9]/.test(translation.start_price)
-          ? englishToBengaliNumeral(translation.start_price)
-          : translation.start_price
-        : formatPrice(startPrice || "", true),
-      end_price: translation.end_price
-        ? /[0-9]/.test(translation.end_price)
-          ? englishToBengaliNumeral(translation.end_price)
-          : translation.end_price
-        : formatPrice(endPrice || "", true),
+      // Only ever return a price if the English (left side) product actually has one
+      start_price: hasStartPrice
+        ? translation.start_price
+          ? /[0-9]/.test(translation.start_price)
+            ? englishToBengaliNumeral(translation.start_price)
+            : translation.start_price
+          : formatPrice(startPrice, true)
+        : "",
+      end_price: hasEndPrice
+        ? translation.end_price
+          ? /[0-9]/.test(translation.end_price)
+            ? englishToBengaliNumeral(translation.end_price)
+            : translation.end_price
+          : formatPrice(endPrice, true)
+        : "",
     });
   } catch (error) {
     console.error("Translation error:", error);

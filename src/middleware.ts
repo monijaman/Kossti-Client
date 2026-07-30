@@ -16,6 +16,36 @@ interface RequestWithGeo extends NextRequest {
 
 const PUBLIC_FILE = /\.(.*)$/;
 
+// --- Lightweight per-IP rate limiting -------------------------------------
+// Best-effort, in-memory limiter scoped to this middleware instance. It
+// protects the data channel scrapers actually want (/api/proxy, which
+// forwards to the Go backend) and the admin login endpoint (brute force),
+// as a first line of defense in front of the backend's own rate limiter.
+// Note: on multi-instance/edge deployments each instance keeps its own
+// counters, so this is a deterrent, not a hard guarantee - pair it with
+// the backend limiter and/or edge-level bot protection (e.g. Cloudflare).
+type RateBucket = { count: number; resetAt: number };
+const rateBuckets = new Map<string, RateBucket>();
+
+function isRateLimited(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+
+  if (!bucket || now > bucket.resetAt) {
+    rateBuckets.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+
+  bucket.count += 1;
+  return bucket.count > limit;
+}
+
+function getClientIp(req: NextRequest): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
 // Function to check admin session
 function checkAdminSession(req: RequestWithGeo): boolean {
   const adminSession = req.cookies.get("admin_session")?.value;
@@ -144,6 +174,25 @@ async function handleTokenAndRedirect(
 
 // Main middleware function
 export async function middleware(request: RequestWithGeo) {
+  const pathname = request.nextUrl.pathname;
+  const clientIp = getClientIp(request);
+
+  if (pathname.startsWith("/api/admin/login")) {
+    if (isRateLimited(`login:${clientIp}`, 10, 5 * 60_000)) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": "300" } },
+      );
+    }
+  } else if (pathname.startsWith("/api/proxy")) {
+    if (isRateLimited(`proxy:${clientIp}`, 200, 60_000)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please slow down." },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
+  }
+
   const response = NextResponse.next();
 
   const token = request.cookies.get("accessToken")?.value;
@@ -166,8 +215,7 @@ export async function middleware(request: RequestWithGeo) {
     }
   }
 
-  // Only call handleTokenAndRedirect for specified routes
-  const pathname = request.nextUrl.pathname;
+  // Only call handleTokenAndRedirect for specified routes (pathname declared above)
 
   // Protect admin routes - require session
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
@@ -224,5 +272,9 @@ export const config = {
      * - admin (admin routes - no internationalization)
      */
     "/((?!api|_next|favicon.ico|.*\\.).*)",
+    // Also run (rate-limit check only, see early-return above) on the
+    // backend data proxy and admin login, which are otherwise excluded above.
+    "/api/proxy/:path*",
+    "/api/admin/login",
   ],
 };

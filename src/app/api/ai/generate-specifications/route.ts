@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `Generate realistic specifications for the product: "${productName}"
+    const prompt = `Search the web for the actual official specifications of this exact product: "${productName}"
 
 Based on these specification categories: ${specKeys.join(", ")}
 
-For each category, provide a real value that would be typical for this type of product. Be specific and accurate.
+For each category, find the real, verified value from the manufacturer's spec sheet or reputable review/retailer sources — do not guess or use a similar/generic product's specs from memory.
 
-Return ONLY a valid JSON object with specification keys as properties and their values as strings:
+Return ONLY a valid JSON object with specification keys as properties and their values as strings, no other text, no citations/sources:
 {
   "Display Size": "6.5 inches",
   "Battery Capacity": "5000 mAh",
@@ -37,21 +37,21 @@ Return ONLY a valid JSON object with specification keys as properties and their 
   "Weight": "180 grams"
 }
 
-IMPORTANT: 
-- Return ONLY valid, verified data. Use real values.
+IMPORTANT:
+- Return ONLY valid, verified data found on the web for this exact product. Use real values.
 - Use the exact specification key names provided
-- Values should be realistic and specific, not generic
+- Values should be specific to this exact product, not generic
 - Values should be strings`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-search-preview",
       max_tokens: 2000,
-      temperature: 0.6,
+      web_search_options: {},
       messages: [
         {
           role: "system",
           content:
-            "You are a product specifications generator. Generate realistic specs for products. Return ONLY valid JSON object.",
+            "You are a product specifications researcher. Search the web and report the real, verified specs for the exact product given. Return ONLY a valid JSON object, no citations or extra text.",
         },
         {
           role: "user",

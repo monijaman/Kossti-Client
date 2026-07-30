@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     const categoryLine = categoryName
       ? `\nProduct Category: ${categoryName}`
       : "";
-    const prompt = `You are a product pricing expert for a Bangladeshi e-commerce store.
-Based on the product name and category below, suggest a realistic market start price and end price in BDT (Bangladeshi Taka).
-Consider the actual real-world value of this product carefully — for example, a car costs millions of BDT, a smartphone costs tens of thousands, a book costs a few hundred.
-Return only a JSON object with numeric values (no currency symbol, no commas).
+    const prompt = `You are a pricing researcher for a Bangladeshi e-commerce store.
+Search the current Bangladesh retail market (e.g. Star Tech, Ryans Computers, Pickaboo, Daraz.com.bd, official brand stores) for this exact product and find its actual current selling price range in BDT (Bangladeshi Taka) — do not guess from memory or use global/US pricing.
+Return the lowest and highest price you find among current BD listings as a start price and end price.
+Return only a JSON object with numeric values (no currency symbol, no commas, no other text, no citations/sources).
 
 Product Name: ${productName}${categoryLine}
 
@@ -38,9 +38,14 @@ Respond with JSON only: {"start_price": 5000000, "end_price": 8000000}`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o-search-preview",
+        web_search_options: {
+          user_location: {
+            type: "approximate",
+            approximate: { country: "BD" },
+          },
+        },
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.3,
       }),
     });
 
