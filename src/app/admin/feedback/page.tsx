@@ -1,12 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { getApiUrl } from "@/lib/apiUrl";
 
 export default function FeedbackAdminPage() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
   const [productId, setProductId] = useState(""); const [content, setContent] = useState("");
   const [rating, setRating] = useState("5"); const [sourceUrl, setSourceUrl] = useState("");
   const [message, setMessage] = useState("");
+  if (!authorized) return null;
+  useEffect(() => {
+    if (localStorage.getItem("userType") !== "admin") router.replace("/admin");
+    else setAuthorized(true);
+  }, [router]);
   async function submit(e: React.FormEvent) { e.preventDefault(); setMessage("");
     const token = Cookies.get("accessToken") || "";
     const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ content, rating, source_url: sourceUrl || undefined }) });

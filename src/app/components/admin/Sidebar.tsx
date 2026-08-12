@@ -22,6 +22,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     return (
         <nav className="bg-gray-900 text-white w-full h-full overflow-y-auto p-4 lg:p-6">
             <ul className="space-y-2">
+                {userType === 'admin' && <li>
+                    <Link href="/admin/feedback" className="block px-3 py-2 rounded hover:bg-gray-800 transition-colors" onClick={handleLinkClick}>
+                        Manage Feedback
+                    </Link>
+                </li>}
                 {userType === 'guest' ? (
                     <li className="mb-2">
                         <Link
@@ -43,7 +48,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                                 Dashboard
                             </Link>
                         </li>
-                        <li><Link href="/admin/feedback" className="block px-3 py-2 rounded hover:bg-gray-800 transition-colors" onClick={handleLinkClick}>Manage Feedback</Link></li>
                         <li>
                             <Link
                                 href="/admin/categories"

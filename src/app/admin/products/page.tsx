@@ -24,6 +24,10 @@ const ManageReviews = () => {
     const activeCategory = searchParams.get('category') || '';
     const activeBrands = searchParams.get('brand') || '';
     const activePriceRange = searchParams.get('price') || '';
+    const showInactive = searchParams.get('include_inactive') === 'true';
+    const visibleCategories = Array.isArray(categories)
+        ? categories.filter((cat) => showInactive || Number(cat.status) === 1)
+        : [];
     const locale = searchParams.get('locale') || 'en';
     const [products, setProducts] = useState<Product[]>([]);
     const [totalPage, setTotalPage] = useState(0);
@@ -44,6 +48,7 @@ const ManageReviews = () => {
             if (activeCategory) params.category = activeCategory;
             if (activeBrands) params.brand = activeBrands;
             if (activePriceRange) params.priceRange = activePriceRange;
+            if (showInactive) params.include_inactive = 'true';
             if (debouncedSearchTerm && debouncedSearchTerm.trim() !== '') {
                 params.search = debouncedSearchTerm.trim();
             }
@@ -73,7 +78,7 @@ const ManageReviews = () => {
         };
 
         fetchProductData();
-    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale]);
+    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale, showInactive]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -121,6 +126,14 @@ const ManageReviews = () => {
         }
     };
 
+    const handleInactiveChange = (checked: boolean) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (checked) params.set('include_inactive', 'true');
+        else params.delete('include_inactive');
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
+
 
     useEffect(() => {
         fetchCategories();
@@ -150,19 +163,18 @@ const ManageReviews = () => {
                         <DarkSelect
                             name="category"
                             value={Array.isArray(categories) && categories
-                                .filter((cat) => Number(cat.status) === 1) // Only show active categories
+                                .filter((cat) => showInactive || Number(cat.status) === 1)
                                 .map((cat) => ({
                                     value: cat.id,
                                     label: cat.name,
                                 }))
                                 .find((option) => option.value === selectedCategory) || null}
                             onChange={handleCategoryChange}
-                            options={Array.isArray(categories) ? categories
-                                .filter((cat) => Number(cat.status) === 1) // Only show active categories
+                            options={visibleCategories
                                 .map((cat) => ({
                                     value: cat.id,
                                     label: cat.name,
-                                })) : []}
+                                }))}
                             className="mt-1 block w-full"
                             placeholder="Select a category"
                             isSearchable
@@ -170,6 +182,10 @@ const ManageReviews = () => {
                         />
                     </div>
                 </div>
+                <label className="mt-3 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                    Show inactive categories
+                </label>
             </div>
 
             {/* Add your review management functionalities here */}
