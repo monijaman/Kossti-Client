@@ -4,6 +4,7 @@ import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Review } from '@/lib/types';
 import styles from './reviews.module.css';
+import UserReviewForm from './UserReviewForm';
 
 interface ProductReviewsSectionProps {
     productId: number;
@@ -62,6 +63,7 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
                     <p className="text-xs text-gray-400">
                         Our editorial team also publishes in-depth professional reviews. Check back soon for a full verdict, pros &amp; cons, and buying advice.
                     </p>
+                    <UserReviewForm productId={productId} />
                 </div>
             </section>
         );
@@ -117,9 +119,11 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
                                 {review.additional_details}
                             </div>
                         )}
+                        {review.source_url && <a className="mt-3 inline-block text-sm text-blue-600 underline" href={review.source_url} target="_blank" rel="noreferrer">View original review</a>}
                     </div>
                 ))}
             </div>
+            <UserReviewForm productId={productId} />
         </div>
     );
 };

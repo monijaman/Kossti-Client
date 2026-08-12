@@ -159,6 +159,7 @@ export interface Review {
   locale: string;
   created_at: string; // Added created_at field
   updated_at: string;
+  source_url?: string;
   translations?: ReviewTranslation[];
 }
 
