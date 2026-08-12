@@ -43,6 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                                 Dashboard
                             </Link>
                         </li>
+                        <li><Link href="/admin/feedback" className="block px-3 py-2 rounded hover:bg-gray-800 transition-colors" onClick={handleLinkClick}>Manage Feedback</Link></li>
                         <li>
                             <Link
                                 href="/admin/categories"

@@ -1,5 +1,6 @@
 import SpecDetails from '@/app/components/Products/SpecDetails';
 import ProductReviewsSection from '@/app/components/reviews/ProductReviewsSection';
+import ProductFeedbackSection from '@/app/components/reviews/ProductFeedbackSection';
 import ProductImageGallery from '@/app/components/Products/ProductImageGallery';
 import { useTranslation } from '@/hooks/useLocale';
 import { apiEndpoints } from '@/lib/constants';
@@ -90,19 +91,8 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
 
       {/* Product Details Section */}
 
-      {/* Two Column Layout for Specifications and Reviews */}
-      <div className="mt-8 md:mt-12 ">
-        {/* Reviews Section */}
-        <div className="lg:col-span-2">
-          <Suspense fallback={
-            <div className="my-8 space-y-3" aria-hidden="true">
-              {[1,2,3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />)}
-            </div>
-          }>
-            <ProductReviewsSection productId={product.id} countryCode={countryCode} />
-          </Suspense>
-        </div>
-
+      {/* Specifications, then user reviews (before the Similar Products section) */}
+      <div className="mt-8 md:mt-12">
         {/* Specifications Table */}
         <div className="lg:col-span-3">
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 md:mb-6">
@@ -116,6 +106,18 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
             </div>
           }>
             <SpecDetails productId={product.id} countryCode={countryCode} />
+          </Suspense>
+        </div>
+
+        {/* Separate user feedback/comments section */}
+        <div className="mt-8 border-t border-gray-200 pt-8 md:mt-12 md:pt-10">
+          <Suspense fallback={
+            <div className="my-8 space-y-3" aria-hidden="true">
+              {[1,2,3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />)}
+            </div>
+          }>
+            <ProductReviewsSection productId={product.id} countryCode={countryCode} />
+            <ProductFeedbackSection productId={product.id} />
           </Suspense>
         </div>
       </div>

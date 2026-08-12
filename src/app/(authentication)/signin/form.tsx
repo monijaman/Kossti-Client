@@ -3,7 +3,7 @@ import getErrors from '@/app/components/Form/validation';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { setAccessTokenCookie } from '@/lib/utils';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 
@@ -24,6 +24,7 @@ interface FormErrors {
 }
 export const LoginForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -79,7 +80,14 @@ export const LoginForm = () => {
           // Also set the token as a cookie for API routes
           setAccessTokenCookie(loginData.token);
 
-          router.push("/admin");
+          // Return users to the page where they started (for example, the
+          // review form), while keeping the existing admin-login behaviour
+          // for sign-ins that have no return URL.
+          const redirect = searchParams.get("redirect");
+          const safeRedirect = redirect && redirect.startsWith("/") && !redirect.startsWith("//")
+            ? redirect
+            : "/admin";
+          router.push(safeRedirect);
         } else {
           setError(response.error || "Login failed.");
         }

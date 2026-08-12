@@ -4,7 +4,6 @@ import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Review } from '@/lib/types';
 import styles from './reviews.module.css';
-import UserReviewForm from './UserReviewForm';
 
 interface ProductReviewsSectionProps {
     productId: number;
@@ -55,7 +54,7 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
         return (
             <section className="my-12" aria-label="Reviews">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">User Reviews</h2>
-                <div className="p-8 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="p-5 sm:p-6 bg-gray-50 border border-gray-200 rounded-lg">
                     <p className="text-gray-700 font-medium mb-2">Be the first to review this product</p>
                     <p className="text-gray-500 text-sm mb-4">
                         Share your experience to help other buyers make an informed decision. Your review can cover build quality, performance, value for money, and anything else you found useful or lacking.
@@ -63,7 +62,6 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
                     <p className="text-xs text-gray-400">
                         Our editorial team also publishes in-depth professional reviews. Check back soon for a full verdict, pros &amp; cons, and buying advice.
                     </p>
-                    <UserReviewForm productId={productId} />
                 </div>
             </section>
         );
@@ -119,11 +117,9 @@ const ProductReviewsSection = async ({ productId, countryCode = 'en' }: ProductR
                                 {review.additional_details}
                             </div>
                         )}
-                        {review.source_url && <a className="mt-3 inline-block text-sm text-blue-600 underline" href={review.source_url} target="_blank" rel="noreferrer">View original review</a>}
                     </div>
                 ))}
             </div>
-            <UserReviewForm productId={productId} />
         </div>
     );
 };
