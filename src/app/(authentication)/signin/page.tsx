@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { LoginForm } from './form'
 
 export default function LoginPage() {
@@ -12,7 +13,9 @@ export default function LoginPage() {
           <h2 className="text-2xl font-semibold text-gray-700 text-center mb-6">
             Signin Your Account
           </h2>
-          <LoginForm />
+          <Suspense fallback={<div className="h-48" aria-hidden="true" />}>
+            <LoginForm />
+          </Suspense>
           <Link className="block text-center p-4 text-blue-600 hover:underline font-medium" href="/signup">
             Create New Account
           </Link>
