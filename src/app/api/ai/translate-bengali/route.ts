@@ -7,7 +7,8 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const { text } = await request.json();
+    const { text, targetLocale = "bn" } = await request.json();
+    const targetLanguage = targetLocale === "en" ? "English" : "Bengali";
 
     if (!text) {
       return NextResponse.json(
@@ -60,7 +61,7 @@ ${sharedRules}`;
           },
           {
             role: "user",
-            content: `Translate the full content below to Bengali without truncation:\n\n${sourceText}`,
+            content: `Translate the full content below to ${targetLanguage} without truncation:\n\n${sourceText}`,
           },
         ],
       });

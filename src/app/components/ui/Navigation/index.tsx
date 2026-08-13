@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 const Navigation = () => {
-  const isAdmin = typeof window !== "undefined" && localStorage.getItem("userType") === "admin";
+  const isAdmin = typeof window !== "undefined" && localStorage.getItem("userType")?.trim().toLowerCase() === "admin";
   return (
   <nav className="bg-gray-700 text-white p-4">
     <ul className="flex space-x-4">

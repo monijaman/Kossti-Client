@@ -13,7 +13,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         setShowSpecifications(!showSpecifications);
     };
 
-    const userType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
+    const userType = typeof window !== 'undefined'
+        ? localStorage.getItem('userType')?.trim().toLowerCase()
+        : null;
 
     const handleLinkClick = () => {
         onClose?.();

@@ -117,7 +117,7 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
             </div>
           }>
             <ProductReviewsSection productId={product.id} countryCode={countryCode} />
-            <ProductFeedbackSection productId={product.id} />
+            <ProductFeedbackSection productId={product.id} locale={countryCode} />
           </Suspense>
         </div>
       </div>

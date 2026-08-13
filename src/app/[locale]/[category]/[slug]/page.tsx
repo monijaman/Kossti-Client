@@ -193,7 +193,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
   console.log('datasetdatasetdataset', dataset);
   if (!dataset) {
     return (
-      <MainLayout>
+      <MainLayout sidebarProps={{ countryCode: locale }}>
         <SearchBox initialSearchTerm={searchTerm} />
         <div className="text-center py-8">
           <h3 className="text-lg font-semibold">Product not found</h3>
@@ -204,7 +204,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout sidebarProps={{ countryCode: locale }}>
       {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"

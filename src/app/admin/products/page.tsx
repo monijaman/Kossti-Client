@@ -155,9 +155,15 @@ const ManageReviews = () => {
             </div>
 
             <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Category
-                </label>
+                <div className="mb-2 flex items-center justify-between">
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Category
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                        Show inactive categories
+                    </label>
+                </div>
                 <div className="flex gap-2">
                     <div className="flex-1">
                         <DarkSelect
@@ -182,10 +188,6 @@ const ManageReviews = () => {
                         />
                     </div>
                 </div>
-                <label className="mt-3 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                    <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
-                    Show inactive categories
-                </label>
             </div>
 
             {/* Add your review management functionalities here */}

@@ -156,14 +156,7 @@ async function handleTokenAndRedirect(
     return NextResponse.next();
   }
 
-  if (
-    token &&
-    (request.nextUrl.pathname.startsWith("/signin") ||
-      request.nextUrl.pathname.startsWith("/signup"))
-  ) {
-    console.log("User already signed in, redirecting to admin...");
-    return NextResponse.redirect(new URL("/admin", request.url));
-  } else if (!token) {
+  if (!token) {
     console.log("No token, redirecting to signin...");
     // return NextResponse.redirect(new URL("/signin", request.url));
   }
