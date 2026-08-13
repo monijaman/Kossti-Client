@@ -95,10 +95,15 @@ export default function FeedbackAdminPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setMessage("");
+    const detectionResponse = await fetch("/api/ai/detect-language", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: content }),
+    });
+    const detection = await detectionResponse.json().catch(() => ({}));
+    const detectedLocale = detection.language === "bn" ? "bn" : "en";
     const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ content, locale: "en", rating, source_url: sourceUrl || undefined }),
+      body: JSON.stringify({ content, locale: detectedLocale, rating, source_url: sourceUrl || undefined }),
     });
     const data = await response.json();
     setMessage(response.ok ? "Feedback added successfully." : (data.error || "Could not add feedback."));

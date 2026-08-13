@@ -48,10 +48,11 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
     }
     setSaving(true); setMessage("");
     try {
+      const detectedLocale = window.location.pathname.startsWith("/bn/") ? "bn" : "en";
       const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ content: reviews, locale: window.location.pathname.startsWith("/bn/") ? "bn" : "en", rating, source_url: sourceUrl || undefined }),
+        body: JSON.stringify({ content: reviews, locale: detectedLocale, rating, source_url: sourceUrl || undefined }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -70,7 +71,9 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
       }
       // Keep the original language and translate in the background. The user
       // should not wait for AI translation or lose the form/page state.
-      const targetLocale = "bn";
+      // Translate into the opposite language only after the original has
+      // already been saved in the language selected by the URL.
+      const targetLocale = detectedLocale === "bn" ? "en" : "bn";
       void (async () => {
         try {
         const translationResponse = await fetch("/api/ai/translate-bengali", {
@@ -81,7 +84,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
         if (translationResponse.ok && translation.data && data.feedback?.id) {
           await fetch(`${getApiUrl()}/feedback/${data.feedback.id}`, {
             method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ content_bn: translation.data }),
+            body: JSON.stringify(targetLocale === "en" ? { content_en: translation.data } : { content_bn: translation.data }),
           });
         }
         } catch { /* original feedback remains available */ }
