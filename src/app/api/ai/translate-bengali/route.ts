@@ -26,6 +26,23 @@ export async function POST(request: NextRequest) {
     );
 
     const buildSystemPrompt = () => {
+      if (targetLocale === "en") {
+        const englishRules = `
+CRITICAL RULES — follow exactly:
+- Translate every Bengali word and sentence into natural, clear English.
+- Keep brand names, product names, model names, technical acronyms, numbers, and measurement units accurate.
+- Do not transliterate English names into Bengali.
+- Preserve the meaning, tone, and complete content. Do not summarize or omit anything.`;
+
+        if (looksLikeHtml) {
+          return `You are an expert Bengali-to-English translator for HTML documents. Translate ALL visible text into English while preserving every HTML tag, attribute, class name, id, structure, and order exactly. Return only the complete translated HTML.
+${englishRules}`;
+        }
+
+        return `You are an expert Bengali-to-English translator. Translate the complete content into natural English. Return only the translated English text.
+${englishRules}`;
+      }
+
       const sharedRules = `
 CRITICAL RULES — follow exactly:
 - Transliterate EVERY word of brand names, product names, and model names into Bengali script — including alphanumeric model codes. No English word in a product/brand name may remain in the Latin alphabet. Examples:

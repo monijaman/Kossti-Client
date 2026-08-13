@@ -51,7 +51,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
       const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ content: reviews, rating, source_url: sourceUrl || undefined }),
+        body: JSON.stringify({ content: reviews, locale: window.location.pathname.startsWith("/bn/") ? "bn" : "en", rating, source_url: sourceUrl || undefined }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -68,27 +68,26 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
         }
         throw new Error(data.error || "Could not submit review");
       }
-      // Keep the original language and create the opposite-language version.
-      // Translation is best-effort: the original feedback is still saved if
-      // the translation service is unavailable.
-      const targetLocale = locale === "bn" ? "en" : "bn";
-      try {
+      // Keep the original language and translate in the background. The user
+      // should not wait for AI translation or lose the form/page state.
+      const targetLocale = "bn";
+      void (async () => {
+        try {
         const translationResponse = await fetch("/api/ai/translate-bengali", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: reviews, targetLocale }),
         });
         const translation = await translationResponse.json();
         if (translationResponse.ok && translation.data && data.feedback?.id) {
-          await fetch(`${getApiUrl()}/feedback-translation`, {
-            method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ feedback_id: data.feedback.id, locale: targetLocale, translated_content: translation.data }),
+          await fetch(`${getApiUrl()}/feedback/${data.feedback.id}`, {
+            method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ content_bn: translation.data }),
           });
         }
-      } catch { /* original feedback remains available */ }
+        } catch { /* original feedback remains available */ }
+      })();
       setReviews(""); setRating(""); setSourceUrl(""); setMessage("Thanks! Your comment was submitted.");
-      // Refresh the server-rendered feedback list without navigating away.
       window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#product-feedback`);
-      window.location.reload();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not submit review"); }
     finally { setSaving(false); }
   }

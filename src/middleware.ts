@@ -129,6 +129,12 @@ function internationalization(req: RequestWithGeo, res: NextResponse) {
   // Get preferred locale based on user location
   const preferredLocale = getPreferredLocale(req);
 
+  // Public legacy article URLs without a locale are English by definition.
+  // Do not let a Bengali preference cookie change their feedback language.
+  if (req.nextUrl.pathname === "/sales-and-culture") {
+    return "/en/sales-and-culture";
+  }
+
   // Only redirect to preferred locale if it's the root path
   if (req.nextUrl.pathname === "/") {
     return `/${preferredLocale}`;
