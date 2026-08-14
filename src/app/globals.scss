@@ -72,6 +72,23 @@
      color: #9ca3af !important;
    }
 
+   // Keep the feedback translation panels readable: their backgrounds stay
+   // intentionally light even when the application is using dark mode.
+   .bg-blue-50,
+   .bg-green-50 {
+     color: #111827 !important;
+
+     .text-gray-900,
+     .text-gray-700 {
+       color: #111827 !important;
+     }
+   }
+
+   .feedback-translation-panel,
+   .feedback-translation-panel p {
+     color: #111827 !important;
+   }
+
    .border-gray-200,
    .border-gray-300 {
      border-color: #374151 !important;

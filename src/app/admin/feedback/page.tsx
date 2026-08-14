@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Cookies from "js-cookie";
 import { getApiUrl } from "@/lib/apiUrl";
 
@@ -29,6 +30,7 @@ export default function FeedbackAdminPage() {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [productId, setProductId] = useState("");
   const [productSearch, setProductSearch] = useState("");
@@ -43,6 +45,9 @@ export default function FeedbackAdminPage() {
   const [editRating, setEditRating] = useState("5");
   const [editSourceUrl, setEditSourceUrl] = useState("");
   const [editStatus, setEditStatus] = useState(1);
+  const pageSize = 20;
+  const pageCount = Math.max(1, Math.ceil(feedbacks.length / pageSize));
+  const visibleFeedbacks = feedbacks.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const loadFeedbacks = useCallback(async () => {
     setLoading(true);
@@ -215,7 +220,7 @@ export default function FeedbackAdminPage() {
     <h2 className="mb-3 text-xl font-semibold">Existing feedback ({feedbacks.length})</h2>
     {loading ? <p className="text-gray-500">Loading feedback...</p> : feedbacks.length === 0 ? <p className="rounded border bg-white p-5 text-gray-500">No feedback found.</p> :
       <div className="space-y-4">
-        {feedbacks.map(item => <article key={item.id} className="rounded-lg border bg-white p-5 shadow-sm">
+        {visibleFeedbacks.map(item => <article key={item.id} className="rounded-lg border bg-white p-5 shadow-sm">
           {editingId === item.id ? <div className="space-y-3">
             <p className="text-sm font-semibold">Feedback #{item.id} · Product #{item.product_id}</p>
             <textarea maxLength={2000} value={editContent} onChange={e => setEditContent(e.target.value)} className="min-h-28 w-full rounded border p-3" />
@@ -228,13 +233,14 @@ export default function FeedbackAdminPage() {
             <button type="button" onClick={() => setEditingId(null)} className="rounded border px-4 py-2">Cancel</button>
           </div> : <>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <Link href={`/admin/products/${item.product_id}`} className="text-xs text-blue-600 hover:underline">Open product</Link>
               <p className="font-semibold">Feedback #{item.id} · Product #{item.product_id}</p>
               <span className={`rounded px-2 py-1 text-xs ${item.status ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{item.status ? "Active" : "Hidden"}</span>
             </div>
             <p className="whitespace-pre-wrap text-gray-700">{item.content}</p>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div className="rounded border bg-blue-50 p-3 text-gray-900"><p className="mb-1 text-xs font-semibold text-blue-700">English</p><p className="whitespace-pre-wrap text-sm text-gray-900">{item.content_en || item.content}</p></div>
-              <div className="rounded border bg-green-50 p-3 text-gray-900"><p className="mb-1 text-xs font-semibold text-green-700">Bangla</p><p className="whitespace-pre-wrap text-sm text-gray-900">{item.content_bn || "Not translated yet"}</p></div>
+              <div className="feedback-translation-panel rounded border bg-blue-50 p-3 !text-gray-900"><p className="mb-1 text-xs font-semibold text-blue-700">English</p><p className="whitespace-pre-wrap text-sm !text-gray-900">{item.content_en || item.content}</p></div>
+              <div className="feedback-translation-panel rounded border bg-green-50 p-3 !text-gray-900"><p className="mb-1 text-xs font-semibold text-green-700">Bangla</p><p className="whitespace-pre-wrap text-sm !text-gray-900">{item.content_bn || "Not translated yet"}</p></div>
             </div>
             <p className="mt-2 text-sm text-amber-600">{"★".repeat(Math.max(0, Math.min(5, Number(item.rating) || 0)))}{"☆".repeat(Math.max(0, 5 - Math.min(5, Number(item.rating) || 0)))} <span className="ml-1">{item.rating || "—"} / 5</span></p>
             <p className="mt-1 text-xs text-gray-500">User: {item.user_id} · {item.created_at ? new Date(item.created_at).toLocaleString() : ""}</p>
@@ -247,6 +253,11 @@ export default function FeedbackAdminPage() {
             {item.source_url && <p className="mt-3 border-t border-gray-100 pt-2 text-sm text-gray-500">Source: <a href={item.source_url} target="_blank" rel="noopener noreferrer" className="break-all text-blue-600 hover:underline">{item.source_url}</a></p>}
           </>}
         </article>)}
+        {pageCount > 1 && <div className="flex items-center justify-center gap-3 pt-2">
+          <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage(page => Math.max(1, page - 1))} className="rounded border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">Previous</button>
+          <span className="text-sm text-gray-600">Page {currentPage} of {pageCount}</span>
+          <button type="button" disabled={currentPage === pageCount} onClick={() => setCurrentPage(page => Math.min(pageCount, page + 1))} className="rounded border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">Next</button>
+        </div>}
       </div>}
   </main>;
 }
