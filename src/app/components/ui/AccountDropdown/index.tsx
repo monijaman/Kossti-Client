@@ -2,14 +2,13 @@
 
 import Link from 'next/link';
 import { getApiUrl } from '@/lib/apiUrl';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
   isAuthenticated: boolean; // Define the type for the prop
 };
 
 const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
-  const router = useRouter();
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -100,15 +99,16 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
         credentials: 'include',
       });
 
-      if (response.ok) {
-        console.log('Logout successful, redirecting...');
-        const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/signin';
-        router.push(loginPath);
-      } else {
+      // Full page navigation (not router.push) - the header's authenticated
+      // state comes from a server-rendered prop computed from cookies, which
+      // a client-side route transition never re-fetches. Without a hard
+      // reload here, the UI keeps showing "logged in" until the user
+      // manually refreshes the page.
+      const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/signin';
+      if (!response.ok) {
         console.error('Failed to logout', response.status);
-        const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/signin';
-        router.push(loginPath);
       }
+      window.location.href = loginPath;
     } catch (error) {
       console.error('Error logging out:', error);
     }
