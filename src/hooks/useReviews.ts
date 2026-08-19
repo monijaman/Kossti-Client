@@ -1,6 +1,18 @@
 import { getApiUrl } from "@/lib/apiUrl";
 import { AdditionalDetails } from "@/lib/types";
+import Cookies from "js-cookie";
 import { useCallback } from "react";
+
+// Admin login stores the token in localStorage; some flows fall back to a
+// cookie instead. Mirrors the lookup in UserReviewForm.tsx.
+function getAuthToken(): string | undefined {
+  return (
+    (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
+    Cookies.get("accessToken") ||
+    Cookies.get("theAccessToken") ||
+    undefined
+  );
+}
 
 export const useReviews = () => {
   const getReview = async (
@@ -135,10 +147,14 @@ export const useReviews = () => {
         payload.additional_details = cleanedDetails;
       }
 
+      // This route requires JWT auth on the backend - without this header
+      // every request 401s regardless of login state.
+      const token = getAuthToken();
       const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(payload),
       });
