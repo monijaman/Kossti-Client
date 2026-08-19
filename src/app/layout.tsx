@@ -86,6 +86,27 @@ export default function RootLayout({
         <ClientProvider>
           {children}
         </ClientProvider>
+        {/* Honeypot: invisible to real users (hidden from screen readers,
+            unreachable by tab/mouse), only followed by bots that parse
+            every <a href> in the raw DOM. See middleware.ts HONEYPOT_PATH. */}
+        <a
+          href="/products-full-export"
+          aria-hidden="true"
+          tabIndex={-1}
+          style={{
+            position: "absolute",
+            width: 1,
+            height: 1,
+            margin: -1,
+            padding: 0,
+            overflow: "hidden",
+            clip: "rect(0,0,0,0)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
+          Full product export
+        </a>
         {allowIndexing && <Analytics />}
         {allowIndexing && (
           <Script

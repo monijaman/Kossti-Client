@@ -46,6 +46,103 @@ function getClientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip") || "unknown";
 }
 
+// --- Honeypot trap -----------------------------------------------------
+// A link at this path is rendered hidden (visually-hidden, aria-hidden,
+// unreachable by tab/mouse) in the root layout. No real visitor can ever
+// follow it - only a bot parsing the raw DOM for every <a href> will. Any
+// IP that requests it gets provisionally blocked site-wide. In-memory and
+// per-instance like the rate limiter above, so it's a deterrent, not a
+// guarantee.
+const HONEYPOT_PATH = "/products-full-export";
+const TRAP_TTL_MS = 24 * 60 * 60_000;
+const trappedIps = new Map<string, number>();
+
+function isTrapped(ip: string): boolean {
+  const expiresAt = trappedIps.get(ip);
+  if (!expiresAt) return false;
+  if (Date.now() > expiresAt) {
+    trappedIps.delete(ip);
+    return false;
+  }
+  return true;
+}
+
+function trapIp(ip: string): void {
+  trappedIps.set(ip, Date.now() + TRAP_TTL_MS);
+}
+
+// --- Known-scraper User-Agent blocklist ---------------------------------
+// Default UA strings of common HTTP/scraping libraries. Real browsers
+// never send these, so false positives on human traffic are effectively
+// zero. A missing User-Agent header is also treated as suspicious since
+// every real browser sends one.
+const SCRAPER_UA_PATTERNS = [
+  /python-requests/i,
+  /python-urllib/i,
+  /\bscrapy\b/i,
+  /\bcurl\//i,
+  /\bwget\b/i,
+  /go-http-client/i,
+  /okhttp/i,
+  /libwww-perl/i,
+  /phantomjs/i,
+  /node-fetch/i,
+  /^axios\//i,
+  /postmanruntime/i,
+  /apache-httpclient/i,
+];
+
+function isKnownScraperUA(userAgent: string | null): boolean {
+  if (!userAgent) return true;
+  return SCRAPER_UA_PATTERNS.some((pattern) => pattern.test(userAgent));
+}
+
+// --- Session-bound API access --------------------------------------------
+// /api/proxy only responds if the caller is carrying a short-lived token
+// that this middleware itself minted while serving a normal page. A
+// scraper hitting /api/proxy directly - skipping the page load entirely,
+// the most common lazy-scraper pattern - never has the token and gets
+// rejected. A scraper that first loads a page in a real browser/session
+// (cookie jar) still gets through; this stops naive direct-API scraping,
+// not sophisticated bot sessions.
+const VISIT_TOKEN_COOKIE = "kst_vt";
+const VISIT_TOKEN_TTL_MS = 30 * 60_000;
+const VISIT_TOKEN_SECRET = process.env.VISIT_TOKEN_SECRET;
+
+if (!VISIT_TOKEN_SECRET) {
+  console.warn(
+    "[middleware] VISIT_TOKEN_SECRET is not set - using an insecure dev default. Set it in the deployment's env vars.",
+  );
+}
+
+async function signVisitToken(timestamp: number): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(VISIT_TOKEN_SECRET || "dev-only-visit-token-secret"),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sigBuf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(String(timestamp)));
+  return Array.from(new Uint8Array(sigBuf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function issueVisitToken(): Promise<string> {
+  const ts = Date.now();
+  return `${ts}.${await signVisitToken(ts)}`;
+}
+
+async function isValidVisitToken(token: string | undefined): Promise<boolean> {
+  if (!token) return false;
+  const [tsStr, sig] = token.split(".");
+  const ts = Number(tsStr);
+  if (!ts || !sig) return false;
+  if (Date.now() - ts > VISIT_TOKEN_TTL_MS) return false;
+  return sig === (await signVisitToken(ts));
+}
+
 // --- Country-level blocking -------------------------------------------------
 // Aug 2026: GA4 showed a bot-shaped traffic spike (near-vertical, single
 // browser) originating almost entirely from China and Singapore. Blocking
@@ -191,12 +288,28 @@ async function handleTokenAndRedirect(
 export async function middleware(request: RequestWithGeo) {
   const pathname = request.nextUrl.pathname;
   const clientIp = getClientIp(request);
+  // /admin pages AND the admin API routes are exempt from the blocks below,
+  // so you never lock yourself out of the dashboard or its login call.
+  const isAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
-  // Block CN/SG at the edge, but never lock out /admin (in case you're
-  // legitimately accessing it from one of those countries).
-  if (!pathname.startsWith("/admin")) {
+  // Honeypot: tripping it blocks the IP outright. Respond as an ordinary
+  // 404 so a bot doesn't learn it was caught.
+  if (pathname === HONEYPOT_PATH) {
+    trapIp(clientIp);
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
+  if (!isAdminPath) {
+    if (isTrapped(clientIp)) {
+      return new NextResponse("Blocked", { status: 403 });
+    }
+
     const country = getCountry(request);
     if (country && BLOCKED_COUNTRIES.has(country)) {
+      return new NextResponse("Blocked", { status: 403 });
+    }
+
+    if (isKnownScraperUA(request.headers.get("user-agent"))) {
       return new NextResponse("Blocked", { status: 403 });
     }
   }
@@ -215,9 +328,25 @@ export async function middleware(request: RequestWithGeo) {
         { status: 429, headers: { "Retry-After": "60" } },
       );
     }
+
+    if (!(await isValidVisitToken(request.cookies.get(VISIT_TOKEN_COOKIE)?.value))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const response = NextResponse.next();
+
+  // Mint/refresh the visit token on every page response (not on API
+  // routes themselves) so a browser that just loaded a page can call
+  // /api/proxy immediately after.
+  if (!pathname.startsWith("/api/")) {
+    response.cookies.set(VISIT_TOKEN_COOKIE, await issueVisitToken(), {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: Math.floor(VISIT_TOKEN_TTL_MS / 1000),
+      path: "/",
+    });
+  }
 
   const token = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
