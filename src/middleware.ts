@@ -46,6 +46,22 @@ function getClientIp(req: NextRequest): string {
   return req.headers.get("x-real-ip") || "unknown";
 }
 
+// --- Country-level blocking -------------------------------------------------
+// Aug 2026: GA4 showed a bot-shaped traffic spike (near-vertical, single
+// browser) originating almost entirely from China and Singapore. Blocking
+// those two countries at the edge here rather than relying on GA (which
+// only reports traffic, it doesn't stop it).
+const BLOCKED_COUNTRIES = new Set(["CN", "SG"]);
+
+function getCountry(req: RequestWithGeo): string | undefined {
+  const country =
+    req.geo?.country ||
+    req.headers.get("x-vercel-ip-country") ||
+    req.headers.get("cf-ipcountry") ||
+    undefined;
+  return country?.toUpperCase();
+}
+
 // Function to check admin session
 function checkAdminSession(req: RequestWithGeo): boolean {
   const adminSession = req.cookies.get("admin_session")?.value;
@@ -175,6 +191,15 @@ async function handleTokenAndRedirect(
 export async function middleware(request: RequestWithGeo) {
   const pathname = request.nextUrl.pathname;
   const clientIp = getClientIp(request);
+
+  // Block CN/SG at the edge, but never lock out /admin (in case you're
+  // legitimately accessing it from one of those countries).
+  if (!pathname.startsWith("/admin")) {
+    const country = getCountry(request);
+    if (country && BLOCKED_COUNTRIES.has(country)) {
+      return new NextResponse("Blocked", { status: 403 });
+    }
+  }
 
   if (pathname.startsWith("/api/admin/login")) {
     if (isRateLimited(`login:${clientIp}`, 10, 5 * 60_000)) {
