@@ -15,13 +15,14 @@ export default function ProductImageGallery({
   const [selectedImage, setSelectedImage] = useState(productImages[0] || '/noimage.webp');
 
   return (
-    <div className="w-full flex flex-col md:flex-row gap-4 md:gap-6 mb-8 md:mb-12">
+    <div className="w-full  flex flex-col md:flex-row gap-4 md:gap-6 mb-8 md:mb-12">
       {/* Left: Main Image */}
       <div className="w-full md:w-[50%] bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 rounded-2xl p-4 md:p-8 relative overflow-hidden flex-shrink-0" style={{ minHeight: '300px', height: '70vw', maxHeight: '800px', minWidth: 0 }}>
         <Image
           src={selectedImage}
           alt={productName}
           fill
+          priority
           className="object-contain"
         />
       </div>
@@ -43,6 +44,7 @@ export default function ProductImageGallery({
                   src={img}
                   alt={`${productName} ${index + 1}`}
                   fill
+                  loading="eager"
                   className="object-contain p-1"
                 />
               </div>

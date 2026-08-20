@@ -96,7 +96,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "kossti.s3.ap-southeast-1.amazonaws.com",
-        pathname: "/product-images/**",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "kossti-review.s3.ap-south-1.amazonaws.com",
+        pathname: "/**",
       },
     ],
     formats: ["image/avif", "image/webp"], // Use modern formats

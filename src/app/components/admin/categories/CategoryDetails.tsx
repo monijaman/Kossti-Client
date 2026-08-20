@@ -188,6 +188,7 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
       });
 
       if (response.success) {
+        setMarketProducts((prev) => prev.filter((p) => p !== product));
         alert('Product imported successfully!');
       } else {
         alert(`Failed to import product: ${response.error || 'Unknown error'}`);
