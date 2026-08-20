@@ -85,6 +85,7 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
       {/* Product Info Section - Now at Top */}
 
       <ProductImageGallery
+        key={product.id}
         productImages={productImages}
         productName={displayName}
       />

@@ -366,6 +366,7 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
                     <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Brand</th>
                     <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Description</th>
                     <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Type</th>
+                    <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">Release Date</th>
                     <th className="py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 text-center whitespace-nowrap">Import</th>
                   </tr>
                 </thead>
@@ -379,6 +380,7 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
                         <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">{displayBrand}</td>
                         <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{product.description}</td>
                         <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">{product.type}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{product.release_date || '—'}</td>
                         <td className="py-3 px-4 text-center">
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md text-sm whitespace-nowrap"

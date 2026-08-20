@@ -301,6 +301,7 @@ export interface MarketProduct {
   brand?: string;
   description: string;
   type: string;
+  release_date?: string;
   // Add other fields as necessary for import
   price?: number;
   category_id?: number;
