@@ -25,6 +25,7 @@ const ManageReviews = () => {
     const activeBrands = searchParams.get('brand') || '';
     const activePriceRange = searchParams.get('price') || '';
     const showInactive = searchParams.get('include_inactive') === 'true';
+    const importedOnly = searchParams.get('imported') === 'true';
     const visibleCategories = Array.isArray(categories)
         ? categories.filter((cat) => showInactive || Number(cat.status) === 1)
         : [];
@@ -49,6 +50,7 @@ const ManageReviews = () => {
             if (activeBrands) params.brand = activeBrands;
             if (activePriceRange) params.priceRange = activePriceRange;
             if (showInactive) params.include_inactive = 'true';
+            if (importedOnly) params.imported = 'true';
             if (debouncedSearchTerm && debouncedSearchTerm.trim() !== '') {
                 params.search = debouncedSearchTerm.trim();
             }
@@ -78,7 +80,7 @@ const ManageReviews = () => {
         };
 
         fetchProductData();
-    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale, showInactive]);
+    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale, showInactive, importedOnly]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -134,6 +136,14 @@ const ManageReviews = () => {
         router.push(`?${params.toString()}`);
     };
 
+    const handleImportedChange = (checked: boolean) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (checked) params.set('imported', 'true');
+        else params.delete('imported');
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
+
 
     useEffect(() => {
         fetchCategories();
@@ -162,6 +172,10 @@ const ManageReviews = () => {
                     <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                         Show inactive categories
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" checked={importedOnly} onChange={(e) => handleImportedChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                        Imported products only
                     </label>
                 </div>
                 <div className="flex gap-2">

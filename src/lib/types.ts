@@ -42,6 +42,7 @@ export interface Product {
   slug: string;
   review: string;
   price: number;
+  created_by?: string | null;
   start_price?: number;
   end_price?: number;
 
@@ -297,6 +298,7 @@ export interface VideoItem {
 
 export interface MarketProduct {
   name: string;
+  brand?: string;
   description: string;
   type: string;
   // Add other fields as necessary for import

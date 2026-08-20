@@ -47,7 +47,14 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
             {productList.map((product) => (
               <tr key={product.id} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-300 ease-in-out">
                 <td className="py-4 px-6">{product.id}</td>
-                <td className="py-4 px-6">{product.name}</td>
+                <td className="py-4 px-6">
+                  {product.name}
+                  {product.created_by === 'ai_import' && (
+                    <span className="ml-2 inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-800">
+                      AI Imported
+                    </span>
+                  )}
+                </td>
                 <td className="py-4 px-6">{product.brand?.name}</td>
                 <td className="py-4 px-6">{product.category?.name}</td>
                 {/* Safely handle product.price to avoid TypeError */}

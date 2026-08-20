@@ -123,6 +123,7 @@ const BrandDetails = ({ brands }: PageProps) => {
         category_id: selectedCategory?.id || product.category_id || 1,
         brand_id: activeBrand?.id || 1,
         status: true,
+        created_by: 'ai_import',
       };
 
       const response = await fetchApi(apiEndpoints.createProduct, {
