@@ -6,13 +6,23 @@ import { getApiUrl } from "@/lib/apiUrl";
 
 const MAX_FEEDBACK_LENGTH = 2000;
 
+function getToken() {
+  return (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
+    Cookies.get("accessToken") || Cookies.get("theAccessToken");
+}
+
 export default function UserReviewForm({ productId, locale = "en" }: { productId: number; locale?: string }) {
   const [reviews, setReviews] = useState("");
   const [rating, setRating] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const reviewInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setIsLoggedIn(Boolean(getToken()));
+  }, []);
 
   useEffect(() => {
     if (window.location.hash === "#share-your-experience") {
@@ -30,13 +40,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    // Regular sign-in stores the access token in localStorage, while some
-    // admin/auth flows use a cookie. Support both so submitting feedback does
-    // not incorrectly redirect an already signed-in user to the sign-in page.
-    // The localStorage token is refreshed by the normal sign-in flow. Prefer
-    // it over an older cookie token, which can otherwise cause a false 401.
-    const token = (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
-      Cookies.get("accessToken") || Cookies.get("theAccessToken");
+    const token = getToken();
     if (!token) {
       const returnUrl = `${window.location.pathname}${window.location.search}#share-your-experience`;
       window.location.href = `/signin?redirect=${encodeURIComponent(returnUrl)}`;
@@ -93,6 +97,22 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
       window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#product-feedback`);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not submit review"); }
     finally { setSaving(false); }
+  }
+
+  if (!isLoggedIn) {
+    return <div id="share-your-experience" className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-6 text-center shadow-sm">
+      <p className="mb-3 text-sm text-gray-600">Sign in to share your experience with this product.</p>
+      <button
+        type="button"
+        onClick={() => {
+          const returnUrl = `${window.location.pathname}${window.location.search}#share-your-experience`;
+          window.location.href = `/signin?redirect=${encodeURIComponent(returnUrl)}`;
+        }}
+        className="rounded bg-blue-600 px-4 py-2 font-medium text-white"
+      >
+        Login to comment
+      </button>
+    </div>;
   }
 
   return <form id="share-your-experience" onSubmit={submit} className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">

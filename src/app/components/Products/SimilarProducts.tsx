@@ -20,7 +20,7 @@ const SimilarProducts = ({ countryCode, slug }: PageProps) => {
             setLoading(true);
             const response = await fetchApi(`/products-by-slug/${slug}/similar`, {
                 method: 'GET',
-                queryParams: { locale: countryCode },
+                queryParams: { locale: countryCode, limit: 8 },
             });
 
             if (response.success && response.data && typeof response.data === 'object' && 'products' in response.data) {
