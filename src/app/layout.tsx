@@ -82,6 +82,15 @@ export default function RootLayout({
       // @ts-ignore
       '--font-poppins': poppins.style.fontFamily
     } as React.CSSProperties}>
+      <head>
+        {/* Warm up the DNS/TLS connection to the S3 image host ahead of time.
+            Product pages fire many concurrent image requests to this origin
+            on first paint; without a pre-established connection, that burst
+            of simultaneous first-time connections can fail/time out on the
+            initial load and only succeed on reload once the connection is warm. */}
+        <link rel="preconnect" href="https://kossti-review.s3.ap-south-1.amazonaws.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://kossti-review.s3.ap-south-1.amazonaws.com" />
+      </head>
       <body className={inter.className}>
         <ClientProvider>
           {children}
