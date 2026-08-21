@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /var/www/Kossti_fe
+            cd /var/www/kossti
 
             git pull origin main
 
