@@ -146,9 +146,8 @@ export async function generateMetadata(props: {
           'bn': `${SITE_URL}/bn/${product.category_slug || 'products'}/${slug}`,
         },
       },
-      // Noindex thin pages: products with no meaningful description
-      // A real review or editorial page will have a description with enough content
-      ...(!product.description || product.description.trim().length < 100
+      // Only noindex genuinely empty pages; a product with a review is indexable.
+      ...(!product.description?.trim() && !product.review?.trim()
         ? { robots: { index: false, follow: true } }
         : {}),
     };
@@ -180,7 +179,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
           'Accept': 'application/json',
         },
       });
-      console.log('slugslugslug', slug);
       return response.success ? response.data : null;
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -190,7 +188,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const dataset = await fetchProductData() as Product | null;
 
-  console.log('datasetdatasetdataset', dataset);
   if (!dataset) {
     return (
       <MainLayout sidebarProps={{ countryCode: locale }}>
@@ -220,17 +217,44 @@ const Page = async ({ params, searchParams }: PageProps) => {
               name: typeof dataset.brand === 'object' ? dataset.brand.name : dataset.brand_slug || 'Brand',
             },
             category: typeof dataset.category === 'object' ? dataset.category.name : 'Product',
+            url: `${SITE_URL}/${locale}/${dataset.category_slug || 'products'}/${slug}`,
+            sku: String(dataset.id),
             ...(dataset.price && {
               offers: {
                 '@type': 'Offer',
                 price: dataset.price,
                 priceCurrency: 'BDT',
                 availability: 'https://schema.org/InStock',
+                url: `${SITE_URL}/${locale}/${dataset.category_slug || 'products'}/${slug}`,
               },
             }),
+            ...(dataset.average_rating && dataset.average_rating > 0 ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: dataset.average_rating,
+                bestRating: 5,
+                worstRating: 1,
+              },
+            } : {}),
           }),
         }}
       />
+
+      <nav aria-label="Breadcrumb" className="sr-only">
+        <ol itemScope itemType="https://schema.org/BreadcrumbList">
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <a itemProp="item" href={`${SITE_URL}/${locale}`}><span itemProp="name">Home</span></a>
+            <meta itemProp="position" content="1" />
+          </li>
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <a itemProp="item" href={`${SITE_URL}/${locale}/${dataset.category_slug || 'products'}`}><span itemProp="name">{typeof dataset.category === 'object' ? dataset.category.name : 'Products'}</span></a>
+            <meta itemProp="position" content="2" />
+          </li>
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <span itemProp="name">{dataset.name}</span><meta itemProp="position" content="3" />
+          </li>
+        </ol>
+      </nav>
 
       <SearchBox initialSearchTerm={searchTerm} countryCode={countryCode} />
 

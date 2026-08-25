@@ -1,5 +1,7 @@
 import { LOCALES, SITE_URL } from "@/lib/constants";
 import { MetadataRoute } from "next";
+import fetchApi from "@/lib/fetchApi";
+import { Product } from "@/lib/types";
 
 // This would ideally fetch from your API
 // For now, we'll generate basic routes
@@ -18,20 +20,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // TODO: Fetch dynamic product/category pages from API..
-  // Example:
-  // const products = await fetchProducts()
-  // const productPages = products.flatMap(product =>
-  //   LOCALES.map(locale => ({
-  //     url: `${baseUrl}/${locale}/${product.category_slug}/${product.slug}`,
-  //     lastModified: new Date(product.updated_at),
-  //     changeFrequency: 'weekly',
-  //     priority: 0.8,
-  //   }))
-  // )
+  let products: Product[] = [];
+  try {
+    const response = await fetchApi<{ data: Product[] }>("/products", {
+      queryParams: { per_page: 10000 },
+      next: { revalidate: 3600 },
+    });
+    products = response.success ? (response.data?.data || []) : [];
+  } catch {
+    products = [];
+  }
+
+  const productPages = products.flatMap((product) =>
+    LOCALES.map((locale) => ({
+      url: `${baseUrl}/${locale}/${product.category_slug || "products"}/${product.slug}`,
+      lastModified: product.updated_at ? new Date(product.updated_at) : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }))
+  );
 
   return [
     ...staticPages,
-    // ...productPages,
+    ...productPages,
   ];
 }

@@ -871,6 +871,11 @@ const ReviewForm = ({ params }: PageProps) => {
                         />
                     </div>
                     {aiReviewMode === 'revise' && revisedReview && (
+                        <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700">Original Review (currently saved)</div>
+                            <div className="rounded-md bg-orange-100 px-3 py-2 text-sm font-semibold text-orange-800">Revised Review (AI-generated)</div>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                             <div className="border rounded-lg p-3 bg-gray-50 max-h-96 overflow-auto">
                                 <h3 className="font-semibold mb-2">Existing review</h3>
@@ -881,6 +886,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                 <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: revisedReview }} />
                             </div>
                         </div>
+                        </>
                     )}
                     <div className="flex justify-end gap-2">
                         {aiReviewMode === 'revise' && revisedReview && (
