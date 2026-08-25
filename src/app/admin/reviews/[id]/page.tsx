@@ -249,7 +249,9 @@ const ReviewForm = ({ params }: PageProps) => {
     const generateAIReviewWithPrompt = async () => {
         setAiLoading(true);
         setAiError('');
-        setIsAIReviewModalOpen(false);
+        if (aiReviewMode === 'create') {
+            setIsAIReviewModalOpen(false);
+        }
 
         try {
 
