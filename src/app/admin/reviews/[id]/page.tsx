@@ -42,9 +42,11 @@ const ReviewForm = ({ params }: PageProps) => {
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string>('');
     const [isAIReviewModalOpen, setIsAIReviewModalOpen] = useState(false);
+    const [aiReviewMode, setAiReviewMode] = useState<'create' | 'revise'>('create');
+    const [revisedReview, setRevisedReview] = useState<string>('');
     const [aiReviewPrompt, setAiReviewPrompt] = useState<string>('');
     const [aiReviewStyle, setAiReviewStyle] = useState<ReviewStyle>('aesops-fable');
-    const [activeStyleTab, setActiveStyleTab] = useState<'human-ai' | 'entertainment' | 'tech' | 'lifestyle'>('human-ai');
+    const [activeStyleTab, setActiveStyleTab] = useState<'entertainment' | 'tech' | 'lifestyle'>('entertainment');
     const [translations, setTranslations] = useState<ReviewTranslation[]>([]);
 
     const fetchProductData = async () => {
@@ -230,8 +232,17 @@ const ReviewForm = ({ params }: PageProps) => {
 
     // Generate AI Review - Open Modal
     const handleGenerateAIReview = async () => {
+        setAiReviewMode('create');
+        setRevisedReview('');
         setIsAIReviewModalOpen(true);
         setAiReviewPrompt('');
+    };
+
+    const handleReviseReview = () => {
+        setAiReviewMode('revise');
+        setRevisedReview('');
+        setAiReviewPrompt('');
+        setIsAIReviewModalOpen(true);
     };
 
     // Generate AI Review with Custom Prompt
@@ -246,12 +257,20 @@ const ReviewForm = ({ params }: PageProps) => {
                 throw new Error('Product name is required');
             }
 
+            if (aiReviewMode === 'revise' && !reviews.trim()) {
+                throw new Error('An existing review is required before it can be revised');
+            }
+
+            const revisionInstructions = aiReviewMode === 'revise'
+                ? `Revise the existing review below. Validate its factual structure and rating, preserve accurate product details, fix weak or unclear writing, and create a better, fresh title/headline. Return the complete revised HTML review only. Existing review:\n${reviews}`
+                : undefined;
+
             // Generate review using OpenAI with product details and custom prompt
             const aiReviewContent = await generateAIReview({
                 productName: products.name,
                 productCategory: products.category_slug || '',
                 locale: 'en',
-                customPrompt: aiReviewPrompt || undefined,
+                customPrompt: [revisionInstructions, aiReviewPrompt].filter(Boolean).join('\n\n') || undefined,
                 style: aiReviewStyle,
             });
 
@@ -264,12 +283,15 @@ const ReviewForm = ({ params }: PageProps) => {
             const extractedRating = extractRatingFromReview(aiReviewContent);
             console.log('📊 Extracted rating:', extractedRating);
 
-            // Update form fields with AI review
-            setReviews(aiReviewContent);
-            setRating(extractedRating);
+            if (aiReviewMode === 'revise') {
+                setRevisedReview(aiReviewContent);
+            } else {
+                setReviews(aiReviewContent);
+                setRating(extractedRating);
+            }
 
             // Show success message
-            setSuccessMessage('✅ AI review generated successfully');
+            setSuccessMessage(aiReviewMode === 'revise' ? '✅ Revised review generated. Compare it below before applying.' : '✅ Review generated successfully');
 
             setTimeout(() => {
                 setSuccessMessage('');
@@ -581,9 +603,12 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         <span>✨</span>
-                                                        Human AI
+                                                        Create Review
                                                     </span>
                                                 )}
+                                        </button>
+                                            <button type="button" onClick={handleReviseReview} disabled={aiLoading || !reviews.trim()} className="ml-3 py-2 px-6 rounded-full shadow-lg bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white">
+                                                Revise Review
                                             </button>
                                         </div>
                                         <hr />
@@ -675,13 +700,14 @@ const ReviewForm = ({ params }: PageProps) => {
                         {/* Style Category Tabs */}
                         <div className="flex gap-2 mb-4 border-b border-gray-200">
                             <button
-                                onClick={() => { setActiveStyleTab('human-ai'); setAiReviewStyle('human-ai'); }}
-                                className={`pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'human-ai'
+                                onClick={() => setActiveStyleTab('entertainment')}
+                                style={{ display: 'none' }}
+                                className={`hidden pb-2 px-4 font-medium text-sm transition-colors ${activeStyleTab === 'entertainment'
                                     ? 'border-b-2 border-purple-500 text-purple-600'
                                     : 'text-gray-600 hover:text-gray-800'
                                     }`}
                             >
-                                🤝 Human AI
+                                Create style
                             </button>
                             <button
                                 onClick={() => setActiveStyleTab('entertainment')}
@@ -714,7 +740,7 @@ const ReviewForm = ({ params }: PageProps) => {
 
                         {/* Styles Grid - Shows based on active tab */}
                         <div className="grid grid-cols-2 gap-2">
-                            {activeStyleTab === 'human-ai' && (
+                            {false && (
                                 <div className="col-span-2">
                                     <button
                                         type="button"
@@ -815,7 +841,24 @@ const ReviewForm = ({ params }: PageProps) => {
                             rows={4}
                         />
                     </div>
+                    {aiReviewMode === 'revise' && revisedReview && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div className="border rounded-lg p-3 bg-gray-50 max-h-96 overflow-auto">
+                                <h3 className="font-semibold mb-2">Existing review</h3>
+                                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: reviews }} />
+                            </div>
+                            <div className="border border-orange-200 rounded-lg p-3 bg-orange-50 max-h-96 overflow-auto">
+                                <h3 className="font-semibold mb-2">Revised review</h3>
+                                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: revisedReview }} />
+                            </div>
+                        </div>
+                    )}
                     <div className="flex justify-end gap-2">
+                        {aiReviewMode === 'revise' && revisedReview && (
+                            <button onClick={() => { setReviews(revisedReview); setRating(extractRatingFromReview(revisedReview)); setIsAIReviewModalOpen(false); }} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                Apply Revision
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsAIReviewModalOpen(false)}
                             className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"

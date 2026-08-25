@@ -29,8 +29,8 @@ jobs:
 
             npm ci
             npm run build
-
-            pm2 restart kossti || pm2 start npm --name "kossti" -- start
+            pm2 delete kossti || true
+            PORT=3000 pm2 start npm --name kossti -- start
 
             pm2 save
           EOF
