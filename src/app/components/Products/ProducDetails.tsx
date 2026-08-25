@@ -24,7 +24,8 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
   try {
     const response = await fetchApi<SpecsResponse>(apiEndpoints.getPublicSpecs(product.id), {
       queryParams: { locale: countryCode },
-      next: { revalidate: 60 },
+      // This endpoint returns expiring S3 URLs; never reuse an old response.
+      next: { revalidate: 0 },
     });
     if (response.success && response.data?.dataset) {
       quickSpecs = response.data.dataset.slice(0, 6);
