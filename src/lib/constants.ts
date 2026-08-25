@@ -2,8 +2,11 @@ export const LOCALES = ["en", "bn"];
 export const DEFAULT_LOCALE = "en"; // English as default
 
 // Site Configuration
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://kossti.com";
+// Use one canonical host everywhere. The production site redirects www to the
+// apex domain, so hreflang/canonical URLs must never point at www.
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://kossti.com"
+).replace(/\/$/, "").replace(/^https:\/\/www\./, "https://");
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Kossti";
 export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 

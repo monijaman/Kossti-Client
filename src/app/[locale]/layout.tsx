@@ -19,7 +19,8 @@ interface RootLayoutProps {
 
 export async function generateMetadata({ params }: RootLayoutProps): Promise<Metadata> {
   const { locale } = await params;
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com';
+  const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://kossti.com')
+    .replace(/\/$/, '').replace(/^https:\/\/www\./, 'https://');
 
   return {
     title: 'Kossti - Honest Product Reviews & Comparisons | Best Tech Reviews',
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
     alternates: {
       canonical: `/${locale}`,
       languages: {
-        'x-default': '/',
+        'x-default': '/en',
         'en-US': '/en',
         'en': '/en',
         'bn-BD': '/bn',
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
     openGraph: {
       title: 'Kossti - Honest Product Reviews & Comparisons',
       description: 'Get honest, unbiased reviews of mobiles, electronics, and tech products. Compare prices, features, and specifications.',
-      url: SITE_URL,
+      url: `${SITE_URL}/${locale}`,
       siteName: 'Kossti',
       images: [
         {

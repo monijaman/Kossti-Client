@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     },
   }),
   alternates: {
-    canonical: '/',
+    canonical: '/en',
     languages: {
-      'x-default': '/',
+      'x-default': '/en',
       'en-US': '/en',
       'en': '/en',
       'bn-BD': '/bn',
