@@ -245,6 +245,33 @@ const ReviewForm = ({ params }: PageProps) => {
         setIsAIReviewModalOpen(true);
     };
 
+    const applyRevision = async () => {
+        if (!revisedReview.trim() || !id) return;
+
+        const revisedRating = extractRatingFromReview(revisedReview);
+        setLoading(true);
+        setErrorMessage('');
+        try {
+            const result = reviewData?.id
+                ? await updateReview(+id, reviewData.id, revisedRating, revisedReview, additionalDetails)
+                : await addReview(+id, revisedRating, revisedReview, additionalDetails);
+
+            const saved = !!(result && (result.success === true || result.review || result.data || result.message));
+            if (!saved) throw new Error('The revised review could not be saved');
+
+            setReviews(revisedReview);
+            setRating(revisedRating);
+            setIsAIReviewModalOpen(false);
+            setRevisedReview('');
+            setSuccessMessage('Revision applied and saved successfully.');
+            await fetchReviewData();
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : 'Failed to save revised review');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Generate AI Review with Custom Prompt
     const generateAIReviewWithPrompt = async () => {
         setAiLoading(true);
@@ -857,7 +884,7 @@ const ReviewForm = ({ params }: PageProps) => {
                     )}
                     <div className="flex justify-end gap-2">
                         {aiReviewMode === 'revise' && revisedReview && (
-                            <button onClick={() => { setReviews(revisedReview); setRating(extractRatingFromReview(revisedReview)); setIsAIReviewModalOpen(false); }} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            <button onClick={applyRevision} disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400">
                                 Apply Revision
                             </button>
                         )}
