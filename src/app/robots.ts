@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/constants";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kossti.com";
+  const baseUrl = SITE_URL;
   
   // Allow indexing only on production (main branch)
   const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';

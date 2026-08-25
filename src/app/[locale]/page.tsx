@@ -165,12 +165,9 @@ const Page = async ({ searchParams, params }: PageProps) => {
     locale || cookieStore.get("country-code")?.value || DEFAULT_LOCALE;
   const token = cookieStore.get("accessToken")?.value || "";
 
-  console.log("[Frontend] Sending request with limit:", limit);
-
-  // Fetch all data in parallel for better performance
-  const [productData, latestReviewsData] = await Promise.all([
-    // Main products fetch with ISR caching
-    fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+  // Fetch the paginated product list. Latest Reviews is homepage-only and is
+  // intentionally not requested on /en?page=N pages.
+  const productData = await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: "GET",
       accessToken: token,
       queryParams: {
@@ -184,9 +181,9 @@ const Page = async ({ searchParams, params }: PageProps) => {
         sortby: "priority",
       },
       next: { revalidate: 60 },
-    }),
-    // Latest Reviews: top 8 by priority DESC, filtered by active category/brand when selected
-    fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
+    });
+
+  const latestReviewsData = page === 1 ? await fetchApi<ProductApiResponse>(apiEndpoints.getProducts, {
       method: "GET",
       queryParams: {
         locale: countryCode,
@@ -197,8 +194,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
         sortby: "priority",
       },
       next: { revalidate: 60 },
-    }),
-  ]);
+    }) : null;
 
   // Handle API errors gracefully
   if (!productData.success) {
@@ -240,15 +236,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
     productData.data?.meta?.last_page ?? Math.ceil(totalProducts / limit);
 
   // Latest Reviews: top 8 by priority DESC, updated_at DESC (independent of main listing pagination)
-  const latestReviews = latestReviewsData.data?.data ?? [];
-
-  console.log("[Frontend] Received response:", {
-    productsCount: products.length,
-    totalProducts,
-    totalPages,
-    perPage: productData.data?.meta?.per_page,
-    limit,
-  });
+  const latestReviews = latestReviewsData?.data?.data ?? [];
 
   // Prepare sidebarProps from searchParams
   const sidebarProps = {
@@ -313,7 +301,7 @@ const Page = async ({ searchParams, params }: PageProps) => {
       />
 
       {/* Latest Reviews Section */}
-      <ProductReview products={latestReviews} countryCode={countryCode} />
+      {page === 1 && <ProductReview products={latestReviews} countryCode={countryCode} />}
 
       {/* Popular Products Section */}
       <Suspense fallback={<PopularProductsSkeleton />}>
