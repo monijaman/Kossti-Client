@@ -150,6 +150,11 @@ async function isValidVisitToken(token: string | undefined): Promise<boolean> {
 // only reports traffic, it doesn't stop it).
 const BLOCKED_COUNTRIES = new Set(["CN", "SG"]);
 
+// Requests from these explicitly trusted addresses bypass the honeypot,
+// country, and scraper blocks. Keep this list narrow and review it whenever
+// an administrator's public IP changes.
+const TRUSTED_IPS = new Set(["123.200.20.122"]);
+
 function getCountry(req: RequestWithGeo): string | undefined {
   const country =
     req.geo?.country ||
@@ -291,15 +296,16 @@ export async function middleware(request: RequestWithGeo) {
   // /admin pages AND the admin API routes are exempt from the blocks below,
   // so you never lock yourself out of the dashboard or its login call.
   const isAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
+  const isTrustedIp = TRUSTED_IPS.has(clientIp);
 
   // Honeypot: tripping it blocks the IP outright. Respond as an ordinary
   // 404 so a bot doesn't learn it was caught.
   if (pathname === HONEYPOT_PATH) {
-    trapIp(clientIp);
+    if (!isTrustedIp) trapIp(clientIp);
     return new NextResponse("Not Found", { status: 404 });
   }
 
-  if (!isAdminPath) {
+  if (!isAdminPath && !isTrustedIp) {
     if (isTrapped(clientIp)) {
       return new NextResponse("Blocked", { status: 403 });
     }
