@@ -111,7 +111,7 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
           </Suspense>
         </div>
 
-        {/* Separate user feedback/comments section */}
+        {/* Separate user feedback/comments section. */}
         <div className="mt-8 border-t border-gray-200 pt-8 md:mt-12 md:pt-10">
           <Suspense fallback={
             <div className="my-8 space-y-3" aria-hidden="true">
