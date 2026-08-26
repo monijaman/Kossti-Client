@@ -16,7 +16,7 @@ interface RequestWithGeo extends NextRequest {
 
 const PUBLIC_FILE = /\.(.*)$/;
 
-// --- Lightweight per-IP rate limiting -------------------------------------
+// --- Lightweight per-IP rate limiting ------------------------------
 // Best-effort, in-memory limiter scoped to this middleware instance. It
 // protects the data channel scrapers actually want (/api/proxy, which
 // forwards to the Go backend) and the admin login endpoint (brute force),
