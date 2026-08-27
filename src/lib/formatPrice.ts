@@ -3,12 +3,15 @@ export function formatPrice(value: number | string, locale = 'en'): string {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return 'N/A';
 
+  // Prices are intentionally shown only on Bengali pages.
+  if (locale !== 'bn') return '';
+
   const formatted = amount.toLocaleString(locale === 'bn' ? 'en-BD' : 'en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  return locale === 'bn' ? `৳${formatted}` : `$${formatted}`;
+  return `৳${formatted}`;
 }
 
 export function formatPriceLabel(value: number | string, locale = 'en'): string {

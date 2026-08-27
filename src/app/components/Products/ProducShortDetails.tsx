@@ -88,7 +88,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
           </div>
 
           {/* Price */}
-          {product.start_price !== undefined &&
+          {countryCode === 'bn' && product.start_price !== undefined &&
             product.start_price !== null &&
             product.start_price > 0 && (
               <div className="text-right">

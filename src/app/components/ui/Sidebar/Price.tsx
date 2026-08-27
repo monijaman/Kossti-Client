@@ -2,6 +2,7 @@ import { SidebarParams } from '@/lib/types';
 import Link from 'next/link';
 
 const Price = async ({ activeCategory, selectedBrands, activePriceRange, countryCode = 'en' }: SidebarParams) => {
+    if (countryCode !== 'bn') return null;
     const currency = countryCode === 'bn' ? '৳' : '$';
 
     const clearPriceRangeUrl = `/?category=${activeCategory || ''}${selectedBrands || ''}`;
