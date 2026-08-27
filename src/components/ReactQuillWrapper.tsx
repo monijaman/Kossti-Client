@@ -26,11 +26,13 @@ interface ReactQuillWrapperProps {
     modules?: Record<string, unknown>;
     formats?: string[];
     theme?: string;
+    allowHtmlSource?: boolean;
 }
 
 // Create a wrapper that disables strict mode for ReactQuill
 const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
-    ({ value, onChange, placeholder, className, id, style, modules, formats, theme = 'snow' }, ref) => {
+    ({ value, onChange, placeholder, className, id, style, modules, formats, theme = 'snow', allowHtmlSource = false }, ref) => {
+        const [htmlSource, setHtmlSource] = React.useState(false);
         // Default modules for toolbar
         const defaultModules = {
             toolbar: [
@@ -57,17 +59,36 @@ const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
 
         return (
             <div ref={ref} className="react-quill-wrapper">
-                <ReactQuill
-                    theme={theme}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    className={className}
-                    id={id}
-                    style={style}
-                    modules={modules || defaultModules}
-                    formats={formats || defaultFormats}
-                />
+                {allowHtmlSource && (
+                    <button
+                        type="button"
+                        onClick={() => setHtmlSource((current) => !current)}
+                        className="mb-2 rounded border border-gray-300 bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
+                    >
+                        {htmlSource ? 'Visual Editor' : 'HTML'}
+                    </button>
+                )}
+                {htmlSource ? (
+                    <textarea
+                        value={value}
+                        onChange={(event) => onChange(event.target.value)}
+                        placeholder="Paste HTML review here..."
+                        className="min-h-[240px] w-full rounded border border-gray-300 p-3 font-mono text-sm"
+                        aria-label="Review HTML source"
+                    />
+                ) : (
+                    <ReactQuill
+                        theme={theme}
+                        value={value}
+                        onChange={onChange}
+                        placeholder={placeholder}
+                        className={className}
+                        id={id}
+                        style={style}
+                        modules={modules || defaultModules}
+                        formats={formats || defaultFormats}
+                    />
+                )}
             </div>
         );
     }

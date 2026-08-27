@@ -1,6 +1,7 @@
 'use client';
 import { Product } from '@/lib/types';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/formatPrice';
 
 interface ProductDetailsProps {
   products: Product[];
@@ -60,7 +61,7 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
                 {/* Safely handle product.price to avoid TypeError */}
                 <td className="py-4 px-6">
                   {typeof product.price === 'number'
-                    ? `$${product.price.toFixed(2)}`
+                    ? formatPrice(product.price, countryCode)
                     : 'N/A'}
                 </td>
                 <td className="py-4 px-6 space-x-2">

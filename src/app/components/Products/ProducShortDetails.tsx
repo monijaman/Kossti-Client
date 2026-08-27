@@ -1,6 +1,7 @@
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatPriceRange } from '@/lib/formatPrice';
 
 interface PopularProductsProps {
   product: Product;
@@ -92,7 +93,7 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
             product.start_price > 0 && (
               <div className="text-right">
                 <span className="text-xs md:text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-1 rounded-lg">
-                  ${Number(product.start_price).toFixed(2)}
+                  {formatPriceRange(product.start_price, product.end_price, countryCode)}
                 </span>
               </div>
             )}

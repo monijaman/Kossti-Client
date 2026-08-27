@@ -591,6 +591,7 @@ const ReviewForm = ({ params }: PageProps) => {
                                                 className="mb-4"
                                                 id="reviews"
                                                 style={{ minHeight: '200px' }}
+                                                allowHtmlSource
                                             />
                                             {reviewsError && <p className="text-red-500 mb-4">{reviewsError}</p>} {/* Display error */}
                                         </div>
