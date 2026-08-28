@@ -8,7 +8,7 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://kossti.com"
 ).replace(/\/$/, "").replace(/^https:\/\/www\./, "https://");
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Kossti";
-export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
+export const OG_IMAGE_URL = `${SITE_URL}/og-image.svg`;
 
 export const apiEndpoints = {
   // Authentication endpoints
