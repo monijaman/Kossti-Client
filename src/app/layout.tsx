@@ -69,13 +69,13 @@ export const metadata: Metadata = {
     description: 'Compare products and read honest reviews, specifications, prices, pros and cons before you buy.',
     siteName: 'Kossti',
     type: 'website',
-    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'Kossti honest product reviews' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Kossti honest product reviews' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Kossti - Honest Product Reviews & Comparisons',
     description: 'Compare products and read honest reviews before you buy.',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
 }
 
