@@ -77,7 +77,13 @@ export async function generateMetadata(props: {
     const productName = product.name;
     const brandName = typeof product.brand === 'object' ? product.brand.name : product.brand_slug || 'Brand';
     const categoryName = typeof product.category === 'object' ? product.category.name : 'Product';
-    const image = product.photo || OG_IMAGE_URL;
+    // Social crawlers require a publicly reachable absolute image URL. Some
+    // product records contain a root-relative or API-relative photo path.
+    const image = product.photo
+      ? (product.photo.startsWith('http')
+        ? product.photo
+        : `${SITE_URL}${product.photo.startsWith('/') ? '' : '/'}${product.photo}`)
+      : OG_IMAGE_URL;
 
     // Build SEO-friendly description
     const seoDescription = isEn
@@ -123,8 +129,8 @@ export async function generateMetadata(props: {
         images: [
           {
             url: image,
-            width: 600,
-            height: 600,
+            width: image === OG_IMAGE_URL ? 1200 : 600,
+            height: image === OG_IMAGE_URL ? 630 : 600,
             alt: productName,
           },
         ],
