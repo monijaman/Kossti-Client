@@ -52,9 +52,9 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
       siteName: 'Kossti',
       images: [
         {
-          url: '/og-image.png',
-          width: 1200,
-          height: 630,
+          url: '/logo.png',
+          width: 672,
+          height: 256,
           alt: 'Kossti - Product Reviews Platform',
         },
       ],
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
       card: 'summary_large_image',
       title: 'Kossti - Honest Product Reviews & Comparisons',
       description: 'Get honest, unbiased reviews of mobiles, electronics, and tech products.',
-      images: ['/og-image.png'],
+      images: ['/logo.png'],
     },
     robots: {
       index: true,

@@ -129,8 +129,8 @@ export async function generateMetadata(props: {
         images: [
           {
             url: image,
-            width: image === OG_IMAGE_URL ? 1200 : 600,
-            height: image === OG_IMAGE_URL ? 630 : 600,
+            width: image === OG_IMAGE_URL ? 672 : 600,
+            height: image === OG_IMAGE_URL ? 256 : 600,
             alt: productName,
           },
         ],
@@ -161,7 +161,27 @@ export async function generateMetadata(props: {
     console.error('Error generating metadata:', error);
     return {
       title: `Product Review | ${SITE_NAME}`,
-      description: 'Read detailed product reviews and comparisons on Kossti',
+      description: 'Read detailed product reviews and comparisons on Kossti.',
+      metadataBase: new URL(SITE_URL),
+      openGraph: {
+        title: `Product Review | ${SITE_NAME}`,
+        description: 'Read detailed product reviews and comparisons on Kossti.',
+        url: `${SITE_URL}/${locale}/${slug}`,
+        siteName: SITE_NAME,
+        type: 'article',
+        images: [{
+          url: OG_IMAGE_URL,
+          width: 672,
+          height: 256,
+          alt: 'Kossti honest product reviews',
+        }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Product Review | ${SITE_NAME}`,
+        description: 'Read detailed product reviews and comparisons on Kossti.',
+        images: [OG_IMAGE_URL],
+      },
     };
   }
 }

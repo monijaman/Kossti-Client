@@ -8,7 +8,10 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://kossti.com"
 ).replace(/\/$/, "").replace(/^https:\/\/www\./, "https://");
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Kossti";
-export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
+// Keep the default share image on an existing, same-origin asset so social
+// crawlers always get a reachable image even when the optional OG artwork was
+// not included in a deployment artifact.
+export const OG_IMAGE_URL = `${SITE_URL}/logo.png`;
 
 export const apiEndpoints = {
   // Authentication endpoints
