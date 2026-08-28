@@ -1,7 +1,6 @@
 "use client";
 
 import BrandsListClient from '@/app/components/ui/Sidebar/BrandsClient';
-import { InArticleAd } from '@/app/components/Ads/AdUnit';
 import { useTranslation } from '@/hooks/useLocale';
 import { categoryInt, SidebarParams } from '@/lib/types';
 import { useEffect, useState } from 'react';
@@ -77,7 +76,6 @@ const Sidebar = ({ activeCategory, selectedBrands, searchTerm, countryCode }: Si
         heading={t.categories_heading || 'Categories'}
         clearCategoryText={t.clear_Category}
       />
-      <InArticleAd className="my-4" />
       <BrandsListClient
         selectedBrands={selectedBrands}
         activeCategory={activeCategory}

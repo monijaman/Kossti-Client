@@ -1,10 +1,8 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
-import Script from 'next/script';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
-import { Analytics } from "@vercel/analytics/next"
 const inter = Inter({ subsets: ['latin'] });
 const poppins = Poppins({
   weight: ['400', '500', '600', '700', '800', '900'],
@@ -129,15 +127,8 @@ export default function RootLayout({
         >
           Full product export
         </a>
-        {allowIndexing && <Analytics />}
-        {allowIndexing && (
-          <Script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8172172530139900"
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
+        <script src="https://pl31067810.profitableratecpmnetwork.com/8d/00/60/8d0060f66fb0c9bab4c92f3aa12ea71a.js" />
+        <script src="https://pl31067813.profitableratecpmnetwork.com/41/80/a0/4180a011ef3c5c2a5fb6c32e3026e05f.js" />
       </body>
     </html>
   )

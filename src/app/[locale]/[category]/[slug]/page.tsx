@@ -305,9 +305,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
         <ProductVideos key={`videos-${locale}-${dataset.id}`} productId={dataset.id} locale={locale} />
       </Suspense>
 
-      {/* In-article ad before similar products */}
-      <InArticleAd />
-
       <Suspense fallback={<SimilarProductsSkeleton />}>
         <SimilarProducts countryCode={countryCode} slug={slug} />
       </Suspense>

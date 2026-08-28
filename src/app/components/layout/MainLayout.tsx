@@ -226,14 +226,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                 </svg>
                 <span>by</span>
-                <Link 
-                  href="https://portfolio-three-theta-ephz9pve2c.vercel.app/" 
-                  className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Monir
-                </Link>
+                <span className="text-blue-400 font-medium">Monir</span>
               </div>
             </div>
           </div>

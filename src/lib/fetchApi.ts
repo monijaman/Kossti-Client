@@ -53,7 +53,7 @@ export default async function fetchApi<T>(
   const country = options.countryCode;
 
   const controller = new AbortController();
-  const timeoutMs = options.signal ?? 15000; // Reduced default timeout for Vercel
+  const timeoutMs = options.signal ?? 15000;
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   let errorStatus = 0;
