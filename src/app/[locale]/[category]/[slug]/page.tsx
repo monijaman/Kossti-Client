@@ -2,11 +2,12 @@ import MainLayout from '@/app/components/layout/MainLayout';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import SearchBox from '@/app/components/Search';
 import { InArticleAd } from '@/app/components/Ads/AdUnit';
-import { DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
+import { BLOCKED_PRODUCT_SLUGS, DEFAULT_LOCALE, OG_IMAGE_URL, SITE_NAME, SITE_URL } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
 import { Product, SearchParams } from '@/lib/types';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { Suspense, lazy } from 'react';
 
 // Lazy load non-critical components for better performance while keeping SEO-critical content server-rendered
@@ -54,6 +55,14 @@ export async function generateMetadata(props: {
   }>;
 }): Promise<Metadata> {
   const { slug, locale } = await props.params;
+
+  if (BLOCKED_PRODUCT_SLUGS.has(slug.toLowerCase())) {
+    return {
+      title: 'Page Not Found | Kossti',
+      description: 'The page you are looking for does not exist.',
+      robots: { index: false, follow: false },
+    };
+  }
 
   const isEn = locale === 'en';
 
@@ -188,6 +197,7 @@ export async function generateMetadata(props: {
 
 const Page = async ({ params, searchParams }: PageProps) => {
   const { slug, locale } = await params;
+  if (BLOCKED_PRODUCT_SLUGS.has(slug.toLowerCase())) notFound();
   const cookieStore = await cookies();
   // Use URL locale as primary source — cookie is only a fallback
   const countryCode = locale || cookieStore.get('country-code')?.value || DEFAULT_LOCALE;

@@ -1,4 +1,4 @@
-import { LOCALES, SITE_URL } from "@/lib/constants";
+import { BLOCKED_PRODUCT_SLUGS, LOCALES, SITE_URL } from "@/lib/constants";
 import { MetadataRoute } from "next";
 import fetchApi from "@/lib/fetchApi";
 import { Product } from "@/lib/types";
@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     products = [];
   }
 
-  const productPages = products.flatMap((product) =>
+  const productPages = products.filter((product) => !BLOCKED_PRODUCT_SLUGS.has(product.slug.toLowerCase())).flatMap((product) =>
     LOCALES.map((locale) => ({
       url: `${baseUrl}/${locale}/${product.category_slug || "products"}/${product.slug}`,
       lastModified: product.updated_at ? new Date(product.updated_at) : new Date(),

@@ -13,6 +13,9 @@ export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Kossti";
 // not included in a deployment artifact.
 export const OG_IMAGE_URL = `${SITE_URL}/logo.png`;
 
+// Slugs that must not be publicly served or included in search indexes.
+export const BLOCKED_PRODUCT_SLUGS = new Set(["beau-pere"]);
+
 export const apiEndpoints = {
   // Authentication endpoints
   register: "/api/register",
