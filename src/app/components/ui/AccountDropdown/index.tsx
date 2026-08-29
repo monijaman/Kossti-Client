@@ -10,6 +10,7 @@ type AccountDropdownProps = {
 
 const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const pathname = usePathname();
+  const isBangla = pathname.startsWith('/bn');
 
   const [isOpen, setIsOpen] = useState(false);
   const [localAuthState, setLocalAuthState] = useState(false);
@@ -120,7 +121,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
         onClick={() => setIsOpen((prev) => !prev)}
         className="text-white bg-blue-600 px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm rounded-md focus:outline-none"
       >
-        Account
+        {isBangla ? 'অ্যাকাউন্ট' : 'Account'}
       </button>
       {isOpen && (
         <div
@@ -135,20 +136,20 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
               >
 
 
-                Signin
+                {isBangla ? 'সাইন ইন' : 'Signin'}
               </Link>
               <Link
                 href="/signup"
                 className="block px-4 py-2 hover:bg-gray-200 rounded-md transition-colors"
               >
-                Signup
+                {isBangla ? 'সাইন আপ' : 'Signup'}
               </Link>
 
             </>
           ) : (
             <>
               <Link href="/profile" className="block px-4 py-2 hover:bg-gray-200 rounded-tl-md rounded-tr-md transition-colors">
-                Profile
+                {isBangla ? 'প্রোফাইল' : 'Profile'}
               </Link>
               <Link
                 href='#'
@@ -157,7 +158,7 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
                   handleLogout();
                 }}
                 className="block px-4 py-2 hover:bg-gray-100">
-                Logout
+                {isBangla ? 'লগ আউট' : 'Logout'}
               </Link>
               {isUserAuthenticated && userType !== 'guest' && (
                 <>
@@ -166,10 +167,10 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
                     href="/admin"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
-                    Admin Dashboard
+                    {isBangla ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}
                   </Link>
                   <Link href="/admin/users" className="block px-4 py-2 hover:bg-gray-100  rounded-bl-md rounded-br-md">
-                    Manage Users
+                    {isBangla ? 'ব্যবহারকারী পরিচালনা' : 'Manage Users'}
                   </Link>
                 </>
               )}

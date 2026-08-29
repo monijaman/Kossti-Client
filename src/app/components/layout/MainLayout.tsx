@@ -16,6 +16,7 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroContent }: MainLayoutProps) => {
   const locale = sidebarProps?.countryCode || 'bn';
+  const isBangla = locale === 'bn';
   const withLocale = (path: string) => `/${locale}${path}`;
 
   return (
@@ -68,7 +69,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                 <h3 className="text-xl font-bold">Kossti</h3>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed">
-                Your trusted source for honest, detailed product reviews and comparisons. Making informed decisions easier.
+                {isBangla ? 'বিশ্বস্ত পণ্য রিভিউ ও তুলনার মাধ্যমে সঠিক সিদ্ধান্ত নেওয়া সহজ করি।' : 'Your trusted source for honest, detailed product reviews and comparisons. Making informed decisions easier.'}
               </p>
               <div className="flex space-x-3 pt-2">
                 <a href="#" className="bg-gray-700 hover:bg-blue-600 p-2 rounded-lg transition-colors" aria-label="Facebook">
@@ -93,7 +94,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
             <div>
               <h3 className="text-lg font-bold mb-4 text-white flex items-center">
                 <span className="bg-blue-600 w-1 h-6 mr-2 rounded"></span>
-                Quick Links
+                {isBangla ? 'দ্রুত লিংক' : 'Quick Links'}
               </h3>
               <ul className="space-y-3">
                 <li>
@@ -101,7 +102,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Home
+                    {isBangla ? 'হোম' : 'Home'}
                   </Link>
                 </li>
                 <li>
@@ -109,7 +110,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    About Us
+                    {isBangla ? 'আমাদের সম্পর্কে' : 'About Us'}
                   </Link>
                 </li>
                 <li>
@@ -117,7 +118,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Contact
+                    {isBangla ? 'যোগাযোগ' : 'Contact'}
                   </Link>
                 </li>
                 <li>
@@ -125,7 +126,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Disclaimer
+                    {isBangla ? 'দায়মুক্তি' : 'Disclaimer'}
                   </Link>
                 </li>
               </ul>
@@ -135,7 +136,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
             <div>
               <h3 className="text-lg font-bold mb-4 text-white flex items-center">
                 <span className="bg-blue-600 w-1 h-6 mr-2 rounded"></span>
-                Legal
+                {isBangla ? 'আইনি তথ্য' : 'Legal'}
               </h3>
               <ul className="space-y-3">
                 <li>
@@ -143,7 +144,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Privacy Policy
+                    {isBangla ? 'গোপনীয়তা নীতি' : 'Privacy Policy'}
                   </Link>
                 </li>
                 <li>
@@ -151,7 +152,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Terms of Service
+                    {isBangla ? 'সেবার শর্তাবলি' : 'Terms of Service'}
                   </Link>
                 </li>
                 <li>
@@ -159,7 +160,7 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4 mr-2 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    Editorial Policy
+                    {isBangla ? 'সম্পাদকীয় নীতি' : 'Editorial Policy'}
                   </Link>
                 </li>
                 <li className="pt-4 border-t border-gray-700">
@@ -167,13 +168,14 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
-                    <span>Your data is protected</span>
+                    <span>{isBangla ? 'আপনার তথ্য সুরক্ষিত' : 'Your data is protected'}</span>
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* Column 4: Contact Info */}
+            {/* Contact information removed */}
+            {/*
             <div>
               <h3 className="text-lg font-bold mb-4 text-white flex items-center">
                 <span className="bg-blue-600 w-1 h-6 mr-2 rounded"></span>
@@ -211,21 +213,21 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                   </div>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
 
           {/* Bottom Bar */}
           <div className="border-t border-gray-700 pt-6 mt-6">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-sm text-gray-400 text-center md:text-left">
-                &copy; 2026 <span className="text-white font-semibold">Kossti</span>. All rights reserved.
+                &copy; 2026 <span className="text-white font-semibold">Kossti</span>. {isBangla ? 'সর্বস্বত্ব সংরক্ষিত।' : 'All rights reserved.'}
               </p>
               <div className="flex items-center space-x-2 text-sm text-gray-400">
-                <span>Crafted with</span>
+                <span>{isBangla ? 'ভালোবাসায় তৈরি' : 'Crafted with'}</span>
                 <svg className="w-4 h-4 text-red-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                 </svg>
-                <span>by</span>
+                <span>{isBangla ? 'দ্বারা' : 'by'}</span>
                 <span className="text-blue-400 font-medium">Monir</span>
               </div>
             </div>
