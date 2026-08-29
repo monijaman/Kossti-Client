@@ -466,6 +466,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                             className="w-full mb-4 border border-gray-300 rounded-md"
                             id="review"
                             style={{ backgroundColor: "#f9f9f9" }}
+                            allowHtmlSource
                         />
                     </div>
 
