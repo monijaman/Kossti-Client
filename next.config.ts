@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   // Optimize production builds
   compress: true,
   poweredByHeader: false,
+
+  async redirects() {
+    return [
+      {
+        source: '/bn/movies/beau-pere',
+        destination: '/bn/movies/beau-pere-the-stepfather-daughter-taboo',
+        permanent: true,
+      },
+    ];
+  },
   
   // Add performance and security headers
   async headers() {
