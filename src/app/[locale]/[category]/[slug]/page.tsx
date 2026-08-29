@@ -1,4 +1,5 @@
 import MainLayout from '@/app/components/layout/MainLayout';
+import ViewContentEvent from '@/app/components/Analytics/ViewContentEvent';
 import ProducDetails from '@/app/components/Products/ProducDetails';
 import SearchBox from '@/app/components/Search';
 import { InArticleAd } from '@/app/components/Ads/AdUnit';
@@ -238,6 +239,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   return (
     <MainLayout sidebarProps={{ countryCode: locale }}>
+      <ViewContentEvent
+        productId={dataset.id}
+        productName={dataset.name}
+        category={typeof dataset.category === 'object' ? dataset.category.name : 'Product'}
+        price={dataset.price}
+      />
       {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"
