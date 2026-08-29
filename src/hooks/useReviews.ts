@@ -16,6 +16,7 @@ function getAuthToken(): string | undefined {
 
 function logoutAfterUnauthorized() {
   if (typeof window === "undefined") return;
+  window.alert("Your session has expired. Please log in again.");
   localStorage.clear();
   Cookies.remove("accessToken", { path: "/" });
   Cookies.remove("theAccessToken", { path: "/" });
@@ -363,6 +364,7 @@ export const useReviews = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
       },
       body: JSON.stringify(payload),
     });
