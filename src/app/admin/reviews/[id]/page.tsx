@@ -6,7 +6,7 @@ import DragNdrop from "@/app/components/Uploader/Uploader";
 import ReactQuillWrapper from '@/components/ReactQuillWrapper';
 import { useProducts } from '@/hooks/useProducts';
 import { useReviews } from '@/hooks/useReviews';
-import { extractRatingFromReview, generateAIReview, ReviewStyle } from '@/lib/openai-service';
+import { extractRatingFromReview, generateAIReview, markdownToHtml, ReviewStyle } from '@/lib/openai-service';
 import { AdditionalDetails, Product, Review, ReviewTranslation } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useRef, useState } from 'react';
@@ -309,13 +309,14 @@ const ReviewForm = ({ params }: PageProps) => {
             }
 
             // Extract rating from the AI-generated content
-            const extractedRating = extractRatingFromReview(aiReviewContent);
+            const htmlReviewContent = markdownToHtml(aiReviewContent);
+            const extractedRating = extractRatingFromReview(htmlReviewContent);
             console.log('📊 Extracted rating:', extractedRating);
 
             if (aiReviewMode === 'revise') {
-                setRevisedReview(aiReviewContent);
+                setRevisedReview(htmlReviewContent);
             } else {
-                setReviews(aiReviewContent);
+                setReviews(htmlReviewContent);
                 setRating(extractedRating);
             }
 

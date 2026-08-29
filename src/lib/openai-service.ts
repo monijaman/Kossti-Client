@@ -13,6 +13,51 @@ export type ReviewStyle =
   | "eco-conscious" // Environmental, emissions, electric motorcycle focus
   | "urban-commuter" // City riding, traffic filtering, parking ease
   | "sherlock-detective" // Deductive investigation: clues, evidence, verdict
+
+/** Convert common Markdown returned by the AI into HTML for the rich editor. */
+export function markdownToHtml(content: string): string {
+  const cleaned = content
+    .replace(/^```(?:html|markdown)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+
+  // Do not wrap or restructure content that is already HTML; only fix Markdown emphasis.
+  if (/<\/?[a-z][^>]*>/i.test(cleaned)) {
+    return cleaned.replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>').replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>');
+  }
+
+  const lines = cleaned.split(/\r?\n/);
+  const output: string[] = [];
+  let listItems: string[] = [];
+  const flushList = () => {
+    if (listItems.length) {
+      output.push(`<ul>${listItems.join('')}</ul>`);
+      listItems = [];
+    }
+  };
+  const inline = (text: string) => text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) { flushList(); continue; }
+    const listMatch = trimmed.match(/^[-*+]\s+(.+)$/);
+    if (listMatch) { listItems.push(`<li>${inline(listMatch[1])}</li>`); continue; }
+    flushList();
+    const heading = trimmed.match(/^#{1,6}\s+(.+)$/);
+    if (heading) {
+      const level = trimmed.match(/^#+/)?.[0].length || 2;
+      output.push(`<h${level}>${inline(heading[1])}</h${level}>`);
+    } else {
+      output.push(`<p>${inline(trimmed)}</p>`);
+    }
+  }
+  flushList();
+  return output.join('');
+}
   | "shakespearean-drama" // Theatrical acts, soliloquies, dramatic prose
   | "epic-mythology" // Greek/Norse epic hero's journey with the car as legend
   | "film-noir" // Hard-boiled 1940s noir detective monologue

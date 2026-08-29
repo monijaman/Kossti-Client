@@ -1,4 +1,5 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
+import AdScripts from '@/app/components/Ads/AdScripts';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Poppins } from 'next/font/google';
 import Script from 'next/script';
@@ -147,8 +148,7 @@ fbq('track', 'PageView');`}
         >
           Full product export
         </a>
-        <script src="https://pl31067810.profitableratecpmnetwork.com/8d/00/60/8d0060f66fb0c9bab4c92f3aa12ea71a.js" />
-        <script src="https://pl31067813.profitableratecpmnetwork.com/41/80/a0/4180a011ef3c5c2a5fb6c32e3026e05f.js" />
+        <AdScripts />
       </body>
     </html>
   )
