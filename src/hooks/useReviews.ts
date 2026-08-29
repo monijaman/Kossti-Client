@@ -14,6 +14,16 @@ function getAuthToken(): string | undefined {
   );
 }
 
+function logoutAfterUnauthorized() {
+  if (typeof window === "undefined") return;
+  localStorage.clear();
+  Cookies.remove("accessToken", { path: "/" });
+  Cookies.remove("theAccessToken", { path: "/" });
+  Cookies.remove("refreshToken", { path: "/" });
+  const returnUrl = `${window.location.pathname}${window.location.search}`;
+  window.location.href = `/signin?redirect=${encodeURIComponent(returnUrl)}`;
+}
+
 export const useReviews = () => {
   const getReview = async (
     page: number,
@@ -161,6 +171,7 @@ export const useReviews = () => {
 
       if (!response.ok) {
         const text = await response.text();
+        if (response.status === 401) logoutAfterUnauthorized();
         throw new Error(`Failed to submit review: ${response.status} ${text}`);
       }
 
@@ -358,6 +369,7 @@ export const useReviews = () => {
 
     if (!response.ok) {
       const text = await response.text();
+      if (response.status === 401) logoutAfterUnauthorized();
       throw new Error(`Failed to update review: ${response.status} ${text}`);
     }
 
