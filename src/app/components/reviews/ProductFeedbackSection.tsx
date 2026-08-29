@@ -3,7 +3,8 @@ import UserReviewForm from './UserReviewForm';
 import FeedbackHashScroll from './FeedbackHashScroll';
 
 export default async function ProductFeedbackSection({ productId, locale = 'en' }: { productId: number; locale?: string }) {
-  const requestedLocale = locale === 'bn' ? 'bn' : 'en';
+  // Feedback is intentionally kept in English, including on Bengali pages.
+  const requestedLocale = 'en';
   let comments: Array<{ id: number; content: string; rating?: string; user_id?: number; user_name?: string; username?: string; source_url?: string | null; created_at?: string }> = [];
   try {
     const response = await fetchApi(`/product-feedback/${productId}?locale=${requestedLocale}`, { next: { revalidate: 0 } });
@@ -31,6 +32,6 @@ export default async function ProductFeedbackSection({ productId, locale = 'en' 
         </p>
       </article>)}
     </div>}
-    <UserReviewForm productId={productId} locale={locale} />
+    <UserReviewForm productId={productId} locale="en" />
   </section>;
 }

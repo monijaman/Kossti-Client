@@ -309,7 +309,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
       {/* Non-Critical Components - Lazy Load */}
       <Suspense fallback={<ProductVideosSkeleton />}>
-        <ProductVideos key={`videos-${locale}-${dataset.id}`} productId={dataset.id} locale={locale} />
+        <ProductVideos key={`videos-${locale}-${dataset.id}`} productId={dataset.id} productName={dataset.name} locale={locale} />
       </Suspense>
 
       <Suspense fallback={<SimilarProductsSkeleton />}>

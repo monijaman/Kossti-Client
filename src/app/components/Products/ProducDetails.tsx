@@ -96,20 +96,22 @@ async function ProducDetails({ product, countryCode = 'en' }: PopularProductsPro
       {/* Specifications, then user reviews (before the Similar Products section) */}
       <div className="mt-8 md:mt-12">
         {/* Specifications Table */}
-        <div className="lg:col-span-3">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 md:mb-6">
-            <p className="text-xs md:text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
-          </div>
-
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t.label_specifications || 'Specifications'}</h2>
-          <Suspense fallback={
-            <div className="space-y-2" aria-hidden="true">
-              {[1,2,3,4,5,6].map(i => <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />)}
+        {quickSpecs.length > 0 && (
+          <div className="lg:col-span-3">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 md:p-4 mb-4 md:mb-6">
+              <p className="text-xs md:text-sm text-yellow-800">{t.unofficial_specs || 'Unofficial specifications'}</p>
             </div>
-          }>
-            <SpecDetails productId={product.id} countryCode={countryCode} />
-          </Suspense>
-        </div>
+
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t.label_specifications || 'Specifications'}</h2>
+            <Suspense fallback={
+              <div className="space-y-2" aria-hidden="true">
+                {[1,2,3,4,5,6].map(i => <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />)}
+              </div>
+            }>
+              <SpecDetails productId={product.id} countryCode={countryCode} />
+            </Suspense>
+          </div>
+        )}
 
         {/* Separate user feedback/comments section. */}
         <div className="mt-8 border-t border-gray-200 pt-8 md:mt-12 md:pt-10">

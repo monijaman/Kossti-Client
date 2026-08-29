@@ -52,7 +52,8 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
     }
     setSaving(true); setMessage("");
     try {
-      const detectedLocale = window.location.pathname.startsWith("/bn/") ? "bn" : "en";
+      // User feedback is always submitted in English, regardless of page locale.
+      const detectedLocale = "en";
       const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

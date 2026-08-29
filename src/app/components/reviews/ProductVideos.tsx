@@ -5,10 +5,11 @@ import { useEffect, useState } from 'react';
 
 interface ProductVideosProps {
     productId: number;
+    productName: string;
     locale?: string;
 }
 
-const ProductVideos = ({ productId, locale = 'en' }: ProductVideosProps) => {
+const ProductVideos = ({ productId, productName, locale = 'en' }: ProductVideosProps) => {
     const { getVideosByProductId } = useProducts();
     const [videos, setVideos] = useState<VideoItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -70,7 +71,7 @@ const ProductVideos = ({ productId, locale = 'en' }: ProductVideosProps) => {
 
     return (
         <div className="my-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Videos</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{productName} Videos</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video, index) => {
