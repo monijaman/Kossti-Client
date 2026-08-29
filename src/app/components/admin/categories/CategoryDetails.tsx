@@ -178,7 +178,7 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
         price: product.price || 99.99,
         category_id: activeCategory.id,
         brand_id: brandId || 1,
-        status: true,
+        status: false,
         created_by: 'ai_import',
       };
 
@@ -188,7 +188,9 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
       });
 
       if (response.success) {
-        setMarketProducts((prev) => prev.filter((p) => p !== product));
+        // Remove the imported item from the visible market list by its stable
+        // product name rather than object identity.
+        setMarketProducts((prev) => prev.filter((p) => p.name !== product.name));
         alert('Product imported successfully!');
       } else {
         alert(`Failed to import product: ${response.error || 'Unknown error'}`);
