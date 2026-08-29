@@ -277,6 +277,12 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
                     Get New Products
                   </button>
                 )}
+                <Link
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+                  href={`/admin/products?category=${category.id}&imported=true`}
+                >
+                  View Imported Products
+                </Link>
               </td>
             </tr>
           ))}

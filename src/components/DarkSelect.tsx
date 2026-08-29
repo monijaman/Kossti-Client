@@ -8,7 +8,17 @@ function DarkSelect<
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>
 >(props: Props<Option, IsMulti, Group>) {
-    return <ReactSelect classNamePrefix="rs" {...props} />;
+    return (
+        <ReactSelect
+            classNamePrefix="rs"
+            {...props}
+            menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
+            styles={{
+                ...props.styles,
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
+        />
+    );
 }
 
 export default DarkSelect;

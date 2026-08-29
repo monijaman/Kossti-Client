@@ -86,12 +86,12 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto py-8 px-4">
         <h1 className="text-4xl font-bold mb-6 text-gray-800">Contact Us</h1>
         <p className="text-gray-600 mb-8 text-lg">
-          Have questions or feedback? We'd love to hear from you. Get in touch with us using the information below.
+          Have questions or feedback? We'd love to hear from you. Send us a message using the form below.
         </p>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid gap-8">
           {/* Contact Information */}
-          <div className="space-y-6">
+          <div className="hidden">
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Contact Information</h2>
               
@@ -265,7 +265,7 @@ export default function ContactPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-12 bg-gray-50 p-6 rounded-lg border border-gray-200">
+        <div className="hidden">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Frequently Asked Questions</h2>
           <div className="space-y-4">
             <div>

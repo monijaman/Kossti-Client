@@ -191,6 +191,12 @@ const BrandDetails = ({ brands }: PageProps) => {
                     Get New Products
                   </button>
                 )}
+                <Link
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
+                  href={`/admin/products?brand=${brand.id}&imported=true`}
+                >
+                  View Imported Products
+                </Link>
               </td>
             </tr>
           ))}

@@ -214,6 +214,18 @@ const MainLayout = ({ children, sidebarProps, isAuthenticated = false, heroConte
                 </li>
               </ul>
             </div> */}
+            <div>
+              <h3 className="text-lg font-bold mb-4 text-white flex items-center">
+                <span className="bg-blue-600 w-1 h-6 mr-2 rounded"></span>
+                Get in Touch
+              </h3>
+              <Link
+                href="/en/contact"
+                className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+              >
+                Contact Us
+              </Link>
+            </div>
           </div>
 
           {/* Bottom Bar */}
