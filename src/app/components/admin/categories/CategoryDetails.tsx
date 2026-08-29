@@ -191,7 +191,6 @@ const CategoryDetails = ({ categories, onSort, currentSortBy = 'name', currentSo
         // Remove the imported item from the visible market list by its stable
         // product name rather than object identity.
         setMarketProducts((prev) => prev.filter((p) => p.name !== product.name));
-        alert('Product imported successfully!');
       } else {
         alert(`Failed to import product: ${response.error || 'Unknown error'}`);
       }
