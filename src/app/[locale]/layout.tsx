@@ -1,12 +1,9 @@
 // app/[locale]/layout.tsx
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { ReactNode } from 'react';
 // import { LanguageProvider } from '../context/LanguageContext';
 import '../globals.scss';
-
-const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -85,24 +82,6 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
 
   return (
     <html lang={locale}>
-      <head>
-        {allowIndexing && (
-          <>
-            <Script
-              src="https://www.googletagmanager.com/gtag/js?id=G-8JP2X3MRQ5"
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-8JP2X3MRQ5');
-          `}
-            </Script>
-          </>
-        )}
-      </head>
       <body className="font-sans">
         {/* <LanguageProvider> */}
         <ClientProvider>{children}</ClientProvider>
