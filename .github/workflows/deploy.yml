@@ -23,14 +23,17 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
             cd /var/www/kossti
 
-            git pull origin main
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            echo "Deploying commit: $(git rev-parse --short HEAD)"
 
             npm ci
             npm run build
-            pm2 delete kossti || true
-            PORT=3000 pm2 start npm --name kossti -- start
+            pm2 restart kossti --update-env || PORT=3000 pm2 start npm --name kossti -- start
 
             pm2 save
           EOF
