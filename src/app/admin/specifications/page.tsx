@@ -112,20 +112,31 @@ const Specification = () => {
         }
     };
 
-    // Fetch categories
+    // Fetch categories. The backend caps `limit` at 100 per request, so
+    // page through until a short (non-full) page comes back.
     const fetchCategories = async () => {
         try {
-            const response = await fetchApi(`${apiEndpoints.Categories}?limit=1000&offset=0`);
-            const apiResponse = response as { success: boolean; data: { categories: Category[], count: number, limit: number, offset: number } };
+            const pageSize = 100;
+            let offset = 0;
+            let allCategories: Category[] = [];
 
+            while (true) {
+                const response = await fetchApi(`${apiEndpoints.Categories}?limit=${pageSize}&offset=${offset}`);
+                const apiResponse = response as { success: boolean; data: { categories: Category[], count: number, limit: number, offset: number } };
 
-            if (!apiResponse.success) {
-                console.error("Failed to fetch categories.");
-                return;
+                if (!apiResponse.success) {
+                    console.error("Failed to fetch categories.");
+                    break;
+                }
+
+                const batch = apiResponse.data.categories || [];
+                allCategories = allCategories.concat(batch);
+
+                if (batch.length < pageSize) break;
+                offset += pageSize;
             }
 
-            // console.log("Fetched categories:", apiResponse.data.categories);
-            setCategories(apiResponse.data.categories);
+            setCategories(allCategories);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }

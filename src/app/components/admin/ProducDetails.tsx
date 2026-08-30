@@ -41,6 +41,9 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Brand</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Priority</th>
+              <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Views</th>
               <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -64,6 +67,19 @@ const ProductDetails = ({ products, countryCode }: ProductDetailsProps) => {
                     ? formatPrice(product.price, countryCode)
                     : 'N/A'}
                 </td>
+                <td className="py-4 px-6">
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                      product.status
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {product.status ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td className="py-4 px-6">{product.priority ?? 0}</td>
+                <td className="py-4 px-6">{product.views_count ?? 0}</td>
                 <td className="py-4 px-6 space-x-2">
                   <Link
                     href={`reviews/${product.id}`}

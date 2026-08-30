@@ -15,9 +15,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get auth token from cookies or headers
-        const token = request.cookies.get('token')?.value || '';
-        
+        // Get auth token from the httpOnly cookie, falling back to an
+        // incoming Authorization header.
+        let token = request.cookies.get('accessToken')?.value || '';
+        if (!token) {
+            const authHeader = request.headers.get('authorization');
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
+        }
+
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
         };

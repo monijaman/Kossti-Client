@@ -1,14 +1,16 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
 import { getApiUrl } from "@/lib/apiUrl";
 
 const MAX_FEEDBACK_LENGTH = 2000;
 
-function getToken() {
-  return (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
-    Cookies.get("accessToken") || Cookies.get("theAccessToken");
+// The JWT itself lives only in an httpOnly cookie the /api/proxy route
+// attaches automatically - client JS never reads or sends it. `email` is
+// non-secret display state written at sign-in, and doubles here as a
+// lightweight "is this browser signed in" signal.
+function isSignedIn() {
+  return typeof window !== "undefined" && Boolean(localStorage.getItem("email"));
 }
 
 export default function UserReviewForm({ productId, locale = "en" }: { productId: number; locale?: string }) {
@@ -21,7 +23,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
   const reviewInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setIsLoggedIn(Boolean(getToken()));
+    setIsLoggedIn(isSignedIn());
   }, []);
 
   useEffect(() => {
@@ -40,8 +42,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const token = getToken();
-    if (!token) {
+    if (!isSignedIn()) {
       const returnUrl = `${window.location.pathname}${window.location.search}#share-your-experience`;
       window.location.href = `/signin?redirect=${encodeURIComponent(returnUrl)}`;
       return;
@@ -54,20 +55,22 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
     try {
       // User feedback is always submitted in English, regardless of page locale.
       const detectedLocale = "en" as const;
+      // /api/proxy attaches Authorization itself from the httpOnly
+      // accessToken cookie - nothing to attach here.
       const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: reviews, locale: detectedLocale, rating, source_url: sourceUrl || undefined }),
       });
       const data = await response.json();
       if (!response.ok) {
         if (response.status === 401) {
-          // Remove expired credentials so middleware does not treat them as a
-          // valid session and redirect /signin to /admin/dashboard.
-          Cookies.remove("accessToken", { path: "/" });
-          Cookies.remove("theAccessToken", { path: "/" });
-          localStorage.removeItem("token");
-          localStorage.removeItem("refresh_token");
+          // Session expired or was never established server-side - clear the
+          // httpOnly cookies and the local "signed in" state, then send the
+          // user back to sign in.
+          await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+          localStorage.removeItem("email");
+          localStorage.removeItem("userType");
           const returnUrl = `${window.location.pathname}${window.location.search}#share-your-experience`;
           window.location.href = `/signin?redirect=${encodeURIComponent(returnUrl)}`;
           return;
@@ -88,7 +91,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
         const translation = await translationResponse.json();
         if (translationResponse.ok && translation.data && data.feedback?.id) {
           await fetch(`${getApiUrl()}/feedback/${data.feedback.id}`, {
-            method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            method: "PUT", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ content_bn: translation.data }),
           });
         }

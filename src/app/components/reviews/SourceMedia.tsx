@@ -1,8 +1,7 @@
 "use client"
 import YouTubeModal from '@/app/components/reviews/YouTubeVideoPlayer';
-import { useProducts } from '@/hooks/useProducts';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 interface VideoItem {
     youtubeUrl: string;
     sourceUrl?: string;
@@ -13,26 +12,9 @@ interface VideoGridProps {
     productId: number;
 }
 
-const VideoGrid = ({ dataset, productId }: VideoGridProps) => {
+const VideoGrid = ({ dataset, productId: _productId }: VideoGridProps) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedVideoUrl, setSelectedVideoUrl] = useState<string>("");
-    const { incrementViews } = useProducts()
-
-    const incrementViewsFunc = async () => {
-        try {
-            const response = await incrementViews(productId);
-
-            if (!response.ok) {
-                console.error('Failed to increment views count');
-            }
-        } catch (error) {
-            console.error('Error incrementing views count:', error);
-        }
-    };
-
-    useEffect(() => {
-        incrementViewsFunc();
-    }, [])
 
     // Open the modal with the selected video URL
     const openModal = (url: string) => {

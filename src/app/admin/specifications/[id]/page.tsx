@@ -194,6 +194,21 @@ const Specification = ({ params }: PageProps) => {
             if (response && response.dataset) {
                 if (response.dataset.specifications && response.dataset.specifications.length > 0) {
                     setSpecifications(response.dataset.specifications);
+                    // The product endpoint already includes the key name. Use
+                    // it immediately so existing rows render even when the
+                    // protected /speckey request is temporarily unavailable.
+                    setSpecKeys((current) => {
+                        const byId = new Map(current.map((key) => [key.id, key]));
+                        for (const spec of response.dataset.specifications) {
+                            if (spec.specification_key_id && spec.specification_key) {
+                                byId.set(spec.specification_key_id, {
+                                    id: spec.specification_key_id,
+                                    specification_key: spec.specification_key,
+                                } as SpecificationKey);
+                            }
+                        }
+                        return Array.from(byId.values());
+                    });
                 } else if (response.dataset.formspecs) {
                     setSpecifications(response.dataset.formspecs);
                 }
@@ -243,7 +258,6 @@ const Specification = ({ params }: PageProps) => {
                                         className="mt-1 block w-full"
                                         placeholder="Search and select a specification key"
                                         isSearchable
-                                        isDisabled={true}
                                         required
                                     />
                                 </div>

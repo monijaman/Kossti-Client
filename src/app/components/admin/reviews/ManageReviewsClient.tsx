@@ -51,14 +51,27 @@ const ManageReviewsClient = ({ searchParams }: ManageReviewsClientProps) => {
     const [reviews, setReviews] = useState<ReviewData[]>([]);
     const [totalReviews, setTotalReviews] = useState<number>(0);
 
-    // Fetch categories
+    // Fetch categories. The backend caps `limit` at 100 per request, so
+    // page through until a short (non-full) page comes back.
     const fetchCategories = useCallback(async () => {
         try {
-            const response = await fetchApi(`${apiEndpoints.Categories}?limit=1000&offset=0`);
-            const apiResponse = response as { success: boolean; data: { categories: Category[] } };
-            if (apiResponse.success) {
-                setCategories(apiResponse.data.categories);
+            const pageSize = 100;
+            let offset = 0;
+            let allCategories: Category[] = [];
+
+            while (true) {
+                const response = await fetchApi(`${apiEndpoints.Categories}?limit=${pageSize}&offset=${offset}`);
+                const apiResponse = response as { success: boolean; data: { categories: Category[] } };
+                if (!apiResponse.success) break;
+
+                const batch = apiResponse.data.categories || [];
+                allCategories = allCategories.concat(batch);
+
+                if (batch.length < pageSize) break;
+                offset += pageSize;
             }
+
+            setCategories(allCategories);
         } catch (error) {
             console.error('Error fetching categories:', error);
         }

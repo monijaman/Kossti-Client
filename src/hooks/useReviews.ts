@@ -3,17 +3,6 @@ import { AdditionalDetails } from "@/lib/types";
 import Cookies from "js-cookie";
 import { useCallback } from "react";
 
-// Admin login stores the token in localStorage; some flows fall back to a
-// cookie instead. Mirrors the lookup in UserReviewForm.tsx.
-function getAuthToken(): string | undefined {
-  return (
-    (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
-    Cookies.get("accessToken") ||
-    Cookies.get("theAccessToken") ||
-    undefined
-  );
-}
-
 function logoutAfterUnauthorized() {
   if (typeof window === "undefined") return;
   window.alert("Your session has expired. Please log in again.");
@@ -55,7 +44,9 @@ export const useReviews = () => {
     const fullUrl = `${apiUrl}/products?${queryString}`;
 
     try {
-      const response = await fetch(fullUrl);
+      // Review content is edited in this screen; never reuse a cached GET
+      // after saving or the first refresh shows the previous HTML.
+      const response = await fetch(fullUrl, { cache: "no-store" });
       const dataset = await response.json();
 
       return {
@@ -84,7 +75,9 @@ export const useReviews = () => {
     const fullUrl = `${apiUrl}/product-reviews/${id}${locale ? `?locale=${locale}` : ""}`;
 
     try {
-      const response = await fetch(fullUrl);
+      // This endpoint is read immediately after edits; bypass browser/Next
+      // caching so the first refresh reflects the saved HTML.
+      const response = await fetch(fullUrl, { cache: "no-store" });
       const dataset = await response.json();
 
       // The API returns { product_id: <id>, count: <n>, reviews: [...] }
@@ -158,14 +151,12 @@ export const useReviews = () => {
         payload.additional_details = cleanedDetails;
       }
 
-      // This route requires JWT auth on the backend - without this header
-      // every request 401s regardless of login state.
-      const token = getAuthToken();
+      // This route requires JWT auth on the backend - the /api/proxy route
+      // injects Authorization itself from the httpOnly accessToken cookie.
       const response = await fetch(fullUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(payload),
       });
@@ -364,7 +355,6 @@ export const useReviews = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
       },
       body: JSON.stringify(payload),
     });

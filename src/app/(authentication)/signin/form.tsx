@@ -2,7 +2,6 @@
 import getErrors from '@/app/components/Form/validation';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
-import { setAccessTokenCookie } from '@/lib/utils';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -72,13 +71,22 @@ export const LoginForm = () => {
           setError(null);
           // Store the tokens and user info
           const loginData = response.data as LoginResponse;
-          localStorage.setItem('token', loginData.token);
-          localStorage.setItem('refresh_token', loginData.refresh_token);
+
+          // The JWT itself is set as an httpOnly cookie server-side - it is
+          // never stored where client JS can read it. Only non-secret
+          // display/UI-gating state goes in localStorage.
+          await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token: loginData.token,
+              refresh_token: loginData.refresh_token,
+            }),
+            credentials: 'include',
+          });
+
           localStorage.setItem('email', loginData.email);
           localStorage.setItem('userType', loginData.type);
-
-          // Also set the token as a cookie for API routes
-          setAccessTokenCookie(loginData.token);
 
           // Return users to the page where they started (for example, the
           // review form), while keeping the existing admin-login behaviour

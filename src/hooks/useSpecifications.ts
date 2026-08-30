@@ -12,23 +12,32 @@ import { useCallback } from "react";
 
 export const useSpecifications = () => {
   const getSpecificationsKeys = useCallback(async (searchTerm = "") => {
-    const apiUrl = getApiUrl();
-    // Use the correct endpoint for getting specification keys with a high limit to get all
-    const apiEndpoint = `speckey${
+    // Use the same proxy-aware client as the admin pages. Direct browser calls
+    // to the backend can fail/CORS and leave the selects with no options.
+    const apiEndpoint = `${apiEndpoints.getSpecKeys}${
       searchTerm
         ? `?search=${encodeURIComponent(searchTerm)}&limit=1000`
         : "?limit=1000"
     }`;
 
-    const fullUrl = `${apiUrl}/${apiEndpoint}`;
-
     try {
-      const response = await fetch(fullUrl);
-      const dataset = await response.json();
+      // No token handling here - the /api/proxy route injects Authorization
+      // itself from the httpOnly accessToken cookie.
+      const response = await fetchApi(apiEndpoint, {
+        next: { revalidate: 0 },
+      });
+      const rawDataset: any = (response as any)?.data ?? response;
+      // Support both the backend payload and an additional `{ data: ... }`
+      // envelope used by older proxy deployments.
+      const dataset: any = rawDataset?.specification_keys
+        ? rawDataset
+        : rawDataset?.data ?? rawDataset;
 
       return {
-        success: true,
-        data: dataset.specification_keys || [],
+        success: response.success,
+        data: Array.isArray(dataset?.specification_keys)
+          ? dataset.specification_keys
+          : [],
       };
     } catch (error) {
       console.error("Error fetching specification keys:", error);
@@ -44,19 +53,21 @@ export const useSpecifications = () => {
 
     try {
       const [specificationsResponse, productResponse] = await Promise.all([
-        fetch(fullUrl),
-        fetch(`${apiUrl}/products/${id}`),
+        fetch(fullUrl, { cache: "no-store", credentials: "include" }),
+        fetchApi(`${apiEndpoints.products}/${id}`),
       ]);
 
       const specificationsData = await specificationsResponse.json();
-      const productData = await productResponse.json();
+      // fetchApi returns the API payload under `data`; keep compatibility with
+      // both the proxy response and a direct/legacy response.
+      const productData = (productResponse as any)?.data ?? productResponse;
 
       // Transform the Go server response to match the expected frontend structure
       return {
         success: true,
         dataset: {
           specifications: specificationsData.specifications || [],
-          name: productData.name || `Product ${specificationsData.product_id}`,
+          name: productData?.name || `Product ${specificationsData.product_id}`,
           formspecs: specificationsData.specifications || [], // Fallback for the existing component logic
         },
         count: specificationsData.count || 0,
