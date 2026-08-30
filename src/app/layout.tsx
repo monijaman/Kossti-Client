@@ -1,5 +1,4 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
-import AdScripts from '@/app/components/Ads/AdScripts';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 // Ensure globals.scss is imported for Tailwind CSS
@@ -137,7 +136,6 @@ fbq('track', 'PageView');`}
         >
           Full product export
         </a>
-        <AdScripts />
       </body>
     </html>
   )
