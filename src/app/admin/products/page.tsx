@@ -215,13 +215,12 @@ const ManageReviews = () => {
             </div>
 
             <div>
-                <div className="mb-3 grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-2">
-                    <div />
+                <div className="mb-3 flex flex-wrap items-center justify-end gap-x-8 gap-y-2">
                     <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                         Show inactive categories
                     </label>
-                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 md:justify-self-end">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         <input type="checkbox" checked={importedOnly} onChange={(e) => handleImportedChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                         Imported products only
                     </label>
@@ -281,7 +280,7 @@ const ManageReviews = () => {
                 </div>
             </div>
 
-            {/* Add your review management functionalities here.. */}
+            {/* Add your review management functionalities here */}
             <ProductDetails
                 products={products} countryCode='en'
             />
