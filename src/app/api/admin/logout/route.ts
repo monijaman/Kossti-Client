@@ -39,5 +39,18 @@ export async function POST(request: NextRequest) {
     sameSite: "lax",
   });
 
+  // Some older login flows used these names. Clear them as well so a stale
+  // session cannot make the client appear authenticated after logout.
+  for (const name of ["token", "refresh_token"]) {
+    response.cookies.set({
+      name,
+      value: "",
+      expires: new Date(0),
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+    });
+  }
+
   return response;
 }

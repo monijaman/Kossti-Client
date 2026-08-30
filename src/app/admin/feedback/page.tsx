@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Cookies from "js-cookie";
 import { getApiUrl } from "@/lib/apiUrl";
 
 type Feedback = {
@@ -21,10 +20,6 @@ type Feedback = {
 };
 
 type ProductOption = { id: number; name: string; slug?: string };
-
-const getToken = () =>
-  (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
-  Cookies.get("accessToken") || Cookies.get("theAccessToken") || "";
 
 export default function FeedbackAdminPage() {
   const router = useRouter();
@@ -54,7 +49,6 @@ export default function FeedbackAdminPage() {
     try {
       const response = await fetch(`${getApiUrl()}/feedback?limit=1000`, {
         cache: "no-store",
-        headers: { Authorization: `Bearer ${getToken()}` },
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load feedback");
@@ -107,7 +101,7 @@ export default function FeedbackAdminPage() {
     const detectedLocale = detection.language === "bn" ? "bn" : "en";
     const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, locale: detectedLocale, rating, source_url: sourceUrl || undefined }),
     });
     const data = await response.json();
@@ -130,7 +124,7 @@ export default function FeedbackAdminPage() {
     setMessage("");
     const response = await fetch(`${getApiUrl()}/feedback/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: editContent, rating: editRating, source_url: editSourceUrl || undefined, status: editStatus }),
     });
     const data = await response.json();
@@ -144,7 +138,6 @@ export default function FeedbackAdminPage() {
     try {
       const response = await fetch(`${getApiUrl()}/feedback/${encodeURIComponent(id)}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (!response.ok) {
         const errorText = await response.text().catch(() => "");
@@ -174,7 +167,7 @@ export default function FeedbackAdminPage() {
       const translation = await translationResponse.json();
       if (!translationResponse.ok || !translation.data) throw new Error(translation.error || "Translation failed");
       const saveResponse = await fetch(`${getApiUrl()}/feedback/${item.id}`, {
-        method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(targetLocale === "en" ? { content_en: translation.data } : { content_bn: translation.data }),
       });
       if (!saveResponse.ok) {

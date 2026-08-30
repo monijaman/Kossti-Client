@@ -108,9 +108,6 @@ export async function checkToken(
 }
 
 // Function to set 'accessToken' cookie
-export function setAccessTokenCookie(accessToken: string) {
-  document.cookie = `accessToken=${accessToken}; path=/;`;
-}
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);

@@ -2,7 +2,6 @@
 
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
-import { setAccessTokenCookie } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -87,14 +86,11 @@ const AdminLogin = () => {
 
                 if (adminLoginResponse.ok) {
                     console.log('Admin login successful, redirecting to dashboard');
-                    // Store in localStorage as backup
-                    localStorage.setItem('token', loginData.token);
-                    localStorage.setItem('refresh_token', loginData.refresh_token);
+                    // The JWT itself lives only in the httpOnly cookies set by
+                    // /api/admin/login above - client JS never touches it.
+                    // Only non-secret display/UI-gating state goes here.
                     localStorage.setItem('email', loginData.email);
                     localStorage.setItem('userType', loginData.type);
-
-                    // Also set the token as a cookie for API routes
-                    setAccessTokenCookie(loginData.token);
 
                     // Small delay to ensure cookies are set before redirect
                     setTimeout(() => {

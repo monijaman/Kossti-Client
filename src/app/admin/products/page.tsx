@@ -26,6 +26,8 @@ const ManageReviews = () => {
     const activePriceRange = searchParams.get('price') || '';
     const showInactive = searchParams.get('include_inactive') === 'true';
     const importedOnly = searchParams.get('imported') === 'true';
+    const activeStatus = searchParams.get('status') || '';
+    const activeSortBy = searchParams.get('sortby') || '';
     const visibleCategories = Array.isArray(categories)
         ? categories.filter((cat) => showInactive || Number(cat.status) === 1)
         : [];
@@ -51,6 +53,8 @@ const ManageReviews = () => {
             if (activePriceRange) params.priceRange = activePriceRange;
             if (showInactive) params.include_inactive = 'true';
             if (importedOnly) params.imported = 'true';
+            if (activeStatus) params.status = activeStatus;
+            if (activeSortBy) params.sortby = activeSortBy;
             if (debouncedSearchTerm && debouncedSearchTerm.trim() !== '') {
                 params.search = debouncedSearchTerm.trim();
             }
@@ -80,7 +84,7 @@ const ManageReviews = () => {
         };
 
         fetchProductData();
-    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale, showInactive, importedOnly]);
+    }, [page, debouncedSearchTerm, activeCategory, activeBrands, activePriceRange, locale, showInactive, importedOnly, activeStatus, activeSortBy]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -89,34 +93,33 @@ const ManageReviews = () => {
         router.replace(`?${params.toString()}`);
     };
 
-    // Fetch categories
+    // Fetch categories. The backend caps `limit` at 100 per request
+    // regardless of what's asked for, so a single fetch silently drops
+    // categories beyond the first page - page through until a short
+    // (non-full) page comes back.
     const fetchCategories = async () => {
         try {
-            // Use the same wide-category feed as the public sidebar. The plain
-            // /categories endpoint may return only the category tree's current
-            // branch, which made this selector appear to contain only mobiles.
-            const response = await fetchApi(apiEndpoints.getWideCategories, {
-                method: 'GET',
-                queryParams: {
-                    per_page: 1000,
-                    paginate: 'false',
-                    locale: 'en',
-                    category_id: '',
-                    status: '1',
-                },
-            });
-            const payload = response.data as {
-                categories?: Category[];
-                data?: { categories?: Category[] };
-            } | null;
-            const fetchedCategories = payload?.categories || payload?.data?.categories || [];
+            const pageSize = 100;
+            let offset = 0;
+            let allCategories: Category[] = [];
 
-            if (!response.success) {
-                console.error("Failed to fetch categories.");
-                return;
+            while (true) {
+                const response = await fetchApi(`${apiEndpoints.Categories}?limit=${pageSize}&offset=${offset}`);
+                const apiResponse = response as { success: boolean; data: { categories: Category[], count: number, limit: number, offset: number } };
+
+                if (!apiResponse.success) {
+                    console.error("Failed to fetch categories.");
+                    break;
+                }
+
+                const batch = apiResponse.data.categories || [];
+                allCategories = allCategories.concat(batch);
+
+                if (batch.length < pageSize) break;
+                offset += pageSize;
             }
 
-            setCategories(fetchedCategories);
+            setCategories(allCategories);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -158,6 +161,39 @@ const ManageReviews = () => {
         router.push(`?${params.toString()}`);
     };
 
+    const handleStatusChange = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (selectedOption && selectedOption.value) params.set('status', selectedOption.value);
+        else params.delete('status');
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
+
+    const handleSortByChange = (selectedOption: SingleValue<{ value: string; label: string }>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (selectedOption && selectedOption.value) params.set('sortby', selectedOption.value);
+        else params.delete('sortby');
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
+
+    const statusOptions = [
+        { value: '', label: 'All statuses' },
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' },
+        { value: 'all', label: 'Active + Inactive' },
+    ];
+
+    const sortByOptions = [
+        { value: '', label: 'Default' },
+        { value: 'priority', label: 'Priority' },
+        { value: 'popular', label: 'Most popular (views)' },
+        { value: 'rating', label: 'Highest rated' },
+        { value: 'newest', label: 'Newest' },
+        { value: 'price_asc', label: 'Price: Low to High' },
+        { value: 'price_desc', label: 'Price: High to Low' },
+    ];
+
 
     useEffect(() => {
         fetchCategories();
@@ -179,10 +215,7 @@ const ManageReviews = () => {
             </div>
 
             <div>
-                <div className="mb-2 flex items-center justify-between">
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Category
-                    </label>
+                <div className="mb-3 flex flex-wrap items-center justify-end gap-x-8 gap-y-2">
                     <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         <input type="checkbox" checked={showInactive} onChange={(e) => handleInactiveChange(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                         Show inactive categories
@@ -192,8 +225,11 @@ const ManageReviews = () => {
                         Imported products only
                     </label>
                 </div>
-                <div className="flex gap-2">
-                    <div className="flex-1">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                    <div className="min-w-0">
+                        <label htmlFor="category" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Category
+                        </label>
                         <DarkSelect
                             name="category"
                             value={Array.isArray(categories) && categories
@@ -209,10 +245,36 @@ const ManageReviews = () => {
                                     value: cat.id,
                                     label: cat.name,
                                 }))}
-                            className="mt-1 block w-full"
+                            className="block w-full"
                             placeholder="Select a category"
                             isSearchable
                             isClearable
+                        />
+                    </div>
+                    <div className="min-w-0">
+                        <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Status
+                        </label>
+                        <DarkSelect
+                            name="status"
+                            value={statusOptions.find((option) => option.value === activeStatus) || statusOptions[0]}
+                            onChange={handleStatusChange}
+                            options={statusOptions}
+                            className="block w-full"
+                            placeholder="Filter by status"
+                        />
+                    </div>
+                    <div className="min-w-0">
+                        <label htmlFor="sortby" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Sort By
+                        </label>
+                        <DarkSelect
+                            name="sortby"
+                            value={sortByOptions.find((option) => option.value === activeSortBy) || sortByOptions[0]}
+                            onChange={handleSortByChange}
+                            options={sortByOptions}
+                            className="block w-full"
+                            placeholder="Sort by"
                         />
                     </div>
                 </div>

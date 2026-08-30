@@ -35,6 +35,17 @@ async function proxyRequest(
     }
   });
 
+  // The backend only understands Authorization: Bearer <token> - it has no
+  // cookie support. Inject it here from the httpOnly accessToken cookie so
+  // the browser never needs to read or attach the token itself. This
+  // replaces whatever Authorization header the client may have sent.
+  const accessToken = req.cookies.get("accessToken")?.value;
+  if (accessToken) {
+    headers.set("authorization", `Bearer ${accessToken}`);
+  } else {
+    headers.delete("authorization");
+  }
+
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const body = hasBody ? await req.arrayBuffer() : undefined;
 

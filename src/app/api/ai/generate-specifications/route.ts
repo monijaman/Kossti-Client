@@ -43,28 +43,20 @@ IMPORTANT:
 - Values should be specific to this exact product, not generic
 - Values should be strings`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-search-preview",
-      max_tokens: 2000,
-      web_search_options: {},
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a product specifications researcher. Search the web and report the real, verified specs for the exact product given. Return ONLY a valid JSON object, no citations or extra text.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const response = await openai.responses.create({
+      model: "gpt-5.6-terra",
+      tools: [{ type: "web_search_preview" }],
+      max_output_tokens: 2000,
+      instructions:
+        "You are a product specifications researcher. Search the web and report the real, verified specs for the exact product given. Return ONLY a valid JSON object, no citations or extra text.",
+      input: prompt,
     });
 
-    if (!response.choices[0].message.content) {
+    if (!response.output_text) {
       throw new Error("No response from OpenAI");
     }
 
-    let content = response.choices[0].message.content.trim();
+    let content = response.output_text.trim();
 
     // Remove markdown code blocks if present
     content = content

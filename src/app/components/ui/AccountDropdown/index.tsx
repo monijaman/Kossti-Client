@@ -1,7 +1,6 @@
 'use client'; // This directive makes this component a client component
 
 import Link from 'next/link';
-import { getApiUrl } from '@/lib/apiUrl';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 type AccountDropdownProps = {
@@ -16,11 +15,14 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
   const [localAuthState, setLocalAuthState] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference for the dropdown
 
-  // Check authentication state on component mount and update
+  // Check authentication state on component mount and update. The JWT
+  // itself lives only in an httpOnly cookie, invisible to this component -
+  // `email` is non-secret display state written at sign-in and doubles as
+  // the "is this browser signed in" signal.
   useEffect(() => {
     const checkAuthState = () => {
-      const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('token');
-      setLocalAuthState(hasToken);
+      const hasSession = typeof window !== 'undefined' && !!localStorage.getItem('email');
+      setLocalAuthState(hasSession);
     };
 
     checkAuthState();
@@ -66,32 +68,9 @@ const AccountDropdown = ({ isAuthenticated }: AccountDropdownProps) => {
       // Immediately update local auth state
       setLocalAuthState(false);
 
-      // Step 1: Get the access token from cookies
-      const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('accessToken='))
-        ?.split('=')[1];
-
-      // Step 2: Call server-side logout to invalidate refresh tokens
-      if (token) {
-        try {
-          const serverLogoutResponse = await fetch(
-            `${getApiUrl()}/api/v1/logout`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-              },
-            }
-          );
-          console.log('Server-side logout:', serverLogoutResponse.status);
-        } catch (error) {
-          console.warn('Server logout failed (will continue with client logout):', error);
-        }
-      }
-
-      // Step 3: Call client-side logout to clear cookies and redirect
+      // Clear the httpOnly session cookies server-side (this also
+      // invalidates the session, since the backend only trusts the
+      // Authorization header the proxy derives from these cookies).
       const response = await fetch("/api/admin/logout", {
         method: "POST",
         headers: {

@@ -277,7 +277,7 @@ async function handleTokenAndRedirect(
   // Redirect to signin if trying to access protected routes without a token
   if (!token && request.nextUrl.pathname.startsWith("/signin")) {
     // Allow access to the signin page without redirection
-    return NextResponse.next();
+    return response;
   }
 
   if (!token) {
@@ -285,8 +285,11 @@ async function handleTokenAndRedirect(
     // return NextResponse.redirect(new URL("/signin", request.url));
   }
 
-  // Allow access to other routes
-  return NextResponse.next();
+  // Allow access to other routes. Must return the `response` object (not a
+  // fresh NextResponse.next()) so the visit-token cookie minted earlier in
+  // `middleware()` is actually sent to the browser - otherwise every
+  // /api/proxy call the admin pages make gets rejected as unauthenticated.
+  return response;
 }
 
 // Main middleware function

@@ -56,8 +56,8 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
     // 1) For each file request a presigned URL from the Next.js proxy /api/s3-presign
     // 2) PUT the file to the presigned URL
     // 3) Register the uploaded keys with the backend via /api/s3-register
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    // Both routes read the httpOnly accessToken cookie server-side, so no
+    // token needs to be attached here.
 
     try {
       const uploadedFiles: {
@@ -73,7 +73,6 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
             filename: file.name,
@@ -122,7 +121,6 @@ export const uploadmedia = createAsyncThunk<ApiResponse, UploadMediaPayload>(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ product_id: productId, files: uploadedFiles }),
       });
