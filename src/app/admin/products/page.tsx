@@ -281,7 +281,7 @@ const ManageReviews = () => {
                 </div>
             </div>
 
-            {/* Add your review management functionalities here */}
+            {/* Add your review management functionalities here.. */}
             <ProductDetails
                 products={products} countryCode='en'
             />
