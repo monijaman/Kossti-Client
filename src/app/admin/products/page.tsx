@@ -92,17 +92,31 @@ const ManageReviews = () => {
     // Fetch categories
     const fetchCategories = async () => {
         try {
-            const response = await fetchApi(`${apiEndpoints.Categories}?limit=1000&offset=0`);
-            const apiResponse = response as { success: boolean; data: { categories: Category[], count: number, limit: number, offset: number } };
+            // Use the same wide-category feed as the public sidebar. The plain
+            // /categories endpoint may return only the category tree's current
+            // branch, which made this selector appear to contain only mobiles.
+            const response = await fetchApi(apiEndpoints.getWideCategories, {
+                method: 'GET',
+                queryParams: {
+                    per_page: 1000,
+                    paginate: 'false',
+                    locale: 'en',
+                    category_id: '',
+                    status: '1',
+                },
+            });
+            const payload = response.data as {
+                categories?: Category[];
+                data?: { categories?: Category[] };
+            } | null;
+            const fetchedCategories = payload?.categories || payload?.data?.categories || [];
 
-
-            if (!apiResponse.success) {
+            if (!response.success) {
                 console.error("Failed to fetch categories.");
                 return;
             }
 
-            // console.log("Fetched categories:", apiResponse.data.categories);
-            setCategories(apiResponse.data.categories);
+            setCategories(fetchedCategories);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
