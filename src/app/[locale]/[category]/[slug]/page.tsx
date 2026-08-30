@@ -41,7 +41,7 @@ const SimilarProductsSkeleton = () => (
 interface PageProps {
   params: Promise<{
     category: string; // category parameter
-    slug: string; // slug parameter
+    slug: string; // slug parameter..
     locale: string;
   }>;
   searchParams: Promise<SearchParams>; // or use a more specific type if needed

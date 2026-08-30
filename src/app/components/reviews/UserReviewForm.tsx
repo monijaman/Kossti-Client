@@ -53,7 +53,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
     setSaving(true); setMessage("");
     try {
       // User feedback is always submitted in English, regardless of page locale.
-      const detectedLocale = "en";
+      const detectedLocale = "en" as const;
       const response = await fetch(`${getApiUrl()}/product-feedback/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -78,7 +78,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
       // should not wait for AI translation or lose the form/page state.
       // Translate into the opposite language only after the original has
       // already been saved in the language selected by the URL.
-      const targetLocale = detectedLocale === "bn" ? "en" : "bn";
+      const targetLocale = "bn" as const;
       void (async () => {
         try {
         const translationResponse = await fetch("/api/ai/translate-bengali", {
@@ -89,7 +89,7 @@ export default function UserReviewForm({ productId, locale = "en" }: { productId
         if (translationResponse.ok && translation.data && data.feedback?.id) {
           await fetch(`${getApiUrl()}/feedback/${data.feedback.id}`, {
             method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify(targetLocale === "en" ? { content_en: translation.data } : { content_bn: translation.data }),
+            body: JSON.stringify({ content_bn: translation.data }),
           });
         }
         } catch { /* original feedback remains available */ }
