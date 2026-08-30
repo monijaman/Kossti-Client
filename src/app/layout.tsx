@@ -1,17 +1,9 @@
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import AdScripts from '@/app/components/Ads/AdScripts';
 import type { Metadata, Viewport } from 'next';
-import { Inter, Poppins } from 'next/font/google';
 import Script from 'next/script';
 // Ensure globals.scss is imported for Tailwind CSS
 import './globals.scss';
-const inter = Inter({ subsets: ['latin'] });
-const poppins = Poppins({
-  weight: ['400', '500', '600', '700', '800', '900'],
-  subsets: ['latin'],
-  variable: '--font-poppins',
-})
-
 const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
 
 export const metadata: Metadata = {
@@ -91,10 +83,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning style={{
-      // @ts-ignore
-      '--font-poppins': poppins.style.fontFamily
-    } as React.CSSProperties}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Warm up the DNS/TLS connection to the S3 image host ahead of time.
             Product pages fire many concurrent image requests to this origin
@@ -104,7 +93,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://kossti-review.s3.ap-south-1.amazonaws.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://kossti-review.s3.ap-south-1.amazonaws.com" />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         {/* Meta/Facebook Pixel */}
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?

@@ -1,13 +1,11 @@
 // app/[locale]/layout.tsx
 import ClientProvider from '@/app/components/Provider/ClientProvider';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { ReactNode } from 'react';
 // import { LanguageProvider } from '../context/LanguageContext';
 import '../globals.scss';
 
-const inter = Inter({ subsets: ['latin'] });
 const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
 
 interface RootLayoutProps {
@@ -105,7 +103,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           </>
         )}
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         {/* <LanguageProvider> */}
         <ClientProvider>{children}</ClientProvider>
         {/* </LanguageProvider> */}
