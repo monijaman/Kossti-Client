@@ -1,7 +1,10 @@
+'use client';
+
 import { Product } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatPriceRange } from '@/lib/formatPrice';
+import { useState } from 'react';
 
 interface PopularProductsProps {
   product: Product;
@@ -11,6 +14,7 @@ interface PopularProductsProps {
 }
 
 const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 }: PopularProductsProps) => {
+  const [imageSrc, setImageSrc] = useState(product.photo || '/noimage.webp');
   // Fallback to product ID if slug is missing
   const productSlug = product.slug || `product-${product.id}`;
   const categorySlug = product.category_slug || 'products';
@@ -54,12 +58,13 @@ const ProducShortDetails = ({ product, countryCode, priority = false, index = 0 
           </div>
         )}
         <Image
-          src={product.photo || '/noimage.webp'}
+          src={imageSrc}
           alt={product.name}
           fill
           sizes="(max-width: 740px) 100vw, (max-width: 1024px) 50vw, 25vw"
           loading={priority ? "eager" : "lazy"}
           priority={priority}
+          onError={() => setImageSrc('/noimage.webp')}
           className="object-contain p-2 md:p-4 group-hover:scale-105 transition-transform duration-300"
         />
       </div>

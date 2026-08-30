@@ -64,11 +64,28 @@ const PopularProducts = async ({ countryCode, activeCategory = '', activeBrands 
 
   const dataset = response.data?.data ?? [];
 
+  // This section renders whatever category+page slice was requested, sorted
+  // by popularity - it isn't a fixed "popular picks" list. Once a category
+  // filter is active, label it with that category instead of the generic
+  // "Popular Products" heading, which is misleading past page 1 (and
+  // outright wrong on deep pages, where results are the least-viewed, not
+  // the most).
+  const categoryDisplayName = activeCategory
+    ? (dataset[0]?.category?.name ||
+        activeCategory
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase()))
+    : null;
+
   return (
     <section className="mb-12">
       <SectionHeader
-        title={translation.popupar_product}
-        subtitle={countryCode === 'en' ? 'Most viewed and highly rated products' : 'সর্বাধিক দেখা এবং উচ্চ রেটযুক্ত পণ্য'}
+        title={categoryDisplayName || translation.popupar_product}
+        subtitle={
+          categoryDisplayName
+            ? undefined
+            : (countryCode === 'en' ? 'Most viewed and highly rated products' : 'সর্বাধিক দেখা এবং উচ্চ রেটযুক্ত পণ্য')
+        }
         icon={TrendingUp}
         gradientColor="from-purple-600 to-pink-600"
       />
