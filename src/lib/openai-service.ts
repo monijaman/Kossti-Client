@@ -13,6 +13,9 @@ export type ReviewStyle =
   | "eco-conscious" // Environmental, emissions, electric motorcycle focus
   | "urban-commuter" // City riding, traffic filtering, parking ease
   | "sherlock-detective" // Deductive investigation: clues, evidence, verdict
+  | "shakespearean-drama" | "epic-mythology" | "film-noir" | "tech-journalist"
+  | "wirecutter" | "the-verge" | "consumer-reports" | "pcmag" | "anandtech"
+  | "edmunds" | "car-and-driver" | "motor-trend" | "seo-optimized" | "human-ai";
 
 /** Convert common Markdown returned by the AI into HTML for the rich editor. */
 export function markdownToHtml(content: string): string {
@@ -58,21 +61,10 @@ export function markdownToHtml(content: string): string {
   flushList();
   return output.join('');
 }
-  | "shakespearean-drama" // Theatrical acts, soliloquies, dramatic prose
-  | "epic-mythology" // Greek/Norse epic hero's journey with the car as legend
-  | "film-noir" // Hard-boiled 1940s noir detective monologue
-  | "tech-journalist" // CNET-style tech product review: specs, benchmarks, real-world testing
-  | "wirecutter" // NY Times Wirecutter-style: practical expert testing, honest assessments, buyer guidance
-  | "the-verge" // The Verge: design-focused tech journalism with cultural insight
-  | "consumer-reports" // Consumer Reports: scientific rigorous testing methodology
-  | "pcmag" // PCMag: professional comprehensive tech review authority
-  | "anandtech" // AnandTech: deep technical analysis for enthusiasts
-  | "edmunds" // Edmunds: automotive buyer's guide with practical value
-  | "car-and-driver" // Car and Driver: performance, dynamics, and driving character
-  | "motor-trend" // Motor Trend: professional automotive journalism with testing protocols
-  | "seo-optimized" // SEO-focused: clear structure, tables, FAQ, pros/cons, comparisons, keywords
+/*
   | "human-ai"; // Human-style Bengali comprehensive review — experience + data-driven buying analysis
 
+*/
 export interface AIReviewRequest {
   productName: string;
   productCategory?: string;
