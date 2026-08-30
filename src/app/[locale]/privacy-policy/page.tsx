@@ -68,8 +68,7 @@ export default function PrivacyPolicyPage() {
               to your personal data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              <strong>Google AdSense:</strong> We use Google AdSense to display advertisements. Google may use cookies to serve ads based on your prior visits to our website or other websites. 
-              You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>.
+              We may use third-party advertising services to display advertisements. These providers may use cookies or similar technologies according to their own privacy policies.
             </p>
           </section>
 

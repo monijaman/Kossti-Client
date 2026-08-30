@@ -65,7 +65,7 @@ export default function DisclaimerPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
               <li>We may earn commissions from purchases made through affiliate links</li>
-              <li>We display Google AdSense and other third-party advertisements</li>
+              <li>We may display advertisements from third-party advertising providers</li>
               <li>Affiliate relationships do not influence our editorial content or product reviews</li>
               <li>We maintain editorial independence and provide honest opinions</li>
               <li>Sponsored content is clearly labeled when present</li>
