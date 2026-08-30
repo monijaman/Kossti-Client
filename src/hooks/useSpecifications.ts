@@ -54,7 +54,7 @@ export const useSpecifications = () => {
     try {
       const [specificationsResponse, productResponse] = await Promise.all([
         fetch(fullUrl, { cache: "no-store", credentials: "include" }),
-        fetchApi(`${apiEndpoints.products}/${id}`),
+        fetchApi(apiEndpoints.getProductById(id)),
       ]);
 
       const specificationsData = await specificationsResponse.json();
