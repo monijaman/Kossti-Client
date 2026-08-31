@@ -63,19 +63,17 @@ const ProductForm = ({ product }: ProductFormProps) => {
     const [brands, setBrands] = useState<Brand[]>([]);
 
     const fetchCategoriesAndBrands = async () => {
-        // Try the wide categories endpoint (supports per_page) to avoid default pagination
+        // Use the wide categories endpoint (no hard page-size cap) so categories beyond
+        // the /categories endpoint's 100-row limit (e.g. "Mobile Phones") still show up.
         let categoriesResponse = await getCategory();
         try {
             const wide = await getCategories({ perPage: 1000, paginate: false, status: null });
-            // getCategories returns { success: boolean; data: unknown }
-            // The hook's getCategories currently returns the fetchApi response as `data`.
-            // Handle both shapes: direct array or nested `data` field.
-            if (wide && wide.data) {
-                const maybeApiResp = wide.data as unknown;
-                const inner = (maybeApiResp && ((maybeApiResp as { data?: unknown }).data ?? maybeApiResp)) as unknown;
-                if (Array.isArray(inner)) {
-                    categoriesResponse = { success: true, data: inner } as { success: boolean; data: unknown };
-                }
+            // getCategories returns { success, data: <fetchApi ApiResponse> }
+            // whose `data.data` is the raw body: { categories: [...], count }
+            const body = (wide?.data as { data?: { categories?: unknown } } | undefined)?.data;
+            const inner = body?.categories;
+            if (Array.isArray(inner)) {
+                categoriesResponse = { success: true, data: inner };
             }
         } catch (err) {
             // fallback to the basic getCategory
@@ -84,7 +82,15 @@ const ProductForm = ({ product }: ProductFormProps) => {
 
         const brands = await getBrands();
 
-        setCategories(categoriesResponse.data as Category[]);
+        // Show active categories first, then sort alphabetically within each group
+        const sortedCategories = [...(categoriesResponse.data as Category[])].sort((a, b) => {
+            const aActive = a.status ? 1 : 0;
+            const bActive = b.status ? 1 : 0;
+            if (aActive !== bActive) return bActive - aActive;
+            return (a.name || '').localeCompare(b.name || '');
+        });
+
+        setCategories(sortedCategories);
         setBrands(brands.data as Brand[]);
     };
 
