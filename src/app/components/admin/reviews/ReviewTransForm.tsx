@@ -275,6 +275,14 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
             return;
         }
 
+        if (!selectedTranslation.review || !selectedTranslation.review.trim()) {
+            const err = 'Review content is required.';
+            setFormStatus(err);
+            setTransErrorMessage(err);
+            setSubmitTranslationLoading(false);
+            return;
+        }
+
         const product_id = productId;
 
         try {
@@ -366,7 +374,7 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
                 transErrorTimerRef.current = window.setTimeout(() => {
                     setTransErrorMessage('');
                     transErrorTimerRef.current = null;
-                }, 2500) as unknown as number;
+                }, 6000) as unknown as number;
             }
         } catch (error) {
             console.error('Translation submission error:', error);
@@ -567,10 +575,14 @@ const ReviewTransForm = ({ productId, productName, translations }: PageProps) =>
 
                     {/* Inline transient success / error messages for translation submit */}
                     {transSuccessMessage && (
-                        <div className="mt-4 text-sm text-green-700 text-center">{transSuccessMessage}</div>
+                        <div className="p-3 mt-4 text-sm rounded-lg bg-green-100 text-green-700 border border-green-300 text-center" role="alert">
+                            {transSuccessMessage}
+                        </div>
                     )}
                     {transErrorMessage && (
-                        <div className="mt-4 text-sm text-red-600 text-center">{transErrorMessage}</div>
+                        <div className="p-3 mt-4 text-sm rounded-lg bg-red-100 text-red-700 border border-red-300 text-center" role="alert">
+                            {transErrorMessage}
+                        </div>
                     )}
                 </div>
             )}

@@ -29,10 +29,37 @@ interface ReactQuillWrapperProps {
     allowHtmlSource?: boolean;
 }
 
+// Quill's Delta model only understands the tags/attributes listed in `defaultFormats`
+// below. Any other markup (semantic containers, custom classes, tables, etc.) is
+// silently dropped the moment it round-trips through the visual editor. AI-generated
+// and hand-imported reviews are wrapped in tags like <article>/<section>/<div>, so once
+// that HTML reaches the Quill view it gets stripped on the very next edit - this is what
+// was cutting the <article> wrapper (and everything Quill couldn't represent) out of
+// reviews on save. Detect that markup and keep such content in the raw HTML view instead
+// of ever handing it to Quill, unless the user explicitly opts into the visual editor.
+const UNSUPPORTED_HTML_RE = /<\/?(article|section|div|table|thead|tbody|tr|td|th|style|script|footer|header|nav|aside|figure|figcaption)\b/i;
+
 // Create a wrapper that disables strict mode for ReactQuill
 const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
     ({ value, onChange, placeholder, className, id, style, modules, formats, theme = 'snow', allowHtmlSource = false }, ref) => {
-        const [htmlSource, setHtmlSource] = React.useState(false);
+        const [htmlSource, setHtmlSource] = React.useState(
+            () => allowHtmlSource && UNSUPPORTED_HTML_RE.test(value || '')
+        );
+        // Once the user explicitly picks a view, stop auto-switching on their behalf.
+        const userToggledRef = React.useRef(false);
+
+        React.useEffect(() => {
+            if (!allowHtmlSource || userToggledRef.current) return;
+            if (UNSUPPORTED_HTML_RE.test(value || '')) {
+                setHtmlSource(true);
+            }
+        }, [value, allowHtmlSource]);
+
+        const toggleHtmlSource = () => {
+            userToggledRef.current = true;
+            setHtmlSource((current) => !current);
+        };
+
         // Default modules for toolbar
         const defaultModules = {
             toolbar: [
@@ -62,7 +89,7 @@ const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
                 {allowHtmlSource && (
                     <button
                         type="button"
-                        onClick={() => setHtmlSource((current) => !current)}
+                        onClick={toggleHtmlSource}
                         className="mb-2 rounded border border-gray-300 bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200"
                     >
                         {htmlSource ? 'Visual Editor' : 'HTML'}
@@ -85,8 +112,8 @@ const ReactQuillWrapper = forwardRef<HTMLDivElement, ReactQuillWrapperProps>(
                         className={className}
                         id={id}
                         style={style}
-                        modules={modules || defaultModules}
-                        formats={formats || defaultFormats}
+                        modules={defaultModules}
+                        formats={defaultFormats}
                     />
                 )}
             </div>

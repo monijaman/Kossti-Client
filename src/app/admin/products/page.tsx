@@ -3,7 +3,7 @@ import Pagination from '@/app/components/Pagination/index';
 import ProductDetails from '@/app/components/admin/ProducDetails';
 import { apiEndpoints } from '@/lib/constants';
 import fetchApi from '@/lib/fetchApi';
-import { Category, Product } from '@/lib/types';
+import { Brand, Category, Product } from '@/lib/types';
 import useDebounce from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,8 +16,10 @@ const ManageReviews = () => {
     const router = useRouter();
 
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const [searchTerm, setSearchTerm] = useState('');
+    const urlSearchTerm = searchParams.get('search') || '';
+    const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
 
     const debouncedSearchTerm = useDebounce({ value: searchTerm, delay: 500 });
     const limit = 10;
@@ -37,6 +39,15 @@ const ManageReviews = () => {
     const [selectedCategory, setSelectedCategory] = useState<number | null>(
         activeCategory ? parseInt(activeCategory, 10) : null
     );
+    const [selectedBrand, setSelectedBrand] = useState<number | null>(
+        activeBrands ? parseInt(activeBrands, 10) : null
+    );
+
+    // Keep the input state in sync when the page is opened or navigated to
+    // with a search query (for example, via a pagination link).
+    useEffect(() => {
+        setSearchTerm(urlSearchTerm);
+    }, [urlSearchTerm]);
 
     // Fetch products data; re-run when paging, filters or debounced search term change
     useEffect(() => {
@@ -133,6 +144,7 @@ const ManageReviews = () => {
             // Update URL with the selected category
             const params = new URLSearchParams(searchParams.toString());
             params.set('category', categoryId.toString());
+            params.delete('brand');
             params.set('page', '1'); // Reset to page 1 when category changes
             router.push(`?${params.toString()}`);
         } else {
@@ -140,6 +152,7 @@ const ManageReviews = () => {
             // Remove category from URL
             const params = new URLSearchParams(searchParams.toString());
             params.delete('category');
+            params.delete('brand');
             params.set('page', '1');
             router.push(`?${params.toString()}`);
         }
@@ -198,6 +211,40 @@ const ManageReviews = () => {
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        if (!activeCategory) {
+            setBrands([]);
+            return;
+        }
+
+        fetchApi(`${apiEndpoints.getCategoryBrands}?category_id=${activeCategory}&locale=${locale}`)
+            .then((response) => {
+                const rawBrands = (response.data as { brands?: Brand[] })?.brands ?? [];
+                setBrands(Array.isArray(rawBrands) ? rawBrands : []);
+            })
+            .catch((error) => {
+                console.error('Error fetching category brands:', error);
+                setBrands([]);
+            });
+    }, [activeCategory, locale]);
+
+    useEffect(() => {
+        setSelectedBrand(activeBrands ? parseInt(activeBrands, 10) : null);
+    }, [activeBrands]);
+
+    const handleBrandChange = (selectedOption: SingleValue<{ value: number; label: string }>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (selectedOption) {
+            setSelectedBrand(selectedOption.value);
+            params.set('brand', selectedOption.value.toString());
+        } else {
+            setSelectedBrand(null);
+            params.delete('brand');
+        }
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
     return (
         <>
             <h2 className="text-2xl font-bold mb-4"> Products</h2>
@@ -247,6 +294,26 @@ const ManageReviews = () => {
                                 }))}
                             className="block w-full"
                             placeholder="Select a category"
+                            isSearchable
+                            isClearable
+                        />
+                    </div>
+                    <div className="min-w-0">
+                        <label htmlFor="brand" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Brand
+                        </label>
+                        <DarkSelect
+                            name="brand"
+                            value={brands
+                                .map((brand) => ({ value: Number(brand.id), label: brand.name || '' }))
+                                .find((option) => option.value === selectedBrand) || null}
+                            onChange={handleBrandChange}
+                            options={brands.map((brand) => ({
+                                value: Number(brand.id),
+                                label: brand.name || '',
+                            }))}
+                            className="block w-full"
+                            placeholder="Select a brand"
                             isSearchable
                             isClearable
                         />
